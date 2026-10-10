@@ -23,19 +23,26 @@ junto con el código.
 
 ## Proyecto
 
-Este repositorio contiene los avances del proyecto Nivora para el curso
-de Arquitectura de Software. Su documentación y código se desarrollarán
-progresivamente siguiendo las guías de laboratorio.
+**Nivora: Sistema para el monitoreo del consumo de agua potable.**
 
-## Entorno de desarrollo
+Nivora permitirá consultar el consumo de agua desde celulares, laptops,
+computadoras y otros dispositivos. Mostrará el consumo acumulado,
+su costo estimado, una proyección mensual, el historial y las estadísticas.
 
-| Herramienta | Versión o estado |
-|-------------|------------------|
-| Node.js | 24.17.0 |
-| npm | 11.13.0 |
-| Git | 2.52.0.windows.1 |
-| Visual Studio Code | 1.141.0 — x64 |
-| Docker | Pendiente de instalación |
+También permitirá consultar los recibos mensuales y recibir notificaciones
+en el dispositivo sobre consumo elevado y disponibilidad del recibo.
+
+Durante esta primera etapa se utilizará una API simulada que represente
+al sistema de la empresa de agua. La capacidad del sistema se evaluará
+mediante pruebas con 5000 usuarios simultáneos.
+
+El proyecto se desarrollará progresivamente siguiendo las guías
+del curso de Arquitectura de Software.
+
+## Caso de estudio
+
+La descripción del problema, el funcionamiento y el alcance inicial
+se encuentran en [Caso de estudio de Nivora](docs/00-caso-de-estudio.md).
 
 ## Dependencias instaladas
 
