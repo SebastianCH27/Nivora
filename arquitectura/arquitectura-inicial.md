@@ -85,3 +85,88 @@ memoria y almacenamiento se determinarán mediante pruebas.
 La organización en tres capas permite separar responsabilidades;
 la capacidad requerida deberá comprobarse con la implementación
 y las metas documentadas en los atributos de calidad.
+
+## Diagrama de arquitectura
+
+```mermaid
+flowchart TB
+    subgraph ACTORES["Actores"]
+        Usuario["Usuario de consulta"]
+        Admin["Administrador"]
+    end
+
+    subgraph PRESENTACION["Capa de presentación"]
+        Interfaz["Interfaz de Nivora"]
+        API["API REST del backend"]
+        Interfaz --> API
+    end
+
+    subgraph NEGOCIO["Capa de lógica de negocio"]
+        Acceso["Acceso y suministros"]
+        Consumo["Consumo e historial"]
+        Costos["Costos y proyecciones"]
+        Recibos["Recibos"]
+        Alertas["Alertas y notificaciones"]
+
+        Consumo --> Costos
+        Consumo -->|"Consumo elevado"| Alertas
+        Recibos -->|"Recibo disponible"| Alertas
+    end
+
+    subgraph DATOS["Capa de datos"]
+        AccesoDatos["Componentes de acceso a datos"]
+        BD[("Base de datos propia")]
+        AccesoDatos --> BD
+    end
+
+    subgraph INTEGRACION["Integraciones del backend"]
+        AdaptIdentidad["Integración de identidad"]
+        AdaptAgua["Integración con la empresa"]
+        AdaptAvisos["Integración de notificaciones"]
+    end
+
+    subgraph EXTERNOS["Sistemas externos"]
+        Identidad["API de validación del DNI"]
+        Empresa["API simulada de la empresa de agua"]
+        Notificaciones["Servicio de notificaciones"]
+    end
+
+    Usuario --> Interfaz
+    Admin --> Interfaz
+
+    API --> NEGOCIO
+    NEGOCIO --> AccesoDatos
+
+    Acceso --> AdaptIdentidad
+    Consumo --> AdaptAgua
+    Recibos --> AdaptAgua
+    Alertas --> AdaptAvisos
+
+    AdaptIdentidad --> Identidad
+    AdaptAgua --> Empresa
+    AdaptAvisos --> Notificaciones
+```
+
+### Interpretación del diagrama
+
+Los usuarios interactúan con Nivora mediante su interfaz.
+La API REST recibe las solicitudes y las dirige a la lógica de negocio.
+
+La flecha entre el grupo de negocio y los componentes de acceso a datos
+representa las operaciones de almacenamiento y consulta
+que necesitan los módulos.
+
+El módulo de consumo proporciona información para calcular costos
+y evaluar alertas. El módulo de recibos comunica su disponibilidad
+al módulo de alertas y notificaciones.
+
+Las integraciones son componentes del backend utilizados
+por los módulos de negocio para comunicarse con los sistemas externos.
+
+El servicio de notificaciones entrega los avisos a los dispositivos
+asociados al suministro, incluso cuando Nivora está cerrada,
+si tienen habilitado el permiso correspondiente.
+
+El módulo de costos también comprende la gestión de tarifas,
+y el módulo de consumo comprende la recepción de lecturas,
+el historial y las estadísticas.
