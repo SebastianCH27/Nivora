@@ -1,0 +1,60 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="theme-color" content="#087b86">
+  <meta name="description" content="Nivora: consulta el consumo de agua, sus estimaciones y tus recibos.">
+  <title>Nivora · Tu agua, en cifras</title>
+  <link rel="icon" href="/icono.svg" type="image/svg+xml">
+  <link rel="manifest" href="/manifest.webmanifest">
+  <link rel="stylesheet" href="/estilos.css">
+  <script src="/interfaz.js" defer></script>
+</head>
+<body>
+  <div id="acceso" class="acceso">
+    <section class="presentacion-marca">
+      <a class="marca" href="/"><img src="/icono.svg" width="42" height="42" alt=""><span>Nivora</span></a>
+      <div class="mensaje-marca"><span class="etiqueta">TU AGUA, EN CIFRAS</span><h1>Conoce tu consumo.<br>Anticipa tu recibo.</h1><p>Consulta el agua que utilizas, revisa tus estimaciones y sigue la evolución de tu hogar desde cualquier dispositivo compatible.</p><div class="onda" aria-hidden="true"><svg viewBox="0 0 500 130"><path d="M0 90 Q70 0 140 65 T280 65 T420 65 T560 65" fill="none" stroke="#68ddd0" stroke-width="3"/><path d="M0 120 Q80 30 160 95 T320 95 T480 95" fill="none" stroke="#ffffff" stroke-opacity=".2" stroke-width="2"/></svg></div></div>
+      <p class="pie-marca">Sistema para el monitoreo del consumo de agua potable.</p>
+    </section>
+    <main class="zona-formulario">
+      <div class="formulario-contenedor"><span class="pildora">Demostración académica</span><h2 id="titulo-acceso">Consulta tu suministro</h2><p id="descripcion-acceso">Ingresa el código de tu hogar y el DNI de la persona que consulta.</p>
+        <form id="form-consulta">
+          <label for="codigo">Código de suministro</label><input id="codigo" name="codigo" inputmode="numeric" autocomplete="off" pattern="[0-9]{8}" maxlength="8" placeholder="Ej. 13100390" required>
+          <label for="dni">DNI de quien consulta</label><input id="dni" name="dni" inputmode="numeric" autocomplete="off" pattern="[0-9]{8}" maxlength="8" placeholder="8 dígitos" required>
+          <button class="boton primario" type="submit">Consultar mi consumo <span aria-hidden="true">→</span></button>
+        </form>
+        <form id="form-admin" hidden>
+          <label for="usuario-admin">Usuario administrativo</label><input id="usuario-admin" name="usuario" autocomplete="username" required>
+          <label for="clave-admin">Contraseña</label><input id="clave-admin" name="clave" type="password" autocomplete="current-password" required>
+          <button class="boton primario" type="submit">Entrar a administración</button>
+        </form>
+        <p id="error-acceso" role="alert" class="error" hidden></p>
+        <div id="datos-prueba" class="datos-prueba"><strong>Datos ficticios para probar</strong><p>Código: <b>13100390</b> · DNI: <b>00000001</b></p><p>También puedes usar los DNI 00000002 y 00000003. No se consulta una entidad oficial.</p></div>
+        <button id="cambiar-acceso" class="enlace" type="button">Acceso administrativo</button>
+      </div>
+    </main>
+  </div>
+  <div id="aplicacion" class="aplicacion" hidden>
+    <aside class="barra-lateral">
+      <a class="marca" href="/"><img src="/icono.svg" width="34" height="34" alt=""><span>Nivora</span></a>
+      <span class="etiqueta navegacion-titulo">MI SUMINISTRO</span>
+      <nav id="navegacion" aria-label="Secciones">
+        <button data-vista="resumen" class="nav-activo">◉ <span>Resumen</span></button>
+        <button data-vista="historial">▥ <span>Historial</span></button>
+        <button data-vista="recibos">▤ <span>Recibos</span></button>
+        <button data-vista="notificaciones">◇ <span>Avisos</span><b id="contador-avisos"></b></button>
+      </nav>
+      <div class="nota-lateral"><span class="pildora">Entorno simulado</span><p>Lecturas, identidad, tarifas y recibos de prueba.</p></div>
+      <button id="salir" class="enlace">Cerrar sesión</button>
+    </aside>
+    <main class="contenido">
+      <header class="cabecera"><div><span class="etiqueta">NIVORA / <span id="nombre-seccion">RESUMEN</span></span><h1 id="titulo-vista">Tu consumo de agua</h1></div><div class="perfil"><span id="nombre-persona"></span><b id="codigo-activo"></b></div></header>
+      <div id="mensaje-operacion" class="mensaje" role="status" hidden></div>
+      <div id="contenido-vista" aria-live="polite"><p>Cargando tu información…</p></div>
+      <footer class="pie-contenido">Nivora · Los costos y proyecciones son estimaciones. El importe definitivo corresponde al recibo de la empresa.</footer>
+    </main>
+  </div>
+</body>
+</html>

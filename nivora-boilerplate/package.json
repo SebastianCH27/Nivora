@@ -1,0 +1,21 @@
+{
+  "name": "nivora-boilerplate",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Base académica de Nivora: API REST, arquitectura limpia e integraciones simuladas.",
+  "type": "module",
+  "engines": {
+    "node": ">=24.17.0 <25"
+  },
+  "scripts": {
+    "start": "node --env-file-if-exists=.env src/server.js",
+    "pruebas": "node --test pruebas/*.test.js",
+    "verificar": "node scripts/verificar-capas.js",
+    "vapid": "node scripts/generar-vapid.js",
+    "carga": "node --env-file-if-exists=.env scripts/carga.js"
+  },
+  "dependencies": {
+    "express": "^5.3.0",
+    "web-push": "3.6.7"
+  }
+}

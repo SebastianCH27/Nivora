@@ -1,0 +1,11 @@
+{
+  "name": "Nivora · Monitoreo del agua",
+  "short_name": "Nivora",
+  "lang": "es-PE",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "background_color": "#f3f7f8",
+  "theme_color": "#087b86",
+  "icons": [{ "src": "/icono.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any" }]
+}
