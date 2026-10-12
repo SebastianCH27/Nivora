@@ -18,6 +18,7 @@ de calidad y las restricciones del sistema.
 | DA06 | Proporcionar resultados consistentes desde distintos dispositivos mediante una API REST propia. | RC01 — Acceso desde distintos dispositivos; RC03 — API REST propia; AC09 — Consistencia entre dispositivos | Influye en la separación entre interfaces y backend, centralizando las validaciones y reglas de negocio utilizadas por las consultas. |
 | DA07 | Enviar notificaciones al dispositivo aunque Nivora esté cerrada. | RF23–RF26, RF29; RC07 — Notificaciones al dispositivo | Requiere asociar dispositivos con suministros, conservar los avisos generados e integrar un servicio de entrega. El envío debe funcionar sin depender de que el usuario mantenga abierta la aplicación. |
 | DA08 | Consultar recibos proporcionados por la empresa y notificar su disponibilidad y fecha límite de pago. | RF27–RF29; RC09 — Procedencia de los recibos | Influye en el almacenamiento de recibos, el tratamiento de sus fechas y la generación de avisos. También exige distinguir el importe definitivo de las estimaciones calculadas por Nivora. |
+| DA09 | Permitir cambios en tarifas, proyecciones, alertas y módulos de Nivora sin afectar innecesariamente otras funciones. | AC10 — Mantenibilidad | Orienta la separación de responsabilidades, la modularidad y el control de las dependencias internas, facilitando cambios y pruebas por componente. |
 
 ## Aplicación en el diseño
 
