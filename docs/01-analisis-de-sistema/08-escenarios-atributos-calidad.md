@@ -45,3 +45,18 @@ Su cumplimiento deberá comprobarse mediante pruebas.
 Los escalones de carga constituyen una propuesta para organizar la prueba.
 La capacidad de 5000 usuarios simultáneos conserva su condición
 de requisito del proyecto.
+
+## EQ-03. Exactitud e integridad: procesamiento de lecturas
+
+| Elemento | Descripción |
+|---|---|
+| **Atributo de calidad** | Exactitud e integridad — AC03. |
+| **Fuente** | API simulada de la empresa de agua. |
+| **Estímulo** | Durante una actualización o un reintento llegan lecturas válidas, duplicadas, inválidas o incompatibles con los datos necesarios para calcular el consumo. |
+| **Artefacto** | Validación e incorporación de lecturas, almacenamiento y reglas de cálculo de consumo, costos y proyecciones. |
+| **Entorno** | Prueba con lecturas previamente almacenadas, tarifas versionadas, periodos definidos y una fecha de cálculo controlada. Se dispone de casos con resultados esperados calculados de forma independiente. |
+| **Respuesta esperada** | Nivora valida las lecturas, evita duplicados y registra las incidencias. Calcula utilizando datos compatibles y tarifas aplicables. Cuando la información sea insuficiente, lo comunica. Si un identificador existente llega con valores diferentes, conserva la lectura aceptada y registra el conflicto para revisión. |
+| **Medida** | El 100 % de los casos definidos debe coincidir con los resultados esperados de consumo, costo y proyección, según la precisión y el redondeo especificados para cada caso. Debe haber cero dobles conteos, cero lecturas inválidas utilizadas en cálculos y cero reemplazos silenciosos por identificadores en conflicto. |
+| **Verificación** | Ejecutar casos de lecturas acumuladas e intervalos, duplicados, valores inválidos, datos incompletos y tarifas incompatibles. Comparar con cálculos independientes. Reenviar las mismas lecturas y comprobar que los resultados se mantengan para el mismo periodo, tarifa y fecha de cálculo. Revisar las incidencias registradas. |
+| **Estado** | Pendiente de completar y documentar la matriz de casos y sus resultados. |
+| **Trazabilidad** | AC03; DA02; RF07, RF08, RF10, RF13 y RF15–RF18. |
