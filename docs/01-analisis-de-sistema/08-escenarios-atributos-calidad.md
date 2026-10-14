@@ -83,3 +83,22 @@ informar que no pudo completar la validación antes de crear la sesión.
 La aceptación de un envío por el proveedor no demuestra que
 la notificación haya aparecido en la pantalla del dispositivo.
 
+## EQ-05. Actualidad y trazabilidad: procedencia de los resultados
+
+| Elemento | Descripción |
+|---|---|
+| **Atributo de calidad** | Actualidad y trazabilidad — AC05. |
+| **Fuente** | Usuario de Nivora. |
+| **Estímulo** | Consulta el consumo, costo estimado o proyección después de una actualización de lecturas. |
+| **Artefacto** | Registro de lecturas, tarifas y periodos; reglas de cálculo y servicios de consulta. |
+| **Entorno** | Existen lecturas identificadas, tarifas versionadas y periodos definidos. La API simulada proporciona nuevos registros y la actualización se realiza por separado de las consultas. Las fechas de medición y recepción están controladas en la prueba. |
+| **Respuesta esperada** | Nivora muestra la fecha de la última lectura aceptada y el estado de actualización. Cada resultado puede relacionarse con las lecturas, versión tarifaria y periodo utilizados. Los costos estimados y las proyecciones identifican sus fechas de cálculo y los supuestos correspondientes. |
+| **Medida** | En el 100 % de los casos definidos, la fecha mostrada debe corresponder a la última lectura aceptada del suministro. Todos los resultados revisados deben conservar referencias verificables a sus datos de origen, con cero referencias ausentes o incompatibles. La primera consulta posterior a una actualización completada debe reflejar los datos aceptados que correspondan a su periodo. |
+| **Verificación** | Incorporar lecturas con fechas de medición y recepción diferentes. Consultar los resultados antes y después de la actualización. Comparar fechas, periodos, versiones tarifarias y registros utilizados. Reconstruir los cálculos revisados a partir de esas referencias y comprobar los supuestos de las proyecciones. |
+| **Estado** | Pendiente de completar los casos y documentar la comprobación de fechas y referencias. |
+| **Trazabilidad** | AC05; DA05; RF06, RF12, RF14, RF16 y RF18. |
+
+La actualidad se evalúa respecto de las lecturas disponibles y aceptadas,
+según la frecuencia de actualización de la fuente.
+La fecha de medición, la fecha de recepción y la fecha de consulta
+representan momentos distintos.
