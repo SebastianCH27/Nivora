@@ -26,3 +26,22 @@ Los 5000 usuarios simultáneos constituyen un requisito del proyecto.
 La duración, los tiempos de respuesta y el porcentaje de errores
 son las metas iniciales documentadas en los atributos de calidad.
 Su cumplimiento deberá comprobarse mediante pruebas.
+
+## EQ-02. Escalabilidad: crecimiento de usuarios
+
+| Elemento | Descripción |
+|---|---|
+| **Atributo de calidad** | Escalabilidad — AC02. |
+| **Fuente** | Usuarios que utilizan Nivora simultáneamente. |
+| **Estímulo** | Aumenta progresivamente la cantidad de usuarios activos mientras continúan las actualizaciones de lecturas y la evaluación de alertas. |
+| **Artefacto** | Backend de Nivora, API REST propia y almacenamiento. |
+| **Entorno** | Entorno de prueba con datos, operaciones y configuraciones de recursos documentados. Se utiliza la API simulada de la empresa y se comparan una configuración inicial y otra con recursos ampliados. |
+| **Respuesta esperada** | La ampliación de recursos permite atender una carga sostenible mayor, manteniendo los límites establecidos de respuesta y errores. |
+| **Medida** | Como propuesta de evaluación, aumentar la carga por etapas de 500, 1000, 2500 y 5000 usuarios activos. La configuración ampliada debe sostener una carga mayor que la inicial. La etapa de 5000 usuarios debe mantenerse durante 30 minutos, con al menos el 95 % de las solicitudes válidas de cada operación principal respondidas en un máximo de 2 segundos y menos del 1 % de errores internos o tiempos de espera agotados. |
+| **Verificación** | Registrar la carga sostenible, los tiempos por operación, los errores y el uso de recursos en cada configuración. Comparar los resultados manteniendo la misma mezcla de operaciones y condiciones de datos. Comprobar que continúen las actualizaciones y la evaluación de alertas. |
+| **Estado** | Pendiente de definir las configuraciones de recursos y ejecutar la comparación de capacidad. |
+| **Trazabilidad** | AC02 y DA01. |
+
+Los escalones de carga constituyen una propuesta para organizar la prueba.
+La capacidad de 5000 usuarios simultáneos conserva su condición
+de requisito del proyecto.
