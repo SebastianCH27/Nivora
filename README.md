@@ -42,7 +42,7 @@ del curso de Arquitectura de Software.
 ## Caso de estudio
 
 La descripción del problema, el funcionamiento y el alcance inicial
-se encuentran en [Caso de estudio de Nivora](docs/00-caso-de-estudio.md).
+se encuentran en [Caso de estudio de Nivora](docs/01-analisis-de-sistema/00-caso-de-estudio.md).
 
 ## Dependencias instaladas
 
@@ -63,12 +63,12 @@ Referencia: https://github.com/advisories/GHSA-vfj7-8cjw-p6xm
 
 ### Verificación de versiones
 
-![Versiones de las herramientas](docs/evidencias/01-versiones.png)
+![Versiones de las herramientas](docs/img/01-versiones.png)
 
 ### Configuración de Git
 
-![Identidad de Git y rama inicial](docs/evidencias/02-identidad-git.png)
+![Identidad de Git y rama inicial](docs/img/02-identidad-git.png)
 
 ### Creación del proyecto y estructura base
 
-![Proyecto y estructura de Nivora](docs/evidencias/03-estructura.png)
+![Proyecto y estructura de Nivora](docs/img/03-estructura.png)

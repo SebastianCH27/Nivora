@@ -12,17 +12,18 @@ terminada de los 39 requisitos ni una solución de producción.**
 ## Incorporación en el repositorio
 
 Extraer el ZIP y copiar su carpeta interna `nivora-boilerplate` directamente
-en `C:\Users\HP\Desktop\Nivora`. La ruta debe quedar así:
-`C:\Users\HP\Desktop\Nivora\nivora-boilerplate\package.json`.
+en `C:\Users\HP\Desktop\Nivora\tecnologia`. La ruta debe quedar así:
+`C:\Users\HP\Desktop\Nivora\tecnologia\nivora-boilerplate\package.json`.
 
-El `package.json`, `src/app.js` y `src/server.js` de la raíz del repositorio
-son los archivos iniciales del laboratorio 01. Esta base tiene su propio
-paquete y sus propios archivos dentro de `nivora-boilerplate`.
+Los archivos `tecnologia/package.json`, `tecnologia/src/app.js`
+y `tecnologia/src/server.js` corresponden al laboratorio 01.
+El boilerplate del laboratorio 03 tiene su propio paquete y código
+dentro de `tecnologia/nivora-boilerplate`.
 
 Desde CMD:
 
 ```cmd
-cd /d C:\Users\HP\Desktop\Nivora\nivora-boilerplate
+cd /d C:\Users\HP\Desktop\Nivora\tecnologia\nivora-boilerplate
 npm ci
 npm run pruebas
 npm run verificar
@@ -269,9 +270,9 @@ Después de ejecutarlo y verificarlo, detener el servidor y regresar a la
 raíz del repositorio:
 
 ```cmd
-cd ..
+cd ..\..
 git status --short
-git add nivora-boilerplate
+git add tecnologia/nivora-boilerplate
 git --no-pager diff --cached --stat
 git commit -m "feat(lab03): incorporar boilerplate propio de Nivora"
 git push origin main
@@ -281,6 +282,6 @@ git status
 La carpeta contiene su propio `.gitignore`: excluye dependencias instaladas,
 datos de ejecución, resultados y `.env`. El ZIP no contiene una carpeta `.git`.
 
-En `analisis-de-sistema/03-requisitos-funcionales.md`, separar RF02 y RF03
+En `docs/01-analisis-de-sistema/03-requisitos-funcionales.md`, separar RF02 y RF03
 si aparecen concatenados como `... esa situación. || RF03 | ...`. Cada
 requisito debe quedar en una línea distinta de la tabla Markdown.
