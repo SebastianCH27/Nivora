@@ -60,3 +60,26 @@ de requisito del proyecto.
 | **Verificación** | Ejecutar casos de lecturas acumuladas e intervalos, duplicados, valores inválidos, datos incompletos y tarifas incompatibles. Comparar con cálculos independientes. Reenviar las mismas lecturas y comprobar que los resultados se mantengan para el mismo periodo, tarifa y fecha de cálculo. Revisar las incidencias registradas. |
 | **Estado** | Pendiente de completar y documentar la matriz de casos y sus resultados. |
 | **Trazabilidad** | AC03; DA02; RF07, RF08, RF10, RF13 y RF15–RF18. |
+
+## EQ-04. Continuidad ante fallos externos
+
+| Elemento | Descripción |
+|---|---|
+| **Atributo de calidad** | Continuidad ante fallos externos — AC04. |
+| **Fuente** | API de la empresa de agua y servicio de entrega de notificaciones. |
+| **Estímulo** | La API de la empresa deja de responder o el servicio de notificaciones presenta fallos temporales. |
+| **Artefacto** | Actualización de datos, consultas sobre el almacenamiento propio y procesamiento de notificaciones de Nivora. |
+| **Entorno** | Existen sesiones válidas, información previamente almacenada y avisos generados. Se provocan fallos externos por separado y simultáneamente, manteniendo Nivora en funcionamiento. |
+| **Respuesta esperada** | Las sesiones vigentes continúan consultando la información almacenada. Nivora indica el fallo y la fecha de la última lectura. Conserva los avisos cuyo envío falla, registra las incidencias y realiza reintentos controlados. Cuando se recuperan los servicios, incorpora los datos pendientes y reintenta los envíos que correspondan. |
+| **Medida** | El 100 % de las consultas válidas sobre información almacenada incluidas en la prueba debe responder durante el fallo. Debe haber cero pérdidas de datos aceptados y de avisos generados. Todos los suministros afectados deben mostrar su estado de actualización y la fecha de la última lectura disponible. La recuperación debe producir cero dobles conteos de lecturas y cero avisos duplicados por el mismo evento. |
+| **Verificación** | Interrumpir la API simulada y provocar fallos del emisor de notificaciones. Consultar los datos almacenados y revisar fechas, estados, incidencias y avisos pendientes. Restablecer los servicios y comprobar la recuperación de registros y los reintentos, sin duplicados ni bloqueo de las consultas. |
+| **Estado** | Pendiente de ejecutar y documentar la matriz completa de fallos y recuperación. |
+| **Trazabilidad** | AC04; DA05 y DA07; RF09, RF14 y RF24–RF26; ADR-003 y ADR-004. |
+
+La continuidad de las consultas se aplica a sesiones válidas.
+Si un nuevo acceso necesita una API que no responde, Nivora debe
+informar que no pudo completar la validación antes de crear la sesión.
+
+La aceptación de un envío por el proveedor no demuestra que
+la notificación haya aparecido en la pantalla del dispositivo.
+
