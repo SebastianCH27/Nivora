@@ -124,3 +124,26 @@ un acceso diferenciado y sus propios permisos.
 
 La demostración local utiliza HTTP. La comprobación de HTTPS
 corresponde al despliegue de pruebas configurado para ese propósito.
+
+## EQ-07. Interoperabilidad: intercambio con servicios externos
+
+| Elemento | Descripción |
+|---|---|
+| **Atributo de calidad** | Interoperabilidad — AC07. |
+| **Fuente** | Casos de uso de acceso, actualización de datos y envío de notificaciones de Nivora. |
+| **Estímulo** | Solicitan validar un DNI, obtener suministros, lecturas, tarifas o recibos, o enviar un aviso al dispositivo. |
+| **Artefacto** | Contratos de integración y adaptadores de agua, identidad y notificaciones. |
+| **Entorno** | Pruebas con las API simuladas de empresa e identidad y un emisor ficticio de notificaciones. Se documentan los formatos de solicitudes, respuestas y errores. Se incluyen datos válidos, inexistentes, formatos incompatibles y fallos de comunicación. |
+| **Respuesta esperada** | Los adaptadores generan las solicitudes correspondientes a cada servicio y transforman sus respuestas al modelo utilizado por Nivora. Distinguen los datos inexistentes de los errores de formato y comunicación, sin incorporar respuestas incompatibles como información válida. |
+| **Medida** | El 100 % de los casos válidos definidos debe respetar los campos, tipos y unidades de sus contratos, cuando corresponda. El 100 % de los resultados negativos y errores simulados debe clasificarse correctamente. Debe haber cero respuestas incompatibles incorporadas como datos válidos. |
+| **Verificación** | Ejecutar pruebas de contrato para agua, identidad y notificaciones. Comparar solicitudes, respuestas y transformaciones con los formatos documentados. Probar datos inexistentes, campos obligatorios ausentes, tipos incorrectos y tiempos de espera agotados. Revisar los resultados e incidencias generados. |
+| **Estado** | Pendiente de completar la matriz de contratos y revisar las especificaciones de los proveedores reales antes de sustituir las simulaciones. |
+| **Trazabilidad** | AC07; DA04 y DA07; RC04, RC05 y RC07; RF02, RF05, RF23–RF27 y RF38. |
+
+RENIEC se contempla como integración de identidad del sistema futuro.
+La demostración actual utiliza una API de identidad simulada
+con personas ficticias.
+
+Las pruebas con servicios simulados comprueban los contratos definidos
+para la demostración. La compatibilidad con los servicios reales
+deberá verificarse al implementar esas conexiones.
