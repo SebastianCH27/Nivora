@@ -195,7 +195,7 @@ como antecedente de esta evolución.
 
 ## Decisiones relacionadas
 
-- [ADR-001: Monolito modular](../docs/decisiones/ADR-001-monolito-modular.md)
-- [ADR-002: Clean Architecture](../docs/decisiones/ADR-002-clean-architecture.md)
-- [ADR-003: Actualización y continuidad](../docs/decisiones/ADR-003-actualizacion-y-continuidad.md)
-- [ADR-004: Integraciones externas](../docs/decisiones/ADR-004-integraciones-externas.md)
+- [ADR-001: Monolito modular](../decisiones/ADR-001-monolito-modular.md)
+- [ADR-002: Clean Architecture](../decisiones/ADR-002-clean-architecture.md)
+- [ADR-003: Actualización y continuidad](../decisiones/ADR-003-actualizacion-y-continuidad.md)
+- [ADR-004: Integraciones externas](../decisiones/ADR-004-integraciones-externas.md)

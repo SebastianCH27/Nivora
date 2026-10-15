@@ -215,7 +215,7 @@ son adaptadores locales de una sola instancia.
 
 ## Documentos relacionados
 
-- [Estilo arquitectónico](../estilo-arquitectonico.md)
+- [Estilo arquitectónico](estilo-arquitectonico.md)
 - [ADR-001: Monolito modular](../../docs/decisiones/ADR-001-monolito-modular.md)
 - [ADR-002: Clean Architecture](../../docs/decisiones/ADR-002-clean-architecture.md)
 - [ADR-003: Actualización y continuidad](../../docs/decisiones/ADR-003-actualizacion-y-continuidad.md)
