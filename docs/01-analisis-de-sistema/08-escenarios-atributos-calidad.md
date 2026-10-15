@@ -166,3 +166,22 @@ deberá verificarse al implementar esas conexiones.
 La muestra de cinco participantes y los tamaños de pantalla
 son condiciones propuestas para organizar esta evaluación.
 Los resultados se registrarán junto con las tareas y dispositivos utilizados.
+
+## EQ-09. Consistencia entre dispositivos: resultados equivalentes
+
+| Elemento | Descripción |
+|---|---|
+| **Atributo de calidad** | Consistencia entre dispositivos — AC09. |
+| **Fuente** | Usuarios que consultan el mismo suministro desde distintos dispositivos. |
+| **Estímulo** | Realizan consultas de consumo, costos, proyección, historial o recibos desde un celular y una computadora. |
+| **Artefacto** | API REST propia, reglas de cálculo del backend e interfaces de consulta. |
+| **Entorno** | Sesiones válidas asociadas al mismo suministro. Las comparaciones utilizan el mismo periodo, versión de lecturas, versión tarifaria y fecha de cálculo controlada. |
+| **Respuesta esperada** | La API propia proporciona resultados calculados con las mismas reglas de negocio. Las interfaces muestran valores equivalentes de consumo, costos, proyecciones y recibos para las condiciones comparadas. |
+| **Medida** | El 100 % de los casos definidos debe mostrar resultados equivalentes entre los dispositivos evaluados. Debe haber cero diferencias en los valores comparados después de normalizar las unidades y aplicar las mismas reglas de redondeo. Los periodos y fechas de lectura mostrados deben coincidir con los datos utilizados por el backend. |
+| **Verificación** | Consultar el mismo suministro desde ambos dispositivos y registrar las respuestas de la API y los valores mostrados. Comparar consumo, costos, proyección, historial y recibos, identificando sus versiones y fechas. Comprobar la equivalencia entre litros y metros cúbicos cuando se utilicen unidades distintas. |
+| **Estado** | Pendiente de ejecutar y documentar la comparación entre dispositivos. |
+| **Trazabilidad** | AC09; DA06; RC01 y RC03; RF12, RF14, RF15, RF17, RF19 y RF28. |
+
+Cada comparación identificará la versión de los datos y la fecha
+de cálculo utilizada. Las diferencias de distribución visual
+entre pantallas se evaluarán mediante el escenario de usabilidad.
