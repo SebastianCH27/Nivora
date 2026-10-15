@@ -1,0 +1,520 @@
+<?xml version="1.0" encoding="utf-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+  "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<svg xmlns:xlink="http://www.w3.org/1999/xlink" width="1296pt" height="1476pt" viewBox="0 0 1296 1476" xmlns="http://www.w3.org/2000/svg" version="1.1">
+ <metadata>
+  <rdf:RDF xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:cc="http://creativecommons.org/ns#" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#">
+   <cc:Work>
+    <dc:type rdf:resource="http://purl.org/dc/dcmitype/StillImage"/>
+    <dc:date>2026-10-14T21:45:56.243233</dc:date>
+    <dc:format>image/svg+xml</dc:format>
+    <dc:creator>
+     <cc:Agent>
+      <dc:title>Matplotlib v3.10.8, https://matplotlib.org/</dc:title>
+     </cc:Agent>
+    </dc:creator>
+   </cc:Work>
+  </rdf:RDF>
+ </metadata>
+ <defs>
+  <style type="text/css">*{stroke-linejoin: round; stroke-linecap: butt}</style>
+ </defs>
+ <g id="figure_1">
+  <g id="patch_1">
+   <path d="M 0 1476 
+L 1296 1476 
+L 1296 0 
+L 0 0 
+z
+" style="fill: #ffffff"/>
+  </g>
+  <g id="axes_1">
+   <g id="patch_2">
+    <path d="M 79.2 374.4 
+L 849.6 374.4 
+Q 864 374.4 864 388.8 
+L 864 1216.8 
+Q 864 1231.2 849.6 1231.2 
+L 79.2 1231.2 
+Q 64.8 1231.2 64.8 1216.8 
+L 64.8 388.8 
+Q 64.8 374.4 79.2 374.4 
+z
+" clip-path="url(#p075c00f2c8)" style="fill: #fafcfe; stroke-dasharray: 7.5,6; stroke-dashoffset: 0; stroke: #94aabc; stroke-width: 1.5; stroke-linejoin: miter"/>
+   </g>
+   <g id="patch_3">
+    <path d="M 235.416412 300.216412 
+Q 314.648447 379.448447 392.61557 457.41557 
+" clip-path="url(#p075c00f2c8)" style="fill: none; stroke: #536a7b; stroke-width: 1.6; stroke-linecap: round"/>
+    <path d="M 390.352828 450.627345 
+L 392.61557 457.41557 
+L 385.827345 455.152828 
+" clip-path="url(#p075c00f2c8)" style="fill: none; stroke: #536a7b; stroke-width: 1.6; stroke-linecap: round"/>
+   </g>
+   <g id="patch_4">
+    <path d="M 615.6 300.802258 
+Q 615.6 379.299685 615.6 456.008258 
+" clip-path="url(#p075c00f2c8)" style="fill: none; stroke: #536a7b; stroke-width: 1.6; stroke-linecap: round"/>
+    <path d="M 618.8 449.608258 
+L 615.6 456.008258 
+L 612.4 449.608258 
+" clip-path="url(#p075c00f2c8)" style="fill: none; stroke: #536a7b; stroke-width: 1.6; stroke-linecap: round"/>
+   </g>
+   <g id="patch_5">
+    <path d="M 460.8 613.997974 
+Q 460.8 687.09868 460.8 758.410531 
+" clip-path="url(#p075c00f2c8)" style="fill: none; stroke: #536a7b; stroke-width: 1.6; stroke-linecap: round"/>
+    <path d="M 464 752.010531 
+L 460.8 758.410531 
+L 457.6 752.010531 
+" clip-path="url(#p075c00f2c8)" style="fill: none; stroke: #536a7b; stroke-width: 1.6; stroke-linecap: round"/>
+   </g>
+   <g id="patch_6">
+    <path d="M 460.8 943.389794 
+Q 460.8 1009.298979 460.8 1075.208163 
+" clip-path="url(#p075c00f2c8)" style="fill: none; stroke: #536a7b; stroke-width: 1.6; stroke-linecap: round"/>
+    <path d="M 457.6 949.789794 
+L 460.8 943.389794 
+L 464 949.789794 
+" clip-path="url(#p075c00f2c8)" style="fill: none; stroke: #536a7b; stroke-width: 1.6; stroke-linecap: round"/>
+    <path d="M 464 1068.808163 
+L 460.8 1075.208163 
+L 457.6 1068.808163 
+" clip-path="url(#p075c00f2c8)" style="fill: none; stroke: #536a7b; stroke-width: 1.6; stroke-linecap: round"/>
+   </g>
+   <g id="patch_7">
+    <path d="M 948.397412 540 
+Q 850.098671 540 753.588785 540 
+" clip-path="url(#p075c00f2c8)" style="fill: none; stroke: #536a7b; stroke-width: 1.6; stroke-linecap: round"/>
+    <path d="M 759.988785 543.2 
+L 753.588785 540 
+L 759.988785 536.8 
+" clip-path="url(#p075c00f2c8)" style="fill: none; stroke: #536a7b; stroke-width: 1.6; stroke-linecap: round"/>
+   </g>
+   <g id="patch_8">
+    <path d="M 750.199658 790.575348 
+Q 849.247445 689.75885 947.041565 590.218408 
+" clip-path="url(#p075c00f2c8)" style="fill: none; stroke: #536a7b; stroke-width: 1.6; stroke-linecap: round"/>
+    <path d="M 940.273629 592.541131 
+L 947.041565 590.218408 
+L 944.838982 597.02639 
+" clip-path="url(#p075c00f2c8)" style="fill: none; stroke: #536a7b; stroke-width: 1.6; stroke-linecap: round"/>
+   </g>
+   <g id="patch_9">
+    <path d="M 750.802588 864 
+Q 849.101329 864 945.611215 864 
+" clip-path="url(#p075c00f2c8)" style="fill: none; stroke: #536a7b; stroke-width: 1.6; stroke-linecap: round"/>
+    <path d="M 939.211215 860.8 
+L 945.611215 864 
+L 939.211215 867.2 
+" clip-path="url(#p075c00f2c8)" style="fill: none; stroke: #536a7b; stroke-width: 1.6; stroke-linecap: round"/>
+   </g>
+   <g id="patch_10">
+    <path d="M 750.187354 908.636902 
+Q 849.250393 1011.237907 947.070905 1112.552009 
+" clip-path="url(#p075c00f2c8)" style="fill: none; stroke: #536a7b; stroke-width: 1.6; stroke-linecap: round"/>
+    <path d="M 944.927585 1105.725137 
+L 947.070905 1112.552009 
+L 940.323415 1110.170542 
+" clip-path="url(#p075c00f2c8)" style="fill: none; stroke: #536a7b; stroke-width: 1.6; stroke-linecap: round"/>
+   </g>
+   <g id="patch_11">
+    <path d="M 234 155.52 
+C 238.391763 155.52 242.604243 157.264866 245.709688 160.370312 
+C 248.815134 163.475757 250.56 167.688237 250.56 172.08 
+C 250.56 176.471763 248.815134 180.684243 245.709688 183.789688 
+C 242.604243 186.895134 238.391763 188.64 234 188.64 
+C 229.608237 188.64 225.395757 186.895134 222.290312 183.789688 
+C 219.184866 180.684243 217.44 176.471763 217.44 172.08 
+C 217.44 167.688237 219.184866 163.475757 222.290312 160.370312 
+C 225.395757 157.264866 229.608237 155.52 234 155.52 
+z
+" clip-path="url(#p075c00f2c8)" style="fill: #3d596f; stroke: #3d596f; stroke-linejoin: miter"/>
+   </g>
+   <g id="patch_12">
+    <path d="M 97.92 190.8 
+L 370.08 190.8 
+Q 381.6 190.8 381.6 202.32 
+L 381.6 287.28 
+Q 381.6 298.8 370.08 298.8 
+L 97.92 298.8 
+Q 86.4 298.8 86.4 287.28 
+L 86.4 202.32 
+Q 86.4 190.8 97.92 190.8 
+z
+" clip-path="url(#p075c00f2c8)" style="fill: #3d596f; stroke: #3d596f; stroke-linejoin: miter"/>
+   </g>
+   <g id="patch_13">
+    <path d="M 615.6 155.52 
+C 619.991763 155.52 624.204243 157.264866 627.309688 160.370312 
+C 630.415134 163.475757 632.16 167.688237 632.16 172.08 
+C 632.16 176.471763 630.415134 180.684243 627.309688 183.789688 
+C 624.204243 186.895134 619.991763 188.64 615.6 188.64 
+C 611.208237 188.64 606.995757 186.895134 603.890312 183.789688 
+C 600.784866 180.684243 599.04 176.471763 599.04 172.08 
+C 599.04 167.688237 600.784866 163.475757 603.890312 160.370312 
+C 606.995757 157.264866 611.208237 155.52 615.6 155.52 
+z
+" clip-path="url(#p075c00f2c8)" style="fill: #3d596f; stroke: #3d596f; stroke-linejoin: miter"/>
+   </g>
+   <g id="patch_14">
+    <path d="M 479.52 190.8 
+L 751.68 190.8 
+Q 763.2 190.8 763.2 202.32 
+L 763.2 287.28 
+Q 763.2 298.8 751.68 298.8 
+L 479.52 298.8 
+Q 468 298.8 468 287.28 
+L 468 202.32 
+Q 468 190.8 479.52 190.8 
+z
+" clip-path="url(#p075c00f2c8)" style="fill: #3d596f; stroke: #3d596f; stroke-linejoin: miter"/>
+   </g>
+   <g id="patch_15">
+    <path d="M 183.6 460.8 
+L 738 460.8 
+Q 748.8 460.8 748.8 471.6 
+L 748.8 601.2 
+Q 748.8 612 738 612 
+L 183.6 612 
+Q 172.8 612 172.8 601.2 
+L 172.8 471.6 
+Q 172.8 460.8 183.6 460.8 
+z
+" clip-path="url(#p075c00f2c8)" style="fill: #185482; stroke: #185482; stroke-width: 1.4; stroke-linejoin: miter"/>
+   </g>
+   <g id="patch_16">
+    <path d="M 183.6 763.2 
+L 738 763.2 
+Q 748.8 763.2 748.8 774 
+L 748.8 928.8 
+Q 748.8 939.6 738 939.6 
+L 183.6 939.6 
+Q 172.8 939.6 172.8 928.8 
+L 172.8 774 
+Q 172.8 763.2 183.6 763.2 
+z
+" clip-path="url(#p075c00f2c8)" style="fill: #185482; stroke: #185482; stroke-width: 1.4; stroke-linejoin: miter"/>
+   </g>
+   <g id="patch_17">
+    <path d="M 183.6 1080 
+L 738 1080 
+Q 748.8 1080 748.8 1090.8 
+L 748.8 1180.8 
+Q 748.8 1191.6 738 1191.6 
+L 183.6 1191.6 
+Q 172.8 1191.6 172.8 1180.8 
+L 172.8 1090.8 
+Q 172.8 1080 183.6 1080 
+z
+" clip-path="url(#p075c00f2c8)" style="fill: #eaf5f0; stroke: #659c83; stroke-width: 1.4; stroke-linejoin: miter"/>
+   </g>
+   <g id="patch_18">
+    <path d="M 961.2 468 
+L 1220.4 468 
+Q 1231.2 468 1231.2 478.8 
+L 1231.2 604.8 
+Q 1231.2 615.6 1220.4 615.6 
+L 961.2 615.6 
+Q 950.4 615.6 950.4 604.8 
+L 950.4 478.8 
+Q 950.4 468 961.2 468 
+z
+" clip-path="url(#p075c00f2c8)" style="fill: #edf1f5; stroke: #8999a6; stroke-width: 1.4; stroke-linejoin: miter"/>
+   </g>
+   <g id="patch_19">
+    <path d="M 961.2 777.6 
+L 1220.4 777.6 
+Q 1231.2 777.6 1231.2 788.4 
+L 1231.2 928.8 
+Q 1231.2 939.6 1220.4 939.6 
+L 961.2 939.6 
+Q 950.4 939.6 950.4 928.8 
+L 950.4 788.4 
+Q 950.4 777.6 961.2 777.6 
+z
+" clip-path="url(#p075c00f2c8)" style="fill: #edf1f5; stroke: #8999a6; stroke-width: 1.4; stroke-linejoin: miter"/>
+   </g>
+   <g id="patch_20">
+    <path d="M 961.2 1080 
+L 1220.4 1080 
+Q 1231.2 1080 1231.2 1090.8 
+L 1231.2 1216.8 
+Q 1231.2 1227.6 1220.4 1227.6 
+L 961.2 1227.6 
+Q 950.4 1227.6 950.4 1216.8 
+L 950.4 1090.8 
+Q 950.4 1080 961.2 1080 
+z
+" clip-path="url(#p075c00f2c8)" style="fill: #edf1f5; stroke: #8999a6; stroke-width: 1.4; stroke-linejoin: miter"/>
+   </g>
+   <g id="patch_21">
+    <path d="M 89.28 1418.4 
+L 112.32 1418.4 
+Q 115.2 1418.4 115.2 1421.28 
+L 115.2 1432.08 
+Q 115.2 1434.96 112.32 1434.96 
+L 89.28 1434.96 
+Q 86.4 1434.96 86.4 1432.08 
+L 86.4 1421.28 
+Q 86.4 1418.4 89.28 1418.4 
+z
+" clip-path="url(#p075c00f2c8)" style="fill: #3d596f; stroke: #8999a6; stroke-linejoin: miter"/>
+   </g>
+   <g id="patch_22">
+    <path d="M 326.88 1418.4 
+L 349.92 1418.4 
+Q 352.8 1418.4 352.8 1421.28 
+L 352.8 1432.08 
+Q 352.8 1434.96 349.92 1434.96 
+L 326.88 1434.96 
+Q 324 1434.96 324 1432.08 
+L 324 1421.28 
+Q 324 1418.4 326.88 1418.4 
+z
+" clip-path="url(#p075c00f2c8)" style="fill: #185482; stroke: #8999a6; stroke-linejoin: miter"/>
+   </g>
+   <g id="patch_23">
+    <path d="M 715.68 1418.4 
+L 738.72 1418.4 
+Q 741.6 1418.4 741.6 1421.28 
+L 741.6 1432.08 
+Q 741.6 1434.96 738.72 1434.96 
+L 715.68 1434.96 
+Q 712.8 1434.96 712.8 1432.08 
+L 712.8 1421.28 
+Q 712.8 1418.4 715.68 1418.4 
+z
+" clip-path="url(#p075c00f2c8)" style="fill: #eaf5f0; stroke: #8999a6; stroke-linejoin: miter"/>
+   </g>
+   <g id="patch_24">
+    <path d="M 1039.68 1418.4 
+L 1062.72 1418.4 
+Q 1065.6 1418.4 1065.6 1421.28 
+L 1065.6 1432.08 
+Q 1065.6 1434.96 1062.72 1434.96 
+L 1039.68 1434.96 
+Q 1036.8 1434.96 1036.8 1432.08 
+L 1036.8 1421.28 
+Q 1036.8 1418.4 1039.68 1418.4 
+z
+" clip-path="url(#p075c00f2c8)" style="fill: #edf1f5; stroke: #8999a6; stroke-linejoin: miter"/>
+   </g>
+   <g id="text_1">
+    <text style="font-weight: 700; font-size: 12px; font-family: 'DejaVu Sans'; text-anchor: start; fill: #197b83" x="64.8" y="43.678125" transform="rotate(-0 64.8 43.678125)">NIVORA · MODELO C4</text>
+   </g>
+   <g id="text_2">
+    <text style="font-weight: 700; font-size: 27px; font-family: 'DejaVu Sans'; text-anchor: start; fill: #18344a" x="64.8" y="83.155781" transform="rotate(-0 64.8 83.155781)">Nivel 2 · Diagrama de contenedores</text>
+   </g>
+   <g id="text_3">
+    <text style="font-size: 12px; font-family: 'DejaVu Sans'; text-anchor: start; fill: #536a7b" x="64.8" y="110.638125" transform="rotate(-0 64.8 110.638125)">Aplicaciones, almacenamiento y comunicaciones · Correspondencia con el prototipo</text>
+   </g>
+   <g id="text_4">
+    <text style="font-weight: 700; font-size: 15px; font-family: 'DejaVu Sans'; text-anchor: middle; fill: #ffffff" x="234" y="222.357656" transform="rotate(-0 234 222.357656)">Usuario de consulta</text>
+   </g>
+   <g id="text_5">
+    <text style="font-size: 10.5px; font-family: 'DejaVu Sans'; text-anchor: middle; fill: #d8e4ec" x="234" y="245.578359" transform="rotate(-0 234 245.578359)">[Persona]</text>
+   </g>
+   <g id="text_6">
+    <text style="font-size: 10.5px; font-family: 'DejaVu Sans'; text-anchor: middle; fill: #eef4f8" x="234" y="269.338359" transform="rotate(-0 234 269.338359)">Navegador en celular, laptop o computadora</text>
+   </g>
+   <g id="text_7">
+    <text style="font-weight: 700; font-size: 15px; font-family: 'DejaVu Sans'; text-anchor: middle; fill: #ffffff" x="615.6" y="222.357656" transform="rotate(-0 615.6 222.357656)">Administrador</text>
+   </g>
+   <g id="text_8">
+    <text style="font-size: 10.5px; font-family: 'DejaVu Sans'; text-anchor: middle; fill: #d8e4ec" x="615.6" y="245.578359" transform="rotate(-0 615.6 245.578359)">[Persona]</text>
+   </g>
+   <g id="text_9">
+    <text style="font-size: 10.5px; font-family: 'DejaVu Sans'; text-anchor: middle; fill: #eef4f8" x="615.6" y="269.338359" transform="rotate(-0 615.6 269.338359)">Navegador en celular, laptop o computadora</text>
+   </g>
+   <g id="text_10">
+    <text style="font-weight: 700; font-size: 11px; font-family: 'DejaVu Sans'; text-anchor: start; fill: #536a7b" x="86.4" y="400.038281" transform="rotate(-0 86.4 400.038281)">Nivora [Sistema de software]</text>
+   </g>
+   <g id="text_11">
+    <text style="font-weight: 700; font-size: 17px; font-family: 'DejaVu Sans'; text-anchor: middle; fill: #ffffff" x="460.8" y="490.237344" transform="rotate(-0 460.8 490.237344)">Aplicación web adaptable</text>
+   </g>
+   <g id="text_12">
+    <text style="font-size: 10.5px; font-family: 'DejaVu Sans'; text-anchor: middle; fill: #e1edf6" x="460.8" y="510.538359" transform="rotate(-0 460.8 510.538359)">[Contenedor · HTML, CSS y JavaScript]</text>
+   </g>
+   <g id="text_13">
+    <text style="font-size: 11.5px; font-family: 'DejaVu Sans'; fill: #e1edf6" transform="translate(380.609062 538.658203)">Se ejecuta en el navegador.</text>
+    <text style="font-size: 11.5px; font-family: 'DejaVu Sans'; fill: #e1edf6" transform="translate(283.532891 554.387238)">Consulta y administración; service worker para recibir avisos.</text>
+   </g>
+   <g id="text_14">
+    <text style="font-weight: 700; font-size: 17px; font-family: 'DejaVu Sans'; text-anchor: middle; fill: #ffffff" x="460.8" y="791.957344" transform="rotate(-0 460.8 791.957344)">Backend de Nivora</text>
+   </g>
+   <g id="text_15">
+    <text style="font-size: 10.5px; font-family: 'DejaVu Sans'; text-anchor: middle; fill: #e1edf6" x="460.8" y="812.938359" transform="rotate(-0 460.8 812.938359)">[Contenedor · Node.js, JavaScript y Express]</text>
+   </g>
+   <g id="text_16">
+    <text style="font-size: 11.5px; font-family: 'DejaVu Sans'; fill: #e1edf6" transform="translate(302.953516 841.058203)">API REST, reglas e integraciones del monolito modular.</text>
+    <text style="font-size: 11.5px; font-family: 'DejaVu Sans'; fill: #e1edf6" transform="translate(299.35168 856.787238)">Actualización y entrega de avisos en el mismo backend.</text>
+    <text style="font-size: 11.5px; font-family: 'DejaVu Sans'; fill: #e1edf6" transform="translate(341.742656 871.849273)">Estado operativo y sesiones en memoria.</text>
+   </g>
+   <g id="text_17">
+    <text style="font-weight: 700; font-size: 17px; font-family: 'DejaVu Sans'; text-anchor: middle; fill: #18344a" x="460.8" y="1108.757344" transform="rotate(-0 460.8 1108.757344)">Almacén de datos de Nivora</text>
+   </g>
+   <g id="text_18">
+    <text style="font-size: 10.5px; font-family: 'DejaVu Sans'; text-anchor: middle; fill: #536a7b" x="460.8" y="1130.076328" transform="rotate(-0 460.8 1130.076328)">[Contenedor de datos · JSON en la demostración]</text>
+   </g>
+   <g id="text_19">
+    <text style="font-size: 11.5px; font-family: 'DejaVu Sans'; fill: #536a7b" transform="translate(263.13207 1157.858203)">Lecturas, tarifas, recibos, avisos, accesos, dispositivos e incidencias.</text>
+    <text style="font-size: 11.5px; font-family: 'DejaVu Sans'; fill: #536a7b" transform="translate(314.121992 1172.920238)">Persistencia para un despliegue mayor: por definir.</text>
+   </g>
+   <g id="text_20">
+    <text style="font-weight: 700; font-size: 13.5px; font-family: 'DejaVu Sans'; text-anchor: middle; fill: #18344a" x="1090.8" y="494.097891" transform="rotate(-0 1090.8 494.097891)">Servicio de notificaciones</text>
+   </g>
+   <g id="text_21">
+    <text style="font-size: 10.5px; font-family: 'DejaVu Sans'; text-anchor: middle; fill: #536a7b" x="1090.8" y="514.138359" transform="rotate(-0 1090.8 514.138359)">[Sistema externo]</text>
+   </g>
+   <g id="text_22">
+    <text style="font-size: 10.8px; font-family: 'DejaVu Sans'; fill: #536a7b" transform="translate(1003.260937 541.726312)">Entrega Web Push al navegador.</text>
+    <text style="font-size: 10.8px; font-family: 'DejaVu Sans'; fill: #536a7b" transform="translate(1003.29975 556.497928)">Requiere configuración, permiso</text>
+    <text style="font-size: 10.8px; font-family: 'DejaVu Sans'; fill: #536a7b" transform="translate(1011.722906 570.643144)">y condiciones del dispositivo.</text>
+   </g>
+   <g id="text_23">
+    <text style="font-weight: 700; font-size: 13.5px; font-family: 'DejaVu Sans'; fill: #18344a" transform="translate(1003.962305 803.697891)">Sistema de la empresa</text>
+    <text style="font-weight: 700; font-size: 13.5px; font-family: 'DejaVu Sans'; fill: #18344a" transform="translate(1060.293164 821.37941)">de agua</text>
+   </g>
+   <g id="text_24">
+    <text style="font-size: 10.5px; font-family: 'DejaVu Sans'; text-anchor: middle; fill: #536a7b" x="1090.8" y="841.738359" transform="rotate(-0 1090.8 841.738359)">[Sistema externo]</text>
+   </g>
+   <g id="text_25">
+    <text style="font-size: 10.8px; font-family: 'DejaVu Sans'; fill: #536a7b" transform="translate(1018.364906 869.326312)">API simulada: HTTP / JSON.</text>
+    <text style="font-size: 10.8px; font-family: 'DejaVu Sans'; fill: #536a7b" transform="translate(985.633312 883.471528)">Suministros, lecturas, tarifas y recibos.</text>
+    <text style="font-size: 10.8px; font-family: 'DejaVu Sans'; fill: #536a7b" transform="translate(990.517781 897.616744)">API real: por acordar con la empresa.</text>
+   </g>
+   <g id="text_26">
+    <text style="font-weight: 700; font-size: 13.5px; font-family: 'DejaVu Sans'; fill: #18344a" transform="translate(1007.527148 1106.097891)">Servicio de validación</text>
+    <text style="font-weight: 700; font-size: 13.5px; font-family: 'DejaVu Sans'; fill: #18344a" transform="translate(1062.962578 1123.77941)">del DNI</text>
+   </g>
+   <g id="text_27">
+    <text style="font-size: 10.5px; font-family: 'DejaVu Sans'; text-anchor: middle; fill: #536a7b" x="1090.8" y="1144.138359" transform="rotate(-0 1090.8 1144.138359)">[Sistema externo]</text>
+   </g>
+   <g id="text_28">
+    <text style="font-size: 10.8px; font-family: 'DejaVu Sans'; fill: #536a7b" transform="translate(1018.364906 1171.726312)">API simulada: HTTP / JSON.</text>
+    <text style="font-size: 10.8px; font-family: 'DejaVu Sans'; fill: #536a7b" transform="translate(990.38025 1185.871528)">Identidad ficticia en la demostración.</text>
+    <text style="font-size: 10.8px; font-family: 'DejaVu Sans'; fill: #536a7b" transform="translate(1016.945719 1200.643144)">RENIEC: integración futura.</text>
+   </g>
+   <g id="text_29">
+    <g id="patch_25">
+     <path d="M 261.453125 351.495937 
+L 321.746875 351.495937 
+L 321.746875 328.75 
+L 261.453125 328.75 
+z
+" style="fill: #ffffff"/>
+    </g>
+    <text style="font-size: 11px; font-family: 'DejaVu Sans'; text-anchor: middle; fill: #536a7b" x="291.6" y="343.158281" transform="rotate(-0 291.6 343.158281)">Consulta</text>
+   </g>
+   <g id="text_30">
+    <g id="patch_26">
+     <path d="M 633.840547 351.495937 
+L 705.359453 351.495937 
+L 705.359453 328.75 
+L 633.840547 328.75 
+z
+" style="fill: #ffffff"/>
+    </g>
+    <text style="font-size: 11px; font-family: 'DejaVu Sans'; text-anchor: middle; fill: #536a7b" x="669.6" y="343.158281" transform="rotate(-0 669.6 343.158281)">Administra</text>
+   </g>
+   <g id="text_31">
+    <g id="patch_27">
+     <path d="M 500.719375 699.983102 
+L 708.880625 699.983102 
+L 708.880625 662.83 
+L 500.719375 662.83 
+z
+" style="fill: #ffffff"/>
+    </g>
+    <text style="font-size: 11px; font-family: 'DejaVu Sans'; fill: #536a7b" transform="translate(540.149219 677.238281)">Solicitudes REST / JSON</text>
+    <text style="font-size: 11px; font-family: 'DejaVu Sans'; fill: #536a7b" transform="translate(506.769375 691.645445)">Objetivo: HTTPS · Demo: HTTP local</text>
+   </g>
+   <g id="text_32">
+    <g id="patch_28">
+     <path d="M 514.755781 1024.703102 
+L 716.444219 1024.703102 
+L 716.444219 987.55 
+L 514.755781 987.55 
+z
+" style="fill: #ffffff"/>
+    </g>
+    <text style="font-size: 11px; font-family: 'DejaVu Sans'; fill: #536a7b" transform="translate(520.805781 1001.958281)">Carga al iniciar y persiste cambios</text>
+    <text style="font-size: 11px; font-family: 'DejaVu Sans'; fill: #536a7b" transform="translate(541.763359 1016.365445)">JSON / sistema de archivos</text>
+   </g>
+   <g id="text_33">
+    <g id="patch_29">
+     <path d="M 783.600859 521.423102 
+L 915.599141 521.423102 
+L 915.599141 484.27 
+L 783.600859 484.27 
+z
+" style="fill: #ffffff"/>
+    </g>
+    <text style="font-size: 11px; font-family: 'DejaVu Sans'; fill: #536a7b" transform="translate(789.650859 498.678281)">Entrega eventos Push</text>
+    <text style="font-size: 11px; font-family: 'DejaVu Sans'; fill: #536a7b" transform="translate(802.748594 513.085445)">al service worker</text>
+   </g>
+   <g id="text_34">
+    <g id="patch_30">
+     <path d="M 775.383516 702.143102 
+L 923.816484 702.143102 
+L 923.816484 664.99 
+L 775.383516 664.99 
+z
+" style="fill: #ffffff"/>
+    </g>
+    <text style="font-size: 11px; font-family: 'DejaVu Sans'; fill: #536a7b" transform="translate(781.433516 679.398281)">Solicita envíos Web Push</text>
+    <text style="font-size: 11px; font-family: 'DejaVu Sans'; fill: #536a7b" transform="translate(832.033516 693.805445)">HTTPS</text>
+   </g>
+   <g id="text_35">
+    <g id="patch_31">
+     <path d="M 783.828594 830.303102 
+L 915.371406 830.303102 
+L 915.371406 793.15 
+L 783.828594 793.15 
+z
+" style="fill: #ffffff"/>
+    </g>
+    <text style="font-size: 11px; font-family: 'DejaVu Sans'; fill: #536a7b" transform="translate(794.031953 807.558281)">Consulta y actualiza</text>
+    <text style="font-size: 11px; font-family: 'DejaVu Sans'; fill: #536a7b" transform="translate(789.878594 821.965445)">HTTP / JSON simulado</text>
+   </g>
+   <g id="text_36">
+    <g id="patch_32">
+     <path d="M 783.828594 1024.703102 
+L 915.371406 1024.703102 
+L 915.371406 987.55 
+L 783.828594 987.55 
+z
+" style="fill: #ffffff"/>
+    </g>
+    <text style="font-size: 11px; font-family: 'DejaVu Sans'; fill: #536a7b" transform="translate(813.782969 1001.958281)">Consulta DNI</text>
+    <text style="font-size: 11px; font-family: 'DejaVu Sans'; fill: #536a7b" transform="translate(789.878594 1016.365445)">HTTP / JSON simulado</text>
+   </g>
+   <g id="text_37">
+    <text style="font-weight: 700; font-size: 10.5px; font-family: 'DejaVu Sans'; text-anchor: start; fill: #197b83" x="86.4" y="1282.378359" transform="rotate(-0 86.4 1282.378359)">CORRESPONDENCIA CON LA DEMOSTRACIÓN</text>
+   </g>
+   <g id="text_38">
+    <text style="font-size: 11.5px; font-family: 'DejaVu Sans'; fill: #536a7b" transform="translate(86.4 1312.398203)">Express entrega la interfaz y atiende la API. El navegador ejecuta el código web.</text>
+    <text style="font-size: 11.5px; font-family: 'DejaVu Sans'; fill: #536a7b" transform="translate(86.4 1327.460238)">Los servicios simulados de agua e identidad comparten otro servidor local dentro del mismo proceso Node.js.</text>
+    <text style="font-size: 11.5px; font-family: 'DejaVu Sans'; fill: #536a7b" transform="translate(86.4 1343.189273)">Se muestran fuera de Nivora por el papel de proveedores que representan, según la arquitectura objetivo.</text>
+   </g>
+   <g id="text_39">
+    <text style="font-size: 10.5px; font-family: 'DejaVu Sans'; text-anchor: start; fill: #536a7b" x="126" y="1426.378359" transform="rotate(-0 126 1426.378359)">Persona</text>
+   </g>
+   <g id="text_40">
+    <text style="font-size: 10.5px; font-family: 'DejaVu Sans'; text-anchor: start; fill: #536a7b" x="363.6" y="1426.798359" transform="rotate(-0 363.6 1426.798359)">Aplicación de Nivora</text>
+   </g>
+   <g id="text_41">
+    <text style="font-size: 10.5px; font-family: 'DejaVu Sans'; text-anchor: start; fill: #536a7b" x="752.4" y="1426.378359" transform="rotate(-0 752.4 1426.378359)">Almacén de datos</text>
+   </g>
+   <g id="text_42">
+    <text style="font-size: 10.5px; font-family: 'DejaVu Sans'; text-anchor: start; fill: #536a7b" x="1076.4" y="1426.378359" transform="rotate(-0 1076.4 1426.378359)">Sistema externo</text>
+   </g>
+  </g>
+ </g>
+ <defs>
+  <clipPath id="p075c00f2c8">
+   <rect x="0" y="0" width="1296" height="1476"/>
+  </clipPath>
+ </defs>
+</svg>
