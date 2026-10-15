@@ -185,3 +185,33 @@ Los resultados se registrarán junto con las tareas y dispositivos utilizados.
 Cada comparación identificará la versión de los datos y la fecha
 de cálculo utilizada. Las diferencias de distribución visual
 entre pantallas se evaluarán mediante el escenario de usabilidad.
+
+## EQ-10. Mantenibilidad: sustitución del adaptador de agua
+
+| Elemento | Descripción |
+|---|---|
+| **Atributo de calidad** | Mantenibilidad — AC10. |
+| **Fuente** | Desarrollador encargado del mantenimiento de Nivora. |
+| **Estímulo** | Necesita sustituir el adaptador de la empresa de agua por otra implementación que conserve el contrato de integración definido. |
+| **Artefacto** | Contrato de la fuente de agua, adaptadores, composición del backend y pruebas automatizadas. |
+| **Entorno** | Existe una versión de referencia con pruebas registradas. El nuevo adaptador proporciona los suministros, lecturas, tarifas y recibos requeridos por el mismo contrato. |
+| **Respuesta esperada** | El cambio se concentra en el adaptador y su configuración. Las reglas del dominio y los casos de uso conservan su independencia respecto del formato y la tecnología del proveedor. Las consultas, actualizaciones y alertas mantienen el comportamiento esperado. |
+| **Medida** | Aprobar el 100 % de las pruebas de contrato y regresión definidas para el cambio. Registrar cero violaciones de las reglas de dependencias y cero modificaciones del dominio o de los casos de uso motivadas únicamente por el formato o protocolo del proveedor, mientras se conserve el contrato. |
+| **Verificación** | Realizar una sustitución controlada, revisar los archivos modificados y las importaciones, ejecutar las pruebas del nuevo adaptador y la regresión, y comprobar las reglas de capas. Comparar los resultados con la versión de referencia. |
+| **Estado** | Pendiente de realizar la sustitución controlada y documentar los cambios y pruebas. |
+| **Trazabilidad** | AC10; DA09 y DA04; ADR-002 y ADR-004. |
+
+## Resumen de escenarios
+
+| Código | Atributo de calidad |
+|---|---|
+| EQ-01 | Rendimiento |
+| EQ-02 | Escalabilidad |
+| EQ-03 | Exactitud e integridad |
+| EQ-04 | Continuidad ante fallos externos |
+| EQ-05 | Actualidad y trazabilidad |
+| EQ-06 | Seguridad |
+| EQ-07 | Interoperabilidad |
+| EQ-08 | Usabilidad |
+| EQ-09 | Consistencia entre dispositivos |
+| EQ-10 | Mantenibilidad |
