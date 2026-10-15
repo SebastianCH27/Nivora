@@ -147,3 +147,22 @@ con personas ficticias.
 Las pruebas con servicios simulados comprueban los contratos definidos
 para la demostración. La compatibilidad con los servicios reales
 deberá verificarse al implementar esas conexiones.
+
+## EQ-08. Usabilidad: consultas claras desde distintos dispositivos
+
+| Elemento | Descripción |
+|---|---|
+| **Atributo de calidad** | Usabilidad — AC08. |
+| **Fuente** | Persona que utiliza Nivora desde un celular o una computadora. |
+| **Estímulo** | Necesita consultar y comprender el consumo, costo estimado, proyección, recibos y avisos de un suministro, o interpretar un mensaje de error de acceso. |
+| **Artefacto** | Interfaz de acceso, panel de consulta, recibos, notificaciones y mensajes de error. |
+| **Entorno** | Prueba con datos ficticios, tareas previamente definidas y participantes que utilizan la interfaz sin instrucciones sobre los pasos a seguir. Se evalúan vistas de celular de 390 × 844 píxeles y escritorio de 1440 × 1000 píxeles. |
+| **Respuesta esperada** | La interfaz presenta información legible, unidades y fechas identificables, y controles accesibles en ambas vistas. Permite distinguir el consumo, el costo estimado, la proyección y el importe definitivo del recibo. Los mensajes explican los errores de datos y los fallos de comunicación. |
+| **Medida** | Como propuesta inicial, al menos 4 de 5 participantes deben completar las tareas definidas sin ayuda del observador e interpretar correctamente los importes y mensajes evaluados. En ambas vistas deben permanecer visibles o accesibles todos los controles necesarios, sin contenido esencial cortado ni desplazamiento horizontal de la página. |
+| **Verificación** | Solicitar que los participantes accedan, consulten el consumo, distingan los importes, localicen un recibo y su vencimiento, y consulten un aviso. Presentar casos de datos inválidos y fallos de comunicación. Registrar tareas completadas, ayudas solicitadas, interpretaciones y dificultades en cada vista. |
+| **Estado** | Pendiente de realizar la prueba con participantes y documentar los resultados. |
+| **Trazabilidad** | AC08; RC01; RF01, RF02, RF11, RF16, RF18, RF25 y RF28. |
+
+La muestra de cinco participantes y los tamaños de pantalla
+son condiciones propuestas para organizar esta evaluación.
+Los resultados se registrarán junto con las tareas y dispositivos utilizados.
