@@ -44,6 +44,21 @@ del curso de Arquitectura de Software.
 La descripción del problema, el funcionamiento y el alcance inicial
 se encuentran en [Caso de estudio de Nivora](docs/01-analisis-de-sistema/00-caso-de-estudio.md).
 
+## Implementación actual
+
+El servicio de la **Empresa de Agua** está implementado con Java 21,
+Spring Boot y MySQL. Proporciona las consultas de consumo actual,
+historial mensual, recibos y tarifas.
+
+Sus instrucciones se encuentran en
+[Empresa de Agua](tecnologia/empresa-agua/README.md).
+
+La siguiente etapa corresponde al backend propio de Nivora,
+que consumirá esta API. El frontend está previsto con Flutter.
+
+La base de Node.js y el boilerplate se conservan como material
+de los laboratorios iniciales.
+
 ## Dependencias instaladas
 
 - **Express 5.3.0:** dependencia de producción para el servidor web.
