@@ -14,10 +14,14 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 
 import pe.nivora.empresaagua.consumo.ConsumoActual;
 import pe.nivora.empresaagua.consumo.ConsultarConsumoActual;
+import pe.nivora.empresaagua.consumo.ConsultarHistorialConsumo;
+import pe.nivora.empresaagua.consumo.HistorialConsumo;
 
 @RestController
 @RequestMapping("/api/v1/suministros")
@@ -27,9 +31,14 @@ public class ConsumoController {
         LoggerFactory.getLogger(ConsumoController.class);
 
     private final ConsultarConsumoActual consulta;
+    private final ConsultarHistorialConsumo historial;
 
-    public ConsumoController(ConsultarConsumoActual consulta) {
+    public ConsumoController(
+            ConsultarConsumoActual consulta,
+            ConsultarHistorialConsumo historial) {
+
         this.consulta = consulta;
+        this.historial = historial;
     }
 
     @GetMapping("/{codigo}/consumo-actual")
@@ -41,14 +50,35 @@ public class ConsumoController {
             .body(consulta.consultar(codigo));
     }
 
+    @GetMapping("/{codigo}/historial")
+    public ResponseEntity<HistorialConsumo> consultarHistorial(
+            @PathVariable("codigo") String codigo,
+            @RequestParam(
+                value = "meses",
+                defaultValue = "12"
+            ) int meses) {
+
+        return ResponseEntity.ok()
+            .cacheControl(CacheControl.noStore())
+            .body(historial.consultar(codigo, meses));
+    }
+
     @ExceptionHandler(IllegalArgumentException.class)
-    public ResponseEntity<ProblemDetail> codigoInvalido(
+    public ResponseEntity<ProblemDetail> solicitudInvalida(
             IllegalArgumentException error) {
 
         return problema(
             HttpStatus.BAD_REQUEST,
-            "Codigo invalido",
+            "Solicitud invalida",
             error.getMessage());
+    }
+
+    @ExceptionHandler(MethodArgumentTypeMismatchException.class)
+    public ResponseEntity<ProblemDetail> parametroInvalido() {
+        return problema(
+            HttpStatus.BAD_REQUEST,
+            "Parametro invalido",
+            "El parametro meses debe ser un numero entero.");
     }
 
     @ExceptionHandler(NoSuchElementException.class)
