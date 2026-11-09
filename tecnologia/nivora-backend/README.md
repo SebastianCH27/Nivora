@@ -17,7 +17,7 @@ El puerto 8080 esta ocupado por Jenkins en el equipo de desarrollo.
 
 | Paquete previsto | Modulo | Estado |
 |---|---|---|
-| `acceso` | Acceso y suministros | Modelos, contrato y adaptador HTTP de suministros. |
+| `acceso` | Acceso y suministros | Consulta HTTP, actualizacion explicita y repositorio propio de suministros. |
 | `lecturas` | Lecturas, consumo e historial | Pendiente de implementar. |
 | `tarifas` | Tarifas, costos y proyecciones | Pendiente de implementar. |
 | `notificaciones` | Alertas y notificaciones | Pendiente de implementar. |
@@ -89,12 +89,60 @@ La configuracion esta en `application.properties`:
 Estos tiempos son limites de red, no frecuencias de sincronizacion.
 El arranque habitual no consulta a la Empresa de Agua.
 
+## Almacenamiento propio de suministros
+
+`ActualizarSuministro`, en la capa de aplicacion, consulta `FuenteSuministros`
+y guarda los datos encontrados mediante `RepositorioSuministros`. Las reglas
+de aplicacion y los contratos no dependen de Spring, HTTP ni JDBC.
+
+`RepositorioSuministrosJdbc` conserva en la tabla `nivora.suministros`:
+
+| Columna | Informacion |
+|---|---|
+| `codigo` | Codigo textual, clave primaria; conserva los ceros iniciales. |
+| `titular` | Titular informado por la fuente. |
+| `verificado_en_utc` | Fecha de la verificacion realizada por Nivora, con microsegundos. |
+
+La fecha corresponde a una verificacion del suministro, no a una lectura
+de consumo ni a una version emitida por la Empresa. La tabla conserva el
+ultimo registro aceptado por codigo, no un historial de verificaciones.
+
+La escritura atomica inserta o actualiza el mismo codigo sin duplicarlo.
+Una escritura con fecha anterior a la almacenada no reemplaza el registro.
+Una consulta a `RepositorioSuministros.buscar` utiliza solo la base propia:
+un resultado vacio significa que no hay datos guardados. Un fallo de lectura
+o escritura produce `RepositorioSuministrosNoDisponibleException`.
+
+Si la consulta externa falla o confirma que el suministro no existe, no
+se borran ni se actualizan los datos previamente aceptados. Conservarlos
+no autoriza un nuevo acceso: sus validaciones externas siguen siendo
+obligatorias, segun ADR-003 y ADR-004.
+
+### Crear la tabla en MySQL
+
+Con una cuenta administradora, abrir el cliente MySQL desde CMD:
+
+```bat
+"C:\Program Files\MySQL\MySQL Server 8.0\bin\mysql.exe" -u root -p
+```
+
+Dentro del cliente, cuando aparezca `mysql>`, ejecutar:
+
+```sql
+SOURCE C:/Users/HP/Desktop/Nivora/tecnologia/nivora-backend/base-datos/02-suministros.sql;
+SHOW CREATE TABLE nivora.suministros;
+```
+
+El script crea la tabla si no existe. La cuenta de ejecucion `nivora_app`
+mantiene sus permisos de lectura y escritura sobre `nivora.*`; el backend
+no ejecuta cambios de estructura automaticamente.
+
 ### Integracion pendiente
 
-Este avance incorpora la consulta externa de suministros. Aun faltan
-el caso de uso de acceso, la validacion de identidad, sesiones, roles y
-la persistencia y sincronizacion de datos propios. La comprobacion de
-consola no publica un endpoint de consulta en Nivora.
+Este avance incorpora la consulta externa y el almacenamiento de suministros.
+Aun faltan el caso de uso de acceso, validacion de identidad, sesiones,
+roles, y el almacenamiento y sincronizacion de lecturas, tarifas y recibos.
+Las comprobaciones de consola no publican endpoints de consulta en Nivora.
 
 Para la sincronizacion de lecturas tambien debe definirse su entrega
 con identificacion, fechas, unidad, medidor y recuperacion de pendientes,
@@ -123,8 +171,16 @@ confirmada, datos invalidos, errores HTTP, redirecciones, conexion
 rechazada y tiempos de espera tanto en cabeceras como en el cuerpo.
 No necesitan que MySQL ni la Empresa de Agua esten ejecutandose.
 
+Las pruebas de persistencia ejecutan `base-datos/02-suministros.sql` en H2
+con modo MySQL y un esquema aislado. Comprueban insercion, actualizacion,
+ceros iniciales, fechas UTC, restricciones, reintentos, escrituras retrasadas
+y conservacion de datos ante fallos externos. Las pruebas de aplicacion
+comprueban que solo se guarden suministros confirmados y que los errores
+de fuente o persistencia no se conviertan en resultados satisfactorios.
+
 Estas pruebas no comprueban la conexion a la Empresa de Agua instalada
-en el equipo, las futuras reglas de negocio ni la capacidad de 5000 usuarios.
+en el equipo ni sustituyen la comprobacion manual con MySQL 8.0. Tampoco
+comprueban las futuras reglas de negocio ni la capacidad de 5000 usuarios.
 
 Con Nivora ejecutandose normalmente:
 
@@ -146,6 +202,38 @@ Debe mostrar `Comprobacion Empresa de Agua: suministro 13100390 encontrado.`
 Para comprobar la ausencia confirmada, usar `99999999` como codigo de
 prueba. Si la fuente no esta disponible, la ejecucion falla con
 `FuenteSuministrosNoDisponibleException`; no informa una ausencia falsa.
+
+### Comprobacion manual del almacenamiento propio
+
+Despues de crear la tabla, con `NIVORA_DB_CLAVE` disponible en el entorno,
+ejecutar desde el backend en CMD. Para verificar y guardar un suministro,
+mantener la Empresa de Agua encendida:
+
+```bat
+mvnw.cmd spring-boot:run "-Dspring-boot.run.arguments=--spring.main.web-application-type=none --nivora.suministros.comprobar-al-iniciar=true --nivora.suministros.operacion-prueba=actualizar --nivora.suministros.codigo-prueba=13100390"
+```
+
+Debe informar `suministro 13100390 verificado; registro propio disponible.`
+La misma ejecucion puede repetirse sin generar otra fila para ese codigo.
+
+Para consultar exclusivamente los datos guardados, usar:
+
+```bat
+mvnw.cmd spring-boot:run "-Dspring-boot.run.arguments=--spring.main.web-application-type=none --nivora.suministros.comprobar-al-iniciar=true --nivora.suministros.operacion-prueba=consultar --nivora.suministros.codigo-prueba=13100390"
+```
+
+Debe informar `suministro 13100390 encontrado en la base propia` y su fecha
+de verificacion. Esta operacion permite comprobar la consulta con la Empresa
+apagada y MySQL encendido. Para que la informacion sobreviva al proceso,
+ambas ejecuciones normales utilizan MySQL, no el perfil de pruebas H2.
+
+Estas comprobaciones no abren el puerto 8082. Estan desactivadas por defecto:
+
+| Propiedad | Valor local |
+|---|---|
+| `nivora.suministros.comprobar-al-iniciar` | `false` |
+| `nivora.suministros.operacion-prueba` | `consultar` |
+| `nivora.suministros.codigo-prueba` | `13100390` |
 
 ## Referencias de arquitectura
 
