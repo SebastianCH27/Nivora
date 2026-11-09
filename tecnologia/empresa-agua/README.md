@@ -66,6 +66,7 @@ SOURCE base-datos/03-control-generacion.sql;
 SOURCE base-datos/04-consumos-mensuales.sql;
 SOURCE base-datos/05-control-consumo-continuo.sql;
 SOURCE base-datos/06-detalle-recibos.sql;
+SOURCE base-datos/07-indice-lecturas.sql;
 ```
 
 La cuenta `empresa_app` debe estar creada con los permisos indicados.
@@ -111,6 +112,7 @@ se envía como texto de 1 a 20 dígitos.
 |---|---|
 | `/actuator/health` | Estado del servicio y conexión de datos |
 | `/api/v1/suministros/{codigo}` | Código y titular del suministro, sin depender de sus consumos mensuales |
+| `/api/v1/suministros/{codigo}/lecturas?despuesDe=0&limite=100` | Página de lecturas identificadas ya persistidas, ordenadas por ID |
 | `/api/v1/suministros/{codigo}/consumo-actual` | Consumo acumulado del mes en litros |
 | `/api/v1/suministros/{codigo}/historial?meses=12` | Historial mensual, del más reciente al más antiguo |
 | `/api/v1/suministros/{codigo}/recibos?limite=12` | Recibos emitidos y disponibles para consultar |
@@ -119,13 +121,84 @@ se envía como texto de 1 a 20 dígitos.
 `meses` y `limite` aceptan valores entre 1 y 60.
 Su valor predeterminado es 12.
 
-Las respuestas de suministros, consumo, historial, recibos y tarifas
+Las respuestas de suministros, lecturas, consumo, historial, recibos y tarifas
 incluyen `Cache-Control: no-store`.
 
 - 400: código o parámetro inválido.
 - 404: suministro inexistente.
 - 503: datos necesarios no disponibles, configuración incompleta
   o fallo de acceso a la base de datos.
+
+## Lecturas identificadas para Nivora
+
+La nueva ruta consulta la tabla `lecturas`. No genera mediciones ni modifica
+los totales mensuales. Permite recuperar las lecturas históricas preparadas
+por las cargas inicial y diaria, sin necesitar tablas de consumo mensual.
+
+### Índice para una base ya instalada
+
+Con la Empresa de Agua detenida, ejecutar como administrador de MySQL:
+
+```sql
+SOURCE C:/Users/HP/Desktop/Nivora/tecnologia/empresa-agua/base-datos/07-indice-lecturas.sql;
+SHOW INDEX FROM empresa_agua.lecturas WHERE Key_name = 'idx_lecturas_suministro_id';
+```
+
+El índice combina suministro e ID de lectura. El script conserva los datos
+y puede repetirse: comprueba si el índice ya existe antes de crearlo.
+
+### Contrato de la página
+
+```json
+{
+  "fuente": "empresa-agua",
+  "codigoSuministro": "13100390",
+  "tipoMedicion": "ACUMULADA",
+  "unidad": "L",
+  "lecturas": [
+    {
+      "idLectura": "100391",
+      "idMedidor": "391",
+      "fechaMedicion": "2026-10-01T05:00:00Z",
+      "valorLitros": 123456
+    }
+  ],
+  "siguienteDespuesDe": "100391",
+  "hayMas": true
+}
+```
+
+Los valores del ejemplo son ilustrativos. Los ID corresponden a las filas
+persistidas y se transmiten como texto para conservar todos sus dígitos.
+La fecha representa la medición en UTC. El valor es el contador acumulado
+del medidor convertido de m³ a litros enteros, no el incremento de consumo
+ni el total de un mes. Los acumulados de medidores distintos no se restan
+entre sí.
+
+- `despuesDe` es un ID exclusivo, no una fecha. Acepta de 0 a 9223372036854775807.
+- `limite` acepta de 1 a 500; por defecto devuelve hasta 100 lecturas.
+- Para continuar, enviar `siguienteDespuesDe` como el siguiente `despuesDe`.
+- `hayMas` indica si quedan filas en esa consulta; no acredita que el
+  generador esté al día ni impide que aparezcan nuevas filas más adelante.
+- Una página vacía conserva el cursor recibido y devuelve HTTP 200 si
+  el suministro existe. Un suministro inexistente devuelve HTTP 404.
+- Repetir el cursor permite volver a consultar las mismas filas. Nivora
+  deberá reconocerlas por fuente e ID, validar su contenido y evitar
+  incorporarlas dos veces.
+
+Esta consulta no es un registro de modificaciones: editar una fila existente
+no le asigna otro ID. La coordinación de productores, la confirmación de
+lotes y la recuperación de cambios concurrentes se definirán antes de
+utilizarla como mecanismo de sincronización continua.
+
+### Continuidad de la generación: pendiente
+
+Actualmente `GeneradorConsumoContinuo` actualiza `consumos_mensuales`,
+pero no inserta nuevas filas en `lecturas`. La ruta expone únicamente
+las lecturas que ya existen en esa tabla. Falta conectar la generación
+continua con la entrega de mediciones identificadas y comprobar que
+coincidan con los consumos e históricos. Ese trabajo no se sustituye
+convirtiendo cada consulta del acumulado mensual en un incremento nuevo.
 
 ## Unidades, tarifas y fechas
 
@@ -165,8 +238,13 @@ La consulta independiente del suministro añade seis pruebas HTTP con
 una base H2 exclusiva: suministro existente sin tablas de consumo,
 ceros iniciales, suministro inexistente, código con letras, longitud
 inválida y fallo de acceso a datos. Incluida la prueba de arranque,
-la suite contiene siete pruebas. Estas comprobaciones no dependen
-de los registros del MySQL de desarrollo.
+esas comprobaciones no dependen de los registros del MySQL de desarrollo.
+
+`LecturasApiTests` añade pruebas HTTP sobre una base H2 separada para
+validar el contrato de lecturas, paginación, reintentos, aislamiento entre
+suministros, conversión exacta a litros, fechas UTC, identificadores grandes,
+parámetros inválidos, páginas vacías y errores de datos. Las pruebas no
+comprueban el índice en MySQL ni la futura sincronización de Nivora.
 
 ```bat
 mvnw.cmd clean verify
@@ -178,6 +256,8 @@ Con el servicio activo, comprobar la integración con MySQL:
 curl.exe -i "http://127.0.0.1:8081/actuator/health"
 
 curl.exe -i "http://127.0.0.1:8081/api/v1/suministros/13100390"
+
+curl.exe -i "http://127.0.0.1:8081/api/v1/suministros/13100390/lecturas?despuesDe=0&limite=2"
 
 curl.exe -i "http://127.0.0.1:8081/api/v1/suministros/13100390/consumo-actual"
 

@@ -144,10 +144,17 @@ Aun faltan el caso de uso de acceso, validacion de identidad, sesiones,
 roles, y el almacenamiento y sincronizacion de lecturas, tarifas y recibos.
 Las comprobaciones de consola no publican endpoints de consulta en Nivora.
 
-Para la sincronizacion de lecturas tambien debe definirse su entrega
-con identificacion, fechas, unidad, medidor y recuperacion de pendientes,
-segun los requisitos y ADR-003. Un acumulado mensual no equivale a
-un incremento nuevo que deba sumarse cada vez que se consulta.
+La Empresa de Agua incorpora `GET /api/v1/suministros/{codigo}/lecturas`,
+con paginas de mediciones historicas identificadas, medidor, fecha UTC,
+tipo acumulado y unidad en litros. Los detalles del cursor estan en su README.
+Nivora todavia no implementa el adaptador, validacion, almacenamiento,
+deduplicacion y confirmacion de esas paginas.
+
+El generador continuo de la Empresa actualiza actualmente los totales
+mensuales, no la tabla de lecturas historicas. Su entrega continua y
+la recuperacion de pendientes deben completarse segun ADR-003.
+Un acumulado mensual no equivale a un incremento nuevo que deba sumarse
+cada vez que se consulta.
 
 ## Configuracion y comprobaciones
 
