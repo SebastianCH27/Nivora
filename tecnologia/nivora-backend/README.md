@@ -56,10 +56,11 @@ solicitud del usuario.
 
 ### Integracion pendiente
 
-La API Java existente de la Empresa de Agua ofrece consultas por codigo
-de consumo actual, historial mensual, tarifa vigente y recibos.
-Todavia debemos incorporar una consulta independiente del suministro
-antes de conectar este primer contrato.
+La API Java de la Empresa de Agua ofrece la consulta independiente
+`GET /api/v1/suministros/{codigo}`, con `codigoSuministro` y `titular`,
+ademas de las consultas de consumo actual, historial mensual, tarifa
+vigente y recibos. El adaptador HTTP de Nivora que implementara
+`FuenteSuministros` se incorporara en el siguiente avance.
 
 Para la sincronizacion de lecturas tambien debe definirse su entrega
 con identificacion, fechas, unidad, medidor y recuperacion de pendientes,

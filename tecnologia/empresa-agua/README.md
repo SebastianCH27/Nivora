@@ -110,6 +110,7 @@ se envía como texto de 1 a 20 dígitos.
 | Ruta | Resultado |
 |---|---|
 | `/actuator/health` | Estado del servicio y conexión de datos |
+| `/api/v1/suministros/{codigo}` | Código y titular del suministro, sin depender de sus consumos mensuales |
 | `/api/v1/suministros/{codigo}/consumo-actual` | Consumo acumulado del mes en litros |
 | `/api/v1/suministros/{codigo}/historial?meses=12` | Historial mensual, del más reciente al más antiguo |
 | `/api/v1/suministros/{codigo}/recibos?limite=12` | Recibos emitidos y disponibles para consultar |
@@ -118,7 +119,7 @@ se envía como texto de 1 a 20 dígitos.
 `meses` y `limite` aceptan valores entre 1 y 60.
 Su valor predeterminado es 12.
 
-Las respuestas de consumo, historial, recibos y tarifas
+Las respuestas de suministros, consumo, historial, recibos y tarifas
 incluyen `Cache-Control: no-store`.
 
 - 400: código o parámetro inválido.
@@ -160,6 +161,13 @@ La prueba de arranque utiliza el perfil `test` y una base H2 en memoria.
 Las cargas iniciales y tareas automáticas están desactivadas
 en ese perfil.
 
+La consulta independiente del suministro añade seis pruebas HTTP con
+una base H2 exclusiva: suministro existente sin tablas de consumo,
+ceros iniciales, suministro inexistente, código con letras, longitud
+inválida y fallo de acceso a datos. Incluida la prueba de arranque,
+la suite contiene siete pruebas. Estas comprobaciones no dependen
+de los registros del MySQL de desarrollo.
+
 ```bat
 mvnw.cmd clean verify
 ```
@@ -168,6 +176,8 @@ Con el servicio activo, comprobar la integración con MySQL:
 
 ```bat
 curl.exe -i "http://127.0.0.1:8081/actuator/health"
+
+curl.exe -i "http://127.0.0.1:8081/api/v1/suministros/13100390"
 
 curl.exe -i "http://127.0.0.1:8081/api/v1/suministros/13100390/consumo-actual"
 
