@@ -18,7 +18,7 @@ El puerto 8080 esta ocupado por Jenkins en el equipo de desarrollo.
 | Paquete previsto | Modulo | Estado |
 |---|---|---|
 | `acceso` | Acceso y suministros | Consulta HTTP, actualizacion explicita y repositorio propio de suministros. |
-| `lecturas` | Lecturas, consumo e historial | Modelos y adaptador HTTP de paginas; incorporacion y calculos pendientes. |
+| `lecturas` | Lecturas, consumo e historial | Consulta HTTP e incorporacion manual con deduplicacion e incidencias; calculos pendientes. |
 | `tarifas` | Tarifas, costos y proyecciones | Pendiente de implementar. |
 | `notificaciones` | Alertas y notificaciones | Pendiente de implementar. |
 | `recibos` | Recibos | Pendiente de implementar. |
@@ -148,7 +148,8 @@ La Empresa de Agua incorpora `GET /api/v1/suministros/{codigo}/lecturas`,
 con paginas de mediciones historicas identificadas, medidor, fecha UTC,
 tipo acumulado y unidad en litros. Los detalles del cursor estan en su README.
 Nivora implementa su adaptador y las validaciones de estructura y paginacion.
-El almacenamiento, deduplicacion y confirmacion de esas paginas siguen pendientes.
+La incorporacion manual almacena lecturas, distingue repetidas y registra rechazos.
+La confirmacion persistente de cursores y la sincronizacion automatica siguen pendientes.
 
 El generador continuo de la Empresa actualiza actualmente los totales
 mensuales, no la tabla de lecturas historicas. Su entrega continua y
@@ -186,7 +187,7 @@ El adaptador valida:
 
 Los cursores de este proveedor son decimales canonicos entre `0` y
 `9223372036854775807`; el limite solicitado esta entre 1 y 500. Una pagina
-con errores se rechaza completa. No se corrige silenciosamente ni se avanza
+incompatible con el contrato HTTP se rechaza completa. No se corrige silenciosamente ni se avanza
 un cursor persistido desde este adaptador.
 
 `ClienteEmpresaAgua`, en infraestructura compartida, concentra la conexion,
@@ -194,10 +195,67 @@ los tiempos de espera, la lectura JSON y el rechazo de redirecciones.
 Los adaptadores mantienen separados sus resultados y excepciones de negocio.
 El limite del cuerpo es de 64 KiB para suministros y 512 KiB para lecturas.
 
-Las validaciones temporales respecto del corte de la fuente, la consistencia
-entre mediciones, el control de cambios de medidor, las incidencias y la
-deduplicacion contra datos ya almacenados pertenecen a la futura incorporacion.
-Este avance no calcula consumo ni trata cada contador como un incremento nuevo.
+La incorporacion propia comprueba la fecha respecto de su recepcion, la
+consistencia del contador y las coincidencias con registros ya aceptados.
+La validacion respecto de un corte confirmado por la fuente y del inventario
+de medidores sigue pendiente. Este avance no calcula consumo ni trata cada
+contador como un incremento nuevo.
+
+## Incorporacion de lecturas en la base propia
+
+`ImportarPaginaLecturas` obtiene una pagina mediante `FuenteLecturas` y la
+entrega a `RepositorioLecturas`. La llamada HTTP se completa antes de abrir
+la transaccion de escritura. El suministro debe existir en `nivora.suministros`.
+La consulta y el almacenamiento permanecen separados de las validaciones
+del futuro inicio de sesion.
+
+`RepositorioLecturasJdbc` ejecuta cada lote de hasta 500 lecturas en una
+transaccion. Las incorporaciones de una misma fuente se coordinan mediante
+una fila de control bloqueada, incluso si utilizan conexiones distintas.
+Las reglas de fecha y contador se encuentran en el dominio, en
+`PoliticaIncorporacionLecturas`.
+
+| Caso | Resultado |
+|---|---|
+| Fuente e ID nuevos, medicion compatible | Nueva lectura guardada. |
+| Misma fuente e ID con todos los datos iguales | Repetida; conserva el registro y su primera recepcion. |
+| Misma fuente e ID con otros datos | Rechazada; registra incidencia y conserva la lectura aceptada. |
+| Otro ID para la misma fuente, suministro, medidor y fecha | Rechazada como medicion ya identificada. |
+| Fecha fuera del rango 1000-9999, con precision superior a microsegundos o posterior a su recepcion | Rechazada y registrada en incidencias. |
+| Contador inferior al anterior o superior al posterior del mismo medidor | Rechazada y registrada en incidencias. |
+| Fallo de almacenamiento durante el lote | Revierte todas las escrituras del lote. |
+
+La primera lectura compatible de un medidor se conserva como referencia,
+sin asumir que su contador sea consumo del mes. Un medidor distinto puede
+tener otro valor inicial. La fecha se guarda en UTC sin redondear la medicion.
+
+El script `base-datos/03-lecturas.sql`, posterior a `02-suministros.sql`, crea:
+
+| Tabla | Responsabilidad |
+|---|---|
+| `lecturas` | Datos aceptados, fuente, ID, suministro, medidor, fecha, contador, unidad y tipo. |
+| `incidencias_lecturas` | Motivo y datos recibidos de cada rechazo. |
+| `control_incorporacion_lecturas` | Coordinacion de escrituras por fuente; no contiene un cursor confirmado. |
+
+La identidad de una lectura es fuente e ID. Una clave adicional evita dos
+identificaciones de la misma medicion. Los identificadores distinguen
+mayusculas de minusculas. Los contadores almacenados son acumulados y no
+se suman para obtener el consumo.
+
+Repetir el mismo rechazo no crea otra fila de incidencia: conserva los datos
+recibidos y el motivo, e incrementa su contador de repeticiones. Un rechazo
+con otros datos conserva su propia incidencia. Una lectura rechazada no
+se incorpora a la tabla de lecturas aceptadas.
+
+Los rechazos de estas reglas de incorporacion permiten conservar las otras
+lecturas validas del lote junto con sus incidencias. Un fallo tecnico de la
+transaccion revierte el lote entero. Si una lectura rechazada llega corregida,
+puede aceptarse posteriormente; la incidencia anterior conserva su detalle.
+
+La comprobacion contra la hora de recepcion no equivale a un corte de datos
+confirmado por la Empresa. Aun faltan ese protocolo, la gestion de fallos de
+comunicacion como incidencias de integracion, el cursor persistente, los
+reintentos programados y la generacion continua de mediciones identificadas.
 
 ## Configuracion y comprobaciones
 
@@ -233,6 +291,11 @@ ceros iniciales, fechas UTC, restricciones, reintentos, escrituras retrasadas
 y conservacion de datos ante fallos externos. Las pruebas de aplicacion
 comprueban que solo se guarden suministros confirmados y que los errores
 de fuente o persistencia no se conviertan en resultados satisfactorios.
+
+Las pruebas de incorporacion ejecutan los scripts de suministros y lecturas
+en H2 aislado. Comprueban identidad, fechas, medidores, contadores, conflictos,
+conservacion de incidencias, dos escrituras simultaneas y rollback del lote.
+Las pruebas de aplicacion comprueban la coordinacion entre fuente y repositorio.
 
 Estas pruebas no comprueban la conexion a la Empresa de Agua instalada
 en el equipo ni sustituyen la comprobacion manual con MySQL 8.0. Tampoco
@@ -313,6 +376,52 @@ La ejecucion informa cantidad de lecturas, siguiente cursor y si hay mas.
 Para consultar la siguiente pagina, enviar el cursor informado mediante
 `--nivora.lecturas.cursor-prueba=...`. No se abre el puerto 8082 ni se
 almacenan lecturas. La ejecucion habitual tiene la comprobacion desactivada.
+
+### Preparar el almacenamiento de lecturas en MySQL
+
+Ejecutar como administrador dentro del cliente `mysql>`:
+
+```sql
+SOURCE C:/Users/HP/Desktop/Nivora/tecnologia/nivora-backend/base-datos/03-lecturas.sql;
+SHOW TABLES FROM nivora;
+```
+
+La cuenta `nivora_app` conserva los permisos existentes sobre `nivora.*`.
+El backend no ejecuta DDL durante el arranque.
+
+### Comprobacion manual de incorporacion y consulta
+
+Con el suministro registrado en Nivora, la Empresa de Agua encendida y
+`NIVORA_DB_CLAVE` disponible en el entorno, ejecutar desde el backend en CMD:
+
+```bat
+mvnw.cmd spring-boot:run "-Dspring-boot.run.arguments=--spring.main.web-application-type=none --nivora.lecturas.almacenamiento.comprobar-al-iniciar=true --nivora.lecturas.almacenamiento.operacion-prueba=importar"
+```
+
+El codigo, cursor y limite se toman de las propiedades de prueba de lecturas
+ya descritas. La primera pagina de dos lecturas informara nuevas 2, repetidas
+0 y rechazadas 0 si todavia no fue incorporada. Repetirla debe informar nuevas
+0 y repetidas 2. Una pagina con rechazos requiere revisar sus incidencias;
+un `BUILD SUCCESS` solo acredita que termino la operacion, no que todas las
+lecturas se aceptaron.
+
+Para consultar exclusivamente la base propia:
+
+```bat
+mvnw.cmd spring-boot:run "-Dspring-boot.run.arguments=--spring.main.web-application-type=none --nivora.lecturas.almacenamiento.comprobar-al-iniciar=true --nivora.lecturas.almacenamiento.operacion-prueba=consultar"
+```
+
+Esta consulta informa el total de lecturas aceptadas e incidencias del
+suministro. Funciona con la Empresa apagada y MySQL encendido. Las dos
+operaciones son comprobaciones por consola y no abren el puerto 8082.
+
+| Propiedad | Valor local |
+|---|---|
+| `nivora.lecturas.almacenamiento.comprobar-al-iniciar` | `false` |
+| `nivora.lecturas.almacenamiento.operacion-prueba` | `consultar` |
+
+La importacion no guarda ni confirma el cursor. El siguiente cursor mostrado
+es informacion de la pagina recibida; este paso no activa tareas automaticas.
 
 ## Referencias de arquitectura
 
