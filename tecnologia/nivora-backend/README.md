@@ -18,7 +18,7 @@ El puerto 8080 esta ocupado por Jenkins en el equipo de desarrollo.
 | Paquete previsto | Modulo | Estado |
 |---|---|---|
 | `acceso` | Acceso y suministros | Consulta HTTP, actualizacion explicita y repositorio propio de suministros. |
-| `lecturas` | Lecturas, consumo e historial | Pendiente de implementar. |
+| `lecturas` | Lecturas, consumo e historial | Modelos y adaptador HTTP de paginas; incorporacion y calculos pendientes. |
 | `tarifas` | Tarifas, costos y proyecciones | Pendiente de implementar. |
 | `notificaciones` | Alertas y notificaciones | Pendiente de implementar. |
 | `recibos` | Recibos | Pendiente de implementar. |
@@ -147,14 +147,57 @@ Las comprobaciones de consola no publican endpoints de consulta en Nivora.
 La Empresa de Agua incorpora `GET /api/v1/suministros/{codigo}/lecturas`,
 con paginas de mediciones historicas identificadas, medidor, fecha UTC,
 tipo acumulado y unidad en litros. Los detalles del cursor estan en su README.
-Nivora todavia no implementa el adaptador, validacion, almacenamiento,
-deduplicacion y confirmacion de esas paginas.
+Nivora implementa su adaptador y las validaciones de estructura y paginacion.
+El almacenamiento, deduplicacion y confirmacion de esas paginas siguen pendientes.
 
 El generador continuo de la Empresa actualiza actualmente los totales
 mensuales, no la tabla de lecturas historicas. Su entrega continua y
 la recuperacion de pendientes deben completarse segun ADR-003.
 Un acumulado mensual no equivale a un incremento nuevo que deba sumarse
 cada vez que se consulta.
+
+## Consulta de paginas de lecturas
+
+El paquete `lecturas/dominio` define `LecturaAcumulada`, `LoteLecturas` y
+el contrato `FuenteLecturas`. Se reutiliza `CodigoSuministro` como identificador
+del suministro. Estos modelos no dependen de bibliotecas HTTP, JSON ni Spring.
+
+`FuenteLecturasHttp`, en `lecturas/infraestructura/empresaagua`, consulta
+una pagina y traduce sus datos al dominio. Recibir un lote no significa
+que se haya incorporado a la base propia ni que su cursor este confirmado.
+
+| Respuesta externa | Resultado |
+|---|---|
+| HTTP 200 con pagina compatible | Lote presente, incluso si no tiene lecturas. |
+| HTTP 404 con ProblemDetail del suministro solicitado | `Optional.empty()`: ausencia confirmada. |
+| Error de red, otro estado HTTP o respuesta incompatible | `FuenteLecturasNoDisponibleException`. |
+| Cursor o limite solicitado invalido | `IllegalArgumentException`, sin consultar la fuente. |
+
+El adaptador valida:
+
+- Fuente `empresa-agua`, suministro solicitado, tipo `ACUMULADA` y unidad `L`.
+- Identificadores decimales positivos como texto, sin perder digitos.
+- Fechas en formato ISO de instante UTC con sufijo `Z`.
+- Contadores enteros no negativos representables en `long`.
+- Pagina de hasta el limite solicitado y sin mezclar el suministro indicado.
+- ID estrictamente creciente y posterior al cursor, sin duplicados dentro de la pagina.
+- Cursor final igual al ultimo ID recibido, o sin cambios si la pagina esta vacia.
+- Indicador booleano `hayMas`; una pagina que anuncia mas filas debe estar completa.
+
+Los cursores de este proveedor son decimales canonicos entre `0` y
+`9223372036854775807`; el limite solicitado esta entre 1 y 500. Una pagina
+con errores se rechaza completa. No se corrige silenciosamente ni se avanza
+un cursor persistido desde este adaptador.
+
+`ClienteEmpresaAgua`, en infraestructura compartida, concentra la conexion,
+los tiempos de espera, la lectura JSON y el rechazo de redirecciones.
+Los adaptadores mantienen separados sus resultados y excepciones de negocio.
+El limite del cuerpo es de 64 KiB para suministros y 512 KiB para lecturas.
+
+Las validaciones temporales respecto del corte de la fuente, la consistencia
+entre mediciones, el control de cambios de medidor, las incidencias y la
+deduplicacion contra datos ya almacenados pertenecen a la futura incorporacion.
+Este avance no calcula consumo ni trata cada contador como un incremento nuevo.
 
 ## Configuracion y comprobaciones
 
@@ -177,6 +220,12 @@ Las pruebas del adaptador levantan un servidor HTTP temporal en
 confirmada, datos invalidos, errores HTTP, redirecciones, conexion
 rechazada y tiempos de espera tanto en cabeceras como en el cuerpo.
 No necesitan que MySQL ni la Empresa de Agua esten ejecutandose.
+
+Las pruebas de `FuenteLecturasHttp` usan otro servidor HTTP temporal para
+comprobar paginas validas y vacias, continuidad del cursor, ausencia confirmada,
+identificadores grandes, datos incompatibles, limites de respuesta y errores
+de red. Se conservan las pruebas del adaptador de suministros para comprobar
+el transporte compartido y sus resultados.
 
 Las pruebas de persistencia ejecutan `base-datos/02-suministros.sql` en H2
 con modo MySQL y un esquema aislado. Comprueban insercion, actualizacion,
@@ -241,6 +290,29 @@ Estas comprobaciones no abren el puerto 8082. Estan desactivadas por defecto:
 | `nivora.suministros.comprobar-al-iniciar` | `false` |
 | `nivora.suministros.operacion-prueba` | `consultar` |
 | `nivora.suministros.codigo-prueba` | `13100390` |
+
+### Comprobacion manual de las paginas de lecturas
+
+Con la Empresa de Agua iniciada en el puerto 8081 y `NIVORA_DB_CLAVE`
+disponible en el entorno, ejecutar desde el backend en CMD:
+
+```bat
+mvnw.cmd spring-boot:run "-Dspring-boot.run.arguments=--spring.main.web-application-type=none --nivora.lecturas.comprobar-al-iniciar=true"
+```
+
+La configuracion de la comprobacion es:
+
+| Propiedad | Valor local |
+|---|---|
+| `nivora.lecturas.comprobar-al-iniciar` | `false` |
+| `nivora.lecturas.codigo-prueba` | `13100390` |
+| `nivora.lecturas.cursor-prueba` | `0` |
+| `nivora.lecturas.limite-prueba` | `2` |
+
+La ejecucion informa cantidad de lecturas, siguiente cursor y si hay mas.
+Para consultar la siguiente pagina, enviar el cursor informado mediante
+`--nivora.lecturas.cursor-prueba=...`. No se abre el puerto 8082 ni se
+almacenan lecturas. La ejecucion habitual tiene la comprobacion desactivada.
 
 ## Referencias de arquitectura
 
