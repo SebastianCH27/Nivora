@@ -18,7 +18,7 @@ El puerto 8080 esta ocupado por Jenkins en el equipo de desarrollo.
 | Paquete previsto | Modulo | Estado |
 |---|---|---|
 | `acceso` | Acceso y suministros | Consulta HTTP, actualizacion explicita y repositorio propio de suministros. |
-| `lecturas` | Lecturas, consumo e historial | Consulta HTTP e incorporacion manual con deduplicacion e incidencias; calculos pendientes. |
+| `lecturas` | Lecturas, consumo e historial | Incorporacion y recuperacion manual con progreso persistido; calculos y automatizacion pendientes. |
 | `tarifas` | Tarifas, costos y proyecciones | Pendiente de implementar. |
 | `notificaciones` | Alertas y notificaciones | Pendiente de implementar. |
 | `recibos` | Recibos | Pendiente de implementar. |
@@ -139,9 +139,9 @@ no ejecuta cambios de estructura automaticamente.
 
 ### Integracion pendiente
 
-Este avance incorpora la consulta externa y el almacenamiento de suministros.
-Aun faltan el caso de uso de acceso, validacion de identidad, sesiones,
-roles, y el almacenamiento y sincronizacion de lecturas, tarifas y recibos.
+El backend incorpora consultas externas y almacenamiento propio de suministros
+y lecturas. Aun faltan el caso de uso de acceso, validacion de identidad,
+sesiones, roles, el almacenamiento de tarifas y recibos y la sincronizacion automatica.
 Las comprobaciones de consola no publican endpoints de consulta en Nivora.
 
 La Empresa de Agua incorpora `GET /api/v1/suministros/{codigo}/lecturas`,
@@ -149,7 +149,8 @@ con paginas de mediciones historicas identificadas, medidor, fecha UTC,
 tipo acumulado y unidad en litros. Los detalles del cursor estan en su README.
 Nivora implementa su adaptador y las validaciones de estructura y paginacion.
 La incorporacion manual almacena lecturas, distingue repetidas y registra rechazos.
-La confirmacion persistente de cursores y la sincronizacion automatica siguen pendientes.
+La recuperacion manual confirma el avance dentro de cada recorrido. La
+sincronizacion automatica y el protocolo de corte del proveedor siguen pendientes.
 
 El generador continuo de la Empresa actualiza actualmente los totales
 mensuales, no la tabla de lecturas historicas. Su entrega continua y
@@ -254,8 +255,23 @@ puede aceptarse posteriormente; la incidencia anterior conserva su detalle.
 
 La comprobacion contra la hora de recepcion no equivale a un corte de datos
 confirmado por la Empresa. Aun faltan ese protocolo, la gestion de fallos de
-comunicacion como incidencias de integracion, el cursor persistente, los
-reintentos programados y la generacion continua de mediciones identificadas.
+comunicacion para los otros procesos de integracion, los reintentos programados
+y la generacion continua de mediciones identificadas. La recuperacion manual
+ya registra sus fallos de fuente y conserva el cursor de su recorrido.
+
+## Recuperacion manual de paginas
+
+`RecuperarLecturas` recorre un numero limitado de paginas y reanuda desde
+el cursor almacenado por fuente y suministro. Las lecturas, sus incidencias
+y el avance de la pagina se confirman en una misma transaccion.
+
+Un recorrido terminado se revisa desde el inicio en la siguiente ejecucion.
+Esto permite detectar despues IDs antiguos que hayan aparecido tarde o
+cambiado, utilizando la deduplicacion existente. No equivale a un corte
+confirmado de todos los datos del proveedor.
+
+La preparacion de MySQL, los estados, los limites y las comprobaciones estan
+en [Recuperacion de lecturas](documentacion/recuperacion-lecturas.md).
 
 ## Configuracion y comprobaciones
 
@@ -296,6 +312,10 @@ Las pruebas de incorporacion ejecutan los scripts de suministros y lecturas
 en H2 aislado. Comprueban identidad, fechas, medidores, contadores, conflictos,
 conservacion de incidencias, dos escrituras simultaneas y rollback del lote.
 Las pruebas de aplicacion comprueban la coordinacion entre fuente y repositorio.
+
+Las pruebas de recuperacion incluyen el script `04-recuperacion-lecturas.sql`.
+Comprueban reanudacion, recorrido del historial, fallos de fuente, incidencias,
+bloqueo por datos rechazados, revisiones concurrentes y atomicidad del cursor.
 
 Estas pruebas no comprueban la conexion a la Empresa de Agua instalada
 en el equipo ni sustituyen la comprobacion manual con MySQL 8.0. Tampoco
@@ -420,8 +440,9 @@ operaciones son comprobaciones por consola y no abren el puerto 8082.
 | `nivora.lecturas.almacenamiento.comprobar-al-iniciar` | `false` |
 | `nivora.lecturas.almacenamiento.operacion-prueba` | `consultar` |
 
-La importacion no guarda ni confirma el cursor. El siguiente cursor mostrado
-es informacion de la pagina recibida; este paso no activa tareas automaticas.
+El comando `importar` de esta seccion no guarda ni confirma el cursor. El
+siguiente cursor mostrado es informacion de la pagina recibida. El recuperador
+descrito en su documentacion utiliza un progreso persistido y separado.
 
 ## Referencias de arquitectura
 
