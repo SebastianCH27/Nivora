@@ -139,8 +139,10 @@ SELECT codigo_suministro, ultimo_resultado, fallos_consecutivos, ultimo_intento_
 `ultimo_exito_utc` representa un recorrido automatico completo, no la fecha
 de la ultima medicion ni la fecha confirmada por la fuente. Esos datos se
 consultan en las lecturas y el contexto del progreso. Un resultado parcial
-no adelanta la fecha de exito. Las consultas de supervision mediante la API
-y su presentacion a usuarios se implementaran en el siguiente avance.
+no adelanta la fecha de exito. La consulta HTTP de
+[supervision](supervision-lecturas.md) muestra estos datos desde Nivora,
+separando el ultimo resultado de la vigencia de la reserva. Su presentacion
+en la aplicacion de usuarios se incorporara posteriormente.
 
 Con la Empresa apagada y MySQL disponible, Nivora sigue ejecutandose en
 8082 y conserva las lecturas propias. `/actuator/health` comprueba el servidor
@@ -148,8 +150,9 @@ y su conexion de datos; no certifica disponibilidad ni actualidad de la fuente.
 
 ## Validacion
 
-La suite contiene 231 pruebas: las 200 anteriores y 31 nuevas de politica,
-programacion JDBC y trabajador. Cubren registro idempotente, suministros
+La sincronizacion agrega 31 pruebas a las 200 de la recuperacion anterior.
+Junto con las 20 de supervision HTTP, la suite general contiene 251.
+Las pruebas de politica, programacion JDBC y trabajador cubren registro idempotente, suministros
 nuevos, reservas concurrentes y vencidas, calendario entre instancias,
 reintentos limitados, aislamiento de fallos, pausa y reinicio manual,
 limite por ciclo y continuacion del mismo corte.

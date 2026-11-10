@@ -18,7 +18,7 @@ El puerto 8080 esta ocupado por Jenkins en el equipo de desarrollo.
 | Paquete previsto | Modulo | Estado |
 |---|---|---|
 | `acceso` | Acceso y suministros | Consulta HTTP, actualizacion explicita y repositorio propio de suministros. |
-| `lecturas` | Lecturas, consumo e historial | Recuperacion manual y automatica con corte e inventario persistidos; calculos y supervision por API pendientes. |
+| `lecturas` | Lecturas, consumo e historial | Recuperacion manual y automatica con corte e inventario persistidos y API local de supervision; calculos pendientes. |
 | `tarifas` | Tarifas, costos y proyecciones | Pendiente de implementar. |
 | `notificaciones` | Alertas y notificaciones | Pendiente de implementar. |
 | `recibos` | Recibos | Pendiente de implementar. |
@@ -141,8 +141,9 @@ no ejecuta cambios de estructura automaticamente.
 
 El backend incorpora consultas externas y almacenamiento propio de suministros
 y lecturas. Aun faltan el caso de uso de acceso, validacion de identidad,
-sesiones, roles, el almacenamiento de tarifas y recibos y la supervision de integracion por API.
-Las comprobaciones de consola no publican endpoints de consulta en Nivora.
+sesiones, roles y el almacenamiento de tarifas y recibos. La API local de
+supervision de lecturas consulta el estado propio; las comprobaciones de
+consola se conservan para las operaciones manuales.
 
 La Empresa de Agua incorpora `GET /api/v1/suministros/{codigo}/lecturas`,
 con paginas de mediciones historicas identificadas, medidor, fecha UTC,
@@ -310,6 +311,26 @@ activa la tarea; las comprobaciones no web siguen separadas. El perfil
 
 La configuracion, los estados de programacion y las comprobaciones estan en
 [Sincronizacion de lecturas](documentacion/sincronizacion-lecturas.md).
+
+## API local de supervision de lecturas
+
+`GET /api/v1/supervision/suministros/{codigo}/lecturas` consulta una instantanea
+de las lecturas guardadas, incidencias, progreso, corte y programacion del
+suministro propio. La respuesta distingue el ultimo resultado de una reserva
+vigente o vencida. La consulta usa una sola sentencia de lectura de MySQL,
+no llama a la Empresa y no modifica el calendario ni el cursor.
+
+Un suministro registrado sin lecturas devuelve 200 con conteo cero y fechas
+nulas; la ausencia en Nivora devuelve 404. Un codigo invalido devuelve 400 y
+un fallo al consultar los datos propios devuelve 503. Los errores de fuente
+guardados se informan dentro de una respuesta 200 cuando la lectura propia
+funciona. Las respuestas del endpoint usan `Cache-Control: no-store`.
+
+No requiere otro script SQL: utiliza las ocho tablas de los scripts 01-06.
+La API de supervision corresponde al entorno local vinculado a
+`127.0.0.1`; DNI, sesiones y permisos se incorporaran en el bloque de acceso.
+El contrato, las fechas y los ejemplos estan en
+[Supervision de lecturas](documentacion/supervision-lecturas.md).
 
 ## Configuracion y comprobaciones
 

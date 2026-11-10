@@ -68,6 +68,8 @@ La Empresa ya publica nuevas lecturas identificadas junto con sus totales
 mensuales. La recuperacion manual y la tarea automatica pueden incorporarlas.
 Su programacion se describe en [Sincronizacion](sincronizacion-lecturas.md). La marca de emision
 de la Empresa se conserva en el contexto junto con el limite de sus paginas.
+El progreso, el corte y la programacion pueden consultarse mediante la
+[API local de supervision](supervision-lecturas.md), usando los datos propios.
 
 El adaptador consulta `GET /api/v1/suministros/{codigo}/medidores` y
 `GET /api/v1/lecturas/corte`. Exige fuente y suministro compatibles, fechas
@@ -174,6 +176,7 @@ Las 165 pruebas anteriores se conservan. `RecuperacionConCorteTests` agrega
 publicaciones posteriores, rechazos, fallos de fuente, cambios concurrentes
 de recorrido, migracion repetida y rollback. La suite completa contiene 200
 pruebas de recuperacion. Las 31 pruebas adicionales de sincronizacion llevan
-la suite general a 231. La integracion tambien se comprobo con la API Spring real de la
+la suite a 231; las 20 de supervision HTTP llevan el total a 251.
+La integracion tambien se comprobo con la API Spring real de la
 Empresa y MySQL 8.0.46, conservando datos de un progreso anterior y validando
 la ruta del comprobador principal.
