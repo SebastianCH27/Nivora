@@ -11,7 +11,7 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Component;
 
 import pe.nivora.backend.acceso.dominio.CodigoSuministro;
-import pe.nivora.backend.lecturas.aplicacion.RecuperarLecturas;
+import pe.nivora.backend.lecturas.aplicacion.RecuperarLecturasConCorte;
 import pe.nivora.backend.lecturas.dominio.contratos.RepositorioLecturas;
 import pe.nivora.backend.lecturas.dominio.contratos.RepositorioRecuperacionLecturas;
 
@@ -19,7 +19,7 @@ import pe.nivora.backend.lecturas.dominio.contratos.RepositorioRecuperacionLectu
 @ConditionalOnProperty(name = "nivora.recuperacion.comprobar-al-iniciar", havingValue = "true")
 public class ComprobarRecuperacionLecturas implements ApplicationRunner {
     private static final Logger LOG = LoggerFactory.getLogger(ComprobarRecuperacionLecturas.class);
-    private final RecuperarLecturas recuperar;
+    private final RecuperarLecturasConCorte recuperar;
     private final RepositorioRecuperacionLecturas progreso;
     private final RepositorioLecturas lecturas;
     private final Clock reloj;
@@ -28,7 +28,7 @@ public class ComprobarRecuperacionLecturas implements ApplicationRunner {
     private final int maximoPaginas;
     private final String operacion;
 
-    public ComprobarRecuperacionLecturas(RecuperarLecturas recuperar,
+    public ComprobarRecuperacionLecturas(RecuperarLecturasConCorte recuperar,
             RepositorioRecuperacionLecturas progreso, RepositorioLecturas lecturas, Clock reloj,
             @Value("${nivora.lecturas.codigo-prueba}") String codigo,
             @Value("${nivora.lecturas.limite-prueba}") int limite,
@@ -44,6 +44,14 @@ public class ComprobarRecuperacionLecturas implements ApplicationRunner {
         this.operacion = operacion;
     }
 
+    private void mostrarContexto(pe.nivora.backend.lecturas.dominio.ProgresoRecuperacion actual) {
+        var contexto = actual.contexto();
+        if (contexto != null) {
+            LOG.info("Contexto recuperacion: suministro {}; hasta ID {}; fuente confirmada hasta {}; medidores {}.",
+                codigo.valor(), contexto.hastaIdLectura(), contexto.confirmadoHasta(), contexto.medidores().size());
+        }
+    }
+
     @Override
     public void run(ApplicationArguments argumentos) {
         switch (operacion) {
@@ -53,11 +61,13 @@ public class ComprobarRecuperacionLecturas implements ApplicationRunner {
                 LOG.info("Recuperacion lecturas: suministro {}; paginas {}; nuevas {}; repetidas {}; rechazadas {}; cursor {}; estado {}.",
                     codigo.valor(), resultado.paginas(), conteo.nuevas(), conteo.repetidas(), conteo.rechazadas(),
                     resultado.progreso().cursor(), resultado.progreso().estado());
+                mostrarContexto(resultado.progreso());
             }
             case "consultar" -> {
                 var actual = progreso.consultar("empresa-agua", codigo);
                 LOG.info("Estado recuperacion: suministro {}; cursor {}; estado {}; revision {}; guardadas {}.",
                     codigo.valor(), actual.cursor(), actual.estado(), actual.revision(), lecturas.contar(codigo));
+                mostrarContexto(actual);
             }
             case "reiniciar" -> {
                 var actual = progreso.consultar("empresa-agua", codigo);

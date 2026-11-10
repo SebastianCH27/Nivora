@@ -265,9 +265,9 @@ superior a 1000 elementos devuelve 503, sin truncarlo silenciosamente.
 El inventario no tiene versión histórica asociada al corte. La gestión
 completa de sustituciones y correcciones de medidores sigue pendiente.
 
-Estas rutas preparan el contrato del proveedor. El backend de Nivora
-todavía debe incorporar su consumo, persistencia y validación; su recuperación
-manual actual mantiene el contrato anterior.
+La recuperación manual principal de Nivora consume estas rutas y conserva
+el corte y una copia del inventario durante cada recorrido. La recuperación
+automática sigue pendiente.
 
 ### Emisión continua de lecturas
 

@@ -9,6 +9,11 @@ import pe.nivora.backend.lecturas.dominio.contratos.FuenteLecturas;
 @Configuration(proxyBeanMethods = false)
 public class LecturasEmpresaConfiguracion {
     @Bean
+    pe.nivora.backend.lecturas.dominio.contratos.FuenteLecturasConCorte fuenteLecturasConCorte(ClienteEmpresaAgua cliente) {
+        return new FuenteLecturasConCorteHttp(cliente);
+    }
+
+    @Bean
     FuenteLecturas fuenteLecturas(ClienteEmpresaAgua cliente) {
         return new FuenteLecturasHttp(cliente);
     }

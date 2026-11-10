@@ -4,6 +4,7 @@ import java.math.BigInteger;
 import java.time.DateTimeException;
 import java.time.Instant;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
@@ -29,16 +30,27 @@ public final class FuenteLecturasHttp implements FuenteLecturas {
 
     @Override
     public Optional<LoteLecturas> consultar(CodigoSuministro codigo, String cursor, int limite) {
+        return consultar(codigo, cursor, limite, null);
+    }
+
+    public Optional<LoteLecturas> consultar(CodigoSuministro codigo, String cursor,
+            int limite, String hastaId) {
         Objects.requireNonNull(codigo);
         long desde = identificador(cursor, true);
+        Long hasta = hastaId == null ? null : identificador(hastaId, true);
+        if (hasta != null && desde > hasta) {
+            throw new IllegalArgumentException("El cursor supera el corte solicitado.");
+        }
         if (limite < 1 || limite > 500) {
             throw new IllegalArgumentException("El limite debe estar entre 1 y 500.");
         }
 
         String ruta = "/api/v1/suministros/" + codigo.valor() + "/lecturas";
         ClienteEmpresaAgua.Respuesta respuesta;
+        var parametros = new HashMap<String, Object>(Map.of("despuesDe", cursor, "limite", limite));
+        if (hastaId != null) parametros.put("hastaId", hastaId);
         try {
-            respuesta = cliente.consultar(ruta, Map.of("despuesDe", cursor, "limite", limite),
+            respuesta = cliente.consultar(ruta, parametros,
                 MAXIMO_RESPUESTA_BYTES);
         } catch (ClienteEmpresaAgua.ConsultaFallidaException ex) {
             throw new FuenteLecturasNoDisponibleException(
@@ -47,7 +59,7 @@ public final class FuenteLecturasHttp implements FuenteLecturas {
 
         if (respuesta.estado() == 200) {
             try {
-                return Optional.of(interpretar(respuesta.cuerpo(), codigo, desde, limite));
+                return Optional.of(interpretar(respuesta.cuerpo(), codigo, desde, limite, hasta));
             } catch (IllegalArgumentException | ArithmeticException | DateTimeException ex) {
                 // No adjuntar valores ni el cuerpo del proveedor a la excepcion de dominio.
                 throw respuestaNoUtilizable();
@@ -61,7 +73,7 @@ public final class FuenteLecturasHttp implements FuenteLecturas {
     }
 
     private LoteLecturas interpretar(JsonNode datos, CodigoSuministro codigo,
-                                    long desde, int limite) {
+                                    long desde, int limite, Long hasta) {
         exigir(FUENTE.equals(texto(datos, "fuente"))
             && codigo.valor().equals(texto(datos, "codigoSuministro"))
             && "ACUMULADA".equals(texto(datos, "tipoMedicion"))
@@ -80,7 +92,7 @@ public final class FuenteLecturasHttp implements FuenteLecturas {
             exigir(fila.isObject());
             String id = texto(fila, "idLectura");
             long numero = identificador(id, false);
-            exigir(numero > ultimo);
+            exigir(numero > ultimo && (hasta == null || numero <= hasta));
             String medidor = texto(fila, "idMedidor");
             identificador(medidor, false);
             String fecha = texto(fila, "fechaMedicion");
@@ -96,6 +108,7 @@ public final class FuenteLecturasHttp implements FuenteLecturas {
 
         String siguiente = texto(datos, "siguienteDespuesDe");
         exigir(identificador(siguiente, true) == ultimo);
+        exigir(hasta == null || !hayMas || ultimo < hasta);
         return new LoteLecturas(FUENTE, codigo, lecturas, siguiente, hayMas);
     }
 

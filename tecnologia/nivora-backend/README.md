@@ -18,7 +18,7 @@ El puerto 8080 esta ocupado por Jenkins en el equipo de desarrollo.
 | Paquete previsto | Modulo | Estado |
 |---|---|---|
 | `acceso` | Acceso y suministros | Consulta HTTP, actualizacion explicita y repositorio propio de suministros. |
-| `lecturas` | Lecturas, consumo e historial | Incorporacion y recuperacion manual con progreso persistido; calculos y automatizacion pendientes. |
+| `lecturas` | Lecturas, consumo e historial | Recuperacion manual con corte e inventario persistidos; calculos y automatizacion pendientes. |
 | `tarifas` | Tarifas, costos y proyecciones | Pendiente de implementar. |
 | `notificaciones` | Alertas y notificaciones | Pendiente de implementar. |
 | `recibos` | Recibos | Pendiente de implementar. |
@@ -149,16 +149,16 @@ con paginas de mediciones historicas identificadas, medidor, fecha UTC,
 tipo acumulado y unidad en litros. Los detalles del cursor estan en su README.
 Nivora implementa su adaptador y las validaciones de estructura y paginacion.
 La incorporacion manual almacena lecturas, distingue repetidas y registra rechazos.
-La recuperacion manual confirma el avance dentro de cada recorrido. La
-sincronizacion automatica y la incorporacion del corte del proveedor a Nivora
-siguen pendientes.
+La recuperacion manual confirma el avance de cada recorrido conservando su
+corte y una copia del inventario. La sincronizacion automatica sigue pendiente.
 
 El generador continuo de la Empresa publica nuevas lecturas identificadas
 junto con sus totales mensuales. La recuperacion manual de Nivora puede
 incorporarlas utilizando los contratos existentes. La programacion de esa
 recuperacion sigue pendiente segun ADR-003. La Empresa ofrece ahora un corte
 confirmado, el parametro opcional `hastaId` y el inventario de medidores.
-Nivora todavia debe consumir y almacenar ese contexto para validar sus recorridos.
+Nivora consume esos datos mediante `FuenteLecturasConCorteHttp` y los guarda
+en `contexto_recuperacion_lecturas` para reanudar el mismo recorrido.
 Un acumulado mensual no equivale a un incremento nuevo que deba sumarse
 cada vez que se consulta.
 
@@ -202,9 +202,9 @@ El limite del cuerpo es de 64 KiB para suministros y 512 KiB para lecturas.
 
 La incorporacion propia comprueba la fecha respecto de su recepcion, la
 consistencia del contador y las coincidencias con registros ya aceptados.
-La validacion respecto de un corte confirmado por la fuente y del inventario
-de medidores sigue pendiente. Este avance no calcula consumo ni trata cada
-contador como un incremento nuevo.
+La recuperacion principal valida los IDs respecto del corte confirmado y
+las mediciones respecto de su fecha y del inventario persistido. Este avance
+no calcula consumo ni trata cada contador como un incremento nuevo.
 
 ## Incorporacion de lecturas en la base propia
 
@@ -228,6 +228,7 @@ Las reglas de fecha y contador se encuentran en el dominio, en
 | Otro ID para la misma fuente, suministro, medidor y fecha | Rechazada como medicion ya identificada. |
 | Fecha fuera del rango 1000-9999, con precision superior a microsegundos o posterior a su recepcion | Rechazada y registrada en incidencias. |
 | Contador inferior al anterior o superior al posterior del mismo medidor | Rechazada y registrada en incidencias. |
+| Medicion posterior al corte, medidor ausente del inventario o dia fuera de sus fechas administrativas | Rechazada y registrada; conserva las otras lecturas validas y bloquea el avance. |
 | Fallo de almacenamiento durante el lote | Revierte todas las escrituras del lote. |
 
 La primera lectura compatible de un medidor se conserva como referencia,
@@ -257,24 +258,36 @@ lecturas validas del lote junto con sus incidencias. Un fallo tecnico de la
 transaccion revierte el lote entero. Si una lectura rechazada llega corregida,
 puede aceptarse posteriormente; la incidencia anterior conserva su detalle.
 
-La comprobacion contra la hora de recepcion no equivale a validar el corte de
-la Empresa. Aunque el proveedor ya expone ese contrato, falta incorporarlo
-al adaptador y al progreso de Nivora, junto con el inventario de medidores.
-Aun faltan la gestion de fallos de
-comunicacion para los otros procesos de integracion y los reintentos programados.
+La comprobacion contra la hora de recepcion se complementa con la fecha del
+corte y los dias declarados en el inventario del proveedor. Las fechas de
+instalacion y retiro no tienen precision horaria; la gestion completa de
+sustituciones sigue pendiente. Aun faltan la gestion de fallos de comunicacion
+para los otros procesos de integracion y los reintentos programados.
 La Empresa ya genera mediciones identificadas de forma continua. La recuperacion
 manual registra sus fallos de fuente y conserva el cursor de su recorrido.
 
 ## Recuperacion manual de paginas
 
-`RecuperarLecturas` recorre un numero limitado de paginas y reanuda desde
-el cursor almacenado por fuente y suministro. Las lecturas, sus incidencias
-y el avance de la pagina se confirman en una misma transaccion.
+`RecuperarLecturasConCorte`, utilizado por el comprobador principal, obtiene
+el inventario y el corte fuera de la transaccion de escritura. Guarda ese
+contexto junto con una nueva revision del progreso. Solicita cada pagina con
+el mismo `hastaId`; los fallos conservan el contexto y el cursor confirmado.
+Las lecturas, sus incidencias y el avance de pagina se confirman atomicamente.
 
 Un recorrido terminado se revisa desde el inicio en la siguiente ejecucion.
 Esto permite detectar despues IDs antiguos que hayan aparecido tarde o
-cambiado, utilizando la deduplicacion existente. No equivale a un corte
-confirmado de todos los datos del proveedor.
+cambiado, utilizando la deduplicacion existente, bajo un nuevo corte. El corte
+acota altas confirmadas; no versiona las modificaciones historicas ni el
+inventario. Un recorrido parcial no acredita haber procesado todo ese corte.
+
+Antes de utilizar esta recuperacion, aplicar como administrador
+`base-datos/05-contexto-recuperacion-lecturas.sql`, despues del script 04.
+Conserva los datos anteriores. Un progreso sin contexto vuelve al cursor cero
+al obtenerlo, para revisar las lecturas previas con las nuevas validaciones.
+
+Las comprobaciones individuales de `FuenteLecturas` e `ImportarPaginaLecturas`
+se conservan. La recuperacion principal no utiliza esas consultas sin limite
+como alternativa cuando falta el corte o el inventario.
 
 La preparacion de MySQL, los estados, los limites y las comprobaciones estan
 en [Recuperacion de lecturas](documentacion/recuperacion-lecturas.md).

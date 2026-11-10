@@ -27,6 +27,7 @@ import tools.jackson.databind.json.JsonMapper;
 
 import pe.nivora.backend.acceso.dominio.CodigoSuministro;
 import pe.nivora.backend.lecturas.dominio.LecturaAcumulada;
+import pe.nivora.backend.lecturas.dominio.ContextoLecturas;
 import pe.nivora.backend.lecturas.dominio.LoteLecturas;
 import pe.nivora.backend.lecturas.dominio.MotivoRechazoLectura;
 import pe.nivora.backend.lecturas.dominio.PoliticaIncorporacionLecturas;
@@ -50,20 +51,31 @@ public class RepositorioLecturasJdbc implements RepositorioLecturas {
 
     @Override
     public ResultadoIncorporacion incorporar(LoteLecturas lote, Instant recibidaEn) {
+        return incorporar(lote, recibidaEn, null);
+    }
+
+    @Override
+    public ResultadoIncorporacion incorporar(LoteLecturas lote, Instant recibidaEn,
+            ContextoLecturas contexto) {
         Objects.requireNonNull(lote);
         Objects.requireNonNull(recibidaEn);
         if (lote.lecturas().size() > 500) {
             throw new IllegalArgumentException("El lote no puede superar 500 lecturas.");
         }
+        if (contexto != null && (!contexto.fuente().equals(lote.fuente())
+                || !contexto.suministro().equals(lote.suministro()))) {
+            throw new IllegalArgumentException("El contexto no corresponde al lote.");
+        }
         try {
-            return transaccion.execute(estado -> incorporarEnTransaccion(lote, recibidaEn));
+            return transaccion.execute(estado -> incorporarEnTransaccion(lote, recibidaEn, contexto));
         } catch (DataAccessException | TransactionException | JacksonException ex) {
             throw new RepositorioLecturasNoDisponibleException(
                 "No se pudo completar la incorporacion de lecturas en Nivora.", ex);
         }
     }
 
-    private ResultadoIncorporacion incorporarEnTransaccion(LoteLecturas lote, Instant recibidaEn) {
+    private ResultadoIncorporacion incorporarEnTransaccion(LoteLecturas lote, Instant recibidaEn,
+            ContextoLecturas contexto) {
         // Adquirir el bloqueo antes de cualquier lectura consistente del lote.
         jdbc.update("""
             INSERT INTO control_incorporacion_lecturas (fuente) VALUES (?)
@@ -84,13 +96,19 @@ public class RepositorioLecturasJdbc implements RepositorioLecturas {
         var recepcion = aUtc(recibidaEn.truncatedTo(ChronoUnit.MICROS));
         for (var lectura : lote.lecturas()) {
             var existente = buscarInterno(lectura.fuente(), lectura.idLectura());
-            if (existente.isPresent() && existente.orElseThrow().equals(lectura)) {
+            boolean identica = existente.isPresent() && existente.orElseThrow().equals(lectura);
+            if (identica && contexto == null) {
                 repetidas++;
                 continue;
             }
-            Optional<MotivoRechazoLectura> motivo = existente.isPresent()
+            Optional<MotivoRechazoLectura> motivo = existente.isPresent() && !identica
                 ? Optional.of(MotivoRechazoLectura.ID_EN_CONFLICTO)
                 : PoliticaIncorporacionLecturas.validarFecha(lectura, recibidaEn);
+            if (motivo.isEmpty() && contexto != null) motivo = contexto.validar(lectura);
+            if (identica && motivo.isEmpty()) {
+                repetidas++;
+                continue;
+            }
             if (motivo.isEmpty()) {
                 var mismaMedicion = jdbc.queryForList("""
                     SELECT id_lectura FROM lecturas

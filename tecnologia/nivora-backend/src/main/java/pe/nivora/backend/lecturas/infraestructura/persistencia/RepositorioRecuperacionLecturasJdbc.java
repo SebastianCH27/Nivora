@@ -14,9 +14,11 @@ import org.springframework.stereotype.Repository;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.TransactionException;
 import org.springframework.transaction.support.TransactionTemplate;
+import tools.jackson.core.JacksonException;
 
 import pe.nivora.backend.acceso.dominio.CodigoSuministro;
 import pe.nivora.backend.lecturas.dominio.EstadoRecuperacion;
+import pe.nivora.backend.lecturas.dominio.ContextoLecturas;
 import pe.nivora.backend.lecturas.dominio.LoteLecturas;
 import pe.nivora.backend.lecturas.dominio.ProgresoRecuperacion;
 import pe.nivora.backend.lecturas.dominio.contratos.ProgresoRecuperacionModificadoException;
@@ -24,6 +26,7 @@ import pe.nivora.backend.lecturas.dominio.contratos.RepositorioLecturas;
 import pe.nivora.backend.lecturas.dominio.contratos.RepositorioLecturasNoDisponibleException;
 import pe.nivora.backend.lecturas.dominio.contratos.RepositorioRecuperacionLecturas;
 import pe.nivora.backend.lecturas.dominio.contratos.SuministroNoRegistradoException;
+import pe.nivora.backend.lecturas.infraestructura.ContextoLecturasJson;
 
 @Repository
 public class RepositorioRecuperacionLecturasJdbc implements RepositorioRecuperacionLecturas {
@@ -50,12 +53,33 @@ public class RepositorioRecuperacionLecturasJdbc implements RepositorioRecuperac
     }
 
     @Override
+    public ProgresoRecuperacion iniciarContexto(ProgresoRecuperacion esperado,
+            ContextoLecturas contexto, Instant ahora) {
+        return ejecutarAtomico(() -> {
+            var siguiente = bloquearYComprobar(esperado).iniciarContexto(contexto, ahora);
+            guardar(siguiente);
+            String inventario = ContextoLecturasJson.inventario(contexto);
+            jdbc.update("""
+                INSERT INTO contexto_recuperacion_lecturas (fuente, codigo_suministro,
+                    hasta_id_lectura, confirmado_hasta_utc, inventario_json, capturado_en_utc)
+                VALUES (?, ?, ?, ?, ?, ?)
+                ON DUPLICATE KEY UPDATE hasta_id_lectura = ?, confirmado_hasta_utc = ?,
+                    inventario_json = ?, capturado_en_utc = ?
+                """, siguiente.fuente(), siguiente.suministro().valor(),
+                contexto.hastaIdLectura(), aUtc(contexto.confirmadoHasta()), inventario,
+                aUtc(siguiente.actualizadoEn()), contexto.hastaIdLectura(),
+                aUtc(contexto.confirmadoHasta()), inventario, aUtc(siguiente.actualizadoEn()));
+            return siguiente;
+        });
+    }
+
+    @Override
     public Paso confirmar(ProgresoRecuperacion esperado, LoteLecturas lote, Instant ahora) {
         return ejecutarAtomico(() -> {
             var actual = bloquearYComprobar(esperado);
             actual.comprobarPagina(lote);
             // La incorporacion existente se une a esta misma transaccion JDBC.
-            var resultado = lecturas.incorporar(lote, ahora);
+            var resultado = lecturas.incorporar(lote, ahora, actual.contexto());
             var siguiente = actual.confirmar(lote, resultado, ahora);
             guardar(siguiente);
             jdbc.update("""
@@ -92,6 +116,8 @@ public class RepositorioRecuperacionLecturasJdbc implements RepositorioRecuperac
         return ejecutarAtomico(() -> {
             var siguiente = bloquearYComprobar(esperado).reiniciar(ahora);
             guardar(siguiente);
+            jdbc.update("DELETE FROM contexto_recuperacion_lecturas WHERE fuente = ? AND codigo_suministro = ?",
+                siguiente.fuente(), siguiente.suministro().valor());
             return siguiente;
         });
     }
@@ -122,9 +148,13 @@ public class RepositorioRecuperacionLecturasJdbc implements RepositorioRecuperac
     private Optional<ProgresoRecuperacion> buscar(String fuente, CodigoSuministro suministro, boolean bloquear) {
         String bloqueo = bloquear ? " FOR UPDATE" : "";
         return jdbc.query("""
-            SELECT fuente, codigo_suministro, cursor_confirmado, revision, estado,
-                ultima_confirmacion_utc, actualizado_en_utc
-            FROM progreso_recuperacion_lecturas WHERE fuente = ? AND codigo_suministro = ?
+            SELECT p.fuente, p.codigo_suministro, p.cursor_confirmado, p.revision, p.estado,
+                p.ultima_confirmacion_utc, p.actualizado_en_utc,
+                c.hasta_id_lectura, c.confirmado_hasta_utc, c.inventario_json
+            FROM progreso_recuperacion_lecturas p
+            LEFT JOIN contexto_recuperacion_lecturas c
+                ON c.fuente = p.fuente AND c.codigo_suministro = p.codigo_suministro
+            WHERE p.fuente = ? AND p.codigo_suministro = ?
             """ + bloqueo, RepositorioRecuperacionLecturasJdbc::mapear,
             fuente, suministro.valor()).stream().findFirst();
     }
@@ -146,7 +176,7 @@ public class RepositorioRecuperacionLecturasJdbc implements RepositorioRecuperac
     private <T> T ejecutarAtomico(Supplier<T> operacion) {
         try {
             return transaccion.execute(estado -> operacion.get());
-        } catch (DataAccessException | TransactionException ex) {
+        } catch (DataAccessException | TransactionException | JacksonException ex) {
             throw new RepositorioLecturasNoDisponibleException(
                 "No se pudo completar el registro de recuperacion de lecturas.", ex);
         }
@@ -154,11 +184,24 @@ public class RepositorioRecuperacionLecturasJdbc implements RepositorioRecuperac
 
     private static ProgresoRecuperacion mapear(ResultSet fila, int numero) throws SQLException {
         var confirmacion = fila.getObject("ultima_confirmacion_utc", LocalDateTime.class);
+        ContextoLecturas contexto = null;
+        String hasta = fila.getString("hasta_id_lectura");
+        if (hasta != null) {
+            try {
+                contexto = ContextoLecturasJson.restaurar(fila.getString("fuente"),
+                    new CodigoSuministro(fila.getString("codigo_suministro")), hasta,
+                    fila.getObject("confirmado_hasta_utc", LocalDateTime.class).toInstant(ZoneOffset.UTC),
+                    fila.getString("inventario_json"));
+            } catch (RuntimeException error) {
+                throw new RepositorioLecturasNoDisponibleException(
+                    "El contexto de recuperacion guardado no es utilizable.", error);
+            }
+        }
         return new ProgresoRecuperacion(fila.getString("fuente"),
             new CodigoSuministro(fila.getString("codigo_suministro")), fila.getString("cursor_confirmado"),
             fila.getLong("revision"), EstadoRecuperacion.valueOf(fila.getString("estado")),
             confirmacion == null ? null : confirmacion.toInstant(ZoneOffset.UTC),
-            fila.getObject("actualizado_en_utc", LocalDateTime.class).toInstant(ZoneOffset.UTC));
+            fila.getObject("actualizado_en_utc", LocalDateTime.class).toInstant(ZoneOffset.UTC), contexto);
     }
 
     private static LocalDateTime aUtc(Instant instante) {
