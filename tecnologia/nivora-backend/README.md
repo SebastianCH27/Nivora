@@ -150,12 +150,15 @@ tipo acumulado y unidad en litros. Los detalles del cursor estan en su README.
 Nivora implementa su adaptador y las validaciones de estructura y paginacion.
 La incorporacion manual almacena lecturas, distingue repetidas y registra rechazos.
 La recuperacion manual confirma el avance dentro de cada recorrido. La
-sincronizacion automatica y el protocolo de corte del proveedor siguen pendientes.
+sincronizacion automatica y la incorporacion del corte del proveedor a Nivora
+siguen pendientes.
 
 El generador continuo de la Empresa publica nuevas lecturas identificadas
 junto con sus totales mensuales. La recuperacion manual de Nivora puede
 incorporarlas utilizando los contratos existentes. La programacion de esa
-recuperacion y el corte confirmado del proveedor siguen pendientes segun ADR-003.
+recuperacion sigue pendiente segun ADR-003. La Empresa ofrece ahora un corte
+confirmado, el parametro opcional `hastaId` y el inventario de medidores.
+Nivora todavia debe consumir y almacenar ese contexto para validar sus recorridos.
 Un acumulado mensual no equivale a un incremento nuevo que deba sumarse
 cada vez que se consulta.
 
@@ -254,8 +257,10 @@ lecturas validas del lote junto con sus incidencias. Un fallo tecnico de la
 transaccion revierte el lote entero. Si una lectura rechazada llega corregida,
 puede aceptarse posteriormente; la incidencia anterior conserva su detalle.
 
-La comprobacion contra la hora de recepcion no equivale a un corte de datos
-confirmado por la Empresa. Aun faltan ese protocolo, la gestion de fallos de
+La comprobacion contra la hora de recepcion no equivale a validar el corte de
+la Empresa. Aunque el proveedor ya expone ese contrato, falta incorporarlo
+al adaptador y al progreso de Nivora, junto con el inventario de medidores.
+Aun faltan la gestion de fallos de
 comunicacion para los otros procesos de integracion y los reintentos programados.
 La Empresa ya genera mediciones identificadas de forma continua. La recuperacion
 manual registra sus fallos de fuente y conserva el cursor de su recorrido.

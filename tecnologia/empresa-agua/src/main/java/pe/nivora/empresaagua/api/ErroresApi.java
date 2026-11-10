@@ -10,6 +10,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ProblemDetail;
 import org.springframework.http.ResponseEntity;
+import org.springframework.transaction.TransactionException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
@@ -63,9 +64,9 @@ public class ErroresApi {
             error.getMessage());
     }
 
-    @ExceptionHandler(DataAccessException.class)
+    @ExceptionHandler({DataAccessException.class, TransactionException.class})
     public ResponseEntity<ProblemDetail> falloDatos(
-            DataAccessException error) {
+            RuntimeException error) {
 
         log.error(
             "Fallo al consultar los datos de la Empresa de Agua",

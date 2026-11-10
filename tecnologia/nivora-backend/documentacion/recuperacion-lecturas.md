@@ -22,7 +22,7 @@ obsoleta no se confirma. Se informa `ProgresoRecuperacionModificadoException`
 y debe consultarse de nuevo el estado antes de reintentar.
 
 La fecha de ultima confirmacion representa el procesamiento de una pagina
-en Nivora. Es distinta de la fecha de medicion y del futuro corte de datos
+en Nivora. Es distinta de la fecha de medicion y del corte de datos
 confirmado por la fuente.
 
 ## Estados
@@ -49,8 +49,8 @@ Los rechazos de lecturas se revisan en `incidencias_lecturas`, por separado.
 
 ## Alcance del recorrido
 
-La API actual expone filas persistidas, sin un corte de datos confirmado
-ni un registro de modificaciones. Por eso cada nuevo recorrido, una vez
+La recuperacion actual de Nivora consulta filas persistidas sin enviar un
+limite superior de IDs. Por eso cada nuevo recorrido, una vez
 terminado el anterior, vuelve a revisar el historial completo. Asi puede
 recuperar posteriormente una fila con ID inferior al ultimo cursor de un
 recorrido anterior y detectar cambios de una lectura ya aceptada.
@@ -60,7 +60,13 @@ la hora actual ni representa una fotografia inmutable de todas las paginas.
 La Empresa ya publica nuevas lecturas identificadas junto con sus totales
 mensuales y la recuperacion manual puede incorporarlas. La sincronizacion
 automatica de Nivora y su frecuencia siguen pendientes. La marca de emision
-de la Empresa no fija una fotografia inmutable de las paginas de su API.
+de la Empresa por si sola no fija el limite de las paginas de Nivora.
+
+El proveedor ofrece ahora `GET /api/v1/lecturas/corte`, el parametro opcional
+`hastaId` y `GET /api/v1/suministros/{codigo}/medidores`. El siguiente avance
+de Nivora debe consumir ese contexto y persistir el corte de cada recorrido.
+Hasta entonces, este recuperador conserva su comportamiento anterior. El
+nuevo contrato del proveedor acota altas; no versiona cambios historicos.
 
 Las metas de rendimiento y 5000 usuarios simultaneos requieren sus pruebas
 posteriores. La revision completa del historial y el bloqueo por fuente

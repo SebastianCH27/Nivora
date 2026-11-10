@@ -25,13 +25,23 @@ public class LecturasRepositorio {
     }
 
     public List<PaginaLecturas.Lectura> buscar(long suministro, long despuesDe, int cantidad) {
-        return jdbc.query("""
+        return buscar(suministro, despuesDe, cantidad, null);
+    }
+
+    public List<PaginaLecturas.Lectura> buscar(long suministro, long despuesDe,
+            int cantidad, Long hastaId) {
+        String sql = """
             SELECT id_lectura, id_medidor, fecha_medicion, lectura_acumulada_m3
             FROM lecturas
             WHERE id_suministro = ? AND id_lectura > ?
+            """ + (hastaId == null ? "" : " AND id_lectura <= ? ") + """
             ORDER BY id_lectura ASC
             LIMIT ?
-            """, (fila, numero) -> {
+            """;
+        Object[] parametros = hastaId == null
+            ? new Object[] { suministro, despuesDe, cantidad }
+            : new Object[] { suministro, despuesDe, hastaId, cantidad };
+        return jdbc.query(sql, (fila, numero) -> {
                 long id = fila.getLong("id_lectura");
                 long medidor = fila.getLong("id_medidor");
                 LocalDateTime fecha = fila.getObject("fecha_medicion", LocalDateTime.class);
@@ -51,6 +61,6 @@ public class LecturasRepositorio {
 
                 return new PaginaLecturas.Lectura(Long.toString(id), Long.toString(medidor),
                     fecha.toInstant(ZoneOffset.UTC), litros);
-            }, suministro, despuesDe, cantidad);
+            }, parametros);
     }
 }

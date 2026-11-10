@@ -118,6 +118,8 @@ se envía como texto de 1 a 20 dígitos.
 | `/actuator/health` | Estado del servicio y conexión de datos |
 | `/api/v1/suministros/{codigo}` | Código y titular del suministro, sin depender de sus consumos mensuales |
 | `/api/v1/suministros/{codigo}/lecturas?despuesDe=0&limite=100` | Página de lecturas identificadas ya persistidas, ordenadas por ID |
+| `/api/v1/lecturas/corte` | Límite global de altas confirmadas y fecha de la emisión que lo confirma |
+| `/api/v1/suministros/{codigo}/medidores` | Inventario de medidores del suministro con sus fechas administrativas |
 | `/api/v1/suministros/{codigo}/consumo-actual` | Consumo acumulado del mes en litros |
 | `/api/v1/suministros/{codigo}/historial?meses=12` | Historial mensual, del más reciente al más antiguo |
 | `/api/v1/suministros/{codigo}/recibos?limite=12` | Recibos emitidos y disponibles para consultar |
@@ -196,7 +198,10 @@ entre sí.
 - `despuesDe` es un ID exclusivo, no una fecha. Acepta de 0 a 9223372036854775807.
 - `limite` acepta de 1 a 500; por defecto devuelve hasta 100 lecturas.
 - Para continuar, enviar `siguienteDespuesDe` como el siguiente `despuesDe`.
-- `hayMas` indica si quedan filas en esa consulta; no acredita que el
+- `hastaId` es opcional y limita las filas a IDs menores o iguales a ese valor.
+  Debe ser un decimal canónico entre 0 y 9223372036854775807, mayor o igual
+  a `despuesDe`. Un valor vacío o inválido devuelve HTTP 400.
+- `hayMas` indica si quedan filas dentro del límite solicitado; no acredita que el
   generador esté al día ni impide que aparezcan nuevas filas más adelante.
 - Una página vacía conserva el cursor recibido y devuelve HTTP 200 si
   el suministro existe. Un suministro inexistente devuelve HTTP 404.
@@ -206,8 +211,63 @@ entre sí.
 
 Esta consulta no es un registro de modificaciones: editar una fila existente
 no le asigna otro ID. Los generadores diario y continuo se coordinan mediante
-la fila de control de emisión. El protocolo de corte confirmado para Nivora
-y la recuperación de modificaciones concurrentes siguen pendientes.
+la fila de control de emisión. Las altas de estos generadores conservan las
+lecturas anteriores. La corrección o eliminación manual de filas queda fuera
+de la garantía de altas confirmadas del contrato siguiente.
+
+### Corte confirmado e inventario
+
+`GET /api/v1/lecturas/corte` devuelve:
+
+```json
+{
+  "fuente": "empresa-agua",
+  "hastaIdLectura": "4000000",
+  "confirmadoHasta": "2026-11-10T17:49:11Z"
+}
+```
+
+Los valores son ilustrativos. El ID es un límite global de la fuente,
+transmitido como texto; puede pertenecer a otro suministro. La fecha está
+en UTC y corresponde a la emisión confirmada, incluso si un hogar no
+cambió su contador. No equivale a su última medición ni a la hora actual.
+
+La captura usa una transacción READ COMMITTED y bloquea brevemente la misma
+fila de control que el productor. Obtiene el máximo ID después de adquirir
+ese bloqueo y no mezcla una fecha anterior con un máximo de otra publicación.
+Su transacción tiene un límite de diez segundos; una espera o fallo de datos
+se informa con HTTP 503. Antes de la primera emisión confirmada también
+devuelve 503. La consulta no ejecuta el generador.
+
+Para recuperar un conjunto acotado de altas:
+
+1. Consultar el corte una vez al comenzar el recorrido y conservar ambos campos.
+2. Enviar su `hastaIdLectura` como `hastaId` en todas las páginas.
+3. Continuar con `siguienteDespuesDe` hasta que `hayMas` sea `false`.
+4. Obtener un nuevo corte para incluir las publicaciones posteriores.
+
+Las altas posteriores de los productores reciben IDs superiores y quedan
+fuera del recorrido anterior. `hastaId` por sí solo es un filtro: el cliente
+debe conservar el corte que obtuvo, sin cambiarlo entre páginas. El contrato
+no versiona modificaciones ni borrados históricos. Sin `hastaId`, la ruta
+mantiene su comportamiento anterior.
+
+`GET /api/v1/suministros/{codigo}/medidores` devuelve `fuente`,
+`codigoSuministro`, `zonaFechas: "America/Lima"` y la lista `medidores`.
+Cada elemento contiene `idMedidor` como texto, `fechaInstalacion` y
+`fechaRetiro`, que es `null` mientras no exista retiro registrado. Incluye
+medidores anteriores y actuales, ordenados por instalación e ID, únicamente
+del suministro solicitado. Las fechas administrativas tienen precisión de
+día y no describen la hora exacta de una sustitución.
+
+Un suministro inexistente devuelve 404. Un inventario vacío, inválido o
+superior a 1000 elementos devuelve 503, sin truncarlo silenciosamente.
+El inventario no tiene versión histórica asociada al corte. La gestión
+completa de sustituciones y correcciones de medidores sigue pendiente.
+
+Estas rutas preparan el contrato del proveedor. El backend de Nivora
+todavía debe incorporar su consumo, persistencia y validación; su recuperación
+manual actual mantiene el contrato anterior.
 
 ### Emisión continua de lecturas
 
@@ -294,7 +354,13 @@ comprueban el índice en MySQL ni la futura sincronización de Nivora.
 `LecturasContinuasTests` añade 14 pruebas de generación, intervalos,
 repeticiones, fracciones, cierre mensual, reinicios, validaciones de
 medidores, rollback entre lotes y selección de la última fecha aunque un
-registro antiguo tenga mayor ID. La suite completa contiene 43 pruebas.
+registro antiguo tenga mayor ID.
+
+`CorteLecturasApiTests` añade 25 pruebas HTTP del corte, IDs grandes,
+paginación acotada mientras aparecen nuevas filas, compatibilidad de la
+consulta anterior, parámetros, inventario, aislamiento y errores. La suite
+completa contiene 68 pruebas. Se comprueba además la captura coordinada
+con una publicación sin confirmar usando MySQL 8.0.46.
 
 La revisión de este avance incluyó una comprobación local con MySQL 8.0.46,
 100 000 suministros y 3 700 000 lecturas iniciales: publicación, coherencia

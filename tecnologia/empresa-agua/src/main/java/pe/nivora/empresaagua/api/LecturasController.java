@@ -25,9 +25,25 @@ public class LecturasController {
     public ResponseEntity<PaginaLecturas> consultar(
             @PathVariable("codigo") String codigo,
             @RequestParam(value = "despuesDe", defaultValue = "0") long despuesDe,
-            @RequestParam(value = "limite", defaultValue = "100") int limite) {
+            @RequestParam(value = "limite", defaultValue = "100") int limite,
+            @RequestParam(value = "hastaId", required = false) String hastaId) {
         return ResponseEntity.ok()
             .cacheControl(CacheControl.noStore())
-            .body(consulta.consultar(codigo, despuesDe, limite));
+            .body(consulta.consultar(codigo, despuesDe, limite, interpretarLimite(hastaId)));
+    }
+
+    private Long interpretarLimite(String valor) {
+        if (valor == null) {
+            return null;
+        }
+        if (!valor.matches("(?:0|[1-9][0-9]{0,18})")) {
+            throw new IllegalArgumentException(
+                "hastaId debe ser un entero decimal canonico no negativo.");
+        }
+        try {
+            return Long.valueOf(valor);
+        } catch (NumberFormatException error) {
+            throw new IllegalArgumentException("hastaId supera el rango permitido.");
+        }
     }
 }
