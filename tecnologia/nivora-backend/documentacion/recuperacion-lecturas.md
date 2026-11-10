@@ -65,8 +65,8 @@ recorrido anterior y detectar cambios de una lectura ya aceptada.
 del corte de ese recorrido. No certifica que el proveedor este actualizado
 hasta la hora actual ni versiona modificaciones o borrados historicos.
 La Empresa ya publica nuevas lecturas identificadas junto con sus totales
-mensuales y la recuperacion manual puede incorporarlas. La sincronizacion
-automatica de Nivora y su frecuencia siguen pendientes. La marca de emision
+mensuales. La recuperacion manual y la tarea automatica pueden incorporarlas.
+Su programacion se describe en [Sincronizacion](sincronizacion-lecturas.md). La marca de emision
 de la Empresa se conserva en el contexto junto con el limite de sus paginas.
 
 El adaptador consulta `GET /api/v1/suministros/{codigo}/medidores` y
@@ -92,7 +92,8 @@ pendiente.
 
 Las metas de rendimiento y 5000 usuarios simultaneos requieren sus pruebas
 posteriores. La revision completa del historial y el bloqueo por fuente
-deberan evaluarse junto con esas pruebas antes de fijar frecuencias automaticas.
+deberan evaluarse junto con esas pruebas para ajustar los limites y frecuencias
+de la programacion inicial.
 
 ## Preparar MySQL
 
@@ -163,7 +164,8 @@ paginas. El recuperador toma su cursor de la tabla de progreso. La propiedad
 individual, que siguen disponibles.
 
 La comprobacion esta desactivada por defecto y no abre el puerto 8082.
-Este avance no inicia tareas programadas ni implementa el acceso con DNI.
+Las comprobaciones no web no inician la tarea programada del servidor web.
+El acceso con DNI sigue pendiente.
 
 ## Verificacion
 
@@ -171,6 +173,7 @@ Las 165 pruebas anteriores se conservan. `RecuperacionConCorteTests` agrega
 35 pruebas con HTTP local y H2 sobre contexto persistido, reanudacion,
 publicaciones posteriores, rechazos, fallos de fuente, cambios concurrentes
 de recorrido, migracion repetida y rollback. La suite completa contiene 200
-pruebas. La integracion tambien se comprobo con la API Spring real de la
+pruebas de recuperacion. Las 31 pruebas adicionales de sincronizacion llevan
+la suite general a 231. La integracion tambien se comprobo con la API Spring real de la
 Empresa y MySQL 8.0.46, conservando datos de un progreso anterior y validando
 la ruta del comprobador principal.

@@ -18,7 +18,7 @@ El puerto 8080 esta ocupado por Jenkins en el equipo de desarrollo.
 | Paquete previsto | Modulo | Estado |
 |---|---|---|
 | `acceso` | Acceso y suministros | Consulta HTTP, actualizacion explicita y repositorio propio de suministros. |
-| `lecturas` | Lecturas, consumo e historial | Recuperacion manual con corte e inventario persistidos; calculos y automatizacion pendientes. |
+| `lecturas` | Lecturas, consumo e historial | Recuperacion manual y automatica con corte e inventario persistidos; calculos y supervision por API pendientes. |
 | `tarifas` | Tarifas, costos y proyecciones | Pendiente de implementar. |
 | `notificaciones` | Alertas y notificaciones | Pendiente de implementar. |
 | `recibos` | Recibos | Pendiente de implementar. |
@@ -141,7 +141,7 @@ no ejecuta cambios de estructura automaticamente.
 
 El backend incorpora consultas externas y almacenamiento propio de suministros
 y lecturas. Aun faltan el caso de uso de acceso, validacion de identidad,
-sesiones, roles, el almacenamiento de tarifas y recibos y la sincronizacion automatica.
+sesiones, roles, el almacenamiento de tarifas y recibos y la supervision de integracion por API.
 Las comprobaciones de consola no publican endpoints de consulta en Nivora.
 
 La Empresa de Agua incorpora `GET /api/v1/suministros/{codigo}/lecturas`,
@@ -150,12 +150,14 @@ tipo acumulado y unidad en litros. Los detalles del cursor estan en su README.
 Nivora implementa su adaptador y las validaciones de estructura y paginacion.
 La incorporacion manual almacena lecturas, distingue repetidas y registra rechazos.
 La recuperacion manual confirma el avance de cada recorrido conservando su
-corte y una copia del inventario. La sincronizacion automatica sigue pendiente.
+corte y una copia del inventario. La sincronizacion automatica reutiliza ese
+proceso para los suministros propios con reintentos y programacion persistidos.
 
 El generador continuo de la Empresa publica nuevas lecturas identificadas
 junto con sus totales mensuales. La recuperacion manual de Nivora puede
 incorporarlas utilizando los contratos existentes. La programacion de esa
-recuperacion sigue pendiente segun ADR-003. La Empresa ofrece ahora un corte
+recuperacion se conserva en MySQL y se ejecuta separada de las consultas,
+segun ADR-003. La Empresa ofrece un corte
 confirmado, el parametro opcional `hastaId` y el inventario de medidores.
 Nivora consume esos datos mediante `FuenteLecturasConCorteHttp` y los guarda
 en `contexto_recuperacion_lecturas` para reanudar el mismo recorrido.
@@ -262,7 +264,8 @@ La comprobacion contra la hora de recepcion se complementa con la fecha del
 corte y los dias declarados en el inventario del proveedor. Las fechas de
 instalacion y retiro no tienen precision horaria; la gestion completa de
 sustituciones sigue pendiente. Aun faltan la gestion de fallos de comunicacion
-para los otros procesos de integracion y los reintentos programados.
+para los otros procesos de integracion. Las lecturas ya tienen reintentos
+programados con limites y fechas persistidos.
 La Empresa ya genera mediciones identificadas de forma continua. La recuperacion
 manual registra sus fallos de fuente y conserva el cursor de su recorrido.
 
@@ -291,6 +294,22 @@ como alternativa cuando falta el corte o el inventario.
 
 La preparacion de MySQL, los estados, los limites y las comprobaciones estan
 en [Recuperacion de lecturas](documentacion/recuperacion-lecturas.md).
+
+## Sincronizacion automatica
+
+La tarea del servidor web usa la recuperacion con corte para los suministros
+registrados en Nivora. Reserva un lote acotado, conserva el avance de paginas
+y programa reintentos crecientes ante fallos. Los bloqueos de lecturas se
+pausan para revision. Las reservas vencidas permiten recuperar el trabajo
+tras un cierre, manteniendo la deduplicacion y las revisiones existentes.
+
+Antes de iniciar el servidor con esta funcion habilitada, aplicar
+`base-datos/06-sincronizacion-lecturas.sql`. El arranque web normal en 8082
+activa la tarea; las comprobaciones no web siguen separadas. El perfil
+`test` la desactiva.
+
+La configuracion, los estados de programacion y las comprobaciones estan en
+[Sincronizacion de lecturas](documentacion/sincronizacion-lecturas.md).
 
 ## Configuracion y comprobaciones
 

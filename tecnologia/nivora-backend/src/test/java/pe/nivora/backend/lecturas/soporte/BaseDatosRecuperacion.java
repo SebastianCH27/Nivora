@@ -42,7 +42,8 @@ public final class BaseDatosRecuperacion implements AutoCloseable {
             new ResourceDatabasePopulator(new FileSystemResource("base-datos/02-suministros.sql"),
                 new FileSystemResource("base-datos/03-lecturas.sql"),
                 new FileSystemResource("base-datos/04-recuperacion-lecturas.sql"),
-                new FileSystemResource("base-datos/05-contexto-recuperacion-lecturas.sql")).populate(conexionEsquema);
+                new FileSystemResource("base-datos/05-contexto-recuperacion-lecturas.sql"),
+                new FileSystemResource("base-datos/06-sincronizacion-lecturas.sql")).populate(conexionEsquema);
         } catch (SQLException ex) {
             throw new IllegalStateException("No se pudo preparar la base de pruebas.", ex);
         }

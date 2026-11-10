@@ -265,9 +265,9 @@ superior a 1000 elementos devuelve 503, sin truncarlo silenciosamente.
 El inventario no tiene versión histórica asociada al corte. La gestión
 completa de sustituciones y correcciones de medidores sigue pendiente.
 
-La recuperación manual principal de Nivora consume estas rutas y conserva
-el corte y una copia del inventario durante cada recorrido. La recuperación
-automática sigue pendiente.
+La recuperación de Nivora consume estas rutas y conserva el corte y una
+copia del inventario durante cada recorrido. Su tarea automática reutiliza
+ese proceso para los suministros registrados en su propia base.
 
 ### Emisión continua de lecturas
 
@@ -302,8 +302,8 @@ su contador. No equivale a la última medición de cada hogar ni a un corte
 inmutable de páginas para Nivora. `/actuator/health` comprueba el servicio y
 su conexión de datos; la marca y el registro permiten comprobar el generador.
 
-Nivora puede recuperar estas lecturas mediante su proceso manual existente.
-La programación automática de esa recuperación sigue pendiente.
+Nivora puede recuperar estas lecturas de forma manual o mediante su tarea
+automática con programación y reintentos persistidos.
 
 ## Unidades, tarifas y fechas
 
