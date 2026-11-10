@@ -63,6 +63,23 @@ public class GeneradorLecturasDiarias {
     }
 
     private DiaGenerado generarSiguienteDia(LocalDate objetivo) {
+        List<LocalDateTime> emisiones = jdbc.query("""
+            SELECT ultima_emision_utc
+            FROM control_emision_lecturas
+            WHERE id_control = 1
+            FOR UPDATE
+            """, (fila, numero) -> fila.getObject(1, LocalDateTime.class));
+
+        if (emisiones.size() != 1) {
+            throw new IllegalStateException(
+                "Falta ejecutar 08-control-emision-lecturas.sql.");
+        }
+        if (emisiones.get(0) != null) {
+            throw new IllegalStateException(
+                "La generacion diaria prepara el historial inicial; "
+                    + "la emision continua ya comenzo.");
+        }
+
         Estado estado = jdbc.queryForObject("""
             SELECT fecha_actual, semilla
             FROM estado_simulacion

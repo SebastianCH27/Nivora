@@ -57,9 +57,10 @@ recorrido anterior y detectar cambios de una lectura ya aceptada.
 
 `RECORRIDO_COMPLETO` no certifica que el proveedor este actualizado hasta
 la hora actual ni representa una fotografia inmutable de todas las paginas.
-La sincronizacion automatica, su frecuencia y la entrega continua de lecturas
-identificadas siguen pendientes. El generador continuo actual del proveedor
-actualiza totales mensuales, no esa tabla de mediciones.
+La Empresa ya publica nuevas lecturas identificadas junto con sus totales
+mensuales y la recuperacion manual puede incorporarlas. La sincronizacion
+automatica de Nivora y su frecuencia siguen pendientes. La marca de emision
+de la Empresa no fija una fotografia inmutable de las paginas de su API.
 
 Las metas de rendimiento y 5000 usuarios simultaneos requieren sus pruebas
 posteriores. La revision completa del historial y el bloqueo por fuente

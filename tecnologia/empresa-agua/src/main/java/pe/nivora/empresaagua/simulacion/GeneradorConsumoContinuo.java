@@ -26,13 +26,16 @@ public class GeneradorConsumoContinuo {
 
     private final JdbcTemplate jdbc;
     private final TransactionTemplate transaccion;
+    private final PublicadorLecturasContinuas publicador;
 
     public GeneradorConsumoContinuo(
             JdbcTemplate jdbc,
-            PlatformTransactionManager gestorTransacciones) {
+            PlatformTransactionManager gestorTransacciones,
+            PublicadorLecturasContinuas publicador) {
 
         this.jdbc = jdbc;
         this.transaccion = new TransactionTemplate(gestorTransacciones);
+        this.publicador = publicador;
     }
 
     public Instant actualizarHasta(Instant objetivo) {
@@ -146,9 +149,12 @@ public class GeneradorConsumoContinuo {
         guardarCambios(cambios);
 
         LocalDate siguienteDia = dia.plusDays(1);
+        boolean cierreMes = fin.equals(finDia)
+            && siguienteDia.getDayOfMonth() == 1;
 
-        if (fin.equals(finDia)
-                && siguienteDia.getDayOfMonth() == 1) {
+        publicador.publicar(mes, fin, cierreMes);
+
+        if (cierreMes) {
 
             jdbc.update("""
                 UPDATE consumos_mensuales

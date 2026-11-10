@@ -22,6 +22,9 @@ inteligentes de una empresa real.
   que todavía no tienen uno.
 - Al reiniciar el servicio, el generador procesa el tiempo pendiente
   desde el último avance confirmado.
+- El generador publica lecturas acumuladas identificadas con un intervalo
+  configurable de cinco minutos. Omite contadores sin cambios y conserva
+  una lectura de referencia al cerrar cada mes.
 
 Este servicio representa al proveedor de datos. El backend propio
 de Nivora se implementará por separado y consumirá esta API.
@@ -67,6 +70,7 @@ SOURCE base-datos/04-consumos-mensuales.sql;
 SOURCE base-datos/05-control-consumo-continuo.sql;
 SOURCE base-datos/06-detalle-recibos.sql;
 SOURCE base-datos/07-indice-lecturas.sql;
+SOURCE base-datos/08-control-emision-lecturas.sql;
 ```
 
 La cuenta `empresa_app` debe estar creada con los permisos indicados.
@@ -92,7 +96,8 @@ las asignaciones de tarifa y los recibos iniciales.
 
 La generación diaria se conserva como herramienta de preparación
 del historial inicial. El funcionamiento normal utiliza el generador
-de consumo continuo.
+de consumo continuo. Una vez confirmada la primera emisión continua,
+la herramienta diaria informa que la preparación inicial ya terminó.
 
 Al completar las cargas, iniciar normalmente:
 
@@ -133,7 +138,9 @@ incluyen `Cache-Control: no-store`.
 
 La nueva ruta consulta la tabla `lecturas`. No genera mediciones ni modifica
 los totales mensuales. Permite recuperar las lecturas históricas preparadas
-por las cargas inicial y diaria, sin necesitar tablas de consumo mensual.
+por las cargas inicial y diaria, además de las nuevas mediciones publicadas
+por el generador continuo. La consulta de filas ya guardadas no necesita
+las tablas de consumo mensual.
 
 ### Índice para una base ya instalada
 
@@ -146,6 +153,17 @@ SHOW INDEX FROM empresa_agua.lecturas WHERE Key_name = 'idx_lecturas_suministro_
 
 El índice combina suministro e ID de lectura. El script conserva los datos
 y puede repetirse: comprueba si el índice ya existe antes de crearlo.
+
+Antes de iniciar la emisión continua en una base instalada, ejecutar también
+con el servicio detenido:
+
+```sql
+SOURCE C:/Users/HP/Desktop/Nivora/tecnologia/empresa-agua/base-datos/08-control-emision-lecturas.sql;
+SELECT id_control, ultima_emision_utc FROM empresa_agua.control_emision_lecturas;
+```
+
+El script prepara una fila de control. La primera vez su fecha es `NULL`.
+Repetirlo conserva una fecha que ya haya sido confirmada.
 
 ### Contrato de la página
 
@@ -187,18 +205,45 @@ entre sí.
   incorporarlas dos veces.
 
 Esta consulta no es un registro de modificaciones: editar una fila existente
-no le asigna otro ID. La coordinación de productores, la confirmación de
-lotes y la recuperación de cambios concurrentes se definirán antes de
-utilizarla como mecanismo de sincronización continua.
+no le asigna otro ID. Los generadores diario y continuo se coordinan mediante
+la fila de control de emisión. El protocolo de corte confirmado para Nivora
+y la recuperación de modificaciones concurrentes siguen pendientes.
 
-### Continuidad de la generación: pendiente
+### Emisión continua de lecturas
 
-Actualmente `GeneradorConsumoContinuo` actualiza `consumos_mensuales`,
-pero no inserta nuevas filas en `lecturas`. La ruta expone únicamente
-las lecturas que ya existen en esa tabla. Falta conectar la generación
-continua con la entrega de mediciones identificadas y comprobar que
-coincidan con los consumos e históricos. Ese trabajo no se sustituye
-convirtiendo cada consulta del acumulado mensual en un incremento nuevo.
+`GeneradorConsumoContinuo` actualiza los totales mensuales y llama a
+`PublicadorLecturasContinuas` dentro de la misma transacción de cada avance.
+Las lecturas nuevas, el total mensual y sus controles se confirman juntos.
+Un fallo revierte ese avance; los avances anteriores confirmados se conservan.
+
+El publicador obtiene primero hasta 1000 suministros y consulta sus datos
+y sus últimas mediciones en consultas separadas por lote. Comprueba un único
+medidor activo por suministro, su referencia de inicio del mes y que el
+contador no retroceda ni contradiga una medición ya guardada.
+
+| Propiedad | Valor inicial | Uso |
+|---|---|---|
+| `empresa.lecturas-continuas.intervalo-segundos` | `300` | Intervalo mínimo entre ciclos ordinarios de publicación. |
+| `empresa.lecturas-continuas.consulta-maxima-segundos` | `30` | Límite configurado para cada consulta de lectura del publicador. |
+
+El cierre mensual publica una referencia aunque no haya transcurrido el
+intervalo o el contador no cambie. El contador del medidor continúa en el
+nuevo mes, mientras el consumo mensual empieza en cero. Las mediciones
+conservan resolución de un litro; los totales mensuales mantienen sus
+decimales y pueden superar en menos de un litro la diferencia de contadores.
+
+La simulación requiere una referencia del medidor al inicio del mes.
+La gestión completa de sustituciones de medidores queda pendiente.
+
+Los mensajes de avance muestran filas preparadas dentro de la transacción.
+La marca `control_emision_lecturas.ultima_emision_utc` representa el último
+ciclo de publicación confirmado, incluso cuando algunos hogares no cambian
+su contador. No equivale a la última medición de cada hogar ni a un corte
+inmutable de páginas para Nivora. `/actuator/health` comprueba el servicio y
+su conexión de datos; la marca y el registro permiten comprobar el generador.
+
+Nivora puede recuperar estas lecturas mediante su proceso manual existente.
+La programación automática de esa recuperación sigue pendiente.
 
 ## Unidades, tarifas y fechas
 
@@ -245,6 +290,16 @@ validar el contrato de lecturas, paginación, reintentos, aislamiento entre
 suministros, conversión exacta a litros, fechas UTC, identificadores grandes,
 parámetros inválidos, páginas vacías y errores de datos. Las pruebas no
 comprueban el índice en MySQL ni la futura sincronización de Nivora.
+
+`LecturasContinuasTests` añade 14 pruebas de generación, intervalos,
+repeticiones, fracciones, cierre mensual, reinicios, validaciones de
+medidores, rollback entre lotes y selección de la última fecha aunque un
+registro antiguo tenga mayor ID. La suite completa contiene 43 pruebas.
+
+La revisión de este avance incluyó una comprobación local con MySQL 8.0.46,
+100 000 suministros y 3 700 000 lecturas iniciales: publicación, coherencia
+de los contadores, repetición, intervalo y reinicio. Esta comprobación de
+integración no acredita el objetivo posterior de 5000 usuarios simultáneos.
 
 ```bat
 mvnw.cmd clean verify

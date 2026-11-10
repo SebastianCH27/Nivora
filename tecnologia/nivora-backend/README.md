@@ -152,9 +152,10 @@ La incorporacion manual almacena lecturas, distingue repetidas y registra rechaz
 La recuperacion manual confirma el avance dentro de cada recorrido. La
 sincronizacion automatica y el protocolo de corte del proveedor siguen pendientes.
 
-El generador continuo de la Empresa actualiza actualmente los totales
-mensuales, no la tabla de lecturas historicas. Su entrega continua y
-la recuperacion de pendientes deben completarse segun ADR-003.
+El generador continuo de la Empresa publica nuevas lecturas identificadas
+junto con sus totales mensuales. La recuperacion manual de Nivora puede
+incorporarlas utilizando los contratos existentes. La programacion de esa
+recuperacion y el corte confirmado del proveedor siguen pendientes segun ADR-003.
 Un acumulado mensual no equivale a un incremento nuevo que deba sumarse
 cada vez que se consulta.
 
@@ -255,9 +256,9 @@ puede aceptarse posteriormente; la incidencia anterior conserva su detalle.
 
 La comprobacion contra la hora de recepcion no equivale a un corte de datos
 confirmado por la Empresa. Aun faltan ese protocolo, la gestion de fallos de
-comunicacion para los otros procesos de integracion, los reintentos programados
-y la generacion continua de mediciones identificadas. La recuperacion manual
-ya registra sus fallos de fuente y conserva el cursor de su recorrido.
+comunicacion para los otros procesos de integracion y los reintentos programados.
+La Empresa ya genera mediciones identificadas de forma continua. La recuperacion
+manual registra sus fallos de fuente y conserva el cursor de su recorrido.
 
 ## Recuperacion manual de paginas
 
