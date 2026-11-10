@@ -17,7 +17,7 @@ El puerto 8080 esta ocupado por Jenkins en el equipo de desarrollo.
 
 | Paquete previsto | Modulo | Estado |
 |---|---|---|
-| `acceso` | Acceso y suministros | Consulta HTTP, actualizacion explicita y repositorio propio de suministros. |
+| `acceso` | Acceso y suministros | Consulta y repositorio de suministros; base de cuentas administrativas con inicializacion explicita y claves protegidas. |
 | `lecturas` | Lecturas, consumo e historial | Recuperacion manual y automatica con corte e inventario persistidos y API local de supervision; calculos pendientes. |
 | `tarifas` | Tarifas, costos y proyecciones | Pendiente de implementar. |
 | `notificaciones` | Alertas y notificaciones | Pendiente de implementar. |
@@ -331,6 +331,28 @@ La API de supervision corresponde al entorno local vinculado a
 `127.0.0.1`; DNI, sesiones y permisos se incorporaran en el bloque de acceso.
 El contrato, las fechas y los ejemplos estan en
 [Supervision de lecturas](documentacion/supervision-lecturas.md).
+
+## Cuentas administrativas: primer paso del bloque 3
+
+`InicializarAdministracion` prepara la primera cuenta activa, con permiso
+para gestionar administradores, y su evento de auditoria en la misma
+transaccion. Las claves nuevas se protegen con Argon2id y sal aleatoria.
+Los datos de cuenta que devuelve el repositorio excluyen la clave y su hash.
+
+Aplicar como administrador `base-datos/07-administradores.sql`, despues del
+script 06. Agrega `administradores`, `control_administradores` y
+`auditoria_administradores`; Nivora pasa a tener once tablas.
+La inicializacion requiere una ejecucion no web expresamente habilitada
+y variables de proceso introducidas por consola. Repetirla conserva las
+cuentas existentes, incluso si estan inactivas. El arranque web no la activa.
+
+Este paso prepara cuentas, permisos y credenciales. El inicio de sesion,
+la proteccion de endpoints y las altas posteriores de administradores se
+incorporaran en los siguientes avances. La pantalla administrativa llegara
+con la interfaz; el permiso no se concede desde un formulario publico.
+
+La preparacion, los limites de entrada y los comandos estan en
+[Cuentas administrativas](documentacion/cuentas-administrativas.md).
 
 ## Configuracion y comprobaciones
 
