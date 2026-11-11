@@ -1,22 +1,14 @@
 package pe.nivora.backend.acceso.dominio.administradores;
 
-import java.nio.charset.StandardCharsets;
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
-import java.security.SecureRandom;
-import java.util.Base64;
-import java.util.HexFormat;
+import pe.nivora.backend.acceso.dominio.TokenOpaco;
 
 public final class TokenAdministrativo {
-    private static final SecureRandom AZAR = new SecureRandom();
     private final String valor;
 
     private TokenAdministrativo(String valor) { this.valor = valor; }
 
     public static TokenAdministrativo crear() {
-        byte[] bytes = new byte[32];
-        AZAR.nextBytes(bytes);
-        return new TokenAdministrativo(Base64.getUrlEncoder().withoutPadding().encodeToString(bytes));
+        return new TokenAdministrativo(TokenOpaco.aleatorio());
     }
 
     public static TokenAdministrativo interpretar(String valor) {
@@ -30,10 +22,7 @@ public final class TokenAdministrativo {
     public String huella() { return huellaDe(valor); }
 
     public static String huellaDe(String texto) {
-        try {
-            return HexFormat.of().formatHex(MessageDigest.getInstance("SHA-256")
-                .digest(texto.getBytes(StandardCharsets.UTF_8)));
-        } catch (NoSuchAlgorithmException error) { throw new IllegalStateException(error); }
+        return TokenOpaco.huellaDe(texto);
     }
 
     @Override public String toString() { return "TokenAdministrativo[oculto]"; }

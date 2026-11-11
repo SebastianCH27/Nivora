@@ -47,7 +47,7 @@ mediante el cliente autenticado indicado arriba. El codigo `99999999` debe
 estar ausente de la base propia para esperar 404.
 El servicio esta vinculado a `127.0.0.1`, como el resto del entorno local.
 Este endpoint tecnico utiliza la proteccion administrativa del bloque de
-acceso; el inicio de sesion de consulta con suministro y DNI sigue pendiente.
+acceso. Las [sesiones de consulta](sesiones-consulta.md) tienen sus propias rutas.
 
 ## Contrato HTTP
 

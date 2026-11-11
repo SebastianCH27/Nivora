@@ -17,7 +17,7 @@ El puerto 8080 esta ocupado por Jenkins en el equipo de desarrollo.
 
 | Paquete previsto | Modulo | Estado |
 |---|---|---|
-| `acceso` | Acceso y suministros | Suministros, consulta de DNI mediante APIsPERU, sesiones administrativas, gestion de cuentas y supervision protegida. |
+| `acceso` | Acceso y suministros | Suministros, consulta de DNI mediante APIsPERU, sesiones de consulta y administrativas, gestion de cuentas y supervision protegida. |
 | `lecturas` | Lecturas, consumo e historial | Recuperacion manual y automatica con corte e inventario persistidos y API local de supervision; calculos pendientes. |
 | `tarifas` | Tarifas, costos y proyecciones | Pendiente de implementar. |
 | `notificaciones` | Alertas y notificaciones | Pendiente de implementar. |
@@ -46,9 +46,8 @@ de fuente no disponible; no debe convertirse en un resultado inexistente.
 
 Este contrato corresponde a la comprobacion del suministro durante
 un nuevo acceso. La consulta de DNI tiene su propio contrato.
-El inicio de sesion y el registro del acceso se incorporaran en un caso de uso
-que utilice ambos contratos. El titular del suministro y la persona que consulta
-pueden ser diferentes.
+El inicio de sesion y el registro del acceso utilizan ambos contratos.
+El titular del suministro y la persona que consulta pueden ser diferentes.
 
 El adaptador HTTP implementa este contrato en infraestructura.
 Las consultas del panel utilizaran datos aceptados en el almacenamiento
@@ -105,7 +104,7 @@ La consulta manual usa `NIVORA_IDENTIDAD_DNI` y se activa con
 La comprobacion imprime solo el resultado de la consulta. El backend puede
 arrancar con el token pendiente y el adaptador informa esa situacion al
 intentar consultarlo. La consulta en APIsPERU informa datos asociados al
-documento. La sesion de consulta con DNI y suministro sigue pendiente.
+documento durante el inicio de sesion de consulta.
 
 Desde CMD, ejecuta `mvnw.cmd clean verify`. Con el JAR generado, ejecuta
 el siguiente comando. Al primer aviso, pulsa **Copiar** junto a **Mi Token**
@@ -117,6 +116,15 @@ powershell -NoProfile -STA -Command "& { $null = Read-Host 'Pulsa Copiar junto a
 ```
 
 El resultado esperado es `Consulta DNI correcta desde Nivora mediante APIsPERU.`
+
+## Inicio de sesion de consulta
+
+Nivora verifica el suministro con la Empresa de Agua y el DNI con APIsPERU.
+El acceso exitoso se registra en MySQL y genera una sesion de consulta con
+vigencia de 30 minutos, limitada al suministro elegido. El script
+`base-datos/09-sesiones-consulta.sql` agrega las dos tablas de este paso.
+Las rutas y la prueba desde CMD estan en
+[Sesiones de consulta](documentacion/sesiones-consulta.md).
 
 ## Almacenamiento propio de suministros
 
@@ -169,9 +177,9 @@ no ejecuta cambios de estructura automaticamente.
 ### Integracion pendiente
 
 El backend incorpora la consulta externa de DNI y el almacenamiento propio
-de suministros y lecturas. Quedan pendientes el caso de uso de acceso, las
-sesiones de consulta y el almacenamiento de tarifas y recibos. La API local
-de supervision de lecturas consulta el estado propio.
+de suministros y lecturas. Las sesiones de consulta registran accesos exitosos.
+Queda pendiente el almacenamiento de tarifas y recibos. La API local de
+supervision de lecturas consulta el estado propio.
 
 La Empresa de Agua incorpora `GET /api/v1/suministros/{codigo}/lecturas`,
 con paginas de mediciones historicas identificadas, medidor, fecha UTC,
@@ -243,7 +251,7 @@ no calcula consumo ni trata cada contador como un incremento nuevo.
 entrega a `RepositorioLecturas`. La llamada HTTP se completa antes de abrir
 la transaccion de escritura. El suministro debe existir en `nivora.suministros`.
 La consulta y el almacenamiento permanecen separados de las validaciones
-del futuro inicio de sesion.
+del inicio de sesion.
 
 `RepositorioLecturasJdbc` ejecuta cada lote de hasta 500 lecturas en una
 transaccion. Las incorporaciones de una misma fuente se coordinan mediante
@@ -359,7 +367,6 @@ funciona. Las respuestas del endpoint usan `Cache-Control: no-store`.
 No requiere otro script SQL: utiliza las ocho tablas de los scripts 01-06.
 La API de supervision corresponde al entorno local vinculado a
 `127.0.0.1`; utiliza las sesiones y permisos administrativos del bloque de acceso.
-Las sesiones de consulta con DNI y suministro se incorporaran despues.
 El contrato, las fechas y los ejemplos estan en
 [Supervision de lecturas](documentacion/supervision-lecturas.md).
 
