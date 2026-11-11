@@ -11,15 +11,26 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import pe.nivora.backend.acceso.dominio.contratos.*;
 
-@RestControllerAdvice(assignableTypes = SesionesAdministrativasController.class)
+@RestControllerAdvice(assignableTypes = {SesionesAdministrativasController.class, GestionAdministradoresController.class})
 public class ErroresSesionesAdministrativas {
     private static final Logger LOG = LoggerFactory.getLogger(ErroresSesionesAdministrativas.class);
     @ExceptionHandler(IllegalArgumentException.class)
-    public ResponseEntity<ProblemDetail> formato() { return problema(400, "Solicitud invalida", "Revisa el usuario y el formato de la clave."); }
+    public ResponseEntity<ProblemDetail> formato() { return problema(400, "Solicitud invalida", "Revisa los campos: usuario de 3 a 50 caracteres; claves nuevas de 15 a 128; nombre de 1 a 120; limite de 1 a 100 y cursor valido."); }
 
-    @ExceptionHandler(SesionesAdministrativasController.FormatoAccesoException.class)
-    public ResponseEntity<ProblemDetail> formatoHttp(SesionesAdministrativasController.FormatoAccesoException error) {
-        return problema(error.estado(), "Solicitud invalida", "Envie un objeto JSON UTF-8 con usuario y clave, de hasta 4096 bytes.");
+    @ExceptionHandler(LectorSolicitudAdministrativa.FormatoSolicitudException.class)
+    public ResponseEntity<ProblemDetail> formatoHttp(LectorSolicitudAdministrativa.FormatoSolicitudException error) {
+        return problema(error.estado(), "Solicitud invalida", "Envie los campos requeridos en un objeto JSON UTF-8 de hasta 4096 bytes, sin campos adicionales ni duplicados.");
+    }
+
+    @ExceptionHandler(PermisoGestionAdministrativaException.class)
+    public ResponseEntity<ProblemDetail> permiso() { return problema(403, "Permiso insuficiente", "La cuenta no tiene permiso para gestionar administradores."); }
+
+    @ExceptionHandler(AdministradorNoEncontradoException.class)
+    public ResponseEntity<ProblemDetail> ausente() { return problema(404, "Administrador no encontrado", "No existe una cuenta administrativa con ese usuario."); }
+
+    @ExceptionHandler(ConflictoGestionAdministrativaException.class)
+    public ResponseEntity<ProblemDetail> conflicto(ConflictoGestionAdministrativaException error) {
+        return problema(409, "Operacion en conflicto", error.getMessage());
     }
 
     @ExceptionHandler(CredencialesAdministrativasInvalidasException.class)
@@ -35,8 +46,8 @@ public class ErroresSesionesAdministrativas {
             .body(detalle(429, "Demasiados intentos", "Espera antes de intentar acceder nuevamente."));
     }
 
-    @ExceptionHandler(SesionesAdministrativasNoDisponiblesException.class)
-    public ResponseEntity<ProblemDetail> datos(SesionesAdministrativasNoDisponiblesException error) {
+    @ExceptionHandler({SesionesAdministrativasNoDisponiblesException.class, RepositorioAdministradoresNoDisponibleException.class})
+    public ResponseEntity<ProblemDetail> datos(RuntimeException error) {
         LOG.warn("No se pudo completar una operacion de acceso administrativo.");
         LOG.debug("Detalle del fallo de acceso administrativo", error);
         return problema(503, "Acceso no disponible", "No se pudo completar la operacion de acceso.");

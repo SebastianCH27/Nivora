@@ -36,6 +36,7 @@ normal, incluso si fue creado durante esa excepcion local.
 | `POST /api/v1/acceso/administradores/sesiones` | 201 con `tipoToken`, `token` y los metadatos de `sesion`. |
 | `GET /api/v1/acceso/administradores/sesion` | 200 con metadatos de la sesion; no devuelve el token. |
 | `DELETE /api/v1/acceso/administradores/sesion` | 204 al cerrar la sesion autenticada. |
+| `PUT /api/v1/acceso/administradores/sesion/clave` | 200 al cambiar la clave propia; revoca las sesiones anteriores. |
 | `GET /api/v1/supervision/suministros/{codigo}/lecturas` | 200, 400 o 404 de negocio cuando existe permiso de supervision. |
 | `GET /actuator/health` | Comprobacion publica del servicio y su base. |
 
@@ -82,8 +83,10 @@ enviada por el cliente ni de una copia permanente dentro del token.
 Todas estas sesiones tienen rol `ADMIN`. Una cuenta sin cambio de clave
 pendiente recibe `SUPERVISAR_INTEGRACION`; el permiso
 `GESTIONAR_ADMINISTRADORES` depende de su indicador guardado. Si existe cambio
-de clave pendiente, solo puede consultar sus metadatos y cerrar la sesion;
-la operacion para cambiar la clave se incorporara en la parte 3.
+de clave pendiente, solo puede consultar sus metadatos, cambiar su clave
+y cerrar la sesion. Tras cambiarla, debe iniciar una nueva sesion.
+Las altas, permisos, estados y claves se describen en
+[Gestion de administradores](gestion-administradores.md), parte 3 del bloque.
 
 | Propiedad bajo `nivora.sesiones-administrativas` | Valor inicial |
 |---|---|

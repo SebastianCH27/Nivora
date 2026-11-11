@@ -39,13 +39,24 @@ public class RepositorioSesionesAdministrativasJdbc implements RepositorioSesion
     @Override
     public void consumirIntento(UsuarioAdministrador usuario, String origen, Instant ahora,
             PoliticaSesionAdministrativa politica) {
+        consumir("", usuario, origen, ahora, politica);
+    }
+
+    @Override
+    public void consumirConfirmacion(UsuarioAdministrador usuario, String origen, Instant ahora,
+            PoliticaSesionAdministrativa politica) {
+        consumir("confirmacion:", usuario, origen, ahora, politica);
+    }
+
+    private void consumir(String ambito, UsuarioAdministrador usuario, String origen, Instant ahora,
+            PoliticaSesionAdministrativa politica) {
         if (origen == null || origen.isBlank() || origen.length() > 100) {
             throw new IllegalArgumentException("Origen de acceso invalido.");
         }
         long espera = ejecutar(() -> transaccion.execute(estado -> {
-            long ip = limitar(TokenAdministrativo.huellaDe("origen:" + origen), ahora,
+            long ip = limitar(TokenAdministrativo.huellaDe(ambito + "origen:" + origen), ahora,
                 politica.ventanaIntentos(), politica.intentosPorOrigen());
-            return ip > 0 ? ip : limitar(TokenAdministrativo.huellaDe("usuario:" + usuario.valor()),
+            return ip > 0 ? ip : limitar(TokenAdministrativo.huellaDe(ambito + "usuario:" + usuario.valor()),
                 ahora, politica.ventanaIntentos(), politica.intentosPorUsuario());
         }));
         if (espera > 0) throw new AccesoAdministrativoLimitadoException(espera);

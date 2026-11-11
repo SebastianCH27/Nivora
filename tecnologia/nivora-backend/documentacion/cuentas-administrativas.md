@@ -4,8 +4,8 @@ Primer incremento del bloque 3. Prepara el almacenamiento de cuentas,
 su permiso de gestion, las credenciales protegidas y la creacion explicita
 de la primera cuenta. El acceso con suministro y DNI conserva su diseno
 independiente. El [inicio de sesion administrativo](sesiones-administrativas.md)
-ya utiliza estas cuentas; las operaciones para gestionar otras cuentas
-se implementaran en los siguientes incrementos.
+ya utiliza estas cuentas; la parte 3 incorpora las operaciones de
+[gestion de otras cuentas](gestion-administradores.md).
 
 ## Modelo
 
@@ -13,10 +13,10 @@ se implementaran en los siguientes incrementos.
 |---|---|
 | `usuario` | Entre 3 y 50 caracteres ASCII; comienza con letra y admite letras, numeros, punto, guion y guion bajo. Se guarda en minusculas con `Locale.ROOT`. |
 | `nombre` | Entre 1 y 120 caracteres Unicode, sin controles; se eliminan espacios exteriores del nombre mostrado. |
-| `activa` | Estado de la cuenta; se comprobara durante el acceso y la autorizacion posteriores. |
+| `activa` | Estado comprobado durante el acceso y cada autorizacion. |
 | `gestionar_administradores` | Permiso para gestionar otras cuentas. Por defecto es falso; la primera cuenta lo recibe explicitamente. |
-| `cambio_clave_requerido` | Preparado para el cambio de claves iniciales de altas posteriores. La primera cuenta elige su propia clave y se crea con este valor falso. |
-| `version_credenciales` | Comienza en 1; permitira invalidar sesiones cuando se implementen cambios de credenciales y estado. |
+| `cambio_clave_requerido` | Verdadero en altas posteriores y restablecimientos. La primera cuenta elige su propia clave y se crea con este valor falso. |
+| `version_credenciales` | Comienza en 1; se incrementa al cambiar clave, permiso o estado y se revocan las sesiones anteriores. |
 | `creado_en_utc` / `actualizado_en_utc` | Fechas UTC con microsegundos. |
 
 `Administrador`, el modelo devuelto por el caso de uso y el repositorio,
@@ -25,8 +25,8 @@ no contiene la clave ni el hash. Cada cuenta tiene su propio usuario;
 
 El permiso de gestionar cuentas no se deduce de un DNI ni del titular de
 un suministro. La primera cuenta se prepara mediante el procedimiento local
-de configuracion; las cuentas siguientes requeriran un administrador
-autorizado mediante el flujo que se implementara despues.
+de configuracion; las cuentas siguientes requieren un administrador
+autorizado mediante la API de gestion de la parte 3.
 
 ## Proteccion de claves
 
@@ -183,6 +183,6 @@ digitos, verificando su hash mediante el protector con politica normal.
 El inicio de sesion administrativo y la proteccion de supervision estan
 descritos en [Sesiones administrativas](sesiones-administrativas.md).
 La suite general con las 31 pruebas nuevas de sesiones contiene 315 pruebas.
-Se incorporaran las operaciones para altas adicionales, cambio o
-restablecimiento de claves, permisos y desactivacion. Estos datos base no
-suponen que esos endpoints o las pantallas ya esten implementados.
+Las operaciones para altas adicionales, cambio o restablecimiento de claves,
+permisos y estado estan en [Gestion de administradores](gestion-administradores.md).
+Las pantallas se incorporaran con la interfaz.

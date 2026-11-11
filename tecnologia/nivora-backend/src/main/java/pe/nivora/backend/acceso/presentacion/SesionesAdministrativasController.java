@@ -1,7 +1,6 @@
 package pe.nivora.backend.acceso.presentacion;
 
 import java.io.IOException;
-import java.nio.charset.StandardCharsets;
 import java.time.Instant;
 import java.util.Arrays;
 import java.util.Set;
@@ -12,10 +11,7 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
-import tools.jackson.core.JacksonException;
-import tools.jackson.databind.DeserializationFeature;
-import tools.jackson.databind.ObjectReader;
-import tools.jackson.databind.json.JsonMapper;
+import pe.nivora.backend.acceso.aplicacion.GestionarAdministradores;
 import pe.nivora.backend.acceso.aplicacion.SesionesAdministrativas;
 import pe.nivora.backend.acceso.dominio.administradores.SesionAdministrativa;
 import pe.nivora.backend.acceso.infraestructura.seguridad.PrincipalAdministrativo;
@@ -24,40 +20,26 @@ import pe.nivora.backend.acceso.infraestructura.seguridad.PrincipalAdministrativ
 @RequestMapping("/api/v1/acceso/administradores")
 public class SesionesAdministrativasController {
     private final SesionesAdministrativas sesiones;
-    private final ObjectReader lector;
+    private final LectorSolicitudAdministrativa lector;
+    private final GestionarAdministradores gestion;
 
-    public SesionesAdministrativasController(SesionesAdministrativas sesiones, JsonMapper json) {
+    public SesionesAdministrativasController(SesionesAdministrativas sesiones,
+            LectorSolicitudAdministrativa lector, GestionarAdministradores gestion) {
         this.sesiones = sesiones;
-        lector = json.reader().with(DeserializationFeature.FAIL_ON_TRAILING_TOKENS,
-            DeserializationFeature.FAIL_ON_READING_DUP_TREE_KEY);
+        this.lector = lector;
+        this.gestion = gestion;
     }
 
     @PostMapping(value = "/sesiones", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<InicioRespuesta> iniciar(HttpServletRequest solicitud) throws IOException {
-        MediaType tipo;
-        try { tipo = MediaType.parseMediaType(solicitud.getContentType() == null ? "" : solicitud.getContentType()); }
-        catch (IllegalArgumentException error) { throw new FormatoAccesoException(415); }
-        if (!"application".equals(tipo.getType()) || !"json".equals(tipo.getSubtype())
-                || (tipo.getCharset() != null && !StandardCharsets.UTF_8.equals(tipo.getCharset()))) {
-            throw new FormatoAccesoException(415);
-        }
-        byte[] cuerpo = solicitud.getInputStream().readNBytes(4097);
+        var datos = lector.leer(solicitud, Set.of("usuario", "clave"), Set.of());
         char[] clave = null;
         try {
-            if (cuerpo.length > 4096) throw new FormatoAccesoException(413);
-            var datos = lector.readTree(cuerpo);
-            if (datos == null || !datos.isObject() || datos.size() != 2
-                    || !datos.has("usuario") || !datos.get("usuario").isString()
-                    || !datos.has("clave") || !datos.get("clave").isString()) {
-                throw new FormatoAccesoException(400);
-            }
-            clave = datos.get("clave").stringValue().toCharArray();
-            var inicio = sesiones.iniciar(datos.get("usuario").stringValue(), clave, solicitud.getRemoteAddr());
+            clave = LectorSolicitudAdministrativa.texto(datos, "clave").toCharArray();
+            var inicio = sesiones.iniciar(LectorSolicitudAdministrativa.texto(datos, "usuario"), clave, solicitud.getRemoteAddr());
             return ResponseEntity.status(201).cacheControl(CacheControl.noStore())
                 .body(new InicioRespuesta("Bearer", inicio.token().valor(), DatosSesion.de(inicio.sesion())));
-        } catch (JacksonException error) { throw new FormatoAccesoException(400); }
-        finally {
-            Arrays.fill(cuerpo, (byte) 0);
+        } finally {
             if (clave != null) Arrays.fill(clave, '\0');
         }
     }
@@ -73,6 +55,24 @@ public class SesionesAdministrativasController {
         return ResponseEntity.noContent().cacheControl(CacheControl.noStore()).build();
     }
 
+    @PutMapping(value = "/sesion/clave", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<GestionAdministradoresController.ResultadoRespuesta> cambiarClave(
+            @AuthenticationPrincipal PrincipalAdministrativo principal, HttpServletRequest solicitud) throws IOException {
+        var datos = lector.leer(solicitud, Set.of("claveActual", "claveNueva"), Set.of());
+        char[] actual = null, nueva = null;
+        try {
+            actual = LectorSolicitudAdministrativa.texto(datos, "claveActual").toCharArray();
+            nueva = LectorSolicitudAdministrativa.texto(datos, "claveNueva").toCharArray();
+            var resultado = gestion.cambiarClave(GestionAdministradoresController.actor(principal),
+                actual, nueva, solicitud.getRemoteAddr());
+            return ResponseEntity.ok().cacheControl(CacheControl.noStore())
+                .body(GestionAdministradoresController.ResultadoRespuesta.de(resultado));
+        } finally {
+            if (actual != null) Arrays.fill(actual, '\0');
+            if (nueva != null) Arrays.fill(nueva, '\0');
+        }
+    }
+
     public record InicioRespuesta(String tipoToken, String token, DatosSesion sesion) {
         @Override public String toString() { return "InicioRespuesta[token oculto]"; }
     }
@@ -86,10 +86,4 @@ public class SesionesAdministrativasController {
         }
     }
 
-    public static final class FormatoAccesoException extends RuntimeException {
-        private static final long serialVersionUID = 1L;
-        private final int estado;
-        FormatoAccesoException(int estado) { super("Formato de acceso invalido."); this.estado = estado; }
-        public int estado() { return estado; }
-    }
 }

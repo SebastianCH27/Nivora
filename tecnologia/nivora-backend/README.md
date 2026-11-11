@@ -17,7 +17,7 @@ El puerto 8080 esta ocupado por Jenkins en el equipo de desarrollo.
 
 | Paquete previsto | Modulo | Estado |
 |---|---|---|
-| `acceso` | Acceso y suministros | Suministros y cuentas administrativas; inicio, comprobacion y cierre de sesiones persistidas con proteccion de supervision. |
+| `acceso` | Acceso y suministros | Suministros; sesiones administrativas persistidas, gestion de cuentas, claves, permisos y auditoria; supervision protegida. |
 | `lecturas` | Lecturas, consumo e historial | Recuperacion manual y automatica con corte e inventario persistidos y API local de supervision; calculos pendientes. |
 | `tarifas` | Tarifas, costos y proyecciones | Pendiente de implementar. |
 | `notificaciones` | Alertas y notificaciones | Pendiente de implementar. |
@@ -330,7 +330,8 @@ funciona. Las respuestas del endpoint usan `Cache-Control: no-store`.
 
 No requiere otro script SQL: utiliza las ocho tablas de los scripts 01-06.
 La API de supervision corresponde al entorno local vinculado a
-`127.0.0.1`; DNI, sesiones y permisos se incorporaran en el bloque de acceso.
+`127.0.0.1`; utiliza las sesiones y permisos administrativos del bloque de acceso.
+El DNI y las sesiones de consulta se incorporaran despues.
 El contrato, las fechas y los ejemplos estan en
 [Supervision de lecturas](documentacion/supervision-lecturas.md).
 
@@ -359,15 +360,23 @@ El cierre revoca el token en el almacenamiento. Aplicar el script
 | `POST /api/v1/acceso/administradores/sesiones` | Iniciar sesion con JSON `usuario` y `clave`. |
 | `GET /api/v1/acceso/administradores/sesion` | Consultar la sesion autenticada. |
 | `DELETE /api/v1/acceso/administradores/sesion` | Cerrar esa sesion. |
+| `PUT /api/v1/acceso/administradores/sesion/clave` | Cambiar la propia clave y cerrar sus sesiones anteriores. |
 
-Las altas posteriores y cambios de cuentas se incorporaran en los siguientes
-avances. La pantalla administrativa llegara
-con la interfaz; el permiso no se concede desde un formulario publico.
+La parte 3 incorpora `/api/v1/administracion/administradores`: listado,
+consulta, alta, estado, permisos, restablecimiento de claves y auditoria.
+Requiere `GESTIONAR_ADMINISTRADORES` y confirma la clave del actor para
+mutaciones. Las cuentas nuevas deben cambiar su clave inicial; todos los
+cambios efectivos revocan las sesiones de la cuenta afectada. Se conserva
+al menos un gestor activo sin cambio de clave pendiente, incluso ante
+modificaciones concurrentes. No requiere SQL adicional a los scripts 01-08.
+La pantalla administrativa llegara con la interfaz.
 
 La preparacion, los limites de entrada y los comandos estan en
 [Cuentas administrativas](documentacion/cuentas-administrativas.md).
 El contrato HTTP, los vencimientos y la prueba sin publicar el token estan en
 [Sesiones administrativas](documentacion/sesiones-administrativas.md).
+Las rutas, reglas y recorrido de otra persona estan en
+[Gestion de administradores](documentacion/gestion-administradores.md).
 
 ## Configuracion y comprobaciones
 

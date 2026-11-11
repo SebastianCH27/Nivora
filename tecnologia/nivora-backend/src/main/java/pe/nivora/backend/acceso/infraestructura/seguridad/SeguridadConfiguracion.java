@@ -33,7 +33,10 @@ public class SeguridadConfiguracion {
                 .requestMatchers(HttpMethod.GET, "/actuator/health", "/actuator/health/**").permitAll()
                 .requestMatchers(HttpMethod.HEAD, "/actuator/health", "/actuator/health/**").permitAll()
                 .requestMatchers(HttpMethod.POST, "/api/v1/acceso/administradores/sesiones").permitAll()
+                .requestMatchers(HttpMethod.PUT, "/api/v1/acceso/administradores/sesion/clave").hasRole("ADMIN")
                 .requestMatchers("/api/v1/acceso/administradores/sesion").hasRole("ADMIN")
+                .requestMatchers("/api/v1/administracion/administradores", "/api/v1/administracion/administradores/**")
+                    .hasAuthority("GESTIONAR_ADMINISTRADORES")
                 .requestMatchers("/api/v1/supervision/**").hasAuthority("SUPERVISAR_INTEGRACION")
                 .anyRequest().denyAll())
             .exceptionHandling(e -> e
