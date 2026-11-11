@@ -17,7 +17,7 @@ El puerto 8080 esta ocupado por Jenkins en el equipo de desarrollo.
 
 | Paquete previsto | Modulo | Estado |
 |---|---|---|
-| `acceso` | Acceso y suministros | Consulta y repositorio de suministros; base de cuentas administrativas con inicializacion explicita y claves protegidas. |
+| `acceso` | Acceso y suministros | Suministros y cuentas administrativas; inicio, comprobacion y cierre de sesiones persistidas con proteccion de supervision. |
 | `lecturas` | Lecturas, consumo e historial | Recuperacion manual y automatica con corte e inventario persistidos y API local de supervision; calculos pendientes. |
 | `tarifas` | Tarifas, costos y proyecciones | Pendiente de implementar. |
 | `notificaciones` | Alertas y notificaciones | Pendiente de implementar. |
@@ -141,7 +141,7 @@ no ejecuta cambios de estructura automaticamente.
 
 El backend incorpora consultas externas y almacenamiento propio de suministros
 y lecturas. Aun faltan el caso de uso de acceso, validacion de identidad,
-sesiones, roles y el almacenamiento de tarifas y recibos. La API local de
+sesiones de consulta y el almacenamiento de tarifas y recibos. La API local de
 supervision de lecturas consulta el estado propio; las comprobaciones de
 consola se conservan para las operaciones manuales.
 
@@ -319,6 +319,8 @@ de las lecturas guardadas, incidencias, progreso, corte y programacion del
 suministro propio. La respuesta distingue el ultimo resultado de una reserva
 vigente o vencida. La consulta usa una sola sentencia de lectura de MySQL,
 no llama a la Empresa y no modifica el calendario ni el cursor.
+Requiere una sesion administrativa con permiso `SUPERVISAR_INTEGRACION`.
+Sin sesion responde 401; con una sesion sin ese permiso responde 403.
 
 Un suministro registrado sin lecturas devuelve 200 con conteo cero y fechas
 nulas; la ausencia en Nivora devuelve 404. Un codigo invalido devuelve 400 y
@@ -346,13 +348,26 @@ La inicializacion requiere una ejecucion no web expresamente habilitada
 y variables de proceso introducidas por consola. Repetirla conserva las
 cuentas existentes, incluso si estan inactivas. El arranque web no la activa.
 
-Este paso prepara cuentas, permisos y credenciales. El inicio de sesion,
-la proteccion de endpoints y las altas posteriores de administradores se
-incorporaran en los siguientes avances. La pantalla administrativa llegara
+El inicio de sesion administrativo utiliza un token Bearer aleatorio cuya
+huella y vigencia se guardan en MySQL. El servidor verifica estado de cuenta,
+version de credenciales, permisos y caducidad en cada solicitud protegida.
+El cierre revoca el token en el almacenamiento. Aplicar el script
+`base-datos/08-sesiones-administrativas.sql` antes de usar estas rutas:
+
+| Metodo y ruta | Operacion |
+|---|---|
+| `POST /api/v1/acceso/administradores/sesiones` | Iniciar sesion con JSON `usuario` y `clave`. |
+| `GET /api/v1/acceso/administradores/sesion` | Consultar la sesion autenticada. |
+| `DELETE /api/v1/acceso/administradores/sesion` | Cerrar esa sesion. |
+
+Las altas posteriores y cambios de cuentas se incorporaran en los siguientes
+avances. La pantalla administrativa llegara
 con la interfaz; el permiso no se concede desde un formulario publico.
 
 La preparacion, los limites de entrada y los comandos estan en
 [Cuentas administrativas](documentacion/cuentas-administrativas.md).
+El contrato HTTP, los vencimientos y la prueba sin publicar el token estan en
+[Sesiones administrativas](documentacion/sesiones-administrativas.md).
 
 ## Configuracion y comprobaciones
 

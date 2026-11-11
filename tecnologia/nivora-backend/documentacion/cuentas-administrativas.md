@@ -3,8 +3,9 @@
 Primer incremento del bloque 3. Prepara el almacenamiento de cuentas,
 su permiso de gestion, las credenciales protegidas y la creacion explicita
 de la primera cuenta. El acceso con suministro y DNI conserva su diseno
-independiente. El inicio de sesion administrativo y las operaciones HTTP
-protegidas se implementaran en los siguientes incrementos.
+independiente. El [inicio de sesion administrativo](sesiones-administrativas.md)
+ya utiliza estas cuentas; las operaciones para gestionar otras cuentas
+se implementaran en los siguientes incrementos.
 
 ## Modelo
 
@@ -179,7 +180,9 @@ arranque sin cambios, la reaplicacion del SQL y la conservacion de las lecturas.
 La excepcion local tambien se comprobo con una clave ficticia de seis
 digitos, verificando su hash mediante el protector con politica normal.
 
-El siguiente incremento incorporara el inicio de sesion administrativo.
-Despues se protegeran las operaciones para altas adicionales, cambio o
+El inicio de sesion administrativo y la proteccion de supervision estan
+descritos en [Sesiones administrativas](sesiones-administrativas.md).
+La suite general con las 31 pruebas nuevas de sesiones contiene 315 pruebas.
+Se incorporaran las operaciones para altas adicionales, cambio o
 restablecimiento de claves, permisos y desactivacion. Estos datos base no
 suponen que esos endpoints o las pantallas ya esten implementados.

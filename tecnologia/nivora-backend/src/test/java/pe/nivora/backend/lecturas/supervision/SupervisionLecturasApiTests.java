@@ -35,6 +35,8 @@ import org.springframework.test.context.DynamicPropertySource;
 
 import tools.jackson.databind.JsonNode;
 import tools.jackson.databind.json.JsonMapper;
+import pe.nivora.backend.acceso.aplicacion.InicializarAdministracion;
+import pe.nivora.backend.acceso.aplicacion.SesionesAdministrativas;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -50,8 +52,11 @@ class SupervisionLecturasApiTests {
     @Autowired private JdbcTemplate jdbc;
     @Autowired private DataSource fuente;
     @Autowired private JsonMapper json;
+    @Autowired private InicializarAdministracion inicializar;
+    @Autowired private SesionesAdministrativas sesiones;
     @Value("${local.server.port}") private int puerto;
     private Connection conexionEsquema;
+    private String token;
     private final HttpClient http = HttpClient.newBuilder()
         .connectTimeout(Duration.ofSeconds(3)).build();
 
@@ -92,15 +97,20 @@ class SupervisionLecturasApiTests {
             new FileSystemResource("base-datos/03-lecturas.sql"),
             new FileSystemResource("base-datos/04-recuperacion-lecturas.sql"),
             new FileSystemResource("base-datos/05-contexto-recuperacion-lecturas.sql"),
-            new FileSystemResource("base-datos/06-sincronizacion-lecturas.sql"))
+            new FileSystemResource("base-datos/06-sincronizacion-lecturas.sql"),
+            new FileSystemResource("base-datos/07-administradores.sql"),
+            new FileSystemResource("base-datos/08-sesiones-administrativas.sql"))
             .populate(conexionEsquema);
-        for (String tabla : new String[]{"programacion_sincronizacion_lecturas",
+        for (String tabla : new String[]{"sesiones_administrativas", "limites_acceso_administrativo",
+                "auditoria_administradores", "administradores", "programacion_sincronizacion_lecturas",
                 "contexto_recuperacion_lecturas", "incidencias_recuperacion_lecturas",
                 "progreso_recuperacion_lecturas", "incidencias_lecturas", "lecturas",
                 "control_incorporacion_lecturas", "suministros"}) {
             jdbc.execute("DELETE FROM " + tabla);
         }
         jdbc.update("INSERT INTO suministros VALUES ('13100390','Titular privado','2026-11-10 20:00:00'),('00001234','Otro titular','2026-11-10 20:00:00'),('13100391','Tercero','2026-11-10 20:00:00')");
+        inicializar.ejecutar("admin", "Responsable de prueba", "Frase ficticia administrativa".toCharArray());
+        token = sesiones.iniciar("admin", "Frase ficticia administrativa".toCharArray(), "pruebas").token().valor();
     }
 
     @AfterEach
@@ -273,6 +283,7 @@ class SupervisionLecturasApiTests {
     void noOfreceOperacionesDeEscrituraPorPost() throws Exception {
         var antes = instantanea();
         var respuesta = http.send(HttpRequest.newBuilder(URI.create(url(RUTA)))
+            .header("Authorization", "Bearer " + token)
             .POST(HttpRequest.BodyPublishers.noBody()).build(), HttpResponse.BodyHandlers.ofString());
         assertEquals(405, respuesta.statusCode());
         assertEquals(antes, instantanea());
@@ -306,6 +317,7 @@ class SupervisionLecturasApiTests {
 
     private JsonNode get(String ruta, int estado) throws Exception {
         var respuesta = http.send(HttpRequest.newBuilder(URI.create(url(ruta)))
+            .header("Authorization", "Bearer " + token)
             .timeout(Duration.ofSeconds(10)).GET().build(), HttpResponse.BodyHandlers.ofString());
         assertEquals(estado, respuesta.statusCode(), respuesta.body());
         assertEquals("no-store", respuesta.headers().firstValue("Cache-Control").orElse(""));

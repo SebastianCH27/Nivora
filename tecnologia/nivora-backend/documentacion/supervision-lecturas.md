@@ -6,6 +6,11 @@ El endpoint consulta los datos propios de un suministro registrado en Nivora:
 GET /api/v1/supervision/suministros/{codigo}/lecturas
 ```
 
+Requiere una sesion administrativa y el permiso `SUPERVISAR_INTEGRACION`.
+El token se envia exclusivamente en el encabezado `Authorization: Bearer ...`.
+El cliente de [Sesiones administrativas](sesiones-administrativas.md) permite
+probar el acceso manteniendo el token en memoria, sin publicarlo.
+
 No consulta a la Empresa de Agua, no ejecuta recuperaciones, no adelanta
 reintentos y no escribe lecturas, incidencias ni progreso. Utiliza una sola
 sentencia de lectura consistente de las tablas InnoDB. Los agregados estan
@@ -31,23 +36,25 @@ powershell -NoProfile -Command "$claveNivora = Read-Host 'Contrasena de nivora_a
 
 Este arranque normal reemplaza tambien la opcion de registro DEBUG utilizada
 durante el diagnostico anterior. Mantener abierta la consola del servidor.
-Desde otro CMD libre consultar:
+Desde otro CMD libre, comprobar que el acceso sin sesion responde 401:
 
 ```bat
 curl.exe -i "http://127.0.0.1:8082/api/v1/supervision/suministros/13100390/lecturas"
-curl.exe -i "http://127.0.0.1:8082/api/v1/supervision/suministros/ABC/lecturas"
-curl.exe -i "http://127.0.0.1:8082/api/v1/supervision/suministros/99999999/lecturas"
 ```
 
-El ultimo codigo debe estar ausente de la base propia para esperar 404.
+Para las respuestas de negocio 200, 400 y 404, utilizar una sesion valida
+mediante el cliente autenticado indicado arriba. El codigo `99999999` debe
+estar ausente de la base propia para esperar 404.
 El servicio esta vinculado a `127.0.0.1`, como el resto del entorno local.
-Este endpoint tecnico corresponde al bloque de datos; DNI, sesiones y
-permisos de acceso se implementaran en su bloque especifico.
+Este endpoint tecnico utiliza la proteccion administrativa del bloque de
+acceso; el inicio de sesion de consulta con suministro y DNI sigue pendiente.
 
 ## Contrato HTTP
 
 | Caso | Respuesta |
 |---|---|
+| Sin sesion administrativa valida | 401, ProblemDetail de sesion requerida o no valida. |
+| Sesion sin permiso de supervision | 403, ProblemDetail `Permiso insuficiente`. |
 | Suministro registrado en Nivora | 200 con la instantanea, incluso si todavia no hay lecturas. |
 | Codigo fuera de 1-20 digitos ASCII | 400, ProblemDetail `Solicitud invalida`. |
 | Codigo valido sin registro propio | 404, ProblemDetail `Suministro no registrado`. |
@@ -152,7 +159,8 @@ sus reglas posteriores.
 
 ## Validacion
 
-Las 20 pruebas HTTP nuevas llevan el total de la suite de 231 a 251.
+Las 20 pruebas de supervision se conservan y ahora preparan una sesion
+administrativa. Con los incrementos de cuentas y sesiones, la suite suma 315.
 Utilizan un servidor Spring real con puerto temporal y H2
 con los scripts 02-06. Cubren respuestas vacias, filtros por fuente y codigo,
 ceros iniciales, IDs grandes, fechas UTC, incidencias abiertas, reserva vigente
