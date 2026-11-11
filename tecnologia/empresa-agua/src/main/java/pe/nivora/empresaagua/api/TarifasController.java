@@ -7,7 +7,9 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import pe.nivora.empresaagua.tarifas.ConsultarHistorialTarifas;
 import pe.nivora.empresaagua.tarifas.ConsultarTarifaActual;
+import pe.nivora.empresaagua.tarifas.HistorialTarifas;
 import pe.nivora.empresaagua.tarifas.TarifaActual;
 
 @RestController
@@ -15,9 +17,11 @@ import pe.nivora.empresaagua.tarifas.TarifaActual;
 public class TarifasController {
 
     private final ConsultarTarifaActual consulta;
+    private final ConsultarHistorialTarifas historial;
 
-    public TarifasController(ConsultarTarifaActual consulta) {
+    public TarifasController(ConsultarTarifaActual consulta, ConsultarHistorialTarifas historial) {
         this.consulta = consulta;
+        this.historial = historial;
     }
 
     @GetMapping("/{codigo}/tarifa-actual")
@@ -27,5 +31,12 @@ public class TarifasController {
         return ResponseEntity.ok()
             .cacheControl(CacheControl.noStore())
             .body(consulta.consultar(codigo));
+    }
+
+    @GetMapping("/{codigo}/tarifas")
+    public ResponseEntity<HistorialTarifas> historial(@PathVariable("codigo") String codigo) {
+        return ResponseEntity.ok()
+            .cacheControl(CacheControl.noStore())
+            .body(historial.consultar(codigo));
     }
 }

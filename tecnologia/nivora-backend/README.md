@@ -399,6 +399,13 @@ Consulta el contrato y la prueba desde CMD en
 La matriz de pruebas del bloque está en
 [Verificación del consumo](documentacion/verificacion-consumo.md).
 
+## Tarifas y vigencias de la Empresa de Agua
+
+La fuente simulada expone el historial tarifario del suministro con las
+fechas de aplicación de cada versión y sus tramos en soles por m³.
+El contrato de la fuente se describe en
+[Historial tarifario por suministro](../empresa-agua/README.md#historial-tarifario-por-suministro).
+
 ## Cuentas administrativas: primer paso del bloque 3
 
 `InicializarAdministracion` prepara la primera cuenta activa, con permiso

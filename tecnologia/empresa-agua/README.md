@@ -124,6 +124,7 @@ se envía como texto de 1 a 20 dígitos.
 | `/api/v1/suministros/{codigo}/historial?meses=12` | Historial mensual, del más reciente al más antiguo |
 | `/api/v1/suministros/{codigo}/recibos?limite=12` | Recibos emitidos y disponibles para consultar |
 | `/api/v1/suministros/{codigo}/tarifa-actual` | Tarifa asignada y vigente en la fecha de consulta |
+| `/api/v1/suministros/{codigo}/tarifas` | Versiones tarifarias asignadas al suministro, con su vigencia efectiva |
 
 `meses` y `limite` aceptan valores entre 1 y 60.
 Su valor predeterminado es 12.
@@ -332,6 +333,41 @@ mensual. Pueden diferir cuando una vivienda no está consumiendo.
 La configuración espera dos segundos entre ciclos de consumo y sesenta
 entre revisiones de recibos, después de terminar cada ejecución.
 El tiempo de procesamiento también influye en la actualización.
+
+## Historial tarifario por suministro
+
+La ruta `GET /api/v1/suministros/{codigo}/tarifas` usa las tarifas y
+asignaciones guardadas en la Empresa. La respuesta incluye `fuente`,
+`codigoSuministro`, `moneda` con valor `PEN`, `zonaFechas` con valor
+`America/Lima` y el arreglo `asignaciones`, ordenado por el inicio
+de aplicación.
+
+Cada asignación incluye `codigoTarifa`, `versionTarifa`, `nombreTarifa`,
+`cargoFijo` en soles y los tramos ordenados por volumen. Un tramo informa
+`desdeM3`, `hastaM3` y `precioPorM3` en soles. El último tramo tiene
+`hastaM3: null` y cubre el consumo restante.
+
+| Fechas | Significado |
+|---|---|
+| `vigenteDesde`, `vigenteHasta` | Vigencia general de esa versión tarifaria. |
+| `asignadaDesde`, `asignadaHasta` | Fechas de asignación al suministro. |
+| `aplicableDesde`, `aplicableHasta` | Intersección de la vigencia de la versión y la asignación al suministro. |
+
+Los inicios son inclusivos y los finales exclusivos. Un final `null`
+indica un rango sin fecha de término. Un hueco entre rangos permanece
+visible. Un suministro existente sin tarifas devuelve HTTP 200 con
+`asignaciones: []`. Una asignación incompatible, tramos incompletos o
+rangos aplicables superpuestos producen HTTP 503. Para un suministro
+inexistente se devuelve HTTP 404.
+
+Después de compilar y reiniciar Empresa de Agua, prueba desde otro CMD.
+
+```bat
+curl.exe -i "http://127.0.0.1:8081/api/v1/suministros/13100390/tarifas"
+```
+
+La carga de demostración devuelve la tarifa `DOMESTICA`, versión 1, con
+cargo fijo de S/ 5.00 y tres tramos cuando esa es la asignación guardada.
 
 ## Verificación
 
