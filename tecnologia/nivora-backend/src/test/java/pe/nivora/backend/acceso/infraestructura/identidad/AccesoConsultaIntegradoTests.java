@@ -12,6 +12,7 @@ import java.time.Clock;
 import java.time.Duration;
 import java.time.Instant;
 import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.time.ZoneOffset;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -39,9 +40,15 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
 
+import tools.jackson.databind.JsonNode;
 import tools.jackson.databind.json.JsonMapper;
 import pe.nivora.backend.acceso.aplicacion.InicializarAdministracion;
+import pe.nivora.backend.acceso.dominio.CodigoSuministro;
 import pe.nivora.backend.acceso.dominio.contratos.FuenteIdentidad;
+import pe.nivora.backend.lecturas.dominio.LecturaAcumulada;
+import pe.nivora.backend.lecturas.dominio.LoteLecturas;
+import pe.nivora.backend.lecturas.dominio.ResultadoIncorporacion;
+import pe.nivora.backend.lecturas.dominio.contratos.RepositorioLecturas;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -63,6 +70,7 @@ class AccesoConsultaIntegradoTests {
     private static final String SOLICITUD = "{\"codigoSuministro\":\"000101\",\"dni\":\"00000001\"}";
     private static final String CLAVE_ADMIN = "Frase ficticia de administracion";
     private static final Instant AHORA = Instant.parse("2026-11-11T13:00:00Z");
+    private static final AtomicReference<Instant> instantePrueba = new AtomicReference<>(AHORA);
     private static final List<String> SCRIPTS = List.of("02-suministros.sql", "03-lecturas.sql",
         "04-recuperacion-lecturas.sql", "05-contexto-recuperacion-lecturas.sql",
         "06-sincronizacion-lecturas.sql", "07-administradores.sql",
@@ -85,6 +93,7 @@ class AccesoConsultaIntegradoTests {
     @Autowired private JdbcTemplate jdbc;
     @Autowired private JsonMapper json;
     @Autowired private InicializarAdministracion inicializar;
+    @Autowired private RepositorioLecturas repositorioLecturas;
     @Value("${local.server.port}") private int puerto;
 
     private Connection esquema;
@@ -104,12 +113,13 @@ class AccesoConsultaIntegradoTests {
         }
 
         @Bean @Primary Clock relojDePrueba() {
-            return Clock.fixed(AHORA, ZoneOffset.UTC);
+            return new RelojPrueba(ZoneOffset.UTC);
         }
     }
 
     @BeforeEach
     void preparar() throws Exception {
+        instantePrueba.set(AHORA);
         if (esquema == null) {
             esquema = datos.getConnection();
         }
@@ -119,6 +129,7 @@ class AccesoConsultaIntegradoTests {
         for (String tabla : List.of("sesiones_consulta", "limites_acceso_consulta",
                 "sesiones_administrativas", "limites_acceso_administrativo",
                 "auditoria_administradores", "administradores", "lecturas",
+                "control_incorporacion_lecturas",
                 "contexto_recuperacion_lecturas", "progreso_recuperacion_lecturas",
                 "programacion_sincronizacion_lecturas", "suministros")) {
             jdbc.execute("DELETE FROM " + tabla);
@@ -478,6 +489,80 @@ class AccesoConsultaIntegradoTests {
         enviar("GET", ESTADISTICAS + "?meses=13", null, sesion, 400);
     }
 
+    @Test
+    void consumoHistorialYEstadisticasCoincidenAlCambiarElMesDeLima() throws Exception {
+        instantePrueba.set(Instant.parse("2026-11-01T04:59:59.999999Z"));
+        String sesion = token(enviar("POST", CONSULTA + "/sesiones", SOLICITUD, null, 201));
+        agua.set(CAIDA);
+        identidad.set(CAIDA);
+        incorporarLectura("1", "2026-10-01T05:00:00Z", 100);
+        incorporarLectura("2", "2026-10-31T05:00:00Z", 250);
+
+        var antes = consultarJson(CONSUMO, sesion);
+        assertEquals("2026-10", antes.path("periodo").stringValue());
+        assertEquals("150", antes.at("/consumo/litros").stringValue());
+        var historialAntes = consultarJson(HISTORIAL + "?meses=1", sesion);
+        assertEquals("2026-09", historialAntes.at("/periodos/0/periodo").stringValue());
+        var comparacionAntes = consultarJson(ESTADISTICAS + "?meses=1", sesion).path("comparacion");
+        assertEquals(antes.path("consumo"), comparacionAntes.at("/actual/consumo"));
+        assertTrue(comparacionAntes.path("diferencia").isNull());
+
+        instantePrueba.set(Instant.parse("2026-11-01T05:00:01Z"));
+        var mesNuevo = consultarJson(CONSUMO, sesion);
+        assertEquals("2026-11", mesNuevo.path("periodo").stringValue());
+        assertEquals("SIN_DATOS", mesNuevo.at("/consumo/estado").stringValue());
+        assertEquals("2026-10-31T05:00:00Z", mesNuevo.at("/actualizacion/ultimaLectura").stringValue());
+        var octubreParcial = consultarJson(HISTORIAL + "?meses=1", sesion).at("/periodos/0");
+        assertEquals("2026-10", octubreParcial.path("periodo").stringValue());
+        assertEquals("PARCIAL", octubreParcial.at("/consumo/estado").stringValue());
+        assertEquals("FALTA_LECTURA_FINAL", octubreParcial.at("/consumo/motivo").stringValue());
+
+        incorporarLectura("3", "2026-11-01T05:00:00Z", 300);
+        var octubre = consultarJson(HISTORIAL + "?meses=1", sesion).at("/periodos/0");
+        assertEquals("COMPLETO", octubre.at("/consumo/estado").stringValue());
+        assertEquals("200", octubre.at("/consumo/litros").stringValue());
+        assertEquals("3", octubre.at("/consumo/idLecturaFinal").stringValue());
+
+        instantePrueba.set(Instant.parse("2026-11-01T05:00:02Z"));
+        incorporarLectura("4", "2026-11-01T05:00:01Z", 300);
+        var noviembre = consultarJson(CONSUMO, sesion);
+        assertEquals("0", noviembre.at("/consumo/litros").stringValue());
+        assertEquals("3", noviembre.at("/consumo/idLecturaInicial").stringValue());
+        assertEquals("2026-11-01T05:00:01Z", noviembre.at("/actualizacion/ultimaLectura").stringValue());
+
+        var estadisticas = consultarJson(ESTADISTICAS + "?meses=2", sesion);
+        assertEquals(noviembre.path("consumo"), estadisticas.at("/comparacion/actual/consumo"));
+        assertEquals(octubre.path("consumo"), estadisticas.at("/comparacion/anterior/consumo"));
+        assertEquals("1", estadisticas.at("/comparacion/actual/duracionSegundos").stringValue());
+        assertEquals("2678400", estadisticas.at("/comparacion/anterior/duracionSegundos").stringValue());
+        assertEquals("-200", estadisticas.at("/comparacion/diferencia/litros").stringValue());
+        assertEquals("SIN_DATOS", estadisticas.at("/serieMensual/0/consumo/estado").stringValue());
+        assertEquals(octubre, estadisticas.at("/serieMensual/1"));
+        assertEquals(1, estadisticas.at("/resumen/mesesCompletos").intValue());
+        assertEquals(1, estadisticas.at("/resumen/mesesSinDatos").intValue());
+        assertEquals("200", estadisticas.at("/resumen/total/litros").stringValue());
+        assertEquals(1, llamadasAgua.get());
+        assertEquals(1, llamadasIdentidad.get());
+
+        enviar("DELETE", CONSULTA + "/sesion", null, sesion, 204);
+        for (String ruta : List.of(CONSUMO, HISTORIAL, ESTADISTICAS)) {
+            enviar("GET", ruta, null, sesion, 401);
+        }
+    }
+
+    private JsonNode consultarJson(String ruta, String sesion) throws Exception {
+        return json.readTree(enviar("GET", ruta, null, sesion, 200).body());
+    }
+
+    private void incorporarLectura(String id, String fecha, long litros) {
+        String fuente = "empresa-agua";
+        var codigo = new CodigoSuministro("000101");
+        var lectura = new LecturaAcumulada(fuente, id, codigo, "1", Instant.parse(fecha), litros);
+        var lote = new LoteLecturas(fuente, codigo, List.of(lectura), id, false);
+        assertEquals(new ResultadoIncorporacion(1, 0, 0),
+            repositorioLecturas.incorporar(lote, instantePrueba.get()));
+    }
+
     private void lectura(String fuente, String id, String codigo, String fecha, long litros) {
         LocalDateTime medida = LocalDateTime.parse(fecha);
         jdbc.update("""
@@ -546,6 +631,18 @@ class AccesoConsultaIntegradoTests {
             intercambio.sendResponseHeaders(respuesta.estado(), bytes.length);
             intercambio.getResponseBody().write(bytes);
         }
+    }
+
+    private static final class RelojPrueba extends Clock {
+        private final ZoneId zona;
+
+        RelojPrueba(ZoneId zona) {
+            this.zona = zona;
+        }
+
+        @Override public ZoneId getZone() { return zona; }
+        @Override public Clock withZone(ZoneId zona) { return new RelojPrueba(zona); }
+        @Override public Instant instant() { return instantePrueba.get(); }
     }
 
     private record Respuesta(int estado, String tipo, String cuerpo) {}

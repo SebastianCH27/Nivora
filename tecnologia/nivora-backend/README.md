@@ -396,6 +396,8 @@ el mes anterior e indica la duración medida de cada tramo. Devuelve una
 serie cronológica para el gráfico y un resumen de los meses completos.
 Consulta el contrato y la prueba desde CMD en
 [Comparación y estadísticas](documentacion/estadisticas-consumo.md).
+La matriz de pruebas del bloque está en
+[Verificación del consumo](documentacion/verificacion-consumo.md).
 
 ## Cuentas administrativas: primer paso del bloque 3
 
