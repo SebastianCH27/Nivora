@@ -25,7 +25,8 @@ public class SeguridadConfiguracion {
         return sinEstado(http.securityMatcher("/api/v1/acceso/consulta/**"))
             .authorizeHttpRequests(a -> a
                 .requestMatchers(HttpMethod.POST, "/api/v1/acceso/consulta/sesiones").permitAll()
-                .requestMatchers(HttpMethod.GET, "/api/v1/acceso/consulta/sesion").hasRole("CONSULTA")
+                .requestMatchers(HttpMethod.GET, "/api/v1/acceso/consulta/sesion",
+                    "/api/v1/acceso/consulta/consumo-actual").hasRole("CONSULTA")
                 .requestMatchers(HttpMethod.DELETE, "/api/v1/acceso/consulta/sesion").hasRole("CONSULTA")
                 .anyRequest().denyAll())
             .exceptionHandling(e -> e

@@ -11,6 +11,7 @@ import java.sql.Connection;
 import java.time.Clock;
 import java.time.Duration;
 import java.time.Instant;
+import java.time.LocalDateTime;
 import java.time.ZoneOffset;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -52,6 +53,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 class AccesoConsultaIntegradoTests {
 
     private static final String CONSULTA = "/api/v1/acceso/consulta";
+    private static final String CONSUMO = CONSULTA + "/consumo-actual";
     private static final String ADMIN = "/api/v1/acceso/administradores";
     private static final String SUPERVISION = "/api/v1/supervision/suministros/000101/lecturas";
     private static final String DNI = "00000001";
@@ -114,7 +116,9 @@ class AccesoConsultaIntegradoTests {
         new ResourceDatabasePopulator(scripts).populate(esquema);
         for (String tabla : List.of("sesiones_consulta", "limites_acceso_consulta",
                 "sesiones_administrativas", "limites_acceso_administrativo",
-                "auditoria_administradores", "administradores", "suministros")) {
+                "auditoria_administradores", "administradores", "lecturas",
+                "contexto_recuperacion_lecturas", "progreso_recuperacion_lecturas",
+                "programacion_sincronizacion_lecturas", "suministros")) {
             jdbc.execute("DELETE FROM " + tabla);
         }
         agua.set(AGUA_OK);
@@ -202,12 +206,110 @@ class AccesoConsultaIntegradoTests {
         enviar("GET", CONSULTA + "/sesion", null, admin, 401);
         enviar("GET", SUPERVISION, null, consulta, 401);
         enviar("GET", SUPERVISION, null, admin, 200);
+        enviar("GET", CONSUMO, null, admin, 401);
         enviar("DELETE", CONSULTA + "/sesion", null, consulta, 204);
         enviar("GET", CONSULTA + "/sesion", null, consulta, 401);
         assertEquals(2, llamadasAgua.get());
         assertEquals(1, llamadasIdentidad.get());
         assertEquals(1, jdbc.queryForObject(
             "SELECT COUNT(*) FROM sesiones_consulta WHERE revocada_en_utc IS NOT NULL", Integer.class));
+    }
+
+    @Test
+    void consultaSoloElConsumoDelSuministroDeLaSesionConLasFuentesCaidas() throws Exception {
+        enviar("GET", CONSUMO, null, null, 401);
+        String sesion = token(enviar("POST", CONSULTA + "/sesiones", SOLICITUD, null, 201));
+        agua.set(CAIDA);
+        identidad.set(CAIDA);
+        jdbc.update("INSERT INTO suministros (codigo, titular, verificado_en_utc) VALUES (?, ?, ?)",
+            "000102", "Otro titular ficticio", LocalDateTime.parse("2026-11-01T00:00:00"));
+        lectura("empresa-agua", "1", "000101", "2026-11-01T04:59:59.999999", 50);
+        lectura("empresa-agua", "2", "000101", "2026-11-01T05:00:00", 100);
+        lectura("empresa-agua", "3", "000101", "2026-11-03T05:00:00", 1350);
+        lectura("empresa-agua", "4", "000101", "2026-11-11T13:00:00.000001", 9000);
+        lectura("empresa-agua", "5", "000102", "2026-11-10T05:00:00", 10000);
+        lectura("otra-fuente", "6", "000101", "2026-11-05T05:00:00", 5000);
+
+        var respuesta = enviar("GET", CONSUMO + "?codigoSuministro=000102", null, sesion, 200);
+        var cuerpo = json.readTree(respuesta.body());
+        var consumo = cuerpo.path("consumo");
+        assertEquals("000101", cuerpo.path("codigoSuministro").stringValue());
+        assertEquals("2026-11", cuerpo.path("periodo").stringValue());
+        assertEquals("America/Lima", cuerpo.path("zonaHoraria").stringValue());
+        assertEquals("2026-11-01T05:00:00Z", cuerpo.path("inicioMes").stringValue());
+        assertEquals("2026-12-01T05:00:00Z", cuerpo.path("finMesExclusivo").stringValue());
+        assertEquals("COMPLETO", consumo.path("estado").stringValue());
+        assertEquals("1250", consumo.path("litros").stringValue());
+        assertEquals("1.250", consumo.path("metrosCubicos").stringValue());
+        assertEquals("2", consumo.path("idLecturaInicial").stringValue());
+        assertEquals("3", consumo.path("idLecturaFinal").stringValue());
+        assertEquals("2026-11-03T05:00:00Z", cuerpo.at("/actualizacion/ultimaLectura").stringValue());
+        assertEquals("PENDIENTE", cuerpo.at("/actualizacion/estado").stringValue());
+        assertFalse(respuesta.body().contains(DNI));
+        assertFalse(respuesta.body().contains("Persona Ficticia"));
+        assertFalse(respuesta.body().contains(sesion));
+        assertEquals(1, llamadasAgua.get());
+        assertEquals(1, llamadasIdentidad.get());
+        enviar("DELETE", CONSULTA + "/sesion", null, sesion, 204);
+        enviar("GET", CONSUMO, null, sesion, 401);
+    }
+
+    @Test
+    void mantieneLaFechaDeLaUltimaLecturaCuandoElMesAunNoTieneDatos() throws Exception {
+        String sesion = token(enviar("POST", CONSULTA + "/sesiones", SOLICITUD, null, 201));
+        var vacio = json.readTree(enviar("GET", CONSUMO, null, sesion, 200).body());
+        assertEquals("SIN_LECTURAS", vacio.at("/actualizacion/estado").stringValue());
+        assertTrue(vacio.at("/actualizacion/ultimaLectura").isNull());
+
+        lectura("empresa-agua", "1", "000101", "2026-10-31T23:00:00", 50);
+        var anterior = json.readTree(enviar("GET", CONSUMO, null, sesion, 200).body());
+        assertEquals("SIN_DATOS", anterior.at("/consumo/estado").stringValue());
+        assertTrue(anterior.at("/consumo/litros").isNull());
+        assertEquals("2026-10-31T23:00:00Z", anterior.at("/actualizacion/ultimaLectura").stringValue());
+
+        lectura("empresa-agua", "2", "000101", "2026-11-02T05:00:00", 100);
+        lectura("empresa-agua", "3", "000101", "2026-11-03T05:00:00", 110);
+        var parcial = json.readTree(enviar("GET", CONSUMO, null, sesion, 200).body());
+        assertEquals("PARCIAL", parcial.at("/consumo/estado").stringValue());
+        assertEquals("FALTA_LECTURA_INICIAL", parcial.at("/consumo/motivo").stringValue());
+        assertEquals("10", parcial.at("/consumo/litros").stringValue());
+    }
+
+    @Test
+    void diferenciaElCorteCompletoDeUnFalloDeActualizacion() throws Exception {
+        String sesion = token(enviar("POST", CONSULTA + "/sesiones", SOLICITUD, null, 201));
+        lectura("empresa-agua", "1", "000101", "2026-11-01T05:00:00", 100);
+        lectura("empresa-agua", "2", "000101", "2026-11-03T05:00:00", 120);
+        LocalDateTime corte = LocalDateTime.parse("2026-11-10T05:00:00");
+        jdbc.update("""
+            INSERT INTO progreso_recuperacion_lecturas
+                (fuente, codigo_suministro, cursor_confirmado, revision, estado, actualizado_en_utc)
+            VALUES ('empresa-agua', '000101', '2', 1, 'RECORRIDO_COMPLETO', ?)
+            """, corte);
+        jdbc.update("""
+            INSERT INTO contexto_recuperacion_lecturas
+                (fuente, codigo_suministro, hasta_id_lectura, confirmado_hasta_utc,
+                    inventario_json, capturado_en_utc)
+            VALUES ('empresa-agua', '000101', '5', ?, '[]', ?)
+            """, corte, corte);
+        var confirmado = json.readTree(enviar("GET", CONSUMO, null, sesion, 200).body());
+        assertEquals("CORTE_CONFIRMADO", confirmado.at("/actualizacion/estado").stringValue());
+        assertEquals("2026-11-10T05:00:00Z", confirmado.at("/actualizacion/confirmadoHasta").stringValue());
+
+        jdbc.update("UPDATE progreso_recuperacion_lecturas SET estado = 'ERROR_FUENTE'");
+        var fallo = json.readTree(enviar("GET", CONSUMO, null, sesion, 200).body());
+        assertEquals("CON_INCIDENCIAS", fallo.at("/actualizacion/estado").stringValue());
+        assertTrue(fallo.at("/actualizacion/confirmadoHasta").isNull());
+        assertEquals(confirmado.path("consumo"), fallo.path("consumo"));
+    }
+
+    private void lectura(String fuente, String id, String codigo, String fecha, long litros) {
+        LocalDateTime medida = LocalDateTime.parse(fecha);
+        jdbc.update("""
+            INSERT INTO lecturas (fuente, id_lectura, codigo_suministro, id_medidor,
+                fecha_medicion_utc, valor_litros, recibida_en_utc)
+            VALUES (?, ?, ?, '1', ?, ?, ?)
+            """, fuente, id, codigo, medida, litros, medida);
     }
 
     private void assertSinAccesos() {

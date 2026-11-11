@@ -372,6 +372,15 @@ La API de supervision corresponde al entorno local vinculado a
 El contrato, las fechas y los ejemplos estan en
 [Supervision de lecturas](documentacion/supervision-lecturas.md).
 
+## Consumo acumulado del mes
+
+La sesión de consulta permite leer el consumo de su suministro mediante
+`GET /api/v1/acceso/consulta/consumo-actual`. El cálculo usa las lecturas
+aceptadas en MySQL y el mes de `America/Lima`. La respuesta muestra
+litros, m³, fechas, referencias, cobertura y estado de actualización.
+El contrato y la prueba desde CMD están en
+[Consumo acumulado del mes](documentacion/consumo-actual.md).
+
 ## Cuentas administrativas: primer paso del bloque 3
 
 `InicializarAdministracion` prepara la primera cuenta activa, con permiso
