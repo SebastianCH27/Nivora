@@ -2,18 +2,16 @@ package pe.nivora.backend.lecturas.aplicacion;
 
 import java.time.Clock;
 import java.time.Instant;
-import java.time.YearMonth;
-import java.time.ZoneId;
 import java.time.temporal.ChronoUnit;
 
 import pe.nivora.backend.acceso.dominio.CodigoSuministro;
 import pe.nivora.backend.lecturas.dominio.ConsumoPeriodo;
 import pe.nivora.backend.lecturas.dominio.EstadoRecuperacion;
+import pe.nivora.backend.lecturas.dominio.MesConsumo;
 import pe.nivora.backend.lecturas.dominio.contratos.ConsultaLecturasPeriodo;
 import pe.nivora.backend.lecturas.dominio.contratos.SuministroNoRegistradoException;
 
 public class ConsultarConsumoActual {
-    private static final ZoneId LIMA = ZoneId.of("America/Lima");
     private static final String FUENTE = "empresa-agua";
 
     private final ConsultaLecturasPeriodo consulta;
@@ -26,9 +24,8 @@ public class ConsultarConsumoActual {
 
     public Resultado ejecutar(CodigoSuministro suministro) {
         Instant ahora = reloj.instant().truncatedTo(ChronoUnit.MICROS);
-        YearMonth mes = YearMonth.from(ahora.atZone(LIMA));
-        Instant inicio = mes.atDay(1).atStartOfDay(LIMA).toInstant();
-        Instant fin = mes.plusMonths(1).atDay(1).atStartOfDay(LIMA).toInstant();
+        var mes = MesConsumo.de(ahora);
+        Instant inicio = mes.inicio();
         var datos = consulta.consultar(FUENTE, suministro, inicio, ahora)
             .orElseThrow(SuministroNoRegistradoException::new);
         Instant ultima = datos.lecturas().isEmpty() ? datos.ultimaAnterior()
@@ -41,8 +38,8 @@ public class ConsultarConsumoActual {
 
         var consumo = ConsumoPeriodo.calcular(inicio, ultima, datos.lecturas());
         var actualizacion = new Actualizacion(estado(datos, ultima, corte), ultima, corte);
-        return new Resultado(FUENTE, suministro.valor(), mes.toString(), LIMA.getId(),
-            inicio, fin, ahora, consumo, actualizacion);
+        return new Resultado(FUENTE, suministro.valor(), mes.valor().toString(), MesConsumo.ZONA.getId(),
+            inicio, mes.fin(), ahora, consumo, actualizacion);
     }
 
     private static EstadoActualizacion estado(ConsultaLecturasPeriodo.Datos datos,

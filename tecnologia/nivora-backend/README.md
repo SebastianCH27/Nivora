@@ -381,6 +381,14 @@ litros, m³, fechas, referencias, cobertura y estado de actualización.
 El contrato y la prueba desde CMD están en
 [Consumo acumulado del mes](documentacion/consumo-actual.md).
 
+## Historial mensual de consumo
+
+`GET /api/v1/acceso/consulta/historial` devuelve los meses anteriores del
+suministro de la sesión con su cobertura. Usa `meses` para elegir hasta
+12 periodos consecutivos y `hasta` para consultar ventanas más antiguas.
+Consulta los parámetros, los estados y la prueba desde CMD en
+[Historial mensual de consumo](documentacion/historial-mensual.md).
+
 ## Cuentas administrativas: primer paso del bloque 3
 
 `InicializarAdministracion` prepara la primera cuenta activa, con permiso

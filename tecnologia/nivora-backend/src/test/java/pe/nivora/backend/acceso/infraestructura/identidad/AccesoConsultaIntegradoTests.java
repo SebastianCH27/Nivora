@@ -54,6 +54,7 @@ class AccesoConsultaIntegradoTests {
 
     private static final String CONSULTA = "/api/v1/acceso/consulta";
     private static final String CONSUMO = CONSULTA + "/consumo-actual";
+    private static final String HISTORIAL = CONSULTA + "/historial";
     private static final String ADMIN = "/api/v1/acceso/administradores";
     private static final String SUPERVISION = "/api/v1/supervision/suministros/000101/lecturas";
     private static final String DNI = "00000001";
@@ -207,6 +208,7 @@ class AccesoConsultaIntegradoTests {
         enviar("GET", SUPERVISION, null, consulta, 401);
         enviar("GET", SUPERVISION, null, admin, 200);
         enviar("GET", CONSUMO, null, admin, 401);
+        enviar("GET", HISTORIAL, null, admin, 401);
         enviar("DELETE", CONSULTA + "/sesion", null, consulta, 204);
         enviar("GET", CONSULTA + "/sesion", null, consulta, 401);
         assertEquals(2, llamadasAgua.get());
@@ -301,6 +303,90 @@ class AccesoConsultaIntegradoTests {
         assertEquals("CON_INCIDENCIAS", fallo.at("/actualizacion/estado").stringValue());
         assertTrue(fallo.at("/actualizacion/confirmadoHasta").isNull());
         assertEquals(confirmado.path("consumo"), fallo.path("consumo"));
+    }
+
+    @Test
+    void historialEntregaLosMesesAnterioresConCoberturaYRespetaElSuministroDeLaSesion() throws Exception {
+        enviar("GET", HISTORIAL, null, null, 401);
+        String sesion = token(enviar("POST", CONSULTA + "/sesiones", SOLICITUD, null, 201));
+        agua.set(CAIDA);
+        identidad.set(CAIDA);
+        jdbc.update("INSERT INTO suministros (codigo, titular, verificado_en_utc) VALUES (?, ?, ?)",
+            "000102", "Otro titular ficticio", LocalDateTime.parse("2026-11-01T00:00:00"));
+        lectura("empresa-agua", "1", "000101", "2026-06-01T05:00:00", 50);
+        lectura("empresa-agua", "2", "000101", "2026-06-15T05:00:00", 40);
+        lectura("empresa-agua", "3", "000101", "2026-07-01T05:00:00", 100);
+        lectura("empresa-agua", "4", "000101", "2026-07-22T05:00:00", 300);
+        lectura("empresa-agua", "5", "000101", "2026-09-02T05:00:00", 500);
+        lectura("empresa-agua", "6", "000101", "2026-10-01T05:00:00", 800);
+        lectura("empresa-agua", "7", "000101", "2026-11-01T05:00:00", 2050);
+        lectura("empresa-agua", "8", "000101", "2026-11-01T05:00:00.000001", 9000);
+        lectura("empresa-agua", "9", "000102", "2026-10-10T05:00:00", 10000);
+        lectura("otra-fuente", "10", "000101", "2026-10-12T05:00:00", 11000);
+
+        var respuesta = enviar("GET", HISTORIAL + "?meses=5&codigoSuministro=000102", null, sesion, 200);
+        var cuerpo = json.readTree(respuesta.body());
+        assertEquals("000101", cuerpo.path("codigoSuministro").stringValue());
+        assertEquals("America/Lima", cuerpo.path("zonaHoraria").stringValue());
+        var periodos = cuerpo.path("periodos");
+        assertEquals(5, periodos.size());
+        var octubre = periodos.get(0);
+        assertEquals("2026-10", octubre.path("periodo").stringValue());
+        assertEquals("2026-10-01T05:00:00Z", octubre.path("inicioMes").stringValue());
+        assertEquals("2026-11-01T05:00:00Z", octubre.path("finMesExclusivo").stringValue());
+        assertEquals("COMPLETO", octubre.at("/consumo/estado").stringValue());
+        assertEquals("1250", octubre.at("/consumo/litros").stringValue());
+        assertEquals("1.250", octubre.at("/consumo/metrosCubicos").stringValue());
+        assertEquals("6", octubre.at("/consumo/idLecturaInicial").stringValue());
+        assertEquals("7", octubre.at("/consumo/idLecturaFinal").stringValue());
+        var septiembre = periodos.get(1);
+        assertEquals("2026-09", septiembre.path("periodo").stringValue());
+        assertEquals("PARCIAL", septiembre.at("/consumo/estado").stringValue());
+        assertEquals("FALTA_LECTURA_INICIAL", septiembre.at("/consumo/motivo").stringValue());
+        assertEquals("6", septiembre.at("/consumo/idLecturaFinal").stringValue());
+        assertEquals("2026-08", periodos.get(2).path("periodo").stringValue());
+        assertEquals("SIN_DATOS", periodos.get(2).at("/consumo/estado").stringValue());
+        assertTrue(periodos.get(2).at("/consumo/litros").isNull());
+        assertEquals("FALTA_LECTURA_FINAL", periodos.get(3).at("/consumo/motivo").stringValue());
+        assertEquals("200", periodos.get(3).at("/consumo/litros").stringValue());
+        assertEquals("INCOMPATIBLE", periodos.get(4).at("/consumo/estado").stringValue());
+        assertEquals("RETROCESO_DEL_CONTADOR", periodos.get(4).at("/consumo/motivo").stringValue());
+        assertTrue(periodos.get(4).at("/consumo/litros").isNull());
+
+        assertFalse(respuesta.body().contains(DNI));
+        assertFalse(respuesta.body().contains("Persona Ficticia"));
+        assertFalse(respuesta.body().contains(sesion));
+        assertEquals(1, llamadasAgua.get());
+        assertEquals(1, llamadasIdentidad.get());
+        enviar("DELETE", CONSULTA + "/sesion", null, sesion, 204);
+        enviar("GET", HISTORIAL, null, sesion, 401);
+    }
+
+    @Test
+    void historialAdmiteUnaVentanaAnteriorYSinLecturas() throws Exception {
+        String sesion = token(enviar("POST", CONSULTA + "/sesiones", SOLICITUD, null, 201));
+        var reciente = json.readTree(enviar("GET", HISTORIAL, null, sesion, 200).body()).path("periodos");
+        assertEquals(12, reciente.size());
+        assertEquals("2026-10", reciente.get(0).path("periodo").stringValue());
+        assertEquals("2025-11", reciente.get(11).path("periodo").stringValue());
+
+        var anterior = json.readTree(enviar("GET", HISTORIAL + "?meses=2&hasta=2024-03",
+            null, sesion, 200).body()).path("periodos");
+        assertEquals(2, anterior.size());
+        assertEquals("2024-03", anterior.get(0).path("periodo").stringValue());
+        assertEquals("2024-02", anterior.get(1).path("periodo").stringValue());
+        assertEquals("2024-03-01T05:00:00Z", anterior.get(1).path("finMesExclusivo").stringValue());
+        assertEquals("SIN_DATOS", anterior.get(1).at("/consumo/estado").stringValue());
+        assertTrue(anterior.get(1).at("/consumo/metrosCubicos").isNull());
+    }
+
+    @ParameterizedTest
+    @ValueSource(strings = {"meses=0", "meses=13", "meses=texto", "hasta=2026-11",
+        "hasta=2026-12", "hasta=2026-9", "hasta=2026-13", "meses=12&hasta=1000-01"})
+    void historialRechazaRangosInvalidos(String consulta) throws Exception {
+        String sesion = token(enviar("POST", CONSULTA + "/sesiones", SOLICITUD, null, 201));
+        var respuesta = enviar("GET", HISTORIAL + "?" + consulta, null, sesion, 400);
+        assertEquals("Rango de historial invalido", json.readTree(respuesta.body()).path("title").stringValue());
     }
 
     private void lectura(String fuente, String id, String codigo, String fecha, long litros) {
