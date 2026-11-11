@@ -125,6 +125,8 @@ vigencia de 30 minutos, limitada al suministro elegido. El script
 `base-datos/09-sesiones-consulta.sql` agrega las dos tablas de este paso.
 Las rutas y la prueba desde CMD estan en
 [Sesiones de consulta](documentacion/sesiones-consulta.md).
+La matriz de pruebas del bloque está en
+[Verificación del acceso](documentacion/verificacion-acceso.md).
 
 ## Almacenamiento propio de suministros
 

@@ -115,7 +115,7 @@ representan momentos distintos.
 | **Respuesta esperada** | Nivora comprueba la sesión y los permisos antes de ejecutar la operación. Rechaza los intentos no autorizados, conserva los datos sin modificaciones indebidas y protege la información del DNI y los registros de acceso. Las operaciones autorizadas funcionan según el perfil correspondiente. |
 | **Medida** | Rechazar el 100 % de los intentos no autorizados definidos en la prueba, con cero modificaciones indebidas y cero exposiciones no autorizadas de datos del DNI o registros de acceso. Permitir el 100 % de los casos autorizados definidos. Todas las comunicaciones protegidas del despliegue evaluado deben utilizar HTTPS. |
 | **Verificación** | Probar los distintos estados de sesión y ambos perfiles. Intentar operaciones administrativas desde una sesión de consulta y revisar sus respuestas y efectos. Comprobar el cierre y la caducidad de sesiones, la protección de los registros y el uso de HTTPS en el despliegue evaluado. |
-| **Estado** | Pendiente de completar la matriz de sesiones y permisos y verificar el despliegue HTTPS. |
+| **Estado** | [Pruebas locales de sesiones y permisos](../../tecnologia/nivora-backend/documentacion/verificacion-acceso.md). Quedan pendientes la verificación del despliegue HTTPS y las pruebas de las futuras rutas de registros de acceso. |
 | **Trazabilidad** | AC06; DA03; RF01–RF04, RF30 y RF31; RC05 y RC06. |
 
 El acceso de consulta requiere un suministro existente y un DNI válido,
