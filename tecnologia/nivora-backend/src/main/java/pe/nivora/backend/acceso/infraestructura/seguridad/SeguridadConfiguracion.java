@@ -27,7 +27,8 @@ public class SeguridadConfiguracion {
                 .requestMatchers(HttpMethod.POST, "/api/v1/acceso/consulta/sesiones").permitAll()
                 .requestMatchers(HttpMethod.GET, "/api/v1/acceso/consulta/sesion",
                     "/api/v1/acceso/consulta/consumo-actual",
-                    "/api/v1/acceso/consulta/historial").hasRole("CONSULTA")
+                    "/api/v1/acceso/consulta/historial",
+                    "/api/v1/acceso/consulta/estadisticas").hasRole("CONSULTA")
                 .requestMatchers(HttpMethod.DELETE, "/api/v1/acceso/consulta/sesion").hasRole("CONSULTA")
                 .anyRequest().denyAll())
             .exceptionHandling(e -> e

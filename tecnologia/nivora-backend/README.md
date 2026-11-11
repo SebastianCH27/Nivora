@@ -389,6 +389,14 @@ suministro de la sesión con su cobertura. Usa `meses` para elegir hasta
 Consulta los parámetros, los estados y la prueba desde CMD en
 [Historial mensual de consumo](documentacion/historial-mensual.md).
 
+## Comparación y estadísticas de consumo
+
+`GET /api/v1/acceso/consulta/estadisticas` compara el acumulado actual con
+el mes anterior e indica la duración medida de cada tramo. Devuelve una
+serie cronológica para el gráfico y un resumen de los meses completos.
+Consulta el contrato y la prueba desde CMD en
+[Comparación y estadísticas](documentacion/estadisticas-consumo.md).
+
 ## Cuentas administrativas: primer paso del bloque 3
 
 `InicializarAdministracion` prepara la primera cuenta activa, con permiso

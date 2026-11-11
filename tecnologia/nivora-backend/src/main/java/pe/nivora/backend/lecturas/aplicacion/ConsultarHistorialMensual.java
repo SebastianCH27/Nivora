@@ -9,6 +9,7 @@ import java.util.List;
 
 import pe.nivora.backend.acceso.dominio.CodigoSuministro;
 import pe.nivora.backend.lecturas.dominio.ConsumoPeriodo;
+import pe.nivora.backend.lecturas.dominio.LecturaAcumulada;
 import pe.nivora.backend.lecturas.dominio.MesConsumo;
 import pe.nivora.backend.lecturas.dominio.contratos.ConsultaLecturasPeriodo;
 import pe.nivora.backend.lecturas.dominio.contratos.SuministroNoRegistradoException;
@@ -26,9 +27,7 @@ public class ConsultarHistorialMensual {
     }
 
     public Resultado ejecutar(CodigoSuministro suministro, int meses, YearMonth hasta) {
-        if (meses < 1 || meses > MAXIMO_MESES) {
-            throw new IllegalArgumentException("El historial admite de 1 a 12 meses por consulta.");
-        }
+        validarMeses(meses);
         Instant ahora = reloj.instant().truncatedTo(ChronoUnit.MICROS);
         YearMonth actual = MesConsumo.de(ahora).valor();
         YearMonth ultimo = hasta == null ? actual.minusMonths(1) : hasta;
@@ -41,6 +40,17 @@ public class ConsultarHistorialMensual {
                 new MesConsumo(primero).inicio(), new MesConsumo(ultimo).fin())
             .orElseThrow(SuministroNoRegistradoException::new)
             .lecturas();
+        return new Resultado(FUENTE, suministro.valor(), MesConsumo.ZONA.getId(), ahora,
+            calcularPeriodos(primero, meses, lecturas));
+    }
+
+    static void validarMeses(int meses) {
+        if (meses < 1 || meses > MAXIMO_MESES) {
+            throw new IllegalArgumentException("Se admiten de 1 a 12 meses por consulta.");
+        }
+    }
+
+    static List<Periodo> calcularPeriodos(YearMonth primero, int meses, List<LecturaAcumulada> lecturas) {
         var periodos = new ArrayList<Periodo>(meses);
         int inicioLecturas = 0;
         int finLecturas = 0;
@@ -63,8 +73,7 @@ public class ConsultarHistorialMensual {
             }
         }
 
-        return new Resultado(FUENTE, suministro.valor(), MesConsumo.ZONA.getId(), ahora,
-            List.copyOf(periodos.reversed()));
+        return List.copyOf(periodos.reversed());
     }
 
     public record Periodo(String periodo, Instant inicioMes, Instant finMesExclusivo,
