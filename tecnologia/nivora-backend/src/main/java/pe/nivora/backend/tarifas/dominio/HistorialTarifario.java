@@ -1,6 +1,8 @@
 package pe.nivora.backend.tarifas.dominio;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Objects;
@@ -40,6 +42,48 @@ public record HistorialTarifario(String fuente, CodigoSuministro suministro, Lis
         return asignaciones.stream().filter(a -> !desde.isBefore(a.aplicableDesde())
                 && (a.aplicableHasta() == null || !hasta.isAfter(a.aplicableHasta())))
             .findFirst();
+    }
+
+    public boolean intersecta(LocalDate desde, LocalDate hasta) {
+        return asignaciones.stream().anyMatch(a -> a.aplicableDesde().isBefore(hasta)
+            && (a.aplicableHasta() == null || desde.isBefore(a.aplicableHasta())));
+    }
+
+    public HistorialTarifario conAsignacion(Asignacion nueva) {
+        var desde = nueva.aplicableDesde();
+        var hasta = nueva.aplicableHasta();
+        var cambios = new ArrayList<Asignacion>();
+        for (var anterior : asignaciones) {
+            var finAnterior = anterior.aplicableHasta();
+            if ((finAnterior != null && !finAnterior.isAfter(desde))
+                    || (hasta != null && !anterior.aplicableDesde().isBefore(hasta))) {
+                cambios.add(anterior);
+                continue;
+            }
+            if (anterior.aplicableDesde().isBefore(desde)) {
+                cambios.add(new Asignacion(anterior.tarifa(), anterior.vigenteHasta(),
+                    anterior.asignadaDesde(), desde));
+            }
+            if (hasta != null && (finAnterior == null || hasta.isBefore(finAnterior))) {
+                cambios.add(new Asignacion(anterior.tarifa(), anterior.vigenteHasta(),
+                    hasta, anterior.asignadaHasta()));
+            }
+        }
+        cambios.add(nueva);
+        cambios.sort(Comparator.comparing(Asignacion::aplicableDesde));
+        var consolidadas = new ArrayList<Asignacion>();
+        for (var actual : cambios) {
+            var previa = consolidadas.isEmpty() ? null : consolidadas.getLast();
+            if (previa != null && actual.aplicableDesde().equals(previa.aplicableHasta())
+                    && previa.tarifa().equals(actual.tarifa())
+                    && Objects.equals(previa.vigenteHasta(), actual.vigenteHasta())) {
+                consolidadas.set(consolidadas.size() - 1, new Asignacion(previa.tarifa(),
+                    previa.vigenteHasta(), previa.asignadaDesde(), actual.asignadaHasta()));
+            } else {
+                consolidadas.add(actual);
+            }
+        }
+        return new HistorialTarifario(fuente, suministro, consolidadas);
     }
 
     private record ClaveVersion(String codigo, int version) {}

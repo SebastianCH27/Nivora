@@ -19,7 +19,7 @@ public final class LectorSolicitudAdministrativa {
 
     public LectorSolicitudAdministrativa(JsonMapper json) {
         lector = json.reader().with(DeserializationFeature.FAIL_ON_TRAILING_TOKENS,
-            DeserializationFeature.FAIL_ON_READING_DUP_TREE_KEY);
+            DeserializationFeature.FAIL_ON_READING_DUP_TREE_KEY, DeserializationFeature.USE_BIG_DECIMAL_FOR_FLOATS);
     }
 
     public JsonNode leer(HttpServletRequest solicitud, Set<String> requeridos,
@@ -35,13 +35,17 @@ public final class LectorSolicitudAdministrativa {
         try {
             if (cuerpo.length > 4096) throw new FormatoSolicitudException(413);
             var datos = lector.readTree(cuerpo);
-            if (datos == null || !datos.isObject()) throw new FormatoSolicitudException(400);
-            for (String campo : requeridos) if (!datos.has(campo)) throw new FormatoSolicitudException(400);
-            long presentes = opcionales.stream().filter(datos::has).count();
-            if (datos.size() != requeridos.size() + presentes) throw new FormatoSolicitudException(400);
+            validarCampos(datos, requeridos, opcionales);
             return datos;
         } catch (JacksonException error) { throw new FormatoSolicitudException(400); }
         finally { Arrays.fill(cuerpo, (byte) 0); }
+    }
+
+    public static void validarCampos(JsonNode datos, Set<String> requeridos, Set<String> opcionales) {
+        if (datos == null || !datos.isObject()) throw new FormatoSolicitudException(400);
+        for (String campo : requeridos) if (!datos.has(campo)) throw new FormatoSolicitudException(400);
+        long presentes = opcionales.stream().filter(datos::has).count();
+        if (datos.size() != requeridos.size() + presentes) throw new FormatoSolicitudException(400);
     }
 
     public static String texto(JsonNode datos, String campo) {

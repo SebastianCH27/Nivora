@@ -27,8 +27,8 @@ import pe.nivora.backend.lecturas.dominio.contratos.SuministroNoRegistradoExcept
 import pe.nivora.backend.tarifas.aplicacion.ConsultarCostosConsumo;
 import pe.nivora.backend.tarifas.aplicacion.ConsultarProyeccionMensual;
 import pe.nivora.backend.tarifas.dominio.CostoEstimado;
-import pe.nivora.backend.tarifas.dominio.HistorialTarifario;
 import pe.nivora.backend.tarifas.dominio.ProyeccionMensual;
+import pe.nivora.backend.tarifas.dominio.TarifasParaCalculo;
 
 @RestController
 public class CostosConsumoController {
@@ -47,7 +47,8 @@ public class CostosConsumoController {
         var anteriores = resultado.anteriores().stream().map(CostosConsumoController::periodo).toList();
         return ResponseEntity.ok().cacheControl(CacheControl.noStore()).body(
             new Respuesta(resultado.fuente(), resultado.codigoSuministro(), "PEN", resultado.zonaHoraria(),
-                resultado.consultadoEn(), resultado.revisionTarifaria() == null ? null : resultado.revisionTarifaria().toString(),
+                resultado.consultadoEn(), revision(resultado.revisionTarifaria()),
+                revision(resultado.revisionTarifariaAdministrativa()),
                 periodo(resultado.actual()), anteriores));
     }
 
@@ -61,8 +62,8 @@ public class CostosConsumoController {
             segundos(datos.duracionObservada()), segundos(datos.duracionMes()));
         var estimacion = resultado.estimacion();
         var costo = estimacion == null ? null : new CostoProyectado(estimacion.estado(),
-            estimacion.revisionTarifaria() == null ? null : estimacion.revisionTarifaria().toString(),
-            tarifa(estimacion.tarifa()), desglose(estimacion.costo()));
+            estimacion.seleccion().fuente(), revision(estimacion.seleccion().revision()),
+            tarifa(estimacion.seleccion()), desglose(estimacion.costo()));
         var supuestos = new Supuestos("RITMO_PROMEDIO_CONSTANTE", ProyeccionMensual.MINIMO_OBSERVADO.toSeconds());
         return ResponseEntity.ok().cacheControl(CacheControl.noStore()).body(new RespuestaProyeccion(
             observado.fuente(), observado.codigoSuministro(), "PEN", observado.periodo(), observado.zonaHoraria(),
@@ -73,7 +74,7 @@ public class CostosConsumoController {
     private static PeriodoCosto periodo(ConsultarCostosConsumo.Estimacion estimacion) {
         var periodo = estimacion.periodo();
         return new PeriodoCosto(periodo.periodo(), periodo.inicioMes(), periodo.finMesExclusivo(), estimacion.estado(),
-            consumo(periodo.consumo()), tarifa(estimacion.tarifa()), desglose(estimacion.costo()));
+            consumo(periodo.consumo()), tarifa(estimacion.seleccion()), desglose(estimacion.costo()));
     }
 
     private static Consumo consumo(ConsumoPeriodo consumo) {
@@ -86,11 +87,17 @@ public class CostosConsumoController {
         return BigDecimal.valueOf(duracion.toNanos(), 9).stripTrailingZeros().toPlainString();
     }
 
-    private static Tarifa tarifa(HistorialTarifario.Asignacion asignacion) {
-        if (asignacion == null) return null;
+    private static Tarifa tarifa(TarifasParaCalculo.Seleccion seleccion) {
+        if (seleccion == null || seleccion.asignacion() == null) return null;
+        var asignacion = seleccion.asignacion();
         var version = asignacion.tarifa();
         return new Tarifa(version.codigo(), version.version(), version.nombre(), asignacion.aplicableDesde(),
-            asignacion.aplicableHasta(), decimal(version.igvPorcentaje()));
+            asignacion.aplicableHasta(), decimal(version.igvPorcentaje()), seleccion.fuente(),
+            revision(seleccion.revision()));
+    }
+
+    private static String revision(Long valor) {
+        return valor == null ? null : valor.toString();
     }
 
     private static Desglose desglose(CostoEstimado costo) {
@@ -130,7 +137,8 @@ public class CostosConsumoController {
     }
 
     public record Respuesta(String fuente, String codigoSuministro, String moneda, String zonaHoraria,
-            Instant consultadoEn, String revisionTarifaria, PeriodoCosto actual, List<PeriodoCosto> anteriores) {}
+            Instant consultadoEn, String revisionTarifaria, String revisionTarifariaAdministrativa,
+            PeriodoCosto actual, List<PeriodoCosto> anteriores) {}
 
     public record PeriodoCosto(String periodo, Instant inicioMes, Instant finMesExclusivo,
             ConsultarCostosConsumo.Estado estado, Consumo consumo, Tarifa tarifa, Desglose desglose) {}
@@ -145,7 +153,7 @@ public class CostosConsumoController {
     public record VolumenProyectado(String litros, String metrosCubicos, String promedioLitrosPorDia,
             String segundosObservados, String segundosDelMes) {}
 
-    public record CostoProyectado(ConsultarCostosConsumo.Estado estado, String revisionTarifaria,
+    public record CostoProyectado(ConsultarCostosConsumo.Estado estado, String fuenteTarifaria, String revisionTarifaria,
             Tarifa tarifa, Desglose desglose) {}
 
     public record Consumo(ConsumoPeriodo.Estado estado, ConsumoPeriodo.Motivo motivo, String litros,
@@ -153,7 +161,8 @@ public class CostosConsumoController {
             String idLecturaFinal) {}
 
     public record Tarifa(String codigoTarifa, int versionTarifa, String nombreTarifa,
-            LocalDate aplicableDesde, LocalDate aplicableHasta, String igvPorcentaje) {}
+            LocalDate aplicableDesde, LocalDate aplicableHasta, String igvPorcentaje, String fuenteTarifaria,
+            String revisionTarifaria) {}
 
     public record Desglose(String agua, String alcantarillado, String cargoFijo, String subtotalConocido,
             String igv, String totalEstimado, List<Tramo> tramos) {}

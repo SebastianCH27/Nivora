@@ -71,6 +71,7 @@ class AccesoConsultaIntegradoTests {
     private static final String COSTOS = CONSULTA + "/costos";
     private static final String PROYECCION = CONSULTA + "/proyeccion";
     private static final String ADMIN = "/api/v1/acceso/administradores";
+    private static final String GESTION_TARIFAS = "/api/v1/administracion/suministros/000101/tarifas";
     private static final String SUPERVISION = "/api/v1/supervision/suministros/000101/lecturas";
     private static final String DNI = "00000001";
     private static final String TOKEN_PROVEEDOR = "token-ficticio-integracion";
@@ -81,7 +82,7 @@ class AccesoConsultaIntegradoTests {
     private static final List<String> SCRIPTS = List.of("02-suministros.sql", "03-lecturas.sql",
         "04-recuperacion-lecturas.sql", "05-contexto-recuperacion-lecturas.sql",
         "06-sincronizacion-lecturas.sql", "07-administradores.sql",
-        "08-sesiones-administrativas.sql", "09-sesiones-consulta.sql", "10-tarifas.sql");
+        "08-sesiones-administrativas.sql", "09-sesiones-consulta.sql", "10-tarifas.sql", "11-gestion-tarifas.sql");
 
     private static final Respuesta AGUA_OK = new Respuesta(200, "application/json",
         "{\"codigoSuministro\":\"000101\",\"titular\":\"Titular ficticio\"}");
@@ -136,7 +137,7 @@ class AccesoConsultaIntegradoTests {
         new ResourceDatabasePopulator(scripts).populate(esquema);
         for (String tabla : List.of("sesiones_consulta", "limites_acceso_consulta",
                 "sesiones_administrativas", "limites_acceso_administrativo",
-                "auditoria_administradores", "administradores", "lecturas",
+                "tarifas_publicaciones", "auditoria_administradores", "administradores", "lecturas",
                 "control_incorporacion_lecturas",
                 "contexto_recuperacion_lecturas", "progreso_recuperacion_lecturas",
                 "programacion_sincronizacion_lecturas", "tarifas_asignaciones", "tarifas_historiales",
@@ -723,6 +724,108 @@ class AccesoConsultaIntegradoTests {
         assertEquals("2", incompleto.at("/costoProyectado/revisionTarifaria").stringValue());
         assertEquals("14.48", incompleto.at("/costoProyectado/desglose/subtotalConocido").stringValue());
         assertTrue(incompleto.at("/costoProyectado/desglose/totalEstimado").isNull());
+    }
+
+    @Test
+    void publicacionTarifariaSeUsaEnCostosYProyeccionSinAlterarMesesAnteriores() throws Exception {
+        var sesion = token(enviar("POST", CONSULTA + "/sesiones", SOLICITUD, null, 201));
+        var admin = iniciarAdminTarifas();
+        incorporarLectura("1", "2026-10-01T05:00:00Z", 100);
+        incorporarLectura("2", "2026-11-01T05:00:00Z", 1100);
+        incorporarLectura("3", "2026-11-11T05:00:00Z", 3100);
+        var octubre = LocalDate.parse("2026-10-01");
+        var tarifa = new VersionTarifaria("DOMESTICA", 1, "Importada", octubre, new BigDecimal("5.00"),
+            null, List.of(tramoCosto("0", null, "1.50", null)));
+        var suministro = new CodigoSuministro("000101");
+        var historial = new HistorialTarifario("empresa-agua", suministro, List.of(
+            new HistorialTarifario.Asignacion(tarifa, null, octubre, null)));
+        tarifas.guardar(historial, AHORA);
+
+        var anterior = consultarJson(GESTION_TARIFAS, admin);
+        assertEquals("0", anterior.path("revisionAdministrativa").stringValue());
+        assertEquals("1", anterior.at("/importada/revision").stringValue());
+        enviar("PUT", GESTION_TARIFAS, solicitudTarifa(0, 1, "2026-11-01", null), admin, 200);
+
+        var actualizacion = new HistorialTarifario("empresa-agua", suministro, List.of(
+            new HistorialTarifario.Asignacion(tarifa, null, octubre, LocalDate.parse("2027-03-01"))));
+        tarifas.guardar(actualizacion, AHORA.plusSeconds(1));
+        var costos = consultarJson(COSTOS + "?meses=1", sesion);
+        assertEquals("2", costos.path("revisionTarifaria").stringValue());
+        assertEquals("1", costos.path("revisionTarifariaAdministrativa").stringValue());
+        assertEquals("nivora", costos.at("/actual/tarifa/fuenteTarifaria").stringValue());
+        assertEquals("10.00", costos.at("/actual/desglose/totalEstimado").stringValue());
+        assertEquals("empresa-agua", costos.at("/anteriores/0/tarifa/fuenteTarifaria").stringValue());
+        assertEquals("6.50", costos.at("/anteriores/0/desglose/subtotalConocido").stringValue());
+        var proyeccion = consultarJson(PROYECCION, sesion);
+        assertEquals("6000", proyeccion.at("/proyeccion/litros").stringValue());
+        assertEquals("nivora", proyeccion.at("/costoProyectado/fuenteTarifaria").stringValue());
+        assertEquals("20.00", proyeccion.at("/costoProyectado/desglose/totalEstimado").stringValue());
+
+        enviar("PUT", GESTION_TARIFAS, solicitudTarifa(1, 2, "2026-11-15", null), admin, 200);
+        assertEquals("SIN_TARIFA_COMPATIBLE",
+            consultarJson(COSTOS, sesion).at("/actual/estado").stringValue());
+        assertEquals("SIN_TARIFA_COMPATIBLE",
+            consultarJson(PROYECCION, sesion).at("/costoProyectado/estado").stringValue());
+    }
+
+    @Test
+    void publicacionTarifariaConservaLaRevisionYLosExtremosDeLaVigenciaAnterior() throws Exception {
+        token(enviar("POST", CONSULTA + "/sesiones", SOLICITUD, null, 201));
+        var admin = iniciarAdminTarifas();
+        var primera = solicitudTarifa(0, 1, "2026-11-01", null);
+        var segunda = solicitudTarifa(1, 2, "2026-12-01", "2027-01-01");
+        enviar("PUT", GESTION_TARIFAS, primera, admin, 200);
+        var publicada = json.readTree(enviar("PUT", GESTION_TARIFAS, segunda, admin, 200).body());
+        assertEquals("admin", publicada.path("publicadoPor").stringValue());
+        assertEquals("2", publicada.at("/historial/revision").stringValue());
+        var vigencias = publicada.at("/historial/asignaciones");
+        assertEquals(3, vigencias.size());
+        assertEquals("2026-12-01", vigencias.at("/0/aplicableHasta").stringValue());
+        assertEquals(2, vigencias.at("/1/versionTarifa").intValue());
+        assertEquals("2027-01-01", vigencias.at("/2/aplicableDesde").stringValue());
+        assertEquals(1, vigencias.at("/2/versionTarifa").intValue());
+        assertTrue(vigencias.at("/2/aplicableHasta").isNull());
+        var original = consultarJson(GESTION_TARIFAS + "/revisiones/1", admin);
+        assertEquals(1, original.at("/historial/asignaciones").size());
+        assertTrue(original.at("/historial/asignaciones/0/aplicableHasta").isNull());
+
+        enviar("PUT", GESTION_TARIFAS, segunda, admin, 409);
+        var intentoInmutable = primera.replace("\"revisionEsperada\":\"0\"", "\"revisionEsperada\":\"2\"")
+            .replace("\"cargoFijo\":5.00", "\"cargoFijo\":6.00");
+        enviar("PUT", GESTION_TARIFAS, intentoInmutable, admin, 409);
+        assertEquals("2", consultarJson(GESTION_TARIFAS, admin).path("revisionAdministrativa").stringValue());
+        enviar("GET", GESTION_TARIFAS + "/revisiones/3", null, admin, 404);
+    }
+
+    @Test
+    void gestionTarifariaExigePermisoYValidaFechasTramosYPrecision() throws Exception {
+        var sesion = token(enviar("POST", CONSULTA + "/sesiones", SOLICITUD, null, 201));
+        var primera = solicitudTarifa(0, 1, "2026-11-01", null);
+        enviar("GET", GESTION_TARIFAS, null, null, 401);
+        enviar("PUT", GESTION_TARIFAS, primera, sesion, 401);
+        var admin = iniciarAdminTarifas();
+        enviar("GET", GESTION_TARIFAS.replace("000101", "000999"), null, admin, 404);
+        enviar("PUT", GESTION_TARIFAS, primera.replace("2026-11-01", "2026-11-31"), admin, 400);
+        enviar("PUT", GESTION_TARIFAS, primera.replace("\"desdeM3\":0", "\"desdeM3\":1"), admin, 400);
+        enviar("PUT", GESTION_TARIFAS, primera.replace("2.00", "2.00000000000000001"), admin, 400);
+        enviar("PUT", GESTION_TARIFAS, primera.replace("\"desdeM3\":0", "\"desdeM3\":0,\"desdeM3\":0"), admin, 400);
+        assertEquals("0", consultarJson(GESTION_TARIFAS, admin).path("revisionAdministrativa").stringValue());
+        jdbc.update("UPDATE administradores SET cambio_clave_requerido = TRUE WHERE usuario = 'admin'");
+        enviar("PUT", GESTION_TARIFAS, primera, admin, 403);
+    }
+
+    private String iniciarAdminTarifas() throws Exception {
+        inicializar.ejecutar("admin", "Admin de prueba", CLAVE_ADMIN.toCharArray());
+        return token(enviar("POST", ADMIN + "/sesiones",
+            "{\"usuario\":\"admin\",\"clave\":\"" + CLAVE_ADMIN + "\"}", null, 201));
+    }
+
+    private static String solicitudTarifa(long revision, int version, String desde, String hasta) {
+        return """
+            {"revisionEsperada":"%d","codigoTarifa":"DOMESTICA","versionTarifa":%d,"nombreTarifa":"Tarifa de prueba",
+             "vigenteDesde":"%s","asignadaDesde":"%s","asignadaHasta":%s,"cargoFijo":5.00,"igvPorcentaje":0,
+             "tramos":[{"desdeM3":0,"hastaM3":null,"precioAguaPorM3":2.00,"precioAlcantarilladoPorM3":0.50}]}
+            """.formatted(revision, version, desde, desde, hasta == null ? "null" : "\"" + hasta + "\"");
     }
 
     private static VersionTarifaria.Tramo tramoCosto(String desde, String hasta, String agua, String alcantarillado) {

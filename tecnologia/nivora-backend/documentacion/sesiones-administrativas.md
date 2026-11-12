@@ -81,7 +81,7 @@ el acceso. Los permisos se obtienen de la cuenta actual, no de informacion
 enviada por el cliente ni de una copia permanente dentro del token.
 
 Todas estas sesiones tienen rol `ADMIN`. Una cuenta sin cambio de clave
-pendiente recibe `SUPERVISAR_INTEGRACION`; el permiso
+pendiente recibe `SUPERVISAR_INTEGRACION` y `GESTIONAR_TARIFAS`. El permiso
 `GESTIONAR_ADMINISTRADORES` depende de su indicador guardado. Si existe cambio
 de clave pendiente, solo puede consultar sus metadatos, cambiar su clave
 y cerrar la sesion. Tras cambiarla, debe iniciar una nueva sesion.

@@ -15,6 +15,7 @@ import java.util.Optional;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.PlatformTransactionManager;
+import org.springframework.transaction.TransactionDefinition;
 import org.springframework.transaction.support.TransactionTemplate;
 
 import tools.jackson.databind.json.JsonMapper;
@@ -22,17 +23,22 @@ import tools.jackson.databind.json.JsonMapper;
 import pe.nivora.backend.acceso.dominio.CodigoSuministro;
 import pe.nivora.backend.tarifas.dominio.HistorialTarifario;
 import pe.nivora.backend.tarifas.dominio.RepositorioTarifas;
+import pe.nivora.backend.tarifas.dominio.TarifasParaCalculo;
 import pe.nivora.backend.tarifas.dominio.VersionTarifaria;
 
 @Repository
 public class RepositorioTarifasJdbc implements RepositorioTarifas {
     private final JdbcTemplate jdbc;
     private final TransactionTemplate transaccion;
+    private final TransactionTemplate lectura;
     private final JsonMapper json;
 
     public RepositorioTarifasJdbc(JdbcTemplate jdbc, PlatformTransactionManager gestor, JsonMapper json) {
         this.jdbc = jdbc;
         this.transaccion = new TransactionTemplate(gestor);
+        this.lectura = new TransactionTemplate(gestor);
+        this.lectura.setReadOnly(true);
+        this.lectura.setIsolationLevel(TransactionDefinition.ISOLATION_REPEATABLE_READ);
         this.json = json;
     }
 
@@ -44,10 +50,8 @@ public class RepositorioTarifasJdbc implements RepositorioTarifas {
 
     private Guardado guardarEnTransaccion(HistorialTarifario historial, Instant consultadoEn) {
         var suministro = historial.suministro();
-        String codigo = suministro.valor();
         String fuente = historial.fuente();
-        if (jdbc.queryForList("SELECT codigo FROM suministros WHERE codigo = ? FOR UPDATE",
-                String.class, codigo).isEmpty()) {
+        if (!existeSuministro(suministro, true)) {
             throw new IllegalStateException("Verifica el suministro en Nivora antes de incorporar tarifas.");
         }
 
@@ -60,11 +64,49 @@ public class RepositorioTarifasJdbc implements RepositorioTarifas {
                 jdbc.update("""
                     UPDATE tarifas_historiales SET consultado_en_utc = ?
                     WHERE fuente = ? AND codigo_suministro = ? AND revision = ?
-                    """, utc(consultadoEn), fuente, codigo, ultimo.revision());
+                    """, utc(consultadoEn), fuente, suministro.valor(), ultimo.revision());
                 return new Guardado(ultimo.revision(), consultadoEn, historial);
             }
         }
 
+        long revision = ultimo == null ? 1 : Math.incrementExact(ultimo.revision());
+        return insertarRevision(historial, consultadoEn, revision);
+    }
+
+    @Override
+    public Publicacion publicar(CodigoSuministro suministro, long revisionEsperada,
+            HistorialTarifario.Asignacion asignacion, String actor, Instant instante) {
+        return transaccion.execute(estado -> {
+            if (!existeSuministro(suministro, true)) throw new SuministroNoEncontrado();
+            var anterior = buscar(FUENTE_ADMINISTRATIVA, suministro).orElse(null);
+            long revision = anterior == null ? 0 : anterior.revision();
+            if (revisionEsperada != revision) {
+                throw new Conflicto("La revision administrativa cambio. Vuelve a consultar las tarifas.");
+            }
+            var historial = anterior == null ? new HistorialTarifario(FUENTE_ADMINISTRATIVA, suministro, List.of())
+                : anterior.historial();
+            var nueva = asignacion.tarifa();
+            boolean cambioVersionGuardada = historial.asignaciones().stream().map(HistorialTarifario.Asignacion::tarifa)
+                .anyMatch(t -> t.codigo().equals(nueva.codigo()) && t.version() == nueva.version() && !t.equals(nueva));
+            if (cambioVersionGuardada) throw versionInmutable();
+            var publicado = historial.conAsignacion(asignacion);
+            if (anterior != null && publicado.equals(historial)) {
+                return publicacion(anterior);
+            }
+
+            var guardado = insertarRevision(publicado, instante.truncatedTo(ChronoUnit.MICROS),
+                Math.incrementExact(revision));
+            jdbc.update("""
+                INSERT INTO tarifas_publicaciones (fuente, codigo_suministro, revision, actor_usuario)
+                VALUES (?, ?, ?, ?)
+                """, FUENTE_ADMINISTRATIVA, suministro.valor(), guardado.revision(), actor);
+            return new Publicacion(guardado, actor);
+        });
+    }
+
+    private Guardado insertarRevision(HistorialTarifario historial, Instant consultadoEn, long revision) {
+        String fuente = historial.fuente();
+        String codigo = historial.suministro().valor();
         // Bloquear versiones compartidas en el mismo orden para todos los suministros.
         var versiones = historial.asignaciones().stream().map(HistorialTarifario.Asignacion::tarifa)
             .distinct().sorted(Comparator.comparing(VersionTarifaria::codigo)
@@ -73,7 +115,6 @@ public class RepositorioTarifasJdbc implements RepositorioTarifas {
             conservarVersion(fuente, tarifa);
         }
 
-        long revision = ultimo == null ? 1 : Math.incrementExact(ultimo.revision());
         jdbc.update("""
             INSERT INTO tarifas_historiales (fuente, codigo_suministro, revision, consultado_en_utc)
             VALUES (?, ?, ?, ?)
@@ -106,13 +147,56 @@ public class RepositorioTarifasJdbc implements RepositorioTarifas {
             FOR UPDATE
             """, (fila, indice) -> leerVersion(fila), fuente, tarifa.codigo(), tarifa.version());
         if (!tarifa.equals(guardada)) {
-            throw new IllegalStateException("La fuente cambio las condiciones de una version tarifaria guardada.");
+            throw versionInmutable();
         }
+    }
+
+    private static Conflicto versionInmutable() {
+        return new Conflicto("Las condiciones de una version tarifaria guardada son inmutables.");
     }
 
     @Override
     public Optional<Guardado> buscar(String fuente, CodigoSuministro suministro) {
-        return jdbc.query("""
+        return buscarRevision(fuente, suministro, null);
+    }
+
+    @Override
+    public TarifasParaCalculo buscarParaCalculo(String fuente, CodigoSuministro suministro) {
+        return lectura.execute(estado -> new TarifasParaCalculo(buscar(fuente, suministro).orElse(null),
+            buscar(FUENTE_ADMINISTRATIVA, suministro).orElse(null)));
+    }
+
+    @Override
+    public VistaAdministrativa consultarGestion(CodigoSuministro suministro) {
+        return lectura.execute(estado -> {
+            if (!existeSuministro(suministro, false)) throw new SuministroNoEncontrado();
+            return new VistaAdministrativa(buscar("empresa-agua", suministro).orElse(null),
+                buscar(FUENTE_ADMINISTRATIVA, suministro).map(this::publicacion).orElse(null));
+        });
+    }
+
+    @Override
+    public Publicacion consultarPublicacion(CodigoSuministro suministro, long revision) {
+        return buscarRevision(FUENTE_ADMINISTRATIVA, suministro, revision)
+            .map(this::publicacion).orElseThrow(RevisionNoEncontrada::new);
+    }
+
+    private Publicacion publicacion(Guardado guardado) {
+        var actor = jdbc.queryForObject("""
+            SELECT actor_usuario FROM tarifas_publicaciones
+            WHERE fuente = ? AND codigo_suministro = ? AND revision = ?
+            """, String.class, FUENTE_ADMINISTRATIVA, guardado.historial().suministro().valor(), guardado.revision());
+        return new Publicacion(guardado, actor);
+    }
+
+    private boolean existeSuministro(CodigoSuministro suministro, boolean bloquear) {
+        var consulta = "SELECT codigo FROM suministros WHERE codigo = ?";
+        return !jdbc.queryForList(bloquear ? consulta + " FOR UPDATE" : consulta,
+            String.class, suministro.valor()).isEmpty();
+    }
+
+    private Optional<Guardado> buscarRevision(String fuente, CodigoSuministro suministro, Long revision) {
+        var consulta = """
             SELECT h.revision, h.consultado_en_utc, a.aplicable_desde, a.vigente_hasta,
                    a.asignada_desde, a.asignada_hasta,
                    v.codigo_tarifa, v.version_tarifa, v.nombre, v.vigente_desde,
@@ -122,15 +206,19 @@ public class RepositorioTarifasJdbc implements RepositorioTarifas {
                 AND a.codigo_suministro = h.codigo_suministro AND a.revision = h.revision
             LEFT JOIN tarifas_versiones v ON v.fuente = a.fuente
                 AND v.codigo_tarifa = a.codigo_tarifa AND v.version_tarifa = a.version_tarifa
-            WHERE h.fuente = ? AND h.codigo_suministro = ?
-                AND h.revision = (
+            WHERE h.fuente = ? AND h.codigo_suministro = ? AND h.revision =
+            """;
+        var filtro = revision == null ? """
+                (
                     SELECT MAX(revision) FROM tarifas_historiales
                     WHERE fuente = h.fuente AND codigo_suministro = h.codigo_suministro
                 )
-            ORDER BY a.aplicable_desde
-            """, filas -> {
-                return leerHistorial(filas, fuente, suministro);
-            }, fuente, suministro.valor());
+            """ : "?";
+        Object[] parametros = revision == null ? new Object[] {fuente, suministro.valor()}
+            : new Object[] {fuente, suministro.valor(), revision};
+        return jdbc.query(consulta + filtro + " ORDER BY a.aplicable_desde", filas -> {
+            return leerHistorial(filas, fuente, suministro);
+        }, parametros);
     }
 
     private Optional<Guardado> leerHistorial(ResultSet filas, String fuente, CodigoSuministro suministro)

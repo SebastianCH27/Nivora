@@ -5,10 +5,11 @@ del consumo actual y de los meses anteriores, del más reciente al más
 antiguo. La consulta usa el suministro de la sesión `CONSULTA`. El parámetro
 `meses` admite de 1 a 12 meses anteriores y su valor predeterminado es 3.
 
-El cálculo usa las lecturas guardadas y una sola revisión del historial
-tarifario. Cada mes se evalúa con la asignación que cubre todo su intervalo
-en `America/Lima`. Si dos vigencias se suceden a mitad de mes, el sistema
-informa que el mes carece de una tarifa compatible para este cálculo.
+El cálculo usa las lecturas guardadas y las revisiones vigentes al
+consultar. Cada mes se evalúa con una asignación que cubra todo su intervalo
+en `America/Lima`. Si existe una vigencia administrativa durante el mes,
+la asignación debe venir de esa revisión. Si dos vigencias se suceden a
+mitad de mes, el sistema informa que el mes carece de una tarifa compatible.
 
 | Estado de la estimación | Qué devuelve |
 |---|---|
@@ -19,9 +20,11 @@ informa que el mes carece de una tarifa compatible para este cálculo.
 
 Cada resultado incluye la cobertura del consumo y las referencias a las
 lecturas. Un consumo parcial se calcula sobre el tramo medido y se marca
-como tal. El cargo fijo corresponde al mes completo. La respuesta incluye
-la revisión tarifaria, el código, la versión y las fechas aplicables de la
-tarifa usada. Los volúmenes y montos se entregan como cadenas decimales.
+como tal. El cargo fijo corresponde al mes completo. El campo principal
+`revisionTarifaria` identifica la revisión importada y
+`revisionTarifariaAdministrativa` identifica la publicación administrativa.
+Cada tarifa aplicada indica su fuente, revisión, código, versión y fechas.
+Los volúmenes y montos se entregan como cadenas decimales.
 
 ## Cálculo
 

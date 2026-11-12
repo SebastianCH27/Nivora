@@ -5,9 +5,9 @@ import pe.nivora.backend.lecturas.aplicacion.ConsultarConsumoActual;
 import pe.nivora.backend.lecturas.dominio.MesConsumo;
 import pe.nivora.backend.tarifas.aplicacion.ConsultarCostosConsumo.Estado;
 import pe.nivora.backend.tarifas.dominio.CostoEstimado;
-import pe.nivora.backend.tarifas.dominio.HistorialTarifario;
 import pe.nivora.backend.tarifas.dominio.ProyeccionMensual;
 import pe.nivora.backend.tarifas.dominio.RepositorioTarifas;
+import pe.nivora.backend.tarifas.dominio.TarifasParaCalculo;
 
 public class ConsultarProyeccionMensual {
     private final ConsultarConsumoActual consumoActual;
@@ -26,24 +26,24 @@ public class ConsultarProyeccionMensual {
             return new Resultado(observado, proyeccion, null);
         }
 
-        var guardado = tarifas.buscar(observado.fuente(), suministro);
-        var revision = guardado.map(RepositorioTarifas.Guardado::revision).orElse(null);
+        var historial = tarifas.buscarParaCalculo(observado.fuente(), suministro);
         var inicio = observado.inicioMes().atZone(MesConsumo.ZONA).toLocalDate();
         var fin = observado.finMesExclusivo().atZone(MesConsumo.ZONA).toLocalDate();
-        var asignacion = guardado.flatMap(g -> g.historial().aplicable(inicio, fin)).orElse(null);
+        var seleccion = historial.aplicar(inicio, fin);
+        var asignacion = seleccion.asignacion();
         if (asignacion == null) {
             return new Resultado(observado, proyeccion,
-                new Estimacion(Estado.SIN_TARIFA_COMPATIBLE, revision, null, null));
+                new Estimacion(Estado.SIN_TARIFA_COMPATIBLE, seleccion, null));
         }
 
         var costo = CostoEstimado.calcular(proyeccion.datos().litros(), asignacion.tarifa());
         var estado = costo.totalEstimado() == null ? Estado.CONCEPTOS_INCOMPLETOS : Estado.ESTIMADO;
-        return new Resultado(observado, proyeccion, new Estimacion(estado, revision, asignacion, costo));
+        return new Resultado(observado, proyeccion, new Estimacion(estado, seleccion, costo));
     }
 
     public record Resultado(ConsultarConsumoActual.Resultado observado, ProyeccionMensual proyeccion,
             Estimacion estimacion) {}
 
-    public record Estimacion(Estado estado, Long revisionTarifaria, HistorialTarifario.Asignacion tarifa,
+    public record Estimacion(Estado estado, TarifasParaCalculo.Seleccion seleccion,
             CostoEstimado costo) {}
 }

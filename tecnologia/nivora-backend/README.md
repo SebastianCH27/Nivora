@@ -19,7 +19,7 @@ El puerto 8080 esta ocupado por Jenkins en el equipo de desarrollo.
 |---|---|---|
 | `acceso` | Acceso y suministros | Suministros, consulta de DNI mediante APIsPERU, sesiones de consulta y administrativas, gestion de cuentas y supervision protegida. |
 | `lecturas` | Lecturas, consumo e historial | Recuperacion manual y automatica con corte e inventario persistidos y API local de supervision; calculos pendientes. |
-| `tarifas` | Tarifas, costos y proyecciones | Historial tarifario versionado, costos estimados y proyección al cierre del mes. |
+| `tarifas` | Tarifas, costos y proyecciones | Historial versionado, gestión administrativa de vigencias, costos estimados y proyección mensual. |
 | `notificaciones` | Alertas y notificaciones | Pendiente de implementar. |
 | `recibos` | Recibos | Pendiente de implementar. |
 
@@ -424,6 +424,15 @@ al cierre del mes para el suministro de la sesión. Devuelve el consumo
 observado, la fecha de cálculo y el supuesto de ritmo constante.
 Consulta las reglas y la prueba desde CMD en
 [Proyección mensual](documentacion/proyeccion-mensual.md).
+
+## Gestión administrativa de tarifas
+
+Una sesión con `GESTIONAR_TARIFAS` puede consultar y publicar vigencias por
+suministro. Cada publicación conserva la revisión anterior e identifica al
+administrador que la registró. Aplica `base-datos/11-gestion-tarifas.sql`
+después de los scripts de administradores y tarifas. El contrato y la
+prueba desde CMD están en
+[Gestión de tarifas](documentacion/gestion-tarifas.md).
 
 ## Cuentas administrativas: primer paso del bloque 3
 

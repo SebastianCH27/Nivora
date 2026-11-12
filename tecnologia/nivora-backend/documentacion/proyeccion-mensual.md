@@ -29,8 +29,9 @@ de 30 días dan una proyección de 12 000 L (12 m³).
 
 Cuando existe una proyección, el costo se calcula sobre los litros
 proyectados, con los tramos y el cargo fijo mensual de la asignación
-que cubre todo el mes. La respuesta incluye la revisión tarifaria
-guardada y el desglose en PEN. El monto a pagar se consulta en el
+que cubre todo el mes, según las mismas reglas que
+[los costos estimados](costos-estimados.md). La respuesta incluye la fuente,
+la revisión tarifaria y el desglose en PEN. El monto a pagar se consulta en el
 recibo emitido por la empresa.
 
 | Estado de `costoProyectado` | Significado |
