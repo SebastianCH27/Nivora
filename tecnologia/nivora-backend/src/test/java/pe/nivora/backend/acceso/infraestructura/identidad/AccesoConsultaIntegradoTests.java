@@ -52,8 +52,10 @@ import pe.nivora.backend.lecturas.dominio.LecturaAcumulada;
 import pe.nivora.backend.lecturas.dominio.LoteLecturas;
 import pe.nivora.backend.lecturas.dominio.ResultadoIncorporacion;
 import pe.nivora.backend.lecturas.dominio.contratos.RepositorioLecturas;
+import pe.nivora.backend.notificaciones.aplicacion.ConfigurarNotificaciones;
 import pe.nivora.backend.notificaciones.aplicacion.EvaluarAlertaConsumo;
 import pe.nivora.backend.notificaciones.aplicacion.GenerarAvisosRecibo;
+import pe.nivora.backend.notificaciones.dominio.RepositorioConfiguracionNotificaciones;
 import pe.nivora.backend.recibos.aplicacion.IncorporarRecibos;
 import pe.nivora.backend.recibos.aplicacion.SincronizarRecibos;
 import pe.nivora.backend.recibos.dominio.ReciboEmitido;
@@ -83,8 +85,10 @@ class AccesoConsultaIntegradoTests {
     private static final String PROYECCION = CONSULTA + "/proyeccion";
     private static final String RECIBOS = CONSULTA + "/recibos";
     private static final String NOTIFICACIONES = CONSULTA + "/notificaciones";
+    private static final String DISPOSITIVO = NOTIFICACIONES + "/dispositivos/d782d504-7031-4d2c-b319-94db17e13c58";
     private static final String ADMIN = "/api/v1/acceso/administradores";
     private static final String GESTION_TARIFAS = "/api/v1/administracion/suministros/000101/tarifas";
+    private static final String CONTROL_ALERTAS = "/api/v1/administracion/notificaciones/alertas-consumo";
     private static final String SUPERVISION = "/api/v1/supervision/suministros/000101/lecturas";
     private static final String DNI = "00000001";
     private static final String TOKEN_PROVEEDOR = "token-ficticio-integracion";
@@ -97,7 +101,8 @@ class AccesoConsultaIntegradoTests {
         "06-sincronizacion-lecturas.sql", "07-administradores.sql",
         "08-sesiones-administrativas.sql", "09-sesiones-consulta.sql", "10-tarifas.sql",
         "11-gestion-tarifas.sql", "12-recibos.sql", "13-sincronizacion-recibos.sql",
-        "14-alertas-consumo.sql", "15-avisos-recibo.sql", "16-notificaciones-leidas.sql");
+        "14-alertas-consumo.sql", "15-avisos-recibo.sql", "16-notificaciones-leidas.sql",
+        "17-configuracion-notificaciones.sql");
 
     private static final Respuesta AGUA_OK = new Respuesta(200, "application/json",
         "{\"codigoSuministro\":\"000101\",\"titular\":\"Titular ficticio\"}");
@@ -123,6 +128,7 @@ class AccesoConsultaIntegradoTests {
     @Autowired private RepositorioLecturas repositorioLecturas;
     @Autowired private EvaluarAlertaConsumo evaluarAlertaConsumo;
     @Autowired private GenerarAvisosRecibo generarAvisosRecibo;
+    @Autowired private RepositorioConfiguracionNotificaciones configuracionNotificaciones;
     @Autowired private RepositorioTarifas tarifas;
     @Autowired private IncorporarTarifas incorporarTarifas;
     @Autowired private RepositorioRecibos recibos;
@@ -162,12 +168,13 @@ class AccesoConsultaIntegradoTests {
         new ResourceDatabasePopulator(scripts).populate(esquema);
         for (String tabla : List.of("sesiones_consulta", "limites_acceso_consulta",
                 "sesiones_administrativas", "limites_acceso_administrativo",
-                "tarifas_publicaciones", "auditoria_administradores", "administradores", "lecturas",
+                "tarifas_publicaciones", "auditoria_administradores", "configuracion_alertas_consumo",
+                "administradores", "lecturas",
                 "control_incorporacion_lecturas",
                 "contexto_recuperacion_lecturas", "progreso_recuperacion_lecturas",
                 "programacion_sincronizacion_lecturas", "tarifas_asignaciones", "tarifas_historiales",
                 "tarifas_versiones", "programacion_sincronizacion_recibos", "notificaciones_leidas",
-                "avisos_recibo", "recibos",
+                "preferencias_notificaciones_dispositivo", "avisos_recibo", "recibos",
                 "alertas_consumo", "suministros")) {
             jdbc.execute("DELETE FROM " + tabla);
         }
@@ -1171,6 +1178,91 @@ class AccesoConsultaIntegradoTests {
         var respuesta = enviar("GET", NOTIFICACIONES, null, sesion, 503);
         assertEquals("Notificaciones no disponibles", json.readTree(respuesta.body()).path("title").stringValue());
         enviar("PUT", NOTIFICACIONES + "/RECIBO_DISPONIBLE-2026-10/leida", null, sesion, 503);
+    }
+
+    @Test
+    void preferenciasPorDispositivoYSuministroRequierenPermisoParaActivar() throws Exception {
+        var propia = token(enviar("POST", CONSULTA + "/sesiones", SOLICITUD, null, 201));
+        var concedido = "{\"permiso\":\"CONCEDIDO\",\"habilitadas\":true}";
+        enviar("GET", DISPOSITIVO, null, propia, 404);
+        enviar("PUT", DISPOSITIVO, "{\"permiso\":\"PENDIENTE\",\"habilitadas\":true}", propia, 400);
+        enviar("PUT", DISPOSITIVO, "{\"permiso\":\"DENEGADO\",\"habilitadas\":true}", propia, 400);
+        enviar("PUT", DISPOSITIVO, "{\"permiso\":\"CONCEDIDO\",\"habilitadas\":\"true\"}", propia, 400);
+        enviar("PUT", NOTIFICACIONES + "/dispositivos/1-1-1-1-1", concedido, propia, 400);
+
+        var primera = json.readTree(enviar("PUT", DISPOSITIVO, concedido, propia, 200).body());
+        assertTrue(primera.path("habilitadas").booleanValue());
+        assertEquals("CONCEDIDO", primera.path("permiso").stringValue());
+        assertEquals(AHORA.toString(), primera.path("actualizadaEn").stringValue());
+
+        instantePrueba.set(AHORA.plusSeconds(60));
+        assertEquals(primera, json.readTree(enviar("PUT", DISPOSITIVO, concedido, propia, 200).body()));
+        agua.set(new Respuesta(200, "application/json", AGUA_OK.cuerpo().replace("000101", "000102")));
+        var ajena = token(enviar("POST", CONSULTA + "/sesiones", SOLICITUD.replace("000101", "000102"), null, 201));
+        enviar("GET", DISPOSITIVO + "?codigoSuministro=000101", null, ajena, 404);
+        var denegado = "{\"permiso\":\"DENEGADO\",\"habilitadas\":false}";
+        enviar("PUT", DISPOSITIVO + "?codigoSuministro=000101", denegado, ajena, 200);
+        assertEquals(primera, consultarJson(DISPOSITIVO, propia));
+
+        var desactivada = json.readTree(enviar("PUT", DISPOSITIVO, denegado, propia, 200).body());
+        assertFalse(desactivada.path("habilitadas").booleanValue());
+        assertEquals("DENEGADO", desactivada.path("permiso").stringValue());
+        assertEquals(AHORA.plusSeconds(60).toString(), desactivada.path("actualizadaEn").stringValue());
+        assertEquals(desactivada, consultarJson(DISPOSITIVO, propia));
+    }
+
+    @Test
+    void pausaPersistidaSeAplicaAlEvaluadorYPermiteReanudarSinReinicio() throws Exception {
+        var suministro = new CodigoSuministro("000101");
+        var propia = token(enviar("POST", CONSULTA + "/sesiones", SOLICITUD, null, 201));
+        var admin = iniciarAdminTarifas();
+        assertTrue(consultarJson(CONTROL_ALERTAS, admin).path("efectiva").booleanValue());
+        incorporarLectura("1", "2026-10-01T05:00:00Z", 100);
+        incorporarLectura("2", "2026-11-01T05:00:00Z", 2100);
+        incorporarLectura("3", "2026-11-11T05:00:00Z", 4200);
+
+        var apagar = "{\"habilitada\":false}";
+        var pausa = json.readTree(enviar("PUT", CONTROL_ALERTAS, apagar, admin, 200).body());
+        assertFalse(pausa.path("habilitada").booleanValue());
+        assertFalse(pausa.path("efectiva").booleanValue());
+        assertEquals("admin", pausa.path("actualizadaPor").stringValue());
+        assertEquals(AHORA.toString(), pausa.path("actualizadaEn").stringValue());
+        assertEquals(pausa, consultarJson(CONTROL_ALERTAS, admin));
+        assertEquals(EvaluarAlertaConsumo.Estado.PAUSADA, evaluarAlertaConsumo.ejecutar(suministro).estado());
+        assertEquals(0, jdbc.queryForObject("SELECT COUNT(*) FROM alertas_consumo", Integer.class));
+
+        recibos.guardar(new RecibosEmitidos(suministro, List.of(recibo("REC-101-10", YearMonth.of(2026, 10)))), AHORA);
+        assertEquals(1, generarAvisosRecibo.ejecutar());
+        assertEquals("RECIBO_DISPONIBLE", consultarJson(NOTIFICACIONES, propia).at("/notificaciones/0/tipo").stringValue());
+
+        instantePrueba.set(AHORA.plusSeconds(60));
+        assertEquals(pausa, json.readTree(enviar("PUT", CONTROL_ALERTAS, apagar, admin, 200).body()));
+        var encendida = json.readTree(enviar("PUT", CONTROL_ALERTAS, "{\"habilitada\":true}", admin, 200).body());
+        assertTrue(encendida.path("efectiva").booleanValue());
+        assertEquals(AHORA.plusSeconds(60).toString(), encendida.path("actualizadaEn").stringValue());
+        assertEquals(EvaluarAlertaConsumo.Estado.GENERADA, evaluarAlertaConsumo.ejecutar(suministro).estado());
+        var servidorPausado = new ConfigurarNotificaciones(configuracionNotificaciones,
+            Clock.fixed(AHORA, ZoneOffset.UTC), false);
+        assertTrue(servidorPausado.consultarAlertas().habilitada());
+        assertFalse(servidorPausado.consultarAlertas().efectiva());
+        assertFalse(servidorPausado.evaluarAlertas());
+    }
+
+    @Test
+    void configuracionSeparaLosPermisosDeConsultaYAdministracion() throws Exception {
+        var solicitud = "{\"habilitada\":false}";
+        enviar("GET", DISPOSITIVO, null, null, 401);
+        enviar("PUT", CONTROL_ALERTAS, solicitud, null, 401);
+        var propia = token(enviar("POST", CONSULTA + "/sesiones", SOLICITUD, null, 201));
+        enviar("GET", CONTROL_ALERTAS, null, propia, 401);
+        enviar("PUT", CONTROL_ALERTAS, solicitud, propia, 401);
+        var admin = iniciarAdminTarifas();
+        enviar("GET", DISPOSITIVO, null, admin, 401);
+        enviar("PUT", CONTROL_ALERTAS, "{\"habilitada\":false,\"actualizadaPor\":\"otro\"}", admin, 400);
+        jdbc.update("UPDATE administradores SET cambio_clave_requerido = TRUE WHERE usuario = 'admin'");
+        enviar("GET", CONTROL_ALERTAS, null, admin, 403);
+        enviar("PUT", CONTROL_ALERTAS, solicitud, admin, 403);
+        assertEquals(0, jdbc.queryForObject("SELECT COUNT(*) FROM configuracion_alertas_consumo", Integer.class));
     }
 
     private static ReciboEmitido recibo(String numero, YearMonth periodo) {

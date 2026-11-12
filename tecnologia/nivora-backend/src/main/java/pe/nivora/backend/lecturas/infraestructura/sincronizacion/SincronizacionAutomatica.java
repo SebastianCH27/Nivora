@@ -2,7 +2,6 @@ package pe.nivora.backend.lecturas.infraestructura.sincronizacion;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnWebApplication;
 import org.springframework.context.annotation.Configuration;
@@ -20,13 +19,10 @@ public class SincronizacionAutomatica {
     private static final Logger LOG = LoggerFactory.getLogger(SincronizacionAutomatica.class);
     private final SincronizarLecturas sincronizar;
     private final EvaluarAlertaConsumo evaluarAlerta;
-    private final boolean alertasHabilitadas;
 
-    public SincronizacionAutomatica(SincronizarLecturas sincronizar, EvaluarAlertaConsumo evaluarAlerta,
-            @Value("${nivora.alertas-consumo.habilitada}") boolean alertasHabilitadas) {
+    public SincronizacionAutomatica(SincronizarLecturas sincronizar, EvaluarAlertaConsumo evaluarAlerta) {
         this.sincronizar = sincronizar;
         this.evaluarAlerta = evaluarAlerta;
-        this.alertasHabilitadas = alertasHabilitadas;
     }
 
     @Scheduled(initialDelayString = "${nivora.sincronizacion.espera-inicial-ms}",
@@ -47,7 +43,7 @@ public class SincronizacionAutomatica {
                         conteo.repetidas(), conteo.rechazadas(), intento.proximoIntento());
                 }
                 if (intento.error() != null) LOG.debug("Detalle de sincronizacion", intento.error());
-                if (alertasHabilitadas && intento.programacionConfirmada()
+                if (intento.programacionConfirmada()
                         && intento.estado() == EstadoSincronizacion.RECORRIDO_COMPLETO) {
                     evaluarAlerta(intento);
                 }

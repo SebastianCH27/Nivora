@@ -19,7 +19,8 @@ Esta etapa registra las alertas en la base de datos.
 
 ## Comprobación local
 
-Aplica `base-datos/14-alertas-consumo.sql` en el cliente MySQL. Compila
+Aplica `base-datos/14-alertas-consumo.sql` y
+`base-datos/17-configuracion-notificaciones.sql` en el cliente MySQL. Compila
 con `mvnw.cmd clean verify`. Desde el CMD del módulo, ejecuta lo siguiente
 para evaluar las lecturas guardadas en MySQL para el suministro
 `13100390`. Puedes elegir otro suministro registrado mediante
@@ -31,10 +32,13 @@ powershell -NoProfile -Command "$clave = Read-Host 'Contrasena de nivora_app' -A
 
 | Resultado | Significado |
 | --- | --- |
+| `PAUSADA` | La evaluación de alertas está desactivada en el servidor o en la configuración administrativa. |
 | `SIN_DATOS_COMPARABLES` | Alguno de los cálculos carece de cobertura completa. |
 | `NO_SUPERA` | El acumulado actual es menor o igual al total anterior. |
 | `GENERADA` | Se guardó la primera alerta para ese suministro y mes. |
 | `YA_REGISTRADA` | El acumulado supera el umbral y la alerta del mes ya está guardada. |
 
-La evaluación automática está habilitada por defecto. Puedes pausarla
-mediante `nivora.alertas-consumo.habilitada=false`.
+La evaluación está habilitada por defecto. Puedes pausarla desde la
+[configuración administrativa](configuracion-notificaciones.md).
+La propiedad `nivora.alertas-consumo.habilitada=false` fuerza la pausa en
+esa instancia del servidor.

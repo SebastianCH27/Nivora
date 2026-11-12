@@ -32,9 +32,11 @@ public class SeguridadConfiguracion {
                     "/api/v1/acceso/consulta/costos",
                     "/api/v1/acceso/consulta/proyeccion",
                     "/api/v1/acceso/consulta/recibos",
-                    "/api/v1/acceso/consulta/notificaciones").hasRole("CONSULTA")
+                    "/api/v1/acceso/consulta/notificaciones",
+                    "/api/v1/acceso/consulta/notificaciones/dispositivos/*").hasRole("CONSULTA")
                 .requestMatchers(HttpMethod.PUT,
-                    "/api/v1/acceso/consulta/notificaciones/*/leida").hasRole("CONSULTA")
+                    "/api/v1/acceso/consulta/notificaciones/*/leida",
+                    "/api/v1/acceso/consulta/notificaciones/dispositivos/*").hasRole("CONSULTA")
                 .requestMatchers(HttpMethod.DELETE, "/api/v1/acceso/consulta/sesion").hasRole("CONSULTA")
                 .anyRequest().denyAll())
             .exceptionHandling(e -> e
@@ -64,6 +66,10 @@ public class SeguridadConfiguracion {
                     "/api/v1/administracion/suministros/*/tarifas/revisiones/*").hasAuthority("GESTIONAR_TARIFAS")
                 .requestMatchers(HttpMethod.PUT, "/api/v1/administracion/suministros/*/tarifas")
                     .hasAuthority("GESTIONAR_TARIFAS")
+                .requestMatchers(HttpMethod.GET, "/api/v1/administracion/notificaciones/alertas-consumo")
+                    .hasAuthority("GESTIONAR_ALERTAS")
+                .requestMatchers(HttpMethod.PUT, "/api/v1/administracion/notificaciones/alertas-consumo")
+                    .hasAuthority("GESTIONAR_ALERTAS")
                 .requestMatchers("/api/v1/supervision/**").hasAuthority("SUPERVISAR_INTEGRACION")
                 .anyRequest().denyAll())
             .exceptionHandling(e -> e
