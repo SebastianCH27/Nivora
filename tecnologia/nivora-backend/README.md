@@ -405,6 +405,9 @@ La fuente simulada expone el historial tarifario del suministro con las
 fechas de aplicación de cada versión y sus tramos en soles por m³.
 El contrato de la fuente se describe en
 [Historial tarifario por suministro](../empresa-agua/README.md#historial-tarifario-por-suministro).
+Nivora valida y conserva las revisiones por suministro. El script y la
+prueba desde CMD están en
+[Incorporación de tarifas](documentacion/almacenamiento-tarifas.md).
 
 ## Cuentas administrativas: primer paso del bloque 3
 

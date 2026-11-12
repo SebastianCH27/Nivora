@@ -29,7 +29,7 @@ public final class ClienteEmpresaAgua {
             throw new IllegalArgumentException("Los tiempos HTTP deben ser positivos.");
         }
         lector = Objects.requireNonNull(json).reader()
-            .with(DeserializationFeature.FAIL_ON_TRAILING_TOKENS);
+            .with(DeserializationFeature.FAIL_ON_TRAILING_TOKENS, DeserializationFeature.USE_BIG_DECIMAL_FOR_FLOATS);
         var conexiones = new SimpleClientHttpRequestFactory() {
             @Override
             protected void prepareConnection(HttpURLConnection conexion, String metodo)
