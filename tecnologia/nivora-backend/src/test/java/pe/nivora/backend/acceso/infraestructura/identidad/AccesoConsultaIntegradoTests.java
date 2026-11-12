@@ -1,6 +1,7 @@
 package pe.nivora.backend.acceso.infraestructura.identidad;
 
 import java.io.IOException;
+import java.math.BigDecimal;
 import java.net.InetSocketAddress;
 import java.net.URI;
 import java.net.http.HttpClient;
@@ -11,6 +12,7 @@ import java.sql.Connection;
 import java.time.Clock;
 import java.time.Duration;
 import java.time.Instant;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.ZoneOffset;
@@ -49,6 +51,9 @@ import pe.nivora.backend.lecturas.dominio.LecturaAcumulada;
 import pe.nivora.backend.lecturas.dominio.LoteLecturas;
 import pe.nivora.backend.lecturas.dominio.ResultadoIncorporacion;
 import pe.nivora.backend.lecturas.dominio.contratos.RepositorioLecturas;
+import pe.nivora.backend.tarifas.dominio.HistorialTarifario;
+import pe.nivora.backend.tarifas.dominio.RepositorioTarifas;
+import pe.nivora.backend.tarifas.dominio.VersionTarifaria;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -63,6 +68,7 @@ class AccesoConsultaIntegradoTests {
     private static final String CONSUMO = CONSULTA + "/consumo-actual";
     private static final String HISTORIAL = CONSULTA + "/historial";
     private static final String ESTADISTICAS = CONSULTA + "/estadisticas";
+    private static final String COSTOS = CONSULTA + "/costos";
     private static final String ADMIN = "/api/v1/acceso/administradores";
     private static final String SUPERVISION = "/api/v1/supervision/suministros/000101/lecturas";
     private static final String DNI = "00000001";
@@ -74,7 +80,7 @@ class AccesoConsultaIntegradoTests {
     private static final List<String> SCRIPTS = List.of("02-suministros.sql", "03-lecturas.sql",
         "04-recuperacion-lecturas.sql", "05-contexto-recuperacion-lecturas.sql",
         "06-sincronizacion-lecturas.sql", "07-administradores.sql",
-        "08-sesiones-administrativas.sql", "09-sesiones-consulta.sql");
+        "08-sesiones-administrativas.sql", "09-sesiones-consulta.sql", "10-tarifas.sql");
 
     private static final Respuesta AGUA_OK = new Respuesta(200, "application/json",
         "{\"codigoSuministro\":\"000101\",\"titular\":\"Titular ficticio\"}");
@@ -94,6 +100,7 @@ class AccesoConsultaIntegradoTests {
     @Autowired private JsonMapper json;
     @Autowired private InicializarAdministracion inicializar;
     @Autowired private RepositorioLecturas repositorioLecturas;
+    @Autowired private RepositorioTarifas tarifas;
     @Value("${local.server.port}") private int puerto;
 
     private Connection esquema;
@@ -131,7 +138,8 @@ class AccesoConsultaIntegradoTests {
                 "auditoria_administradores", "administradores", "lecturas",
                 "control_incorporacion_lecturas",
                 "contexto_recuperacion_lecturas", "progreso_recuperacion_lecturas",
-                "programacion_sincronizacion_lecturas", "suministros")) {
+                "programacion_sincronizacion_lecturas", "tarifas_asignaciones", "tarifas_historiales",
+                "tarifas_versiones", "suministros")) {
             jdbc.execute("DELETE FROM " + tabla);
         }
         agua.set(AGUA_OK);
@@ -222,6 +230,7 @@ class AccesoConsultaIntegradoTests {
         enviar("GET", CONSUMO, null, admin, 401);
         enviar("GET", HISTORIAL, null, admin, 401);
         enviar("GET", ESTADISTICAS, null, admin, 401);
+        enviar("GET", COSTOS, null, admin, 401);
         enviar("DELETE", CONSULTA + "/sesion", null, consulta, 204);
         enviar("GET", CONSULTA + "/sesion", null, consulta, 401);
         assertEquals(2, llamadasAgua.get());
@@ -548,6 +557,88 @@ class AccesoConsultaIntegradoTests {
         for (String ruta : List.of(CONSUMO, HISTORIAL, ESTADISTICAS)) {
             enviar("GET", ruta, null, sesion, 401);
         }
+    }
+
+    @Test
+    void costosUsanElConsumoYLaVersionAplicableDeCadaMes() throws Exception {
+        enviar("GET", COSTOS, null, null, 401);
+        String sesion = token(enviar("POST", CONSULTA + "/sesiones", SOLICITUD, null, 201));
+        agua.set(CAIDA);
+        identidad.set(CAIDA);
+        incorporarLectura("1", "2026-10-01T05:00:00Z", 100);
+        incorporarLectura("2", "2026-11-01T05:00:00Z", 12100);
+        incorporarLectura("3", "2026-11-10T05:00:00Z", 32100);
+
+        var octubre = LocalDate.parse("2026-10-01");
+        var noviembre = octubre.plusMonths(1);
+        var historica = new VersionTarifaria("HUAMANGA-PRUEBA", 1, "Version anterior", octubre,
+            new BigDecimal("3.60"), new BigDecimal("18"), List.of(
+                tramoCosto("0", "8", "1.16", "0.51"),
+                tramoCosto("8", "18", "1.28", "0.56"),
+                tramoCosto("18", null, "1.99", "0.89")));
+        var vigente = new VersionTarifaria("HUAMANGA-PRUEBA", 2, "Version siguiente", noviembre,
+            new BigDecimal("4.60"), historica.igvPorcentaje(), historica.tramos());
+        tarifas.guardar(new HistorialTarifario("empresa-agua", new CodigoSuministro("000101"), List.of(
+            new HistorialTarifario.Asignacion(historica, noviembre, octubre, noviembre),
+            new HistorialTarifario.Asignacion(vigente, null, noviembre, null))), AHORA);
+
+        var resultado = consultarJson(COSTOS + "?meses=2&codigoSuministro=000102", sesion);
+        assertEquals("000101", resultado.path("codigoSuministro").stringValue());
+        assertEquals("PEN", resultado.path("moneda").stringValue());
+        assertEquals("1", resultado.path("revisionTarifaria").stringValue());
+        assertEquals("2026-11", resultado.at("/actual/periodo").stringValue());
+        assertEquals("20000", resultado.at("/actual/consumo/litros").stringValue());
+        assertEquals(2, resultado.at("/actual/tarifa/versionTarifa").intValue());
+        assertEquals("49.70", resultado.at("/actual/desglose/totalEstimado").stringValue());
+        assertEquals("2.000", resultado.at("/actual/desglose/tramos/2/volumenM3").stringValue());
+        var anterior = resultado.at("/anteriores/0");
+        assertEquals("2026-10", anterior.path("periodo").stringValue());
+        assertEquals("ESTIMADO", anterior.path("estado").stringValue());
+        assertEquals("12000", anterior.at("/consumo/litros").stringValue());
+        assertEquals("2", anterior.at("/consumo/idLecturaFinal").stringValue());
+        assertEquals(1, anterior.at("/tarifa/versionTarifa").intValue());
+        assertEquals("28.70", anterior.at("/desglose/totalEstimado").stringValue());
+        assertEquals("SIN_CONSUMO_CALCULABLE", resultado.at("/anteriores/1/estado").stringValue());
+        assertTrue(resultado.at("/anteriores/1/desglose").isNull());
+        assertEquals(1, llamadasAgua.get());
+        assertEquals(1, llamadasIdentidad.get());
+        enviar("GET", COSTOS + "?meses=13", null, sesion, 400);
+        enviar("DELETE", CONSULTA + "/sesion", null, sesion, 204);
+        enviar("GET", COSTOS, null, sesion, 401);
+    }
+
+    @Test
+    void costosIdentificanTarifasIncompatiblesYConceptosNoInformados() throws Exception {
+        String sesion = token(enviar("POST", CONSULTA + "/sesiones", SOLICITUD, null, 201));
+        incorporarLectura("1", "2026-10-01T05:00:00Z", 100);
+        incorporarLectura("2", "2026-11-01T05:00:00Z", 5737);
+        incorporarLectura("3", "2026-11-10T05:00:00Z", 7632);
+
+        var sinTarifa = consultarJson(COSTOS + "?meses=1", sesion);
+        assertEquals("SIN_TARIFA_COMPATIBLE", sinTarifa.at("/actual/estado").stringValue());
+        assertTrue(sinTarifa.at("/actual/desglose").isNull());
+        assertTrue(sinTarifa.path("revisionTarifaria").isNull());
+
+        var octubre = LocalDate.parse("2026-10-01");
+        var mitad = LocalDate.parse("2026-11-15");
+        var tarifa = new VersionTarifaria("DOMESTICA", 1, "Demostracion", octubre,
+            new BigDecimal("5.00"), null, List.of(tramoCosto("0", null, "1.50", null)));
+        tarifas.guardar(new HistorialTarifario("empresa-agua", new CodigoSuministro("000101"), List.of(
+            new HistorialTarifario.Asignacion(tarifa, mitad, octubre, mitad))), AHORA);
+
+        var parcial = consultarJson(COSTOS + "?meses=1", sesion);
+        assertEquals("SIN_TARIFA_COMPATIBLE", parcial.at("/actual/estado").stringValue());
+        assertTrue(parcial.at("/actual/tarifa").isNull());
+        assertEquals("CONCEPTOS_INCOMPLETOS", parcial.at("/anteriores/0/estado").stringValue());
+        assertEquals("13.46", parcial.at("/anteriores/0/desglose/subtotalConocido").stringValue());
+        assertTrue(parcial.at("/anteriores/0/desglose/alcantarillado").isNull());
+        assertTrue(parcial.at("/anteriores/0/desglose/igv").isNull());
+        assertTrue(parcial.at("/anteriores/0/desglose/totalEstimado").isNull());
+    }
+
+    private static VersionTarifaria.Tramo tramoCosto(String desde, String hasta, String agua, String alcantarillado) {
+        return new VersionTarifaria.Tramo(new BigDecimal(desde), hasta == null ? null : new BigDecimal(hasta),
+            new BigDecimal(agua), alcantarillado == null ? null : new BigDecimal(alcantarillado));
     }
 
     private JsonNode consultarJson(String ruta, String sesion) throws Exception {

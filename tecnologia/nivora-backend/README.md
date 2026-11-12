@@ -409,6 +409,14 @@ Nivora valida y conserva las revisiones por suministro. El script y la
 prueba desde CMD están en
 [Incorporación de tarifas](documentacion/almacenamiento-tarifas.md).
 
+## Costos estimados
+
+`GET /api/v1/acceso/consulta/costos` calcula el costo del consumo actual
+y de los meses anteriores con la versión tarifaria aplicable. Devuelve
+los tramos, el desglose de conceptos y la cobertura de las lecturas.
+El contrato y la prueba desde CMD están en
+[Costos estimados](documentacion/costos-estimados.md).
+
 ## Cuentas administrativas: primer paso del bloque 3
 
 `InicializarAdministracion` prepara la primera cuenta activa, con permiso
