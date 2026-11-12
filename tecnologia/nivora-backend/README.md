@@ -21,7 +21,7 @@ El puerto 8080 esta ocupado por Jenkins en el equipo de desarrollo.
 | `lecturas` | Lecturas, consumo e historial | Recuperacion manual y automatica con corte e inventario persistidos y API local de supervision; calculos pendientes. |
 | `tarifas` | Tarifas, costos y proyecciones | Historial versionado, gestión administrativa de vigencias, costos estimados y proyección mensual. |
 | `notificaciones` | Alertas y notificaciones | Pendiente de implementar. |
-| `recibos` | Recibos | Pendiente de implementar. |
+| `recibos` | Recibos | Lectura y validación de recibos emitidos por Empresa de Agua. |
 
 Las capas de cada modulo se incorporaran cuando se implementen sus
 responsabilidades: dominio, aplicacion, infraestructura y presentacion.
@@ -435,6 +435,13 @@ prueba desde CMD están en
 [Gestión de tarifas](documentacion/gestion-tarifas.md).
 La prueba de cierre del bloque está en
 [Verificación integrada de tarifas, costos y proyecciones](documentacion/verificacion-tarifas.md).
+
+## Recibos emitidos
+
+Nivora consulta el historial de recibos disponible en Empresa de Agua y
+conserva en la respuesta de la integración el importe y las fechas de
+cada recibo emitido. El contrato y el comando de comprobación están en
+[Fuente de recibos](documentacion/fuente-recibos.md).
 
 ## Cuentas administrativas: primer paso del bloque 3
 
