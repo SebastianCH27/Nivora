@@ -58,7 +58,7 @@ de requisito del proyecto.
 | **Respuesta esperada** | Nivora valida las lecturas, evita duplicados y registra las incidencias. Calcula utilizando datos compatibles y tarifas aplicables. Cuando la información sea insuficiente, lo comunica. Si un identificador existente llega con valores diferentes, conserva la lectura aceptada y registra el conflicto para revisión. |
 | **Medida** | El 100 % de los casos definidos debe coincidir con los resultados esperados de consumo, costo y proyección, según la precisión y el redondeo especificados para cada caso. Debe haber cero dobles conteos, cero lecturas inválidas utilizadas en cálculos y cero reemplazos silenciosos por identificadores en conflicto. |
 | **Verificación** | Ejecutar casos de lecturas acumuladas e intervalos, duplicados, valores inválidos, datos incompletos y tarifas incompatibles. Comparar con cálculos independientes. Reenviar las mismas lecturas y comprobar que los resultados se mantengan para el mismo periodo, tarifa y fecha de cálculo. Revisar las incidencias registradas. |
-| **Estado** | [Comprobaciones de consumo acumulado](../../tecnologia/nivora-backend/documentacion/verificacion-consumo.md). Quedan pendientes los casos de intervalos, costos y proyecciones. |
+| **Estado** | [Comprobaciones de consumo acumulado](../../tecnologia/nivora-backend/documentacion/verificacion-consumo.md) y [casos integrados de costos y proyecciones con tarifas versionadas](../../tecnologia/nivora-backend/documentacion/verificacion-tarifas.md). Quedan pendientes los casos de lecturas de intervalo. |
 | **Trazabilidad** | AC03; DA02; RF07, RF08, RF10, RF13 y RF15–RF18. |
 
 ## EQ-04. Continuidad ante fallos externos
@@ -73,7 +73,7 @@ de requisito del proyecto.
 | **Respuesta esperada** | Las sesiones vigentes continúan consultando la información almacenada. Nivora indica el fallo y la fecha de la última lectura. Conserva los avisos cuyo envío falla, registra las incidencias y realiza reintentos controlados. Cuando se recuperan los servicios, incorpora los datos pendientes y reintenta los envíos que correspondan. |
 | **Medida** | El 100 % de las consultas válidas sobre información almacenada incluidas en la prueba debe responder durante el fallo. Debe haber cero pérdidas de datos aceptados y de avisos generados. Todos los suministros afectados deben mostrar su estado de actualización y la fecha de la última lectura disponible. La recuperación debe producir cero dobles conteos de lecturas y cero avisos duplicados por el mismo evento. |
 | **Verificación** | Interrumpir la API simulada y provocar fallos del emisor de notificaciones. Consultar los datos almacenados y revisar fechas, estados, incidencias y avisos pendientes. Restablecer los servicios y comprobar la recuperación de registros y los reintentos, sin duplicados ni bloqueo de las consultas. |
-| **Estado** | [Consultas locales durante fallos externos](../../tecnologia/nivora-backend/documentacion/verificacion-consumo.md). Quedan pendientes la matriz completa de recuperación y las pruebas de notificaciones. |
+| **Estado** | [Consultas locales de consumo](../../tecnologia/nivora-backend/documentacion/verificacion-consumo.md) y [costos y proyecciones con una importación tarifaria fallida](../../tecnologia/nivora-backend/documentacion/verificacion-tarifas.md). Quedan pendientes la matriz completa de recuperación y las pruebas de notificaciones. |
 | **Trazabilidad** | AC04; DA05 y DA07; RF09, RF14 y RF24–RF26; ADR-003 y ADR-004. |
 
 La continuidad de las consultas se aplica a sesiones válidas.
@@ -95,7 +95,7 @@ la notificación haya aparecido en la pantalla del dispositivo.
 | **Respuesta esperada** | Nivora muestra la fecha de la última lectura aceptada y el estado de actualización. Cada resultado puede relacionarse con las lecturas, versión tarifaria y periodo utilizados. Los costos estimados y las proyecciones identifican sus fechas de cálculo y los supuestos correspondientes. |
 | **Medida** | En el 100 % de los casos definidos, la fecha mostrada debe corresponder a la última lectura aceptada del suministro. Todos los resultados revisados deben conservar referencias verificables a sus datos de origen, con cero referencias ausentes o incompatibles. La primera consulta posterior a una actualización completada debe reflejar los datos aceptados que correspondan a su periodo. |
 | **Verificación** | Incorporar lecturas con fechas de medición y recepción diferentes. Consultar los resultados antes y después de la actualización. Comparar fechas, periodos, versiones tarifarias y registros utilizados. Reconstruir los cálculos revisados a partir de esas referencias y comprobar los supuestos de las proyecciones. |
-| **Estado** | [Fechas y referencias de consumo verificadas](../../tecnologia/nivora-backend/documentacion/verificacion-consumo.md). Quedan pendientes los casos de tarifas y proyecciones. |
+| **Estado** | [Fechas y referencias de consumo](../../tecnologia/nivora-backend/documentacion/verificacion-consumo.md) y [lecturas de corte, vigencias, revisiones y supuestos de proyección](../../tecnologia/nivora-backend/documentacion/verificacion-tarifas.md) comprobados en los casos integrados. |
 | **Trazabilidad** | AC05; DA05; RF06, RF12, RF14, RF16 y RF18. |
 
 La actualidad se evalúa respecto de las lecturas disponibles y aceptadas,

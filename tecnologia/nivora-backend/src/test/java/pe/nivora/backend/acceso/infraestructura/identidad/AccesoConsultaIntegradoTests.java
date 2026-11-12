@@ -51,12 +51,14 @@ import pe.nivora.backend.lecturas.dominio.LecturaAcumulada;
 import pe.nivora.backend.lecturas.dominio.LoteLecturas;
 import pe.nivora.backend.lecturas.dominio.ResultadoIncorporacion;
 import pe.nivora.backend.lecturas.dominio.contratos.RepositorioLecturas;
+import pe.nivora.backend.tarifas.aplicacion.IncorporarTarifas;
 import pe.nivora.backend.tarifas.dominio.HistorialTarifario;
 import pe.nivora.backend.tarifas.dominio.RepositorioTarifas;
 import pe.nivora.backend.tarifas.dominio.VersionTarifaria;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
@@ -90,8 +92,10 @@ class AccesoConsultaIntegradoTests {
         "{\"dni\":\"00000001\",\"nombres\":\"Persona\",\"apellidoPaterno\":\"Ficticia\"}");
     private static final Respuesta CAIDA = new Respuesta(503, "application/json", "{}");
     private static final AtomicReference<Respuesta> agua = new AtomicReference<>(AGUA_OK);
+    private static final AtomicReference<Respuesta> tarifasProveedor = new AtomicReference<>(CAIDA);
     private static final AtomicReference<Respuesta> identidad = new AtomicReference<>(IDENTIDAD_OK);
     private static final AtomicInteger llamadasAgua = new AtomicInteger();
+    private static final AtomicInteger llamadasTarifas = new AtomicInteger();
     private static final AtomicInteger llamadasIdentidad = new AtomicInteger();
     private static final AtomicReference<String> peticionAgua = new AtomicReference<>();
     private static final AtomicReference<PeticionIdentidad> peticionIdentidad = new AtomicReference<>();
@@ -103,6 +107,7 @@ class AccesoConsultaIntegradoTests {
     @Autowired private InicializarAdministracion inicializar;
     @Autowired private RepositorioLecturas repositorioLecturas;
     @Autowired private RepositorioTarifas tarifas;
+    @Autowired private IncorporarTarifas incorporarTarifas;
     @Value("${local.server.port}") private int puerto;
 
     private Connection esquema;
@@ -145,8 +150,10 @@ class AccesoConsultaIntegradoTests {
             jdbc.execute("DELETE FROM " + tabla);
         }
         agua.set(AGUA_OK);
+        tarifasProveedor.set(CAIDA);
         identidad.set(IDENTIDAD_OK);
         llamadasAgua.set(0);
+        llamadasTarifas.set(0);
         llamadasIdentidad.set(0);
         peticionAgua.set(null);
         peticionIdentidad.set(null);
@@ -814,6 +821,95 @@ class AccesoConsultaIntegradoTests {
         enviar("PUT", GESTION_TARIFAS, primera, admin, 403);
     }
 
+    @Test
+    void tarifasImportadasYPublicadasSeAplicanAlCambiarDeMesEnLima() throws Exception {
+        var suministro = new CodigoSuministro("000101");
+        var noviembre = token(enviar("POST", CONSULTA + "/sesiones", SOLICITUD, null, 201));
+        var admin = iniciarAdminTarifas();
+        incorporarLectura("1", "2026-11-01T05:00:00Z", 2100);
+        incorporarLectura("2", "2026-11-11T05:00:00Z", 6100);
+        tarifasProveedor.set(respuestaTarifaria(tarifaImportada(1, "2026-10-01", null, "5.00")));
+        assertEquals(1L, incorporarTarifas.ejecutar(suministro).orElseThrow().revision());
+
+        enviar("PUT", GESTION_TARIFAS, solicitudTarifa(0, 1, "2026-12-01", null), admin, 200);
+        var costoNoviembre = consultarJson(COSTOS + "?meses=1", noviembre).path("actual");
+        assertEquals("empresa-agua", costoNoviembre.at("/tarifa/fuenteTarifaria").stringValue());
+        assertEquals("1", costoNoviembre.at("/tarifa/revisionTarifaria").stringValue());
+        assertEquals("4000", costoNoviembre.at("/consumo/litros").stringValue());
+        assertEquals("15.34", costoNoviembre.at("/desglose/totalEstimado").stringValue());
+        var proyeccionNoviembre = consultarJson(PROYECCION, noviembre);
+        assertEquals("12000", proyeccionNoviembre.at("/proyeccion/litros").stringValue());
+        assertEquals("36.58", proyeccionNoviembre.at("/costoProyectado/desglose/totalEstimado").stringValue());
+        enviar("DELETE", CONSULTA + "/sesion", null, noviembre, 204);
+        enviar("DELETE", ADMIN + "/sesion", null, admin, 204);
+
+        instantePrueba.set(Instant.parse("2026-12-11T13:00:00Z"));
+        var diciembre = token(enviar("POST", CONSULTA + "/sesiones", SOLICITUD, null, 201));
+        incorporarLectura("3", "2026-12-01T05:00:00Z", 12100);
+        incorporarLectura("4", "2026-12-11T05:00:00Z", 14100);
+        tarifasProveedor.set(respuestaTarifaria(
+            tarifaImportada(1, "2026-10-01", "2026-12-01", "5.00"),
+            tarifaImportada(2, "2026-12-01", null, "9.00")));
+        assertEquals(2L, incorporarTarifas.ejecutar(suministro).orElseThrow().revision());
+        tarifasProveedor.set(CAIDA);
+        assertThrows(IllegalStateException.class, () -> incorporarTarifas.ejecutar(suministro));
+        agua.set(CAIDA);
+        identidad.set(CAIDA);
+
+        var costos = consultarJson(COSTOS + "?meses=1", diciembre);
+        assertEquals("2", costos.path("revisionTarifaria").stringValue());
+        assertEquals("1", costos.path("revisionTarifariaAdministrativa").stringValue());
+        var cerrado = costos.at("/anteriores/0");
+        assertEquals("2026-11", cerrado.path("periodo").stringValue());
+        assertEquals("2026-12-01T05:00:00Z", cerrado.path("finMesExclusivo").stringValue());
+        assertEquals("3", cerrado.at("/consumo/idLecturaFinal").stringValue());
+        assertEquals("10000", cerrado.at("/consumo/litros").stringValue());
+        assertEquals("empresa-agua", cerrado.at("/tarifa/fuenteTarifaria").stringValue());
+        assertEquals(1, cerrado.at("/tarifa/versionTarifa").intValue());
+        assertEquals("29.50", cerrado.at("/desglose/totalEstimado").stringValue());
+
+        var actual = costos.path("actual");
+        assertEquals("2026-12", actual.path("periodo").stringValue());
+        assertEquals("3", actual.at("/consumo/idLecturaInicial").stringValue());
+        assertEquals("4", actual.at("/consumo/idLecturaFinal").stringValue());
+        assertEquals("2000", actual.at("/consumo/litros").stringValue());
+        assertEquals("nivora", actual.at("/tarifa/fuenteTarifaria").stringValue());
+        assertEquals("1", actual.at("/tarifa/revisionTarifaria").stringValue());
+        assertEquals("10.00", actual.at("/desglose/totalEstimado").stringValue());
+
+        var proyeccion = consultarJson(PROYECCION, diciembre);
+        assertEquals(instantePrueba.get().toString(), proyeccion.path("calculadoEn").stringValue());
+        assertEquals("2026-12-11T05:00:00Z", proyeccion.at("/observado/hasta").stringValue());
+        assertEquals("RITMO_PROMEDIO_CONSTANTE", proyeccion.at("/supuestos/metodo").stringValue());
+        assertEquals("6200", proyeccion.at("/proyeccion/litros").stringValue());
+        assertEquals("nivora", proyeccion.at("/costoProyectado/fuenteTarifaria").stringValue());
+        assertEquals("1", proyeccion.at("/costoProyectado/revisionTarifaria").stringValue());
+        assertEquals("20.50", proyeccion.at("/costoProyectado/desglose/totalEstimado").stringValue());
+        assertEquals(3, llamadasTarifas.get());
+        assertEquals(2, llamadasAgua.get());
+        assertEquals(2, llamadasIdentidad.get());
+        enviar("DELETE", CONSULTA + "/sesion", null, diciembre, 204);
+    }
+
+    private static Respuesta respuestaTarifaria(String... asignaciones) {
+        var cuerpo = """
+            {"fuente":"empresa-agua","codigoSuministro":"000101","moneda":"PEN","zonaFechas":"America/Lima",
+             "asignaciones":[%s]}
+            """.formatted(String.join(",", asignaciones));
+        return new Respuesta(200, "application/json", cuerpo);
+    }
+
+    private static String tarifaImportada(int version, String desde, String hasta, String cargo) {
+        var fin = hasta == null ? "null" : "\"" + hasta + "\"";
+        return """
+            {"codigoTarifa":"DOMESTICA","versionTarifa":%d,"nombreTarifa":"Tarifa importada",
+             "vigenteDesde":"%s","vigenteHasta":%s,"asignadaDesde":"%s","asignadaHasta":null,
+             "aplicableDesde":"%s","aplicableHasta":%s,"cargoFijo":%s,"igvPorcentaje":18,
+             "tramos":[{"desdeM3":0,"hastaM3":10,"precioPorM3":1.50,"precioAlcantarilladoPorM3":0.50},
+                       {"desdeM3":10,"hastaM3":null,"precioPorM3":2.20,"precioAlcantarilladoPorM3":0.80}]}
+            """.formatted(version, desde, fin, desde, desde, fin, cargo);
+    }
+
     private String iniciarAdminTarifas() throws Exception {
         inicializar.ejecutar("admin", "Admin de prueba", CLAVE_ADMIN.toCharArray());
         return token(enviar("POST", ADMIN + "/sesiones",
@@ -892,6 +988,10 @@ class AccesoConsultaIntegradoTests {
                 llamadasAgua.incrementAndGet();
                 peticionAgua.set(intercambio.getRequestMethod() + " " + intercambio.getRequestURI());
                 responder(intercambio, agua.get());
+            });
+            servidor.createContext("/api/v1/suministros/000101/tarifas", intercambio -> {
+                llamadasTarifas.incrementAndGet();
+                responder(intercambio, tarifasProveedor.get());
             });
             servidor.createContext("/api/v1/dni/", intercambio -> {
                 llamadasIdentidad.incrementAndGet();

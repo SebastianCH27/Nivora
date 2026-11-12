@@ -433,6 +433,8 @@ administrador que la registró. Aplica `base-datos/11-gestion-tarifas.sql`
 después de los scripts de administradores y tarifas. El contrato y la
 prueba desde CMD están en
 [Gestión de tarifas](documentacion/gestion-tarifas.md).
+La prueba de cierre del bloque está en
+[Verificación integrada de tarifas, costos y proyecciones](documentacion/verificacion-tarifas.md).
 
 ## Cuentas administrativas: primer paso del bloque 3
 
