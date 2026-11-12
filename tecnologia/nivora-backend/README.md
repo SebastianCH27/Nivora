@@ -456,6 +456,8 @@ calendario persistido. Los pasos y el comportamiento ante fallos están en
 El usuario puede consultar los recibos guardados de su suministro desde
 `GET /api/v1/acceso/consulta/recibos`. El contrato y la comprobación están en
 [Consulta de recibos](documentacion/consulta-recibos.md).
+El recorrido de emisión, sincronización y consulta está documentado en
+[Verificación integrada de recibos](documentacion/verificacion-recibos.md).
 
 ## Cuentas administrativas: primer paso del bloque 3
 

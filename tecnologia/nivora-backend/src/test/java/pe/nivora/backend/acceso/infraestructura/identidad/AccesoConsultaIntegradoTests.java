@@ -52,9 +52,12 @@ import pe.nivora.backend.lecturas.dominio.LecturaAcumulada;
 import pe.nivora.backend.lecturas.dominio.LoteLecturas;
 import pe.nivora.backend.lecturas.dominio.ResultadoIncorporacion;
 import pe.nivora.backend.lecturas.dominio.contratos.RepositorioLecturas;
+import pe.nivora.backend.recibos.aplicacion.IncorporarRecibos;
+import pe.nivora.backend.recibos.aplicacion.SincronizarRecibos;
 import pe.nivora.backend.recibos.dominio.ReciboEmitido;
 import pe.nivora.backend.recibos.dominio.RecibosEmitidos;
 import pe.nivora.backend.recibos.dominio.RepositorioRecibos;
+import pe.nivora.backend.recibos.dominio.RepositorioSincronizacionRecibos;
 import pe.nivora.backend.tarifas.aplicacion.IncorporarTarifas;
 import pe.nivora.backend.tarifas.dominio.HistorialTarifario;
 import pe.nivora.backend.tarifas.dominio.RepositorioTarifas;
@@ -90,7 +93,7 @@ class AccesoConsultaIntegradoTests {
         "04-recuperacion-lecturas.sql", "05-contexto-recuperacion-lecturas.sql",
         "06-sincronizacion-lecturas.sql", "07-administradores.sql",
         "08-sesiones-administrativas.sql", "09-sesiones-consulta.sql", "10-tarifas.sql",
-        "11-gestion-tarifas.sql", "12-recibos.sql");
+        "11-gestion-tarifas.sql", "12-recibos.sql", "13-sincronizacion-recibos.sql");
 
     private static final Respuesta AGUA_OK = new Respuesta(200, "application/json",
         "{\"codigoSuministro\":\"000101\",\"titular\":\"Titular ficticio\"}");
@@ -99,9 +102,11 @@ class AccesoConsultaIntegradoTests {
     private static final Respuesta CAIDA = new Respuesta(503, "application/json", "{}");
     private static final AtomicReference<Respuesta> agua = new AtomicReference<>(AGUA_OK);
     private static final AtomicReference<Respuesta> tarifasProveedor = new AtomicReference<>(CAIDA);
+    private static final AtomicReference<Respuesta> recibosProveedor = new AtomicReference<>(CAIDA);
     private static final AtomicReference<Respuesta> identidad = new AtomicReference<>(IDENTIDAD_OK);
     private static final AtomicInteger llamadasAgua = new AtomicInteger();
     private static final AtomicInteger llamadasTarifas = new AtomicInteger();
+    private static final AtomicInteger llamadasRecibos = new AtomicInteger();
     private static final AtomicInteger llamadasIdentidad = new AtomicInteger();
     private static final AtomicReference<String> peticionAgua = new AtomicReference<>();
     private static final AtomicReference<PeticionIdentidad> peticionIdentidad = new AtomicReference<>();
@@ -115,6 +120,8 @@ class AccesoConsultaIntegradoTests {
     @Autowired private RepositorioTarifas tarifas;
     @Autowired private IncorporarTarifas incorporarTarifas;
     @Autowired private RepositorioRecibos recibos;
+    @Autowired private IncorporarRecibos incorporarRecibos;
+    @Autowired private RepositorioSincronizacionRecibos programacionRecibos;
     @Value("${local.server.port}") private int puerto;
 
     private Connection esquema;
@@ -153,14 +160,16 @@ class AccesoConsultaIntegradoTests {
                 "control_incorporacion_lecturas",
                 "contexto_recuperacion_lecturas", "progreso_recuperacion_lecturas",
                 "programacion_sincronizacion_lecturas", "tarifas_asignaciones", "tarifas_historiales",
-                "tarifas_versiones", "recibos", "suministros")) {
+                "tarifas_versiones", "programacion_sincronizacion_recibos", "recibos", "suministros")) {
             jdbc.execute("DELETE FROM " + tabla);
         }
         agua.set(AGUA_OK);
         tarifasProveedor.set(CAIDA);
+        recibosProveedor.set(CAIDA);
         identidad.set(IDENTIDAD_OK);
         llamadasAgua.set(0);
         llamadasTarifas.set(0);
+        llamadasRecibos.set(0);
         llamadasIdentidad.set(0);
         peticionAgua.set(null);
         peticionIdentidad.set(null);
@@ -991,6 +1000,72 @@ class AccesoConsultaIntegradoTests {
         assertEquals("Recibos no disponibles", json.readTree(respuesta.body()).path("title").stringValue());
     }
 
+    @Test
+    void recibosEmitidosSeSincronizanYSePuedenConsultarDuranteUnaCaida() throws Exception {
+        var sesion = token(enviar("POST", CONSULTA + "/sesiones", SOLICITUD, null, 201));
+        assertTrue(consultarJson(RECIBOS, sesion).path("recibos").isEmpty());
+        var sincronizar = new SincronizarRecibos(programacionRecibos, incorporarRecibos,
+            new SincronizarRecibos.Politica(1, 60, Duration.ofSeconds(60),
+                Duration.ofSeconds(300), Duration.ofSeconds(30), Duration.ofSeconds(1800)),
+            new RelojPrueba(ZoneOffset.UTC));
+
+        var emitidos = new Respuesta(200, "application/json", """
+            {"codigoSuministro":"000101","moneda":"PEN","recibos":[
+              {"numeroRecibo":"EA-202610-000101","periodo":"2026-10-01","consumoLitros":5637,
+               "cargoFijo":5.00,"importeConsumo":8.46,"importeTotal":13.46,
+               "fechaDisponibilidad":"2026-11-01","fechaVencimiento":"2026-11-08","codigoTarifa":"DOMESTICA","versionTarifa":1},
+              {"numeroRecibo":"EA-202609-000101","periodo":"2026-09-01","consumoLitros":2000,
+               "cargoFijo":5.00,"importeConsumo":3.00,"importeTotal":8.00,
+               "fechaDisponibilidad":"2026-10-01","fechaVencimiento":"2026-10-08","codigoTarifa":"DOMESTICA","versionTarifa":1}
+            ]}
+            """);
+        recibosProveedor.set(emitidos);
+        var primera = sincronizar.ejecutarCiclo().getFirst();
+        assertEquals(RepositorioSincronizacionRecibos.Estado.ACTUALIZADO, primera.estado());
+        assertTrue(primera.programacionConfirmada());
+        assertEquals(new RepositorioRecibos.Incorporacion(2, 0), primera.incorporacion());
+
+        var pagina = consultarJson(RECIBOS + "?limite=1", sesion);
+        var octubre = pagina.at("/recibos/0");
+        assertEquals("EA-202610-000101", octubre.path("numeroRecibo").stringValue());
+        assertEquals("5637.000", octubre.path("consumoLitros").stringValue());
+        assertEquals("5.00", octubre.path("cargoFijo").stringValue());
+        assertEquals("8.46", octubre.path("importeConsumo").stringValue());
+        assertEquals("13.46", octubre.path("importeTotal").stringValue());
+        assertEquals("2026-11-01", octubre.path("fechaDisponibilidad").stringValue());
+        assertEquals("2026-11-08", octubre.path("fechaVencimiento").stringValue());
+        assertEquals(AHORA.toString(), octubre.path("recibidoEn").stringValue());
+        assertEquals("2026-10", pagina.path("siguienteAntesDe").stringValue());
+        var septiembre = consultarJson(RECIBOS + "?limite=1&antesDe=2026-10", sesion);
+        assertEquals("EA-202609-000101", septiembre.at("/recibos/0/numeroRecibo").stringValue());
+        assertEquals("8.00", septiembre.at("/recibos/0/importeTotal").stringValue());
+        assertFalse(septiembre.path("hayMas").booleanValue());
+
+        recibosProveedor.set(CAIDA);
+        agua.set(CAIDA);
+        identidad.set(CAIDA);
+        instantePrueba.set(primera.proximoIntento());
+        var fallo = sincronizar.ejecutarCiclo().getFirst();
+        assertEquals(RepositorioSincronizacionRecibos.Estado.ERROR_FUENTE, fallo.estado());
+        assertEquals(primera.proximoIntento().plusSeconds(30), fallo.proximoIntento());
+        assertTrue(sincronizar.ejecutarCiclo().isEmpty());
+        assertEquals(pagina, consultarJson(RECIBOS + "?limite=1", sesion));
+
+        recibosProveedor.set(emitidos);
+        instantePrueba.set(fallo.proximoIntento());
+        var recuperado = sincronizar.ejecutarCiclo().getFirst();
+        assertEquals(RepositorioSincronizacionRecibos.Estado.ACTUALIZADO, recuperado.estado());
+        assertEquals(new RepositorioRecibos.Incorporacion(0, 2), recuperado.incorporacion());
+        assertEquals(pagina, consultarJson(RECIBOS + "?limite=1", sesion));
+        assertEquals(septiembre, consultarJson(RECIBOS + "?limite=1&antesDe=2026-10", sesion));
+        assertEquals(2, recibos.buscarRecientes(new CodigoSuministro("000101"), 60).size());
+        assertEquals(3, llamadasRecibos.get());
+        assertEquals(1, llamadasAgua.get());
+        assertEquals(1, llamadasIdentidad.get());
+        enviar("DELETE", CONSULTA + "/sesion", null, sesion, 204);
+        enviar("GET", RECIBOS, null, sesion, 401);
+    }
+
     private static ReciboEmitido recibo(String numero, YearMonth periodo) {
         var disponible = periodo.plusMonths(1).atDay(1);
         return new ReciboEmitido(numero, periodo, new BigDecimal("5637.125"), new BigDecimal("5.00"),
@@ -1079,6 +1154,10 @@ class AccesoConsultaIntegradoTests {
             servidor.createContext("/api/v1/suministros/000101/tarifas", intercambio -> {
                 llamadasTarifas.incrementAndGet();
                 responder(intercambio, tarifasProveedor.get());
+            });
+            servidor.createContext("/api/v1/suministros/000101/recibos", intercambio -> {
+                llamadasRecibos.incrementAndGet();
+                responder(intercambio, recibosProveedor.get());
             });
             servidor.createContext("/api/v1/dni/", intercambio -> {
                 llamadasIdentidad.incrementAndGet();
