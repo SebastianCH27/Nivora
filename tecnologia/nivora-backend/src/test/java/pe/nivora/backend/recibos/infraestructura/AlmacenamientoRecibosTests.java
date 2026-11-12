@@ -6,8 +6,10 @@ import java.net.InetSocketAddress;
 import java.nio.charset.StandardCharsets;
 import java.sql.Connection;
 import java.time.Clock;
+import java.time.Duration;
 import java.time.Instant;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.YearMonth;
 import java.time.ZoneOffset;
 import java.util.List;
@@ -38,13 +40,17 @@ import org.springframework.test.context.DynamicPropertySource;
 
 import pe.nivora.backend.acceso.dominio.CodigoSuministro;
 import pe.nivora.backend.recibos.aplicacion.IncorporarRecibos;
+import pe.nivora.backend.recibos.aplicacion.SincronizarRecibos;
 import pe.nivora.backend.recibos.dominio.FuenteRecibosNoDisponibleException;
 import pe.nivora.backend.recibos.dominio.ReciboEmitido;
 import pe.nivora.backend.recibos.dominio.RecibosEmitidos;
 import pe.nivora.backend.recibos.dominio.RepositorioRecibos;
 import pe.nivora.backend.recibos.dominio.RepositorioRecibos.Incorporacion;
+import pe.nivora.backend.recibos.dominio.RepositorioSincronizacionRecibos;
+import pe.nivora.backend.recibos.dominio.RepositorioSincronizacionRecibos.Estado;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -73,6 +79,7 @@ class AlmacenamientoRecibosTests {
     @Autowired private JdbcTemplate jdbc;
     @Autowired private IncorporarRecibos incorporar;
     @Autowired private RepositorioRecibos repositorio;
+    @Autowired private RepositorioSincronizacionRecibos programacion;
     private Connection esquema;
 
     @DynamicPropertySource
@@ -94,8 +101,10 @@ class AlmacenamientoRecibosTests {
         if (esquema == null) {
             esquema = datos.getConnection();
             new ResourceDatabasePopulator(new FileSystemResource("base-datos/02-suministros.sql"),
-                new FileSystemResource("base-datos/12-recibos.sql")).populate(esquema);
+                new FileSystemResource("base-datos/12-recibos.sql"),
+                new FileSystemResource("base-datos/13-sincronizacion-recibos.sql")).populate(esquema);
         }
+        jdbc.execute("DELETE FROM programacion_sincronizacion_recibos");
         jdbc.execute("DELETE FROM recibos");
         jdbc.execute("DELETE FROM suministros");
         jdbc.update("""
@@ -209,6 +218,98 @@ class AlmacenamientoRecibosTests {
         assertEquals(1, repositorio.buscarRecientes(SUMINISTRO, 12).size());
     }
 
+    @Test
+    void sincronizaYReintentaConEstadoPersistidoHastaRecuperarLaFuente() {
+        jdbc.update("DELETE FROM suministros WHERE codigo = ?", OTRO.valor());
+        var inicial = ciclo(RECIBIDO, 2).getFirst();
+        assertEquals(Estado.ACTUALIZADO, inicial.estado());
+        assertEquals(new Incorporacion(1, 0), inicial.incorporacion());
+        var previo = repositorio.buscarRecientes(SUMINISTRO, 1).getFirst();
+        Instant primerFallo = RECIBIDO.plusSeconds(300);
+        assertEquals(primerFallo, inicial.proximoIntento());
+        assertEquals(new Calendario("ACTUALIZADO", 0, RECIBIDO, primerFallo), calendario(SUMINISTRO));
+
+        respuesta.set(new Respuesta(503, "application/problem+json", "{}"));
+        assertTrue(ciclo(primerFallo.minusNanos(1000), 2).isEmpty());
+        var fallido = ciclo(primerFallo, 2).getFirst();
+        assertEquals(Estado.ERROR_FUENTE, fallido.estado());
+        Instant segundoFallo = primerFallo.plusSeconds(30);
+        assertEquals(segundoFallo, fallido.proximoIntento());
+        assertEquals(new Calendario("ERROR_FUENTE", 1, RECIBIDO, segundoFallo), calendario(SUMINISTRO));
+        assertEquals(List.of(previo), repositorio.buscarRecientes(SUMINISTRO, 60));
+
+        ciclo(segundoFallo, 2);
+        Instant reintento = segundoFallo.plusSeconds(60);
+        assertEquals(new Calendario("ERROR_FUENTE", 2, RECIBIDO, reintento), calendario(SUMINISTRO));
+        publicar(NOVIEMBRE, OCTUBRE);
+        var recuperado = ciclo(reintento, 2).getFirst();
+        assertEquals(Estado.ACTUALIZADO, recuperado.estado());
+        assertEquals(new Incorporacion(1, 1), recuperado.incorporacion());
+        assertEquals(new Calendario("ACTUALIZADO", 0, reintento, reintento.plusSeconds(300)),
+            calendario(SUMINISTRO));
+        assertEquals(previo, repositorio.buscarRecientes(SUMINISTRO, 60).getLast());
+    }
+
+    @Test
+    void respetaElLimiteDelCicloYAislaElFalloDeOtroSuministro() {
+        respuesta.set(new Respuesta(503, "application/problem+json", "{}"));
+        var primero = ciclo(RECIBIDO, 1);
+        assertEquals(1, primero.size());
+        assertEquals(SUMINISTRO, primero.getFirst().reserva().suministro());
+        assertEquals(Estado.ERROR_FUENTE, primero.getFirst().estado());
+        var segundo = ciclo(RECIBIDO, 2);
+        assertEquals(1, segundo.size());
+        assertEquals(OTRO, segundo.getFirst().reserva().suministro());
+        assertEquals(Estado.ACTUALIZADO, segundo.getFirst().estado());
+        assertEquals(new Incorporacion(0, 0), segundo.getFirst().incorporacion());
+    }
+
+    @Test
+    void unaReservaVencidaSeReemplazaYElPropietarioAnteriorNoPuedeConfirmarla() {
+        jdbc.update("DELETE FROM suministros WHERE codigo = ?", OTRO.valor());
+        programacion.prepararSuministros(RECIBIDO);
+        var duracion = Duration.ofSeconds(60);
+        var primera = programacion.reservar(RECIBIDO, RECIBIDO, duracion).orElseThrow();
+        assertTrue(programacion.reservar(RECIBIDO, RECIBIDO, duracion).isEmpty());
+        Instant vencimiento = primera.venceEn();
+        var nueva = programacion.reservar(vencimiento, vencimiento, duracion).orElseThrow();
+        assertFalse(programacion.finalizar(primera, Estado.ERROR_FUENTE, 1, vencimiento.plusSeconds(30), vencimiento));
+        assertTrue(programacion.finalizar(nueva, Estado.ACTUALIZADO, 0, vencimiento.plusSeconds(300), vencimiento));
+        assertEquals(new Calendario("ACTUALIZADO", 0, vencimiento, vencimiento.plusSeconds(300)),
+            calendario(SUMINISTRO));
+    }
+
+    @Test
+    void registraElConflictoSinReemplazarElReciboDefinitivo() {
+        incorporar.ejecutar(SUMINISTRO, 12).orElseThrow();
+        var original = repositorio.buscarRecientes(SUMINISTRO, 60);
+        publicar(OCTUBRE.replace("8.46", "8.47").replace("13.46", "13.47"));
+        assertEquals(Estado.CONFLICTO, ciclo(RECIBIDO, 1).getFirst().estado());
+        assertEquals(new Calendario("CONFLICTO", 1, null, RECIBIDO.plusSeconds(30)), calendario(SUMINISTRO));
+        assertEquals(original, repositorio.buscarRecientes(SUMINISTRO, 60));
+    }
+
+    private List<SincronizarRecibos.Intento> ciclo(Instant ahora, int intentos) {
+        var politica = new SincronizarRecibos.Politica(intentos, 60, Duration.ofSeconds(60),
+            Duration.ofSeconds(300), Duration.ofSeconds(30), Duration.ofSeconds(1800));
+        return new SincronizarRecibos(programacion, incorporar, politica, Clock.fixed(ahora, ZoneOffset.UTC))
+            .ejecutarCiclo();
+    }
+
+    private Calendario calendario(CodigoSuministro suministro) {
+        return jdbc.queryForObject("""
+            SELECT ultimo_resultado, fallos_consecutivos, ultimo_exito_utc, proximo_intento_utc
+            FROM programacion_sincronizacion_recibos WHERE codigo_suministro = ?
+            """, (fila, indice) -> {
+                var exito = fila.getObject("ultimo_exito_utc", LocalDateTime.class);
+                var siguiente = fila.getObject("proximo_intento_utc", LocalDateTime.class);
+                return new Calendario(fila.getString("ultimo_resultado"), fila.getInt("fallos_consecutivos"),
+                    exito == null ? null : exito.toInstant(ZoneOffset.UTC), siguiente.toInstant(ZoneOffset.UTC));
+            }, suministro.valor());
+    }
+
+    private record Calendario(String resultado, int fallos, Instant ultimoExito, Instant proximoIntento) {}
+
     private static ReciboEmitido reciboDePrueba(String numero, YearMonth periodo) {
         var disponible = periodo.plusMonths(1).atDay(1);
         return new ReciboEmitido(numero, periodo, BigDecimal.ZERO, new BigDecimal("5.00"), BigDecimal.ZERO,
@@ -224,19 +325,22 @@ class AlmacenamientoRecibosTests {
     private static HttpServer iniciarEmpresa() {
         try {
             var servidor = HttpServer.create(new InetSocketAddress("127.0.0.1", 0), 0);
-            servidor.createContext(RUTA, intercambio -> {
-                try (intercambio) {
-                    var resultado = respuesta.get();
-                    var cuerpo = resultado.cuerpo().getBytes(StandardCharsets.UTF_8);
-                    intercambio.getResponseHeaders().set("Content-Type", resultado.tipo());
-                    intercambio.sendResponseHeaders(resultado.estado(), cuerpo.length);
-                    intercambio.getResponseBody().write(cuerpo);
-                }
-            });
+            servidor.createContext(RUTA, intercambio -> responder(intercambio, respuesta.get()));
+            servidor.createContext(RUTA.replace("000101", "000102"), intercambio -> responder(intercambio,
+                new Respuesta(200, "application/json", "{\"codigoSuministro\":\"000102\",\"moneda\":\"PEN\",\"recibos\":[]}")));
             servidor.start();
             return servidor;
         } catch (IOException error) {
             throw new IllegalStateException("No se pudo iniciar la fuente de prueba.", error);
+        }
+    }
+
+    private static void responder(com.sun.net.httpserver.HttpExchange intercambio, Respuesta resultado) throws IOException {
+        try (intercambio) {
+            var cuerpo = resultado.cuerpo().getBytes(StandardCharsets.UTF_8);
+            intercambio.getResponseHeaders().set("Content-Type", resultado.tipo());
+            intercambio.sendResponseHeaders(resultado.estado(), cuerpo.length);
+            intercambio.getResponseBody().write(cuerpo);
         }
     }
 

@@ -3,6 +3,7 @@ package pe.nivora.backend.lecturas.aplicacion;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.Objects;
+import pe.nivora.backend.compartido.dominio.ReintentoExponencial;
 import pe.nivora.backend.lecturas.dominio.EstadoSincronizacion;
 
 public record PoliticaSincronizacion(int maximoIntentos, int limitePagina,
@@ -33,13 +34,8 @@ public record PoliticaSincronizacion(int maximoIntentos, int limitePagina,
             case BLOQUEADO -> new Siguiente(0, null);
             case CONFLICTO -> new Siguiente(fallosPrevios, ahora.plus(continuacion));
             default -> {
-                int fallos = (int)Math.min(Integer.MAX_VALUE, (long)fallosPrevios + 1);
-                long segundos = reintentoInicial.getSeconds();
-                long maximo = reintentoMaximo.getSeconds();
-                for (int n = 1; n < fallos && segundos < maximo; n++) {
-                    segundos = segundos > maximo / 2 ? maximo : Math.min(maximo, segundos * 2);
-                }
-                yield new Siguiente(fallos, ahora.plusSeconds(segundos));
+                var reintento = ReintentoExponencial.calcular(fallosPrevios, ahora, reintentoInicial, reintentoMaximo);
+                yield new Siguiente(reintento.fallos(), reintento.proximoIntento());
             }
         };
     }

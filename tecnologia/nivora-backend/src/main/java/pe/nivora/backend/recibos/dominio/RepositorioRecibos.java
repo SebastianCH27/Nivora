@@ -15,6 +15,12 @@ public interface RepositorioRecibos {
 
     record Guardado(ReciboEmitido recibo, Instant recibidoEn) {}
 
+    class NoDisponible extends RuntimeException {
+        public NoDisponible(Throwable causa) {
+            super("No se pudo acceder al almacenamiento de recibos.", causa);
+        }
+    }
+
     class Conflicto extends IllegalStateException {
         public Conflicto() {
             super("El periodo o el numero de recibo corresponde a un recibo diferente ya guardado.");

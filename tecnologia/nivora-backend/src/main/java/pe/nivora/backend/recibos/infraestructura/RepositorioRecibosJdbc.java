@@ -14,12 +14,14 @@ import java.util.Map;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
+import org.springframework.dao.DataAccessException;
 import org.springframework.dao.DuplicateKeyException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.TransactionDefinition;
+import org.springframework.transaction.TransactionException;
 import org.springframework.transaction.support.TransactionTemplate;
 
 import pe.nivora.backend.acceso.dominio.CodigoSuministro;
@@ -53,6 +55,8 @@ public class RepositorioRecibosJdbc implements RepositorioRecibos {
             return transaccion.execute(estado -> guardarEnTransaccion(lote, utc));
         } catch (DuplicateKeyException error) {
             throw new Conflicto();
+        } catch (DataAccessException | TransactionException error) {
+            throw new NoDisponible(error);
         }
     }
 
@@ -101,13 +105,17 @@ public class RepositorioRecibosJdbc implements RepositorioRecibos {
         if (limite < 1 || limite > 60) {
             throw new IllegalArgumentException("El limite de recibos debe estar entre 1 y 60.");
         }
-        return jdbc.query(SELECCION + """
-            WHERE codigo_suministro = ?
-            ORDER BY periodo DESC
-            LIMIT ?
-            """, (fila, indice) -> new Guardado(leerRecibo(fila),
-                fila.getObject("recibido_en_utc", LocalDateTime.class).toInstant(ZoneOffset.UTC)),
-            suministro.valor(), limite);
+        try {
+            return jdbc.query(SELECCION + """
+                WHERE codigo_suministro = ?
+                ORDER BY periodo DESC
+                LIMIT ?
+                """, (fila, indice) -> new Guardado(leerRecibo(fila),
+                    fila.getObject("recibido_en_utc", LocalDateTime.class).toInstant(ZoneOffset.UTC)),
+                suministro.valor(), limite);
+        } catch (DataAccessException error) {
+            throw new NoDisponible(error);
+        }
     }
 
     private static ReciboEmitido leerRecibo(ResultSet fila) throws SQLException {

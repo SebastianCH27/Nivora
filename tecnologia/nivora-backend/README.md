@@ -448,6 +448,11 @@ La importación conserva una copia por suministro y mes. Los pasos y la
 consulta de comprobación están en
 [Almacenamiento de recibos](documentacion/almacenamiento-recibos.md).
 
+La tarea web sincroniza los recibos de los suministros registrados.
+Aplica `base-datos/13-sincronizacion-recibos.sql` para habilitar el
+calendario persistido. Los pasos y el comportamiento ante fallos están en
+[Sincronización automática de recibos](documentacion/sincronizacion-recibos.md).
+
 ## Cuentas administrativas: primer paso del bloque 3
 
 `InicializarAdministracion` prepara la primera cuenta activa, con permiso
