@@ -20,7 +20,7 @@ El puerto 8080 esta ocupado por Jenkins en el equipo de desarrollo.
 | `acceso` | Acceso y suministros | Suministros, consulta de DNI mediante APIsPERU, sesiones de consulta y administrativas, gestion de cuentas y supervision protegida. |
 | `lecturas` | Lecturas, consumo e historial | Recuperacion manual y automatica con corte e inventario persistidos y API local de supervision; calculos pendientes. |
 | `tarifas` | Tarifas, costos y proyecciones | Historial versionado, gestión administrativa de vigencias, costos estimados y proyección mensual. |
-| `notificaciones` | Alertas y notificaciones | Registra alertas de consumo y avisos de recibos disponibles. |
+| `notificaciones` | Alertas y notificaciones | Registra alertas de consumo y avisos de recibos, y permite consultarlos y marcarlos como leídos. |
 | `recibos` | Recibos | Importación, sincronización automática y consulta de recibos por suministro. |
 
 Las capas de cada modulo se incorporaran cuando se implementen sus
@@ -474,6 +474,13 @@ registra un aviso por cada recibo cuya fecha de disponibilidad ya llegó en
 Lima. El aviso queda vinculado al periodo y al vencimiento del recibo.
 Consulta la regla y la prueba desde CMD en
 [Avisos de recibo disponible](documentacion/avisos-recibo.md).
+
+## Bandeja de notificaciones
+
+Aplica `base-datos/16-notificaciones-leidas.sql`. La sesión de consulta puede
+listar las alertas y avisos de su suministro, filtrar los pendientes y
+marcarlos como leídos. El contrato y la prueba desde CMD están en
+[Bandeja de notificaciones](documentacion/bandeja-notificaciones.md).
 
 ## Cuentas administrativas: primer paso del bloque 3
 

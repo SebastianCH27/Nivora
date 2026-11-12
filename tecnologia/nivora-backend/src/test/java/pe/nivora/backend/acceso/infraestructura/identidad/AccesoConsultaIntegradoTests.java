@@ -53,6 +53,7 @@ import pe.nivora.backend.lecturas.dominio.LoteLecturas;
 import pe.nivora.backend.lecturas.dominio.ResultadoIncorporacion;
 import pe.nivora.backend.lecturas.dominio.contratos.RepositorioLecturas;
 import pe.nivora.backend.notificaciones.aplicacion.EvaluarAlertaConsumo;
+import pe.nivora.backend.notificaciones.aplicacion.GenerarAvisosRecibo;
 import pe.nivora.backend.recibos.aplicacion.IncorporarRecibos;
 import pe.nivora.backend.recibos.aplicacion.SincronizarRecibos;
 import pe.nivora.backend.recibos.dominio.ReciboEmitido;
@@ -81,6 +82,7 @@ class AccesoConsultaIntegradoTests {
     private static final String COSTOS = CONSULTA + "/costos";
     private static final String PROYECCION = CONSULTA + "/proyeccion";
     private static final String RECIBOS = CONSULTA + "/recibos";
+    private static final String NOTIFICACIONES = CONSULTA + "/notificaciones";
     private static final String ADMIN = "/api/v1/acceso/administradores";
     private static final String GESTION_TARIFAS = "/api/v1/administracion/suministros/000101/tarifas";
     private static final String SUPERVISION = "/api/v1/supervision/suministros/000101/lecturas";
@@ -95,7 +97,7 @@ class AccesoConsultaIntegradoTests {
         "06-sincronizacion-lecturas.sql", "07-administradores.sql",
         "08-sesiones-administrativas.sql", "09-sesiones-consulta.sql", "10-tarifas.sql",
         "11-gestion-tarifas.sql", "12-recibos.sql", "13-sincronizacion-recibos.sql",
-        "14-alertas-consumo.sql");
+        "14-alertas-consumo.sql", "15-avisos-recibo.sql", "16-notificaciones-leidas.sql");
 
     private static final Respuesta AGUA_OK = new Respuesta(200, "application/json",
         "{\"codigoSuministro\":\"000101\",\"titular\":\"Titular ficticio\"}");
@@ -120,6 +122,7 @@ class AccesoConsultaIntegradoTests {
     @Autowired private InicializarAdministracion inicializar;
     @Autowired private RepositorioLecturas repositorioLecturas;
     @Autowired private EvaluarAlertaConsumo evaluarAlertaConsumo;
+    @Autowired private GenerarAvisosRecibo generarAvisosRecibo;
     @Autowired private RepositorioTarifas tarifas;
     @Autowired private IncorporarTarifas incorporarTarifas;
     @Autowired private RepositorioRecibos recibos;
@@ -163,7 +166,8 @@ class AccesoConsultaIntegradoTests {
                 "control_incorporacion_lecturas",
                 "contexto_recuperacion_lecturas", "progreso_recuperacion_lecturas",
                 "programacion_sincronizacion_lecturas", "tarifas_asignaciones", "tarifas_historiales",
-                "tarifas_versiones", "programacion_sincronizacion_recibos", "recibos",
+                "tarifas_versiones", "programacion_sincronizacion_recibos", "notificaciones_leidas",
+                "avisos_recibo", "recibos",
                 "alertas_consumo", "suministros")) {
             jdbc.execute("DELETE FROM " + tabla);
         }
@@ -999,6 +1003,7 @@ class AccesoConsultaIntegradoTests {
     @Test
     void consultaRecibosInformaElFalloDelAlmacenamientoLocal() throws Exception {
         var sesion = token(enviar("POST", CONSULTA + "/sesiones", SOLICITUD, null, 201));
+        jdbc.execute("DROP TABLE avisos_recibo");
         jdbc.execute("DROP TABLE recibos");
         var respuesta = enviar("GET", RECIBOS, null, sesion, 503);
         assertEquals("Recibos no disponibles", json.readTree(respuesta.body()).path("title").stringValue());
@@ -1068,6 +1073,104 @@ class AccesoConsultaIntegradoTests {
         assertEquals(1, llamadasIdentidad.get());
         enviar("DELETE", CONSULTA + "/sesion", null, sesion, 204);
         enviar("GET", RECIBOS, null, sesion, 401);
+    }
+
+    @Test
+    void bandejaPaginaAmbosTiposDeAvisoSinMezclarSuministros() throws Exception {
+        var sesion = token(enviar("POST", CONSULTA + "/sesiones", SOLICITUD, null, 201));
+        var propio = new CodigoSuministro("000101");
+        var ajeno = new CodigoSuministro("000102");
+        jdbc.update("INSERT INTO suministros (codigo, titular, verificado_en_utc) VALUES (?, ?, ?)",
+            ajeno.valor(), "Otra persona ficticia", LocalDateTime.ofInstant(AHORA, ZoneOffset.UTC));
+        var octubre = recibo("REC-101-10", YearMonth.of(2026, 10));
+        var septiembre = recibo("REC-101-09", YearMonth.of(2026, 9));
+        recibos.guardar(new RecibosEmitidos(propio, List.of(octubre, septiembre)), AHORA);
+        recibos.guardar(new RecibosEmitidos(ajeno, List.of(recibo("REC-102-10", YearMonth.of(2026, 10)))), AHORA);
+        assertEquals(3, generarAvisosRecibo.ejecutar());
+        incorporarLectura("1", "2026-10-01T05:00:00Z", 100);
+        incorporarLectura("2", "2026-11-01T05:00:00Z", 2100);
+        incorporarLectura("3", "2026-11-11T05:00:00Z", 4200);
+        assertEquals(EvaluarAlertaConsumo.Estado.GENERADA, evaluarAlertaConsumo.ejecutar(propio).estado());
+
+        var primera = consultarJson(NOTIFICACIONES + "?limite=1&codigoSuministro=000102", sesion);
+        assertEquals("000101", primera.path("codigoSuministro").stringValue());
+        assertTrue(primera.path("hayMas").booleanValue());
+        var aviso = primera.at("/notificaciones/0");
+        assertEquals("RECIBO_DISPONIBLE-2026-10", aviso.path("id").stringValue());
+        assertEquals("REC-101-10", aviso.at("/recibo/numeroRecibo").stringValue());
+        assertEquals("2026-11-08", aviso.at("/recibo/fechaVencimiento").stringValue());
+        assertFalse(aviso.path("leida").booleanValue());
+
+        var segunda = consultarJson(NOTIFICACIONES + "?limite=1&antesDe="
+            + primera.path("siguienteAntesDe").stringValue(), sesion);
+        assertEquals("RECIBO_DISPONIBLE-2026-09", segunda.at("/notificaciones/0/id").stringValue());
+        var ultima = consultarJson(NOTIFICACIONES + "?limite=1&antesDe="
+            + segunda.path("siguienteAntesDe").stringValue(), sesion);
+        var alerta = ultima.at("/notificaciones/0");
+        assertEquals("ALERTA_CONSUMO-2026-11", alerta.path("id").stringValue());
+        assertEquals("2100", alerta.at("/consumo/actualLitros").stringValue());
+        assertEquals("2000", alerta.at("/consumo/anteriorLitros").stringValue());
+        assertFalse(ultima.path("hayMas").booleanValue());
+        assertTrue(ultima.path("siguienteAntesDe").isNull());
+        enviar("PUT", NOTIFICACIONES + "/ALERTA_CONSUMO-2026-11/leida", null, sesion, 204);
+        assertTrue(consultarJson(NOTIFICACIONES, sesion).at("/notificaciones/2/leida").booleanValue());
+    }
+
+    @Test
+    void bandejaMarcaLeidaUnaVezYConservaLaFechaEntreSesiones() throws Exception {
+        var sesion = token(enviar("POST", CONSULTA + "/sesiones", SOLICITUD, null, 201));
+        var propio = new CodigoSuministro("000101");
+        var ajeno = new CodigoSuministro("000102");
+        jdbc.update("INSERT INTO suministros (codigo, titular, verificado_en_utc) VALUES (?, ?, ?)",
+            ajeno.valor(), "Otra persona ficticia", LocalDateTime.ofInstant(AHORA, ZoneOffset.UTC));
+        recibos.guardar(new RecibosEmitidos(propio, List.of(recibo("REC-101-10", YearMonth.of(2026, 10)))), AHORA);
+        recibos.guardar(new RecibosEmitidos(ajeno, List.of(recibo("REC-102-10", YearMonth.of(2026, 10)),
+            recibo("REC-102-09", YearMonth.of(2026, 9)))), AHORA);
+        assertEquals(3, generarAvisosRecibo.ejecutar());
+        enviar("PUT", NOTIFICACIONES + "/RECIBO_DISPONIBLE-2026-09/leida", null, sesion, 404);
+        var ruta = NOTIFICACIONES + "/RECIBO_DISPONIBLE-2026-10/leida";
+        assertEquals("", enviar("PUT", ruta, null, sesion, 204).body());
+        enviar("DELETE", CONSULTA + "/sesion", null, sesion, 204);
+
+        instantePrueba.set(AHORA.plusSeconds(60));
+        var siguienteSesion = token(enviar("POST", CONSULTA + "/sesiones", SOLICITUD, null, 201));
+        enviar("PUT", ruta + "?codigoSuministro=000102", null, siguienteSesion, 204);
+        var aviso = consultarJson(NOTIFICACIONES, siguienteSesion).at("/notificaciones/0");
+        assertTrue(aviso.path("leida").booleanValue());
+        assertEquals(AHORA.toString(), aviso.path("leidaEn").stringValue());
+        assertTrue(consultarJson(NOTIFICACIONES + "?soloPendientes=true", siguienteSesion).path("notificaciones").isEmpty());
+        assertEquals(List.of(propio.valor()), jdbc.queryForList(
+            "SELECT codigo_suministro FROM notificaciones_leidas", String.class));
+    }
+
+    @Test
+    void bandejaExigeSesionDeConsultaYValidaParametros() throws Exception {
+        var ruta = NOTIFICACIONES + "/RECIBO_DISPONIBLE-2026-10/leida";
+        enviar("GET", NOTIFICACIONES, null, null, 401);
+        enviar("PUT", ruta, null, null, 401);
+        var admin = iniciarAdminTarifas();
+        enviar("GET", NOTIFICACIONES, null, admin, 401);
+        enviar("PUT", ruta, null, admin, 401);
+        var sesion = token(enviar("POST", CONSULTA + "/sesiones", SOLICITUD, null, 201));
+        var vacia = consultarJson(NOTIFICACIONES, sesion);
+        assertTrue(vacia.path("notificaciones").isArray());
+        assertTrue(vacia.path("notificaciones").isEmpty());
+        assertFalse(vacia.path("hayMas").booleanValue());
+        enviar("GET", NOTIFICACIONES + "?limite=61", null, sesion, 400);
+        enviar("GET", NOTIFICACIONES + "?antesDe=2026-10", null, sesion, 400);
+        enviar("GET", NOTIFICACIONES + "?soloPendientes=xyz", null, sesion, 400);
+        enviar("PUT", NOTIFICACIONES + "/RECIBO_DISPONIBLE-2026-13/leida", null, sesion, 400);
+        enviar("DELETE", CONSULTA + "/sesion", null, sesion, 204);
+        enviar("GET", NOTIFICACIONES, null, sesion, 401);
+    }
+
+    @Test
+    void bandejaInformaIndisponibilidadDeLasMarcasDeLectura() throws Exception {
+        var sesion = token(enviar("POST", CONSULTA + "/sesiones", SOLICITUD, null, 201));
+        jdbc.execute("DROP TABLE notificaciones_leidas");
+        var respuesta = enviar("GET", NOTIFICACIONES, null, sesion, 503);
+        assertEquals("Notificaciones no disponibles", json.readTree(respuesta.body()).path("title").stringValue());
+        enviar("PUT", NOTIFICACIONES + "/RECIBO_DISPONIBLE-2026-10/leida", null, sesion, 503);
     }
 
     private static ReciboEmitido recibo(String numero, YearMonth periodo) {

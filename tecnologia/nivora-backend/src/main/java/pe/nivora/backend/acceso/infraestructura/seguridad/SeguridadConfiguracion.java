@@ -31,7 +31,10 @@ public class SeguridadConfiguracion {
                     "/api/v1/acceso/consulta/estadisticas",
                     "/api/v1/acceso/consulta/costos",
                     "/api/v1/acceso/consulta/proyeccion",
-                    "/api/v1/acceso/consulta/recibos").hasRole("CONSULTA")
+                    "/api/v1/acceso/consulta/recibos",
+                    "/api/v1/acceso/consulta/notificaciones").hasRole("CONSULTA")
+                .requestMatchers(HttpMethod.PUT,
+                    "/api/v1/acceso/consulta/notificaciones/*/leida").hasRole("CONSULTA")
                 .requestMatchers(HttpMethod.DELETE, "/api/v1/acceso/consulta/sesion").hasRole("CONSULTA")
                 .anyRequest().denyAll())
             .exceptionHandling(e -> e
