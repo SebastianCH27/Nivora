@@ -17,6 +17,7 @@ import java.util.stream.Collectors;
 import org.springframework.dao.DataAccessException;
 import org.springframework.dao.DuplicateKeyException;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.PlatformTransactionManager;
@@ -102,17 +103,38 @@ public class RepositorioRecibosJdbc implements RepositorioRecibos {
 
     @Override
     public List<Guardado> buscarRecientes(CodigoSuministro suministro, int limite) {
+        validarLimite(limite);
+        return buscar(suministro, null, limite);
+    }
+
+    @Override
+    public Pagina buscarPagina(CodigoSuministro suministro, YearMonth antesDe, int limite) {
+        validarLimite(limite);
+        var encontrados = buscar(suministro, antesDe, limite + 1);
+        if (encontrados.size() <= limite) {
+            return new Pagina(encontrados, null);
+        }
+        var pagina = encontrados.subList(0, limite);
+        return new Pagina(pagina, pagina.getLast().recibo().periodo());
+    }
+
+    private static void validarLimite(int limite) {
         if (limite < 1 || limite > 60) {
             throw new IllegalArgumentException("El limite de recibos debe estar entre 1 y 60.");
         }
+    }
+
+    private List<Guardado> buscar(CodigoSuministro suministro, YearMonth antesDe, int limite) {
+        var parametros = new MapSqlParameterSource("codigo", suministro.valor()).addValue("limite", limite);
+        String filtro = "";
+        if (antesDe != null) {
+            filtro = " AND periodo < :antesDe";
+            parametros.addValue("antesDe", antesDe.atDay(1));
+        }
         try {
-            return jdbc.query(SELECCION + """
-                WHERE codigo_suministro = ?
-                ORDER BY periodo DESC
-                LIMIT ?
-                """, (fila, indice) -> new Guardado(leerRecibo(fila),
-                    fila.getObject("recibido_en_utc", LocalDateTime.class).toInstant(ZoneOffset.UTC)),
-                suministro.valor(), limite);
+            return consultas.query(SELECCION + "WHERE codigo_suministro = :codigo" + filtro
+                + " ORDER BY periodo DESC LIMIT :limite", parametros, (fila, indice) -> new Guardado(leerRecibo(fila),
+                    fila.getObject("recibido_en_utc", LocalDateTime.class).toInstant(ZoneOffset.UTC)));
         } catch (DataAccessException error) {
             throw new NoDisponible(error);
         }

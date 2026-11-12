@@ -1,6 +1,7 @@
 package pe.nivora.backend.recibos.dominio;
 
 import java.time.Instant;
+import java.time.YearMonth;
 import java.util.List;
 
 import pe.nivora.backend.acceso.dominio.CodigoSuministro;
@@ -11,9 +12,17 @@ public interface RepositorioRecibos {
 
     List<Guardado> buscarRecientes(CodigoSuministro suministro, int limite);
 
+    Pagina buscarPagina(CodigoSuministro suministro, YearMonth antesDe, int limite);
+
     record Incorporacion(int nuevos, int repetidos) {}
 
     record Guardado(ReciboEmitido recibo, Instant recibidoEn) {}
+
+    record Pagina(List<Guardado> recibos, YearMonth siguienteAntesDe) {
+        public Pagina {
+            recibos = List.copyOf(recibos);
+        }
+    }
 
     class NoDisponible extends RuntimeException {
         public NoDisponible(Throwable causa) {

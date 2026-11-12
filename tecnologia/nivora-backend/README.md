@@ -21,7 +21,7 @@ El puerto 8080 esta ocupado por Jenkins en el equipo de desarrollo.
 | `lecturas` | Lecturas, consumo e historial | Recuperacion manual y automatica con corte e inventario persistidos y API local de supervision; calculos pendientes. |
 | `tarifas` | Tarifas, costos y proyecciones | Historial versionado, gestión administrativa de vigencias, costos estimados y proyección mensual. |
 | `notificaciones` | Alertas y notificaciones | Pendiente de implementar. |
-| `recibos` | Recibos | Lectura, validación y almacenamiento local de recibos emitidos por Empresa de Agua. |
+| `recibos` | Recibos | Importación, sincronización automática y consulta de recibos por suministro. |
 
 Las capas de cada modulo se incorporaran cuando se implementen sus
 responsabilidades: dominio, aplicacion, infraestructura y presentacion.
@@ -452,6 +452,10 @@ La tarea web sincroniza los recibos de los suministros registrados.
 Aplica `base-datos/13-sincronizacion-recibos.sql` para habilitar el
 calendario persistido. Los pasos y el comportamiento ante fallos están en
 [Sincronización automática de recibos](documentacion/sincronizacion-recibos.md).
+
+El usuario puede consultar los recibos guardados de su suministro desde
+`GET /api/v1/acceso/consulta/recibos`. El contrato y la comprobación están en
+[Consulta de recibos](documentacion/consulta-recibos.md).
 
 ## Cuentas administrativas: primer paso del bloque 3
 

@@ -14,6 +14,7 @@ import java.time.Duration;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.YearMonth;
 import java.time.ZoneId;
 import java.time.ZoneOffset;
 import java.util.List;
@@ -51,6 +52,9 @@ import pe.nivora.backend.lecturas.dominio.LecturaAcumulada;
 import pe.nivora.backend.lecturas.dominio.LoteLecturas;
 import pe.nivora.backend.lecturas.dominio.ResultadoIncorporacion;
 import pe.nivora.backend.lecturas.dominio.contratos.RepositorioLecturas;
+import pe.nivora.backend.recibos.dominio.ReciboEmitido;
+import pe.nivora.backend.recibos.dominio.RecibosEmitidos;
+import pe.nivora.backend.recibos.dominio.RepositorioRecibos;
 import pe.nivora.backend.tarifas.aplicacion.IncorporarTarifas;
 import pe.nivora.backend.tarifas.dominio.HistorialTarifario;
 import pe.nivora.backend.tarifas.dominio.RepositorioTarifas;
@@ -72,6 +76,7 @@ class AccesoConsultaIntegradoTests {
     private static final String ESTADISTICAS = CONSULTA + "/estadisticas";
     private static final String COSTOS = CONSULTA + "/costos";
     private static final String PROYECCION = CONSULTA + "/proyeccion";
+    private static final String RECIBOS = CONSULTA + "/recibos";
     private static final String ADMIN = "/api/v1/acceso/administradores";
     private static final String GESTION_TARIFAS = "/api/v1/administracion/suministros/000101/tarifas";
     private static final String SUPERVISION = "/api/v1/supervision/suministros/000101/lecturas";
@@ -84,7 +89,8 @@ class AccesoConsultaIntegradoTests {
     private static final List<String> SCRIPTS = List.of("02-suministros.sql", "03-lecturas.sql",
         "04-recuperacion-lecturas.sql", "05-contexto-recuperacion-lecturas.sql",
         "06-sincronizacion-lecturas.sql", "07-administradores.sql",
-        "08-sesiones-administrativas.sql", "09-sesiones-consulta.sql", "10-tarifas.sql", "11-gestion-tarifas.sql");
+        "08-sesiones-administrativas.sql", "09-sesiones-consulta.sql", "10-tarifas.sql",
+        "11-gestion-tarifas.sql", "12-recibos.sql");
 
     private static final Respuesta AGUA_OK = new Respuesta(200, "application/json",
         "{\"codigoSuministro\":\"000101\",\"titular\":\"Titular ficticio\"}");
@@ -108,6 +114,7 @@ class AccesoConsultaIntegradoTests {
     @Autowired private RepositorioLecturas repositorioLecturas;
     @Autowired private RepositorioTarifas tarifas;
     @Autowired private IncorporarTarifas incorporarTarifas;
+    @Autowired private RepositorioRecibos recibos;
     @Value("${local.server.port}") private int puerto;
 
     private Connection esquema;
@@ -146,7 +153,7 @@ class AccesoConsultaIntegradoTests {
                 "control_incorporacion_lecturas",
                 "contexto_recuperacion_lecturas", "progreso_recuperacion_lecturas",
                 "programacion_sincronizacion_lecturas", "tarifas_asignaciones", "tarifas_historiales",
-                "tarifas_versiones", "suministros")) {
+                "tarifas_versiones", "recibos", "suministros")) {
             jdbc.execute("DELETE FROM " + tabla);
         }
         agua.set(AGUA_OK);
@@ -908,6 +915,86 @@ class AccesoConsultaIntegradoTests {
              "tramos":[{"desdeM3":0,"hastaM3":10,"precioPorM3":1.50,"precioAlcantarilladoPorM3":0.50},
                        {"desdeM3":10,"hastaM3":null,"precioPorM3":2.20,"precioAlcantarilladoPorM3":0.80}]}
             """.formatted(version, desde, fin, desde, desde, fin, cargo);
+    }
+
+    @Test
+    void consultaLosRecibosPropiosEnOrdenYPaginaAunqueLaFuenteEsteCaida() throws Exception {
+        var sesion = token(enviar("POST", CONSULTA + "/sesiones", SOLICITUD, null, 201));
+        var propio = new CodigoSuministro("000101");
+        var ajeno = new CodigoSuministro("000102");
+        jdbc.update("INSERT INTO suministros (codigo, titular, verificado_en_utc) VALUES (?, ?, ?)",
+            ajeno.valor(), "Otra persona ficticia", LocalDateTime.parse("2026-11-01T00:00:00"));
+        var octubre = recibo("REC-101-10", YearMonth.of(2026, 10));
+        var septiembre = recibo("REC-101-09", YearMonth.of(2026, 9));
+        recibos.guardar(new RecibosEmitidos(propio, List.of(octubre, septiembre)), AHORA);
+        recibos.guardar(new RecibosEmitidos(ajeno, List.of(recibo("REC-102-10", YearMonth.of(2026, 10)))), AHORA);
+        agua.set(CAIDA);
+        identidad.set(CAIDA);
+
+        var primera = consultarJson(RECIBOS + "?limite=1&codigoSuministro=000102", sesion);
+        assertEquals("000101", primera.path("codigoSuministro").stringValue());
+        assertEquals("PEN", primera.path("moneda").stringValue());
+        assertEquals("America/Lima", primera.path("zonaFechas").stringValue());
+        assertEquals(1, primera.path("recibos").size());
+        var ultimo = primera.at("/recibos/0");
+        assertEquals("REC-101-10", ultimo.path("numeroRecibo").stringValue());
+        assertEquals("2026-10", ultimo.path("periodo").stringValue());
+        assertEquals("5637.125", ultimo.path("consumoLitros").stringValue());
+        assertEquals("13.46", ultimo.path("importeTotal").stringValue());
+        assertEquals("2026-11-01", ultimo.path("fechaDisponibilidad").stringValue());
+        assertEquals("2026-11-08", ultimo.path("fechaVencimiento").stringValue());
+        assertEquals("DOMESTICA", ultimo.path("codigoTarifa").stringValue());
+        assertEquals(1, ultimo.path("versionTarifa").intValue());
+        assertEquals(AHORA.toString(), ultimo.path("recibidoEn").stringValue());
+        assertTrue(primera.path("hayMas").booleanValue());
+        assertEquals("2026-10", primera.path("siguienteAntesDe").stringValue());
+
+        var anterior = consultarJson(RECIBOS + "?limite=1&antesDe=2026-10", sesion);
+        assertEquals("REC-101-09", anterior.at("/recibos/0/numeroRecibo").stringValue());
+        assertFalse(anterior.path("hayMas").booleanValue());
+        assertTrue(anterior.path("siguienteAntesDe").isNull());
+        assertTrue(consultarJson(RECIBOS + "?antesDe=2026-09", sesion).path("recibos").isEmpty());
+        var completos = consultarJson(RECIBOS, sesion).path("recibos");
+        assertEquals(2, completos.size());
+        assertEquals(ultimo, completos.get(0));
+        assertEquals(1, llamadasAgua.get());
+        assertEquals(1, llamadasIdentidad.get());
+    }
+
+    @Test
+    void consultaRecibosExigeSesionDeConsultaVigenteYDevuelveListaVacia() throws Exception {
+        enviar("GET", RECIBOS, null, null, 401);
+        enviar("GET", RECIBOS, null, iniciarAdminTarifas(), 401);
+        var sesion = token(enviar("POST", CONSULTA + "/sesiones", SOLICITUD, null, 201));
+        var resultado = consultarJson(RECIBOS, sesion);
+        assertTrue(resultado.path("recibos").isArray());
+        assertTrue(resultado.path("recibos").isEmpty());
+        assertFalse(resultado.path("hayMas").booleanValue());
+        assertTrue(resultado.path("siguienteAntesDe").isNull());
+        enviar("DELETE", CONSULTA + "/sesion", null, sesion, 204);
+        enviar("GET", RECIBOS, null, sesion, 401);
+    }
+
+    @ParameterizedTest
+    @ValueSource(strings = {"limite=0", "limite=61", "limite=abc", "antesDe=2026-13", "antesDe=2026-10-01"})
+    void consultaRecibosRechazaParametrosInvalidos(String parametro) throws Exception {
+        var sesion = token(enviar("POST", CONSULTA + "/sesiones", SOLICITUD, null, 201));
+        var respuesta = enviar("GET", RECIBOS + "?" + parametro, null, sesion, 400);
+        assertEquals("Parametros invalidos", json.readTree(respuesta.body()).path("title").stringValue());
+    }
+
+    @Test
+    void consultaRecibosInformaElFalloDelAlmacenamientoLocal() throws Exception {
+        var sesion = token(enviar("POST", CONSULTA + "/sesiones", SOLICITUD, null, 201));
+        jdbc.execute("DROP TABLE recibos");
+        var respuesta = enviar("GET", RECIBOS, null, sesion, 503);
+        assertEquals("Recibos no disponibles", json.readTree(respuesta.body()).path("title").stringValue());
+    }
+
+    private static ReciboEmitido recibo(String numero, YearMonth periodo) {
+        var disponible = periodo.plusMonths(1).atDay(1);
+        return new ReciboEmitido(numero, periodo, new BigDecimal("5637.125"), new BigDecimal("5.00"),
+            new BigDecimal("8.46"), new BigDecimal("13.46"), disponible, disponible.plusDays(7), "DOMESTICA", 1);
     }
 
     private String iniciarAdminTarifas() throws Exception {
