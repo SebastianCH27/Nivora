@@ -39,6 +39,8 @@ import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
 
 import pe.nivora.backend.acceso.dominio.CodigoSuministro;
+import pe.nivora.backend.notificaciones.aplicacion.GenerarAvisosRecibo;
+import pe.nivora.backend.notificaciones.dominio.RepositorioAvisosRecibo;
 import pe.nivora.backend.recibos.aplicacion.IncorporarRecibos;
 import pe.nivora.backend.recibos.aplicacion.SincronizarRecibos;
 import pe.nivora.backend.recibos.dominio.FuenteRecibosNoDisponibleException;
@@ -80,6 +82,8 @@ class AlmacenamientoRecibosTests {
     @Autowired private IncorporarRecibos incorporar;
     @Autowired private RepositorioRecibos repositorio;
     @Autowired private RepositorioSincronizacionRecibos programacion;
+    @Autowired private RepositorioAvisosRecibo avisosRecibo;
+    @Autowired private GenerarAvisosRecibo generarAvisosRecibo;
     private Connection esquema;
 
     @DynamicPropertySource
@@ -102,9 +106,11 @@ class AlmacenamientoRecibosTests {
             esquema = datos.getConnection();
             new ResourceDatabasePopulator(new FileSystemResource("base-datos/02-suministros.sql"),
                 new FileSystemResource("base-datos/12-recibos.sql"),
-                new FileSystemResource("base-datos/13-sincronizacion-recibos.sql")).populate(esquema);
+                new FileSystemResource("base-datos/13-sincronizacion-recibos.sql"),
+                new FileSystemResource("base-datos/15-avisos-recibo.sql")).populate(esquema);
         }
         jdbc.execute("DELETE FROM programacion_sincronizacion_recibos");
+        jdbc.execute("DELETE FROM avisos_recibo");
         jdbc.execute("DELETE FROM recibos");
         jdbc.execute("DELETE FROM suministros");
         jdbc.update("""
@@ -216,6 +222,52 @@ class AlmacenamientoRecibosTests {
             assertEquals(1, a.repetidos() + b.repetidos());
         }
         assertEquals(1, repositorio.buscarRecientes(SUMINISTRO, 12).size());
+    }
+
+    @Test
+    void avisaPorRecibosGuardadosCuandoLlegaSuFechaEnLima() {
+        var octubre = reciboDePrueba("REC-101-10", YearMonth.of(2026, 10));
+        var noviembre = reciboDePrueba("REC-101-11", YearMonth.of(2026, 11));
+        var disponibleDesde = Instant.parse("2026-12-01T05:00:00Z");
+        var anterior = disponibleDesde.minusSeconds(1);
+        repositorio.guardar(new RecibosEmitidos(SUMINISTRO, List.of(noviembre, octubre)), anterior);
+
+        assertEquals(1, new GenerarAvisosRecibo(avisosRecibo, Clock.fixed(anterior, ZoneOffset.UTC)).ejecutar());
+        assertEquals(List.of(octubre.periodo().atDay(1)), jdbc.queryForList(
+            "SELECT periodo FROM avisos_recibo", LocalDate.class));
+
+        assertEquals(1, new GenerarAvisosRecibo(avisosRecibo, Clock.fixed(disponibleDesde, ZoneOffset.UTC)).ejecutar());
+        assertEquals(0, generarAvisosRecibo.ejecutar());
+        assertEquals(List.of(octubre.fechaVencimiento(), noviembre.fechaVencimiento()), jdbc.queryForList("""
+            SELECT r.fecha_vencimiento FROM avisos_recibo a
+            JOIN recibos r ON r.codigo_suministro = a.codigo_suministro AND r.periodo = a.periodo
+            ORDER BY a.periodo
+            """, LocalDate.class));
+        assertEquals(LocalDateTime.ofInstant(disponibleDesde, ZoneOffset.UTC), jdbc.queryForObject("""
+            SELECT registrado_en_utc FROM avisos_recibo WHERE codigo_suministro = ? AND periodo = ?
+            """, LocalDateTime.class, SUMINISTRO.valor(), noviembre.periodo().atDay(1)));
+    }
+
+    @Test
+    void dosCiclosSimultaneosRegistranUnAvisoPorReciboYSuministro() throws Exception {
+        var periodo = YearMonth.of(2026, 10);
+        repositorio.guardar(new RecibosEmitidos(SUMINISTRO, List.of(reciboDePrueba("REC-101-10", periodo))), AHORA);
+        repositorio.guardar(new RecibosEmitidos(OTRO, List.of(reciboDePrueba("REC-102-10", periodo))), AHORA);
+        var listos = new CountDownLatch(2);
+        Callable<Integer> tarea = () -> {
+            listos.countDown();
+            if (!listos.await(5, TimeUnit.SECONDS)) {
+                throw new IllegalStateException("El otro ciclo no inicio.");
+            }
+            return generarAvisosRecibo.ejecutar();
+        };
+        try (var hilos = Executors.newFixedThreadPool(2)) {
+            var primero = hilos.submit(tarea);
+            var segundo = hilos.submit(tarea);
+            assertEquals(2, primero.get(15, TimeUnit.SECONDS) + segundo.get(15, TimeUnit.SECONDS));
+        }
+        assertEquals(List.of(SUMINISTRO.valor(), OTRO.valor()), jdbc.queryForList(
+            "SELECT codigo_suministro FROM avisos_recibo ORDER BY codigo_suministro", String.class));
     }
 
     @Test

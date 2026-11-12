@@ -20,7 +20,7 @@ El puerto 8080 esta ocupado por Jenkins en el equipo de desarrollo.
 | `acceso` | Acceso y suministros | Suministros, consulta de DNI mediante APIsPERU, sesiones de consulta y administrativas, gestion de cuentas y supervision protegida. |
 | `lecturas` | Lecturas, consumo e historial | Recuperacion manual y automatica con corte e inventario persistidos y API local de supervision; calculos pendientes. |
 | `tarifas` | Tarifas, costos y proyecciones | Historial versionado, gestión administrativa de vigencias, costos estimados y proyección mensual. |
-| `notificaciones` | Alertas y notificaciones | Registra alertas de consumo por suministro y mes. |
+| `notificaciones` | Alertas y notificaciones | Registra alertas de consumo y avisos de recibos disponibles. |
 | `recibos` | Recibos | Importación, sincronización automática y consulta de recibos por suministro. |
 
 Las capas de cada modulo se incorporaran cuando se implementen sus
@@ -466,6 +466,14 @@ de lecturas, Nivora registra una alerta si el consumo acumulado del mes
 supera el total del mes anterior y ambos cálculos tienen cobertura completa.
 La regla, los estados y el comando de comprobación están en
 [Alerta de consumo](documentacion/alertas-consumo.md).
+
+## Aviso de recibo disponible
+
+Aplica `base-datos/15-avisos-recibo.sql`. Nivora revisa los recibos guardados y
+registra un aviso por cada recibo cuya fecha de disponibilidad ya llegó en
+Lima. El aviso queda vinculado al periodo y al vencimiento del recibo.
+Consulta la regla y la prueba desde CMD en
+[Avisos de recibo disponible](documentacion/avisos-recibo.md).
 
 ## Cuentas administrativas: primer paso del bloque 3
 

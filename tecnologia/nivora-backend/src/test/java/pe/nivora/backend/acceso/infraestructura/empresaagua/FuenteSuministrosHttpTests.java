@@ -2,9 +2,13 @@ package pe.nivora.backend.acceso.infraestructura.empresaagua;
 
 import java.io.IOException;
 import java.net.InetSocketAddress;
+import java.net.SocketTimeoutException;
 import java.nio.charset.StandardCharsets;
+import java.util.Objects;
+import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.stream.Stream;
@@ -47,7 +51,7 @@ class FuenteSuministrosHttpTests {
 
     @BeforeEach
     void iniciarFuenteHttp() throws IOException {
-        respuesta.set(new Respuesta(200, "application/json", SUMINISTRO, 0, 0, null));
+        respuesta.set(new Respuesta(200, "application/json", SUMINISTRO, null));
         ejecutor = Executors.newVirtualThreadPerTaskExecutor();
         servidor = HttpServer.create(new InetSocketAddress("127.0.0.1", 0), 0);
         servidor.setExecutor(ejecutor);
@@ -77,7 +81,7 @@ class FuenteSuministrosHttpTests {
     @Test
     void conservaLosCerosInicialesDelCodigo() {
         respuesta.set(new Respuesta(200, "application/json; charset=UTF-8",
-            "{\"codigoSuministro\":\"00123\",\"titular\":\"Titular de prueba\"}", 0, 0, null));
+            "{\"codigoSuministro\":\"00123\",\"titular\":\"Titular de prueba\"}", null));
 
         var suministro = fuente.consultar(new CodigoSuministro("00123")).orElseThrow();
 
@@ -89,7 +93,7 @@ class FuenteSuministrosHttpTests {
     void devuelveVacioSoloAnteAusenciaConfirmadaPorElContrato() {
         respuesta.set(new Respuesta(404, "application/problem+json",
             problema("Suministro no encontrado", "/api/v1/suministros/13100390"),
-            0, 0, null));
+            null));
 
         assertTrue(fuente.consultar(CODIGO).isEmpty());
     }
@@ -98,7 +102,7 @@ class FuenteSuministrosHttpTests {
     @MethodSource("respuestasNoUtilizables")
     void noConvierteErroresNiRespuestasInvalidasEnAusencia(
             String escenario, int estado, String tipo, String cuerpo) {
-        respuesta.set(new Respuesta(estado, tipo, cuerpo, 0, 0, null));
+        respuesta.set(new Respuesta(estado, tipo, cuerpo, null));
 
         assertThrows(FuenteSuministrosNoDisponibleException.class,
             () -> fuente.consultar(CODIGO), escenario);
@@ -146,7 +150,7 @@ class FuenteSuministrosHttpTests {
 
     @Test
     void noSigueRedireccionesDelProveedor() {
-        respuesta.set(new Respuesta(302, "text/plain", "", 0, 0,
+        respuesta.set(new Respuesta(302, "text/plain", "",
             urlBase() + "/destino-incorrecto"));
 
         assertThrows(FuenteSuministrosNoDisponibleException.class,
@@ -164,22 +168,43 @@ class FuenteSuministrosHttpTests {
 
     @Test
     void limitaLaEsperaDeLasCabecerasHttp() {
-        fuente = crearFuente(100);
-        respuesta.set(new Respuesta(200, "application/json", SUMINISTRO, 1000, 0, null));
-
-        assertThrows(FuenteSuministrosNoDisponibleException.class,
-            () -> fuente.consultar(CODIGO));
-        assertEquals(1, solicitudes.get());
+        verificarTiempoDeEspera(false);
     }
 
     @Test
     void limitaLaEsperaDelCuerpoAunqueLasCabecerasYaLlegaron() {
-        fuente = crearFuente(100);
-        respuesta.set(new Respuesta(200, "application/json", SUMINISTRO, 0, 1000, null));
+        verificarTiempoDeEspera(true);
+    }
 
-        assertThrows(FuenteSuministrosNoDisponibleException.class,
-            () -> fuente.consultar(CODIGO));
-        assertEquals(1, solicitudes.get());
+    private void verificarTiempoDeEspera(boolean enviarCabeceras) {
+        var servidorEnEspera = new CountDownLatch(1);
+        var terminarPrueba = new CountDownLatch(1);
+        servidor.createContext("/api/v1/suministros/", intercambio -> {
+            try (intercambio) {
+                solicitudes.incrementAndGet();
+                if (enviarCabeceras) {
+                    byte[] cuerpo = SUMINISTRO.getBytes(StandardCharsets.UTF_8);
+                    intercambio.getResponseHeaders().set("Content-Type", "application/json");
+                    intercambio.sendResponseHeaders(200, cuerpo.length);
+                    intercambio.getResponseBody().write(cuerpo[0]);
+                    intercambio.getResponseBody().flush();
+                }
+                servidorEnEspera.countDown();
+                terminarPrueba.await(10, TimeUnit.SECONDS);
+            } catch (InterruptedException ex) {
+                Thread.currentThread().interrupt();
+            }
+        });
+        try {
+            var error = assertThrows(FuenteSuministrosNoDisponibleException.class,
+                () -> fuente.consultar(CODIGO));
+            assertEquals(0, servidorEnEspera.getCount(), "El servidor debe llegar al punto de espera.");
+            assertEquals(1, solicitudes.get());
+            assertTrue(Stream.iterate((Throwable) error, Objects::nonNull, Throwable::getCause)
+                .anyMatch(SocketTimeoutException.class::isInstance), "Se esperaba un timeout de lectura.");
+        } finally {
+            terminarPrueba.countDown();
+        }
     }
 
     private FuenteSuministrosHttp crearFuente(int lecturaMs) {
@@ -202,8 +227,6 @@ class FuenteSuministrosHttpTests {
             ruta.set(intercambio.getRequestURI().getPath());
             aceptado.set(intercambio.getRequestHeaders().getFirst("Accept"));
             Respuesta datos = respuesta.get();
-            Thread.sleep(datos.demoraCabecerasMs());
-
             if (datos.tipo() != null) {
                 intercambio.getResponseHeaders().set("Content-Type", datos.tipo());
             }
@@ -217,20 +240,10 @@ class FuenteSuministrosHttpTests {
 
             byte[] cuerpo = datos.cuerpo().getBytes(StandardCharsets.UTF_8);
             intercambio.sendResponseHeaders(datos.estado(), cuerpo.length);
-            Thread.sleep(datos.demoraCuerpoMs());
             intercambio.getResponseBody().write(cuerpo);
-        } catch (InterruptedException ex) {
-            Thread.currentThread().interrupt();
-        } catch (IOException ex) {
-            // El adaptador cierra la conexion al vencer el tiempo de lectura.
-            if (respuesta.get().demoraCuerpoMs() == 0
-                    && respuesta.get().demoraCabecerasMs() == 0) {
-                throw ex;
-            }
         }
     }
 
-    private record Respuesta(int estado, String tipo, String cuerpo,
-                             long demoraCabecerasMs, long demoraCuerpoMs, String ubicacion) {
+    private record Respuesta(int estado, String tipo, String cuerpo, String ubicacion) {
     }
 }
