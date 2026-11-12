@@ -1,6 +1,7 @@
 package pe.nivora.backend.tarifas.dominio;
 
 import java.math.BigDecimal;
+import java.math.BigInteger;
 import java.math.RoundingMode;
 import java.util.ArrayList;
 import java.util.List;
@@ -10,11 +11,15 @@ public record CostoEstimado(BigDecimal agua, BigDecimal alcantarillado, BigDecim
         BigDecimal subtotalConocido, BigDecimal igv, BigDecimal totalEstimado, List<TramoAplicado> tramos) {
 
     public static CostoEstimado calcular(long litros, VersionTarifaria tarifa) {
-        if (litros < 0) {
+        return calcular(BigInteger.valueOf(litros), tarifa);
+    }
+
+    public static CostoEstimado calcular(BigInteger litros, VersionTarifaria tarifa) {
+        if (litros.signum() < 0) {
             throw new IllegalArgumentException("El consumo en litros debe ser no negativo.");
         }
 
-        var volumen = BigDecimal.valueOf(litros, 3);
+        var volumen = new BigDecimal(litros, 3);
         BigDecimal agua = BigDecimal.ZERO;
         BigDecimal alcantarillado = BigDecimal.ZERO;
         boolean alcantarilladoInformado = true;
@@ -35,7 +40,7 @@ public record CostoEstimado(BigDecimal agua, BigDecimal alcantarillado, BigDecim
             tramos.add(new TramoAplicado(tramo.desdeM3(), tramo.hastaM3(), aplicado,
                 tramo.precioAguaPorM3(), precioAlcantarillado, importeAgua, importeAlcantarillado));
         }
-        if (litros == 0) {
+        if (litros.signum() == 0) {
             alcantarilladoInformado = tarifa.tramos().getFirst().precioAlcantarilladoPorM3() != null;
         }
 

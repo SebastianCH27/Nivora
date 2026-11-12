@@ -69,6 +69,7 @@ class AccesoConsultaIntegradoTests {
     private static final String HISTORIAL = CONSULTA + "/historial";
     private static final String ESTADISTICAS = CONSULTA + "/estadisticas";
     private static final String COSTOS = CONSULTA + "/costos";
+    private static final String PROYECCION = CONSULTA + "/proyeccion";
     private static final String ADMIN = "/api/v1/acceso/administradores";
     private static final String SUPERVISION = "/api/v1/supervision/suministros/000101/lecturas";
     private static final String DNI = "00000001";
@@ -231,6 +232,7 @@ class AccesoConsultaIntegradoTests {
         enviar("GET", HISTORIAL, null, admin, 401);
         enviar("GET", ESTADISTICAS, null, admin, 401);
         enviar("GET", COSTOS, null, admin, 401);
+        enviar("GET", PROYECCION, null, admin, 401);
         enviar("DELETE", CONSULTA + "/sesion", null, consulta, 204);
         enviar("GET", CONSULTA + "/sesion", null, consulta, 401);
         assertEquals(2, llamadasAgua.get());
@@ -634,6 +636,93 @@ class AccesoConsultaIntegradoTests {
         assertTrue(parcial.at("/anteriores/0/desglose/alcantarillado").isNull());
         assertTrue(parcial.at("/anteriores/0/desglose/igv").isNull());
         assertTrue(parcial.at("/anteriores/0/desglose/totalEstimado").isNull());
+    }
+
+    @Test
+    void proyeccionUsaLaUltimaMedicionYAplicaLosTramosAlVolumenDelMes() throws Exception {
+        enviar("GET", PROYECCION, null, null, 401);
+        String sesion = token(enviar("POST", CONSULTA + "/sesiones", SOLICITUD, null, 201));
+        agua.set(CAIDA);
+        identidad.set(CAIDA);
+        incorporarLectura("1", "2026-11-01T05:00:00Z", 100);
+        incorporarLectura("2", "2026-11-11T05:00:00Z", 4100);
+        jdbc.update("INSERT INTO suministros (codigo, titular, verificado_en_utc) VALUES (?, ?, ?)",
+            "000102", "Otro titular ficticio", LocalDateTime.parse("2026-11-01T00:00:00"));
+        lectura("empresa-agua", "3", "000102", "2026-11-01T05:00:00", 9000);
+
+        var noviembre = LocalDate.parse("2026-11-01");
+        var tarifa = new VersionTarifaria("PROYECCION-PRUEBA", 1, "Demostracion", noviembre,
+            new BigDecimal("5.00"), new BigDecimal("18"), List.of(
+                tramoCosto("0", "10", "1.50", "0.50"), tramoCosto("10", null, "2.20", "0.80")));
+        tarifas.guardar(new HistorialTarifario("empresa-agua", new CodigoSuministro("000101"), List.of(
+            new HistorialTarifario.Asignacion(tarifa, null, noviembre, null))), AHORA);
+
+        var resultado = consultarJson(PROYECCION + "?codigoSuministro=000102", sesion);
+        assertEquals("000101", resultado.path("codigoSuministro").stringValue());
+        assertEquals("America/Lima", resultado.path("zonaHoraria").stringValue());
+        assertEquals("2026-11", resultado.path("periodo").stringValue());
+        assertEquals(AHORA.toString(), resultado.path("calculadoEn").stringValue());
+        assertEquals("PROYECTADO", resultado.path("estado").stringValue());
+        assertEquals("RITMO_PROMEDIO_CONSTANTE", resultado.at("/supuestos/metodo").stringValue());
+        assertEquals(86400, resultado.at("/supuestos/minimoObservadoSegundos").intValue());
+        assertEquals("4000", resultado.at("/observado/litros").stringValue());
+        assertEquals("2026-11-11T05:00:00Z", resultado.at("/observado/hasta").stringValue());
+        assertEquals("864000", resultado.at("/proyeccion/segundosObservados").stringValue());
+        assertEquals("2592000", resultado.at("/proyeccion/segundosDelMes").stringValue());
+        assertEquals("12000", resultado.at("/proyeccion/litros").stringValue());
+        assertEquals("12.000", resultado.at("/proyeccion/metrosCubicos").stringValue());
+        assertEquals("400.000", resultado.at("/proyeccion/promedioLitrosPorDia").stringValue());
+        assertEquals("ESTIMADO", resultado.at("/costoProyectado/estado").stringValue());
+        assertEquals("1", resultado.at("/costoProyectado/revisionTarifaria").stringValue());
+        assertEquals("2.000", resultado.at("/costoProyectado/desglose/tramos/1/volumenM3").stringValue());
+        assertEquals("5.00", resultado.at("/costoProyectado/desglose/cargoFijo").stringValue());
+        assertEquals("36.58", resultado.at("/costoProyectado/desglose/totalEstimado").stringValue());
+        assertEquals(1, llamadasAgua.get());
+        assertEquals(1, llamadasIdentidad.get());
+        enviar("DELETE", CONSULTA + "/sesion", null, sesion, 204);
+        enviar("GET", PROYECCION, null, sesion, 401);
+    }
+
+    @Test
+    void proyeccionDistingueFaltaDeLecturasDeFaltaDeTarifaYConceptos() throws Exception {
+        String sesion = token(enviar("POST", CONSULTA + "/sesiones", SOLICITUD, null, 201));
+        var sinLecturas = consultarJson(PROYECCION, sesion);
+        assertEquals("SIN_CONSUMO_CALCULABLE", sinLecturas.path("estado").stringValue());
+        assertTrue(sinLecturas.path("proyeccion").isNull());
+        assertTrue(sinLecturas.path("costoProyectado").isNull());
+
+        incorporarLectura("1", "2026-11-01T05:00:00Z", 100);
+        incorporarLectura("2", "2026-11-01T15:00:00Z", 130);
+        var pocoTiempo = consultarJson(PROYECCION, sesion);
+        assertEquals("TIEMPO_INSUFICIENTE", pocoTiempo.path("estado").stringValue());
+        assertEquals("30", pocoTiempo.at("/observado/litros").stringValue());
+        assertTrue(pocoTiempo.path("proyeccion").isNull());
+
+        incorporarLectura("3", "2026-11-10T05:00:00Z", 1995);
+        var sinTarifa = consultarJson(PROYECCION, sesion);
+        assertEquals("6317", sinTarifa.at("/proyeccion/litros").stringValue());
+        assertEquals("SIN_TARIFA_COMPATIBLE", sinTarifa.at("/costoProyectado/estado").stringValue());
+        assertTrue(sinTarifa.at("/costoProyectado/desglose").isNull());
+
+        var noviembre = LocalDate.parse("2026-11-01");
+        var mitad = noviembre.plusDays(14);
+        var tarifa = new VersionTarifaria("DOMESTICA", 1, "Demostracion", noviembre,
+            new BigDecimal("5.00"), null, List.of(tramoCosto("0", null, "1.50", null)));
+        var suministro = new CodigoSuministro("000101");
+        tarifas.guardar(new HistorialTarifario("empresa-agua", suministro, List.of(
+            new HistorialTarifario.Asignacion(tarifa, null, noviembre, mitad))), AHORA);
+        var vence = consultarJson(PROYECCION, sesion);
+        assertEquals("6317", vence.at("/proyeccion/litros").stringValue());
+        assertEquals("SIN_TARIFA_COMPATIBLE", vence.at("/costoProyectado/estado").stringValue());
+
+        tarifas.guardar(new HistorialTarifario("empresa-agua", suministro, List.of(
+            new HistorialTarifario.Asignacion(tarifa, null, noviembre, null))), AHORA);
+        var incompleto = consultarJson(PROYECCION, sesion);
+        assertEquals("6317", incompleto.at("/proyeccion/litros").stringValue());
+        assertEquals("CONCEPTOS_INCOMPLETOS", incompleto.at("/costoProyectado/estado").stringValue());
+        assertEquals("2", incompleto.at("/costoProyectado/revisionTarifaria").stringValue());
+        assertEquals("14.48", incompleto.at("/costoProyectado/desglose/subtotalConocido").stringValue());
+        assertTrue(incompleto.at("/costoProyectado/desglose/totalEstimado").isNull());
     }
 
     private static VersionTarifaria.Tramo tramoCosto(String desde, String hasta, String agua, String alcantarillado) {

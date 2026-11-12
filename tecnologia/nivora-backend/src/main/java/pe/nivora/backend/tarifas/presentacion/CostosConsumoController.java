@@ -1,6 +1,7 @@
 package pe.nivora.backend.tarifas.presentacion;
 
 import java.math.BigDecimal;
+import java.time.Duration;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.util.List;
@@ -19,19 +20,24 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 
 import pe.nivora.backend.acceso.infraestructura.seguridad.PrincipalConsulta;
+import pe.nivora.backend.lecturas.aplicacion.ConsultarConsumoActual.Actualizacion;
 import pe.nivora.backend.lecturas.dominio.ConsumoPeriodo;
 import pe.nivora.backend.lecturas.dominio.contratos.RepositorioLecturasNoDisponibleException;
 import pe.nivora.backend.lecturas.dominio.contratos.SuministroNoRegistradoException;
 import pe.nivora.backend.tarifas.aplicacion.ConsultarCostosConsumo;
+import pe.nivora.backend.tarifas.aplicacion.ConsultarProyeccionMensual;
 import pe.nivora.backend.tarifas.dominio.CostoEstimado;
 import pe.nivora.backend.tarifas.dominio.HistorialTarifario;
+import pe.nivora.backend.tarifas.dominio.ProyeccionMensual;
 
 @RestController
 public class CostosConsumoController {
     private final ConsultarCostosConsumo consulta;
+    private final ConsultarProyeccionMensual proyeccion;
 
-    public CostosConsumoController(ConsultarCostosConsumo consulta) {
+    public CostosConsumoController(ConsultarCostosConsumo consulta, ConsultarProyeccionMensual proyeccion) {
         this.consulta = consulta;
+        this.proyeccion = proyeccion;
     }
 
     @GetMapping(value = "/api/v1/acceso/consulta/costos", produces = MediaType.APPLICATION_JSON_VALUE)
@@ -45,14 +51,39 @@ public class CostosConsumoController {
                 periodo(resultado.actual()), anteriores));
     }
 
+    @GetMapping(value = "/api/v1/acceso/consulta/proyeccion", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<RespuestaProyeccion> proyectar(@AuthenticationPrincipal PrincipalConsulta principal) {
+        var resultado = proyeccion.ejecutar(principal.sesion().codigoSuministro());
+        var observado = resultado.observado();
+        var datos = resultado.proyeccion().datos();
+        var volumen = datos == null ? null : new VolumenProyectado(datos.litros().toString(),
+            decimal(datos.metrosCubicos()), decimal(datos.promedioLitrosPorDia()),
+            segundos(datos.duracionObservada()), segundos(datos.duracionMes()));
+        var estimacion = resultado.estimacion();
+        var costo = estimacion == null ? null : new CostoProyectado(estimacion.estado(),
+            estimacion.revisionTarifaria() == null ? null : estimacion.revisionTarifaria().toString(),
+            tarifa(estimacion.tarifa()), desglose(estimacion.costo()));
+        var supuestos = new Supuestos("RITMO_PROMEDIO_CONSTANTE", ProyeccionMensual.MINIMO_OBSERVADO.toSeconds());
+        return ResponseEntity.ok().cacheControl(CacheControl.noStore()).body(new RespuestaProyeccion(
+            observado.fuente(), observado.codigoSuministro(), "PEN", observado.periodo(), observado.zonaHoraria(),
+            observado.inicioMes(), observado.finMesExclusivo(), observado.consultadoEn(), supuestos,
+            resultado.proyeccion().estado(), consumo(observado.consumo()), observado.actualizacion(), volumen, costo));
+    }
+
     private static PeriodoCosto periodo(ConsultarCostosConsumo.Estimacion estimacion) {
         var periodo = estimacion.periodo();
-        var consumo = periodo.consumo();
-        var medicion = new Consumo(consumo.estado(), consumo.motivo(),
+        return new PeriodoCosto(periodo.periodo(), periodo.inicioMes(), periodo.finMesExclusivo(), estimacion.estado(),
+            consumo(periodo.consumo()), tarifa(estimacion.tarifa()), desglose(estimacion.costo()));
+    }
+
+    private static Consumo consumo(ConsumoPeriodo consumo) {
+        return new Consumo(consumo.estado(), consumo.motivo(),
             consumo.litros() == null ? null : consumo.litros().toString(), decimal(consumo.metrosCubicos()),
             consumo.desde(), consumo.hasta(), consumo.idMedidor(), consumo.idLecturaInicial(), consumo.idLecturaFinal());
-        return new PeriodoCosto(periodo.periodo(), periodo.inicioMes(), periodo.finMesExclusivo(), estimacion.estado(),
-            medicion, tarifa(estimacion.tarifa()), desglose(estimacion.costo()));
+    }
+
+    private static String segundos(Duration duracion) {
+        return BigDecimal.valueOf(duracion.toNanos(), 9).stripTrailingZeros().toPlainString();
     }
 
     private static Tarifa tarifa(HistorialTarifario.Asignacion asignacion) {
@@ -103,6 +134,19 @@ public class CostosConsumoController {
 
     public record PeriodoCosto(String periodo, Instant inicioMes, Instant finMesExclusivo,
             ConsultarCostosConsumo.Estado estado, Consumo consumo, Tarifa tarifa, Desglose desglose) {}
+
+    public record RespuestaProyeccion(String fuente, String codigoSuministro, String moneda,
+            String periodo, String zonaHoraria, Instant inicioMes, Instant finMesExclusivo, Instant calculadoEn,
+            Supuestos supuestos, ProyeccionMensual.Estado estado, Consumo observado, Actualizacion actualizacion,
+            VolumenProyectado proyeccion, CostoProyectado costoProyectado) {}
+
+    public record Supuestos(String metodo, long minimoObservadoSegundos) {}
+
+    public record VolumenProyectado(String litros, String metrosCubicos, String promedioLitrosPorDia,
+            String segundosObservados, String segundosDelMes) {}
+
+    public record CostoProyectado(ConsultarCostosConsumo.Estado estado, String revisionTarifaria,
+            Tarifa tarifa, Desglose desglose) {}
 
     public record Consumo(ConsumoPeriodo.Estado estado, ConsumoPeriodo.Motivo motivo, String litros,
             String metrosCubicos, Instant desde, Instant hasta, String idMedidor, String idLecturaInicial,

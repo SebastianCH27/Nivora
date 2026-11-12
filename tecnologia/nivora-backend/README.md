@@ -19,7 +19,7 @@ El puerto 8080 esta ocupado por Jenkins en el equipo de desarrollo.
 |---|---|---|
 | `acceso` | Acceso y suministros | Suministros, consulta de DNI mediante APIsPERU, sesiones de consulta y administrativas, gestion de cuentas y supervision protegida. |
 | `lecturas` | Lecturas, consumo e historial | Recuperacion manual y automatica con corte e inventario persistidos y API local de supervision; calculos pendientes. |
-| `tarifas` | Tarifas, costos y proyecciones | Pendiente de implementar. |
+| `tarifas` | Tarifas, costos y proyecciones | Historial tarifario versionado, costos estimados y proyección al cierre del mes. |
 | `notificaciones` | Alertas y notificaciones | Pendiente de implementar. |
 | `recibos` | Recibos | Pendiente de implementar. |
 
@@ -180,8 +180,8 @@ no ejecuta cambios de estructura automaticamente.
 
 El backend incorpora la consulta externa de DNI y el almacenamiento propio
 de suministros y lecturas. Las sesiones de consulta registran accesos exitosos.
-Queda pendiente el almacenamiento de tarifas y recibos. La API local de
-supervision de lecturas consulta el estado propio.
+Nivora guarda las tarifas por suministro. Queda pendiente el almacenamiento
+de recibos. La API local de supervision de lecturas consulta el estado propio.
 
 La Empresa de Agua incorpora `GET /api/v1/suministros/{codigo}/lecturas`,
 con paginas de mediciones historicas identificadas, medidor, fecha UTC,
@@ -416,6 +416,14 @@ y de los meses anteriores con la versión tarifaria aplicable. Devuelve
 los tramos, el desglose de conceptos y la cobertura de las lecturas.
 El contrato y la prueba desde CMD están en
 [Costos estimados](documentacion/costos-estimados.md).
+
+## Proyección mensual
+
+`GET /api/v1/acceso/consulta/proyeccion` proyecta los litros y el costo
+al cierre del mes para el suministro de la sesión. Devuelve el consumo
+observado, la fecha de cálculo y el supuesto de ritmo constante.
+Consulta las reglas y la prueba desde CMD en
+[Proyección mensual](documentacion/proyeccion-mensual.md).
 
 ## Cuentas administrativas: primer paso del bloque 3
 
