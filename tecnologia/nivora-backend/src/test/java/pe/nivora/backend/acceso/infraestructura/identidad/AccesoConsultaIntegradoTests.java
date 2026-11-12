@@ -52,6 +52,7 @@ import pe.nivora.backend.lecturas.dominio.LecturaAcumulada;
 import pe.nivora.backend.lecturas.dominio.LoteLecturas;
 import pe.nivora.backend.lecturas.dominio.ResultadoIncorporacion;
 import pe.nivora.backend.lecturas.dominio.contratos.RepositorioLecturas;
+import pe.nivora.backend.notificaciones.aplicacion.EvaluarAlertaConsumo;
 import pe.nivora.backend.recibos.aplicacion.IncorporarRecibos;
 import pe.nivora.backend.recibos.aplicacion.SincronizarRecibos;
 import pe.nivora.backend.recibos.dominio.ReciboEmitido;
@@ -93,7 +94,8 @@ class AccesoConsultaIntegradoTests {
         "04-recuperacion-lecturas.sql", "05-contexto-recuperacion-lecturas.sql",
         "06-sincronizacion-lecturas.sql", "07-administradores.sql",
         "08-sesiones-administrativas.sql", "09-sesiones-consulta.sql", "10-tarifas.sql",
-        "11-gestion-tarifas.sql", "12-recibos.sql", "13-sincronizacion-recibos.sql");
+        "11-gestion-tarifas.sql", "12-recibos.sql", "13-sincronizacion-recibos.sql",
+        "14-alertas-consumo.sql");
 
     private static final Respuesta AGUA_OK = new Respuesta(200, "application/json",
         "{\"codigoSuministro\":\"000101\",\"titular\":\"Titular ficticio\"}");
@@ -117,6 +119,7 @@ class AccesoConsultaIntegradoTests {
     @Autowired private JsonMapper json;
     @Autowired private InicializarAdministracion inicializar;
     @Autowired private RepositorioLecturas repositorioLecturas;
+    @Autowired private EvaluarAlertaConsumo evaluarAlertaConsumo;
     @Autowired private RepositorioTarifas tarifas;
     @Autowired private IncorporarTarifas incorporarTarifas;
     @Autowired private RepositorioRecibos recibos;
@@ -160,7 +163,8 @@ class AccesoConsultaIntegradoTests {
                 "control_incorporacion_lecturas",
                 "contexto_recuperacion_lecturas", "progreso_recuperacion_lecturas",
                 "programacion_sincronizacion_lecturas", "tarifas_asignaciones", "tarifas_historiales",
-                "tarifas_versiones", "programacion_sincronizacion_recibos", "recibos", "suministros")) {
+                "tarifas_versiones", "programacion_sincronizacion_recibos", "recibos",
+                "alertas_consumo", "suministros")) {
             jdbc.execute("DELETE FROM " + tabla);
         }
         agua.set(AGUA_OK);
@@ -1093,6 +1097,63 @@ class AccesoConsultaIntegradoTests {
 
     private JsonNode consultarJson(String ruta, String sesion) throws Exception {
         return json.readTree(enviar("GET", ruta, null, sesion, 200).body());
+    }
+
+    @Test
+    void alertaSoloAlSuperarElMesAnteriorYConservaLaPrimeraDeteccion() throws Exception {
+        enviar("POST", CONSULTA + "/sesiones", SOLICITUD, null, 201);
+        var suministro = new CodigoSuministro("000101");
+        incorporarLectura("1", "2026-10-01T05:00:00Z", 100);
+        incorporarLectura("2", "2026-11-01T05:00:00Z", 2100);
+        incorporarLectura("3", "2026-11-10T05:00:00Z", 4100);
+        assertEquals(EvaluarAlertaConsumo.Estado.NO_SUPERA, evaluarAlertaConsumo.ejecutar(suministro).estado());
+        assertEquals(0, jdbc.queryForObject("SELECT COUNT(*) FROM alertas_consumo", Integer.class));
+
+        incorporarLectura("4", "2026-11-11T05:00:00Z", 4200);
+        var alerta = evaluarAlertaConsumo.ejecutar(suministro);
+        assertEquals(YearMonth.of(2026, 11), alerta.periodo());
+        assertEquals(EvaluarAlertaConsumo.Estado.GENERADA, alerta.estado());
+
+        instantePrueba.set(AHORA.plusSeconds(60));
+        incorporarLectura("5", "2026-11-11T06:00:00Z", 4300);
+        assertEquals(EvaluarAlertaConsumo.Estado.YA_REGISTRADA, evaluarAlertaConsumo.ejecutar(suministro).estado());
+        assertEquals(2100L, jdbc.queryForObject("SELECT consumo_actual_litros FROM alertas_consumo", Long.class));
+        assertEquals(2000L, jdbc.queryForObject("SELECT consumo_anterior_litros FROM alertas_consumo", Long.class));
+        assertEquals(LocalDateTime.ofInstant(AHORA, ZoneOffset.UTC),
+            jdbc.queryForObject("SELECT detectada_en_utc FROM alertas_consumo", LocalDateTime.class));
+
+        instantePrueba.set(Instant.parse("2026-12-11T13:00:00Z"));
+        incorporarLectura("6", "2026-12-01T05:00:00Z", 4600);
+        incorporarLectura("7", "2026-12-11T05:00:00Z", 7101);
+        var siguiente = evaluarAlertaConsumo.ejecutar(suministro);
+        assertEquals(YearMonth.of(2026, 12), siguiente.periodo());
+        assertEquals(EvaluarAlertaConsumo.Estado.GENERADA, siguiente.estado());
+        assertEquals(2, jdbc.queryForObject("SELECT COUNT(*) FROM alertas_consumo", Integer.class));
+    }
+
+    @Test
+    void alertaRequiereCoberturaCompletaDelMesAnterior() throws Exception {
+        enviar("POST", CONSULTA + "/sesiones", SOLICITUD, null, 201);
+        var suministro = new CodigoSuministro("000101");
+        incorporarLectura("1", "2026-10-02T05:00:00Z", 100);
+        incorporarLectura("2", "2026-11-01T05:00:00Z", 2100);
+        incorporarLectura("3", "2026-11-11T05:00:00Z", 4300);
+
+        assertEquals(EvaluarAlertaConsumo.Estado.SIN_DATOS_COMPARABLES,
+            evaluarAlertaConsumo.ejecutar(suministro).estado());
+        assertEquals(0, jdbc.queryForObject("SELECT COUNT(*) FROM alertas_consumo", Integer.class));
+    }
+
+    @Test
+    void alertaPuedeCompararConUnMesCompletoDeConsumoCero() throws Exception {
+        enviar("POST", CONSULTA + "/sesiones", SOLICITUD, null, 201);
+        var suministro = new CodigoSuministro("000101");
+        incorporarLectura("1", "2026-10-01T05:00:00Z", 100);
+        incorporarLectura("2", "2026-11-01T05:00:00Z", 100);
+        incorporarLectura("3", "2026-11-11T05:00:00Z", 101);
+
+        assertEquals(EvaluarAlertaConsumo.Estado.GENERADA, evaluarAlertaConsumo.ejecutar(suministro).estado());
+        assertEquals(0L, jdbc.queryForObject("SELECT consumo_anterior_litros FROM alertas_consumo", Long.class));
     }
 
     private void incorporarLectura(String id, String fecha, long litros) {
