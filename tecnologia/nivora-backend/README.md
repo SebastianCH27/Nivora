@@ -21,7 +21,7 @@ El puerto 8080 esta ocupado por Jenkins en el equipo de desarrollo.
 | `lecturas` | Lecturas, consumo e historial | Recuperacion manual y automatica con corte e inventario persistidos y API local de supervision; calculos pendientes. |
 | `tarifas` | Tarifas, costos y proyecciones | Historial versionado, gestión administrativa de vigencias, costos estimados y proyección mensual. |
 | `notificaciones` | Alertas y notificaciones | Pendiente de implementar. |
-| `recibos` | Recibos | Lectura y validación de recibos emitidos por Empresa de Agua. |
+| `recibos` | Recibos | Lectura, validación y almacenamiento local de recibos emitidos por Empresa de Agua. |
 
 Las capas de cada modulo se incorporaran cuando se implementen sus
 responsabilidades: dominio, aplicacion, infraestructura y presentacion.
@@ -180,8 +180,8 @@ no ejecuta cambios de estructura automaticamente.
 
 El backend incorpora la consulta externa de DNI y el almacenamiento propio
 de suministros y lecturas. Las sesiones de consulta registran accesos exitosos.
-Nivora guarda las tarifas por suministro. Queda pendiente el almacenamiento
-de recibos. La API local de supervision de lecturas consulta el estado propio.
+Nivora guarda las tarifas y los recibos por suministro. La API local de
+supervision de lecturas consulta el estado propio.
 
 La Empresa de Agua incorpora `GET /api/v1/suministros/{codigo}/lecturas`,
 con paginas de mediciones historicas identificadas, medidor, fecha UTC,
@@ -442,6 +442,11 @@ Nivora consulta el historial de recibos disponible en Empresa de Agua y
 conserva en la respuesta de la integración el importe y las fechas de
 cada recibo emitido. El contrato y el comando de comprobación están en
 [Fuente de recibos](documentacion/fuente-recibos.md).
+
+Aplica `base-datos/12-recibos.sql` para guardar los recibos en Nivora.
+La importación conserva una copia por suministro y mes. Los pasos y la
+consulta de comprobación están en
+[Almacenamiento de recibos](documentacion/almacenamiento-recibos.md).
 
 ## Cuentas administrativas: primer paso del bloque 3
 
