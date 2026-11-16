@@ -52,6 +52,7 @@ import pe.nivora.backend.lecturas.dominio.LecturaAcumulada;
 import pe.nivora.backend.lecturas.dominio.LoteLecturas;
 import pe.nivora.backend.lecturas.dominio.ResultadoIncorporacion;
 import pe.nivora.backend.lecturas.dominio.contratos.RepositorioLecturas;
+import pe.nivora.backend.lecturas.dominio.contratos.RepositorioSincronizacion;
 import pe.nivora.backend.notificaciones.aplicacion.ConfigurarNotificaciones;
 import pe.nivora.backend.notificaciones.aplicacion.EvaluarAlertaConsumo;
 import pe.nivora.backend.notificaciones.aplicacion.GenerarAvisosRecibo;
@@ -130,6 +131,7 @@ class AccesoConsultaIntegradoTests {
     @Autowired private JsonMapper json;
     @Autowired private InicializarAdministracion inicializar;
     @Autowired private RepositorioLecturas repositorioLecturas;
+    @Autowired private RepositorioSincronizacion programacionLecturas;
     @Autowired private EvaluarAlertaConsumo evaluarAlertaConsumo;
     @Autowired private GenerarAvisosRecibo generarAvisosRecibo;
     @Autowired private RepositorioConfiguracionNotificaciones configuracionNotificaciones;
@@ -1102,6 +1104,84 @@ class AccesoConsultaIntegradoTests {
     }
 
     @Test
+    void reintentoRequierePermisoYValidaElSuministroYElProceso() throws Exception {
+        String ruta = SUPERVISION_RECIBOS + "/reintentos";
+        enviar("POST", ruta, null, null, 401);
+        var consulta = token(enviar("POST", CONSULTA + "/sesiones", SOLICITUD, null, 201));
+        enviar("POST", ruta, null, consulta, 401);
+        var admin = iniciarAdminTarifas();
+        enviar("POST", "/api/v1/supervision/suministros/000999/recibos/reintentos", null, admin, 404);
+        enviar("POST", "/api/v1/supervision/suministros/000101/tarifas/reintentos", null, admin, 400);
+        enviar("POST", "/api/v1/supervision/suministros/abc/recibos/reintentos", null, admin, 400);
+        jdbc.execute("DROP TABLE programacion_sincronizacion_recibos");
+        enviar("POST", ruta, null, admin, 503);
+        jdbc.update("UPDATE administradores SET cambio_clave_requerido = TRUE WHERE usuario = 'admin'");
+        enviar("POST", ruta, null, admin, 403);
+    }
+
+    @Test
+    void reintentoDeRecibosAdelantaSoloSuCalendarioYConservaElUltimoResultado() throws Exception {
+        enviar("POST", CONSULTA + "/sesiones", SOLICITUD, null, 201);
+        var admin = iniciarAdminTarifas();
+        jdbc.update("INSERT INTO suministros VALUES ('000102', 'Otro suministro', '2026-11-11 13:00:00')");
+        jdbc.update("""
+            INSERT INTO programacion_sincronizacion_recibos
+                (fuente, codigo_suministro, proximo_intento_utc, fallos_consecutivos, ultimo_resultado)
+            VALUES ('empresa-agua', '000101', '2026-11-11 13:05:00', 2, 'ERROR_FUENTE'),
+                   ('empresa-agua', '000102', '2026-11-11 13:10:00', 1, 'ERROR_FUENTE')
+            """);
+        var ruta = SUPERVISION_RECIBOS + "/reintentos";
+        var aceptada = enviar("POST", ruta, null, admin, 202);
+        assertEquals(SUPERVISION_RECIBOS, aceptada.headers().firstValue("Location").orElseThrow());
+        assertEquals("no-store", aceptada.headers().firstValue("Cache-Control").orElseThrow());
+        var datos = json.readTree(aceptada.body());
+        assertEquals("000101", datos.path("codigoSuministro").stringValue());
+        assertEquals("RECIBOS", datos.path("proceso").stringValue());
+        assertEquals("PROGRAMADO", datos.path("estado").stringValue());
+        assertEquals(AHORA.toString(), datos.path("proximoIntento").stringValue());
+
+        instantePrueba.set(AHORA.plusSeconds(10));
+        var repetida = enviar("POST", ruta, null, admin, 202);
+        assertEquals(datos, json.readTree(repetida.body()));
+        var calendario = consultarJson(SUPERVISION_RECIBOS, admin).path("programacion");
+        assertEquals("ERROR_FUENTE", calendario.path("ultimoResultado").stringValue());
+        assertEquals(2, calendario.path("fallosConsecutivos").intValue());
+        assertEquals(AHORA.toString(), calendario.path("proximoIntento").stringValue());
+        var otro = consultarJson("/api/v1/supervision/suministros/000102/recibos", admin);
+        assertEquals("2026-11-11T13:10:00Z", otro.at("/programacion/proximoIntento").stringValue());
+        assertEquals(0, llamadasRecibos.get());
+    }
+
+    @Test
+    void reintentoDeLecturasRespetaElBloqueoYLaReservaDelTrabajador() throws Exception {
+        enviar("POST", CONSULTA + "/sesiones", SOLICITUD, null, 201);
+        var admin = iniciarAdminTarifas();
+        jdbc.update("""
+            INSERT INTO progreso_recuperacion_lecturas
+                (fuente, codigo_suministro, cursor_confirmado, revision, estado, actualizado_en_utc)
+            VALUES ('empresa-agua', '000101', '0', 1, 'BLOQUEADO', '2026-11-11 13:00:00')
+            """);
+        var ruta = SUPERVISION + "/reintentos";
+        var bloqueada = enviar("POST", ruta, null, admin, 409);
+        assertEquals("Recorrido de lecturas bloqueado", json.readTree(bloqueada.body()).path("title").stringValue());
+        assertEquals(0, jdbc.queryForObject("SELECT COUNT(*) FROM programacion_sincronizacion_lecturas",
+            Integer.class));
+        jdbc.update("UPDATE progreso_recuperacion_lecturas SET estado = 'PENDIENTE'");
+        var aceptada = enviar("POST", ruta, null, admin, 202);
+        assertEquals("LECTURAS", json.readTree(aceptada.body()).path("proceso").stringValue());
+        assertEquals("PENDIENTE", jdbc.queryForObject("SELECT estado FROM progreso_recuperacion_lecturas", String.class));
+
+        var reserva = programacionLecturas.reservar("empresa-agua", AHORA, AHORA, Duration.ofSeconds(60)).orElseThrow();
+        var enCurso = enviar("POST", ruta, null, admin, 409);
+        assertEquals("Sincronizacion en curso", json.readTree(enCurso.body()).path("title").stringValue());
+        assertTrue(programacionLecturas.reservar("empresa-agua", AHORA, AHORA, Duration.ofSeconds(60)).isEmpty());
+        instantePrueba.set(reserva.venceEn());
+        enviar("POST", ruta, null, admin, 202);
+        assertTrue(programacionLecturas.reservar("empresa-agua", reserva.venceEn(), reserva.venceEn(),
+            Duration.ofSeconds(60)).isPresent());
+    }
+
+    @Test
     void incidenciasConservaEmpatesAlPaginarYAislaCadaSuministro() throws Exception {
         enviar("POST", CONSULTA + "/sesiones", SOLICITUD, null, 201);
         var admin = iniciarAdminTarifas();
@@ -1294,18 +1374,19 @@ class AccesoConsultaIntegradoTests {
         assertEquals(pagina, consultarJson(RECIBOS + "?limite=1", sesion));
 
         recibosProveedor.set(emitidos);
-        instantePrueba.set(fallo.proximoIntento());
+        var reintento = enviar("POST", SUPERVISION_RECIBOS + "/reintentos", null, admin, 202);
+        assertEquals(primera.proximoIntento().toString(), json.readTree(reintento.body()).path("proximoIntento").stringValue());
         var recuperado = sincronizar.ejecutarCiclo().getFirst();
         assertEquals(RepositorioSincronizacionRecibos.Estado.ACTUALIZADO, recuperado.estado());
         assertEquals(new RepositorioRecibos.Incorporacion(0, 2), recuperado.incorporacion());
         var supervisionRecuperada = consultarJson(SUPERVISION_RECIBOS, admin);
         assertEquals(almacenamiento, supervisionRecuperada.path("almacenamiento"));
         assertEquals(0, supervisionRecuperada.at("/programacion/fallosConsecutivos").intValue());
-        assertEquals(fallo.proximoIntento().toString(), supervisionRecuperada.at("/programacion/ultimoExito").stringValue());
+        assertEquals(primera.proximoIntento().toString(), supervisionRecuperada.at("/programacion/ultimoExito").stringValue());
         var cerradas = consultarJson(INCIDENCIAS, admin).path("incidencias");
         assertEquals(1, cerradas.size());
         assertEquals("RESUELTA", cerradas.get(0).path("estado").stringValue());
-        assertEquals(fallo.proximoIntento().toString(), cerradas.get(0).path("ultimaResolucion").stringValue());
+        assertEquals(primera.proximoIntento().toString(), cerradas.get(0).path("ultimaResolucion").stringValue());
         assertEquals(pagina, consultarJson(RECIBOS + "?limite=1", sesion));
         assertEquals(septiembre, consultarJson(RECIBOS + "?limite=1&antesDe=2026-10", sesion));
         assertEquals(2, recibos.buscarRecientes(new CodigoSuministro("000101"), 60).size());

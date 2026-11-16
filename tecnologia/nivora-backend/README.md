@@ -22,7 +22,7 @@ El puerto 8080 esta ocupado por Jenkins en el equipo de desarrollo.
 | `tarifas` | Tarifas, costos y proyecciones | Historial versionado, gestión administrativa de vigencias, costos estimados y proyección mensual. |
 | `notificaciones` | Alertas y notificaciones | Registra y consulta avisos, guarda marcas de lectura y configura las preferencias por dispositivo y la evaluación de consumo. |
 | `recibos` | Recibos | Importación, sincronización automática y consulta de recibos por suministro. |
-| `integracion` | Incidencias de integración | Consulta administrativa de incidencias de lecturas y recibos por suministro. |
+| `integracion` | Supervisión de integración | Consulta de incidencias y programación administrativa de reintentos de lecturas y recibos por suministro. |
 
 Las capas de cada modulo se incorporaran cuando se implementen sus
 responsabilidades: dominio, aplicacion, infraestructura y presentacion.
@@ -471,6 +471,10 @@ Los administradores con permiso de supervisión pueden consultar las incidencias
 de lecturas y recibos en `GET /api/v1/supervision/suministros/{codigo}/incidencias`.
 El contrato y el comando de comprobación están en
 [Incidencias de integración](documentacion/incidencias-integracion.md).
+
+El permiso `REINTENTAR_INTEGRACION` permite adelantar la sincronización de
+lecturas o recibos para un suministro. Las rutas y la comprobación están en
+[Reintentos de integración](documentacion/reintentos-integracion.md).
 
 ## Alerta de consumo
 

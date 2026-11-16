@@ -76,6 +76,8 @@ public class SeguridadConfiguracion {
                     .hasAuthority("GESTIONAR_ALERTAS")
                 .requestMatchers(HttpMethod.PUT, "/api/v1/administracion/notificaciones/alertas-consumo")
                     .hasAuthority("GESTIONAR_ALERTAS")
+                .requestMatchers(HttpMethod.POST, "/api/v1/supervision/suministros/*/*/reintentos")
+                    .hasAuthority("REINTENTAR_INTEGRACION")
                 .requestMatchers("/api/v1/supervision/**").hasAuthority("SUPERVISAR_INTEGRACION")
                 .anyRequest().denyAll())
             .exceptionHandling(e -> e
