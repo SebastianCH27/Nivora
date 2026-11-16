@@ -66,6 +66,22 @@
 			<version>1.86</version>
 		</dependency>
 		<dependency>
+			<groupId>nl.martijndwars</groupId>
+			<artifactId>web-push</artifactId>
+			<version>5.1.2</version>
+			<exclusions>
+				<exclusion><groupId>org.bouncycastle</groupId><artifactId>bcprov-jdk15on</artifactId></exclusion>
+				<exclusion><groupId>org.apache.httpcomponents</groupId><artifactId>httpasyncclient</artifactId></exclusion>
+				<exclusion><groupId>org.asynchttpclient</groupId><artifactId>async-http-client</artifactId></exclusion>
+				<exclusion><groupId>com.beust</groupId><artifactId>jcommander</artifactId></exclusion>
+			</exclusions>
+		</dependency>
+		<dependency>
+			<groupId>org.bitbucket.b_c</groupId>
+			<artifactId>jose4j</artifactId>
+			<version>0.9.7</version>
+		</dependency>
+		<dependency>
 			<groupId>com.h2database</groupId>
 			<artifactId>h2</artifactId>
 			<scope>test</scope>

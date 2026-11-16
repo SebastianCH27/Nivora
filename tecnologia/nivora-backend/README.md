@@ -490,6 +490,14 @@ puede guardar una preferencia por dispositivo y suministro. Una sesión con
 la API. El contrato está en
 [Configuración de notificaciones](documentacion/configuracion-notificaciones.md).
 
+## Entrega de notificaciones con Web Push
+
+Aplica `base-datos/18-entregas-web-push.sql`. La página `/web-push.html`
+registra la suscripción del navegador y su service worker. Nivora guarda
+las entregas y reintenta los fallos temporales. El envío se habilita con
+las claves VAPID del servidor. Consulta
+[Web Push](documentacion/web-push.md) para prepararlas y probar el registro.
+
 ## Cuentas administrativas: primer paso del bloque 3
 
 `InicializarAdministracion` prepara la primera cuenta activa, con permiso

@@ -33,11 +33,14 @@ public class SeguridadConfiguracion {
                     "/api/v1/acceso/consulta/proyeccion",
                     "/api/v1/acceso/consulta/recibos",
                     "/api/v1/acceso/consulta/notificaciones",
-                    "/api/v1/acceso/consulta/notificaciones/dispositivos/*").hasRole("CONSULTA")
+                    "/api/v1/acceso/consulta/notificaciones/dispositivos/*",
+                    "/api/v1/acceso/consulta/notificaciones/web-push/clave-publica").hasRole("CONSULTA")
                 .requestMatchers(HttpMethod.PUT,
                     "/api/v1/acceso/consulta/notificaciones/*/leida",
-                    "/api/v1/acceso/consulta/notificaciones/dispositivos/*").hasRole("CONSULTA")
-                .requestMatchers(HttpMethod.DELETE, "/api/v1/acceso/consulta/sesion").hasRole("CONSULTA")
+                    "/api/v1/acceso/consulta/notificaciones/dispositivos/*",
+                    "/api/v1/acceso/consulta/notificaciones/dispositivos/*/suscripcion").hasRole("CONSULTA")
+                .requestMatchers(HttpMethod.DELETE, "/api/v1/acceso/consulta/sesion",
+                    "/api/v1/acceso/consulta/notificaciones/dispositivos/*/suscripcion").hasRole("CONSULTA")
                 .anyRequest().denyAll())
             .exceptionHandling(e -> e
                 .authenticationEntryPoint((q, r, x) -> errores.escribir(q, r, 401,
@@ -57,6 +60,7 @@ public class SeguridadConfiguracion {
                 .dispatcherTypeMatchers(DispatcherType.ERROR).permitAll()
                 .requestMatchers(HttpMethod.GET, "/actuator/health", "/actuator/health/**").permitAll()
                 .requestMatchers(HttpMethod.HEAD, "/actuator/health", "/actuator/health/**").permitAll()
+                .requestMatchers(HttpMethod.GET, "/web-push.html", "/web-push.js", "/web-push-sw.js").permitAll()
                 .requestMatchers(HttpMethod.POST, "/api/v1/acceso/administradores/sesiones").permitAll()
                 .requestMatchers(HttpMethod.PUT, "/api/v1/acceso/administradores/sesion/clave").hasRole("ADMIN")
                 .requestMatchers("/api/v1/acceso/administradores/sesion").hasRole("ADMIN")

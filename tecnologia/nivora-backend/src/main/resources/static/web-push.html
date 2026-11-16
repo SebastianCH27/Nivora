@@ -1,0 +1,47 @@
+<!doctype html>
+<html lang="es">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; style-src 'self' 'unsafe-inline'; form-action 'none'">
+    <title>Notificaciones de Nivora</title>
+    <style>
+        body { margin: 0; background: #eef4f7; color: #193344; font: 1rem/1.55 Inter, system-ui, sans-serif; }
+        main { max-width: 30rem; margin: 9vh auto; padding: 2rem; background: white; border: 1px solid #cadbe4;
+            border-radius: 1rem; }
+        h1 { font-size: 1.65rem; line-height: 1.2; margin: 0 0 1.5rem; }
+        label { display: block; margin-top: 1rem; font-weight: 600; }
+        input { box-sizing: border-box; width: 100%; padding: .65rem; margin-top: .3rem; font: inherit;
+            border: 1px solid #7d9eaf; border-radius: .35rem; }
+        .acciones { display: flex; flex-wrap: wrap; gap: .6rem; margin-top: 1.5rem; }
+        button { font: inherit; cursor: pointer; padding: .55rem .9rem; border: 1px solid #146175;
+            border-radius: .4rem; background: #146175; color: white; }
+        button[value="desactivar"] { background: white; color: #146175; }
+        [hidden] { display: none !important; }
+        button:disabled { opacity: .65; cursor: wait; }
+        output { display: block; margin-top: 1rem; }
+        @media (max-width: 36rem) { main { margin: 1rem; padding: 1.25rem; } }
+    </style>
+    <script src="/web-push.js" defer></script>
+</head>
+<body>
+<main>
+    <h1>Notificaciones de Nivora</h1>
+    <form id="notificaciones" method="post">
+        <label for="codigo">Código de suministro</label>
+        <input id="codigo" name="codigo" type="text" inputmode="numeric" pattern="[0-9]{1,20}" maxlength="20" required>
+        <label for="dni">DNI</label>
+        <input id="dni" name="dni" type="password" inputmode="numeric" pattern="[0-9]{8}" maxlength="8" autocomplete="off" required>
+        <div class="acciones">
+            <button type="submit" value="activar">Activar avisos</button>
+            <button type="submit" value="desactivar">Desactivar avisos</button>
+        </div>
+    </form>
+    <div id="confirmacion" class="acciones" hidden>
+        <button id="confirmar" type="button">Confirmar activación</button>
+        <button id="cancelar" type="button">Cancelar</button>
+    </div>
+    <output id="estado" role="status" aria-live="polite"></output>
+</main>
+</body>
+</html>
