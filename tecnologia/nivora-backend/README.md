@@ -483,6 +483,10 @@ El permiso `REINTENTAR_INTEGRACION` permite adelantar la sincronización de
 lecturas o recibos para un suministro. Las rutas y la comprobación están en
 [Reintentos de integración](documentacion/reintentos-integracion.md).
 
+El recorrido de administración, calendario y recuperación de lecturas y
+recibos está documentado en
+[Verificación del bloque administrativo](documentacion/verificacion-administracion.md).
+
 ## Alerta de consumo
 
 Aplica `base-datos/14-alertas-consumo.sql`. Tras completar la sincronización

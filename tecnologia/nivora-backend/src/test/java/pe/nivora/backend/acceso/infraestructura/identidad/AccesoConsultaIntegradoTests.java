@@ -18,6 +18,7 @@ import java.time.YearMonth;
 import java.time.ZoneId;
 import java.time.ZoneOffset;
 import java.util.List;
+import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
 
@@ -48,6 +49,10 @@ import tools.jackson.databind.json.JsonMapper;
 import pe.nivora.backend.acceso.aplicacion.InicializarAdministracion;
 import pe.nivora.backend.acceso.dominio.CodigoSuministro;
 import pe.nivora.backend.acceso.dominio.contratos.FuenteIdentidad;
+import pe.nivora.backend.lecturas.aplicacion.PoliticaSincronizacion;
+import pe.nivora.backend.lecturas.aplicacion.RecuperarLecturasConCorte;
+import pe.nivora.backend.lecturas.aplicacion.SincronizarLecturas;
+import pe.nivora.backend.lecturas.dominio.EstadoSincronizacion;
 import pe.nivora.backend.lecturas.dominio.LecturaAcumulada;
 import pe.nivora.backend.lecturas.dominio.LoteLecturas;
 import pe.nivora.backend.lecturas.dominio.ResultadoIncorporacion;
@@ -116,6 +121,13 @@ class AccesoConsultaIntegradoTests {
     private static final Respuesta IDENTIDAD_OK = new Respuesta(200, "application/json",
         "{\"dni\":\"00000001\",\"nombres\":\"Persona\",\"apellidoPaterno\":\"Ficticia\"}");
     private static final Respuesta CAIDA = new Respuesta(503, "application/json", "{}");
+    private static final Respuesta PRIMERA_PAGINA_LECTURAS = new Respuesta(200, "application/json", """
+        {"fuente":"empresa-agua","codigoSuministro":"000101","tipoMedicion":"ACUMULADA","unidad":"L",
+         "lecturas":[{"idLectura":"1","idMedidor":"1","fechaMedicion":"2026-11-01T05:00:00Z","valorLitros":100}],
+         "hayMas":true,"siguienteDespuesDe":"1"}
+        """);
+    private static final AtomicReference<Respuesta> paginaLecturasPendiente = new AtomicReference<>(CAIDA);
+    private static final List<String> consultasPaginasLecturas = new CopyOnWriteArrayList<>();
     private static final AtomicReference<Respuesta> agua = new AtomicReference<>(AGUA_OK);
     private static final AtomicReference<Respuesta> tarifasProveedor = new AtomicReference<>(CAIDA);
     private static final AtomicReference<Respuesta> recibosProveedor = new AtomicReference<>(CAIDA);
@@ -134,6 +146,7 @@ class AccesoConsultaIntegradoTests {
     @Autowired private InicializarAdministracion inicializar;
     @Autowired private RepositorioLecturas repositorioLecturas;
     @Autowired private RepositorioSincronizacion programacionLecturas;
+    @Autowired private RecuperarLecturasConCorte recuperarLecturas;
     @Autowired private EvaluarAlertaConsumo evaluarAlertaConsumo;
     @Autowired private GenerarAvisosRecibo generarAvisosRecibo;
     @Autowired private RepositorioConfiguracionNotificaciones configuracionNotificaciones;
@@ -189,6 +202,8 @@ class AccesoConsultaIntegradoTests {
             jdbc.execute("DELETE FROM " + tabla);
         }
         agua.set(AGUA_OK);
+        paginaLecturasPendiente.set(CAIDA);
+        consultasPaginasLecturas.clear();
         tarifasProveedor.set(CAIDA);
         recibosProveedor.set(CAIDA);
         identidad.set(IDENTIDAD_OK);
@@ -1107,6 +1122,106 @@ class AccesoConsultaIntegradoTests {
     }
 
     @Test
+    void flujoAdministrativoRecuperaLecturasYRecibosConCalendarioPublicado() throws Exception {
+        var administrador = iniciarAdminTarifas();
+        var regla = json.readTree(enviar("PUT", PERIODOS, reglaPeriodo(0, "2026-12", 5), administrador, 200).body());
+        assertEquals("1", regla.path("revision").stringValue());
+        assertEquals("admin", regla.path("publicadaPor").stringValue());
+
+        var diaDePrueba = Instant.parse("2026-12-02T13:00:00Z");
+        instantePrueba.set(diaDePrueba);
+        enviar("GET", PERIODOS, null, administrador, 401);
+        var admin = autenticarAdmin();
+        var consulta = token(enviar("POST", CONSULTA + "/sesiones", SOLICITUD, null, 201));
+        var calendario = consultarJson(PERIODOS, admin);
+        assertEquals("1", calendario.path("revision").stringValue());
+        assertEquals("2026-11", calendario.at("/actual/periodo").stringValue());
+        assertEquals("2026-12-05T05:00:00Z", calendario.at("/actual/finMesExclusivo").stringValue());
+        assertEquals("000101", consultarJson(REGISTROS, admin).at("/suministros/0/codigoSuministro").stringValue());
+        var accesos = enviar("GET", ACCESOS, null, admin, 200);
+        assertEquals("******01", json.readTree(accesos.body()).at("/accesos/0/dniEnmascarado").stringValue());
+        assertFalse(accesos.body().contains(DNI));
+        assertFalse(accesos.body().contains(consulta));
+
+        var reloj = new RelojPrueba(ZoneOffset.UTC);
+        var lecturas = new SincronizarLecturas("empresa-agua", programacionLecturas,
+            codigo -> recuperarLecturas.ejecutar(codigo, 1, 2),
+            new PoliticaSincronizacion(1, 1, 2, Duration.ofSeconds(60), Duration.ofSeconds(300),
+                Duration.ofSeconds(1), Duration.ofSeconds(30), Duration.ofSeconds(1800)), reloj);
+        var sincronizarRecibos = new SincronizarRecibos(programacionRecibos, incorporarRecibos,
+            new SincronizarRecibos.Politica(1, 60, Duration.ofSeconds(60),
+                Duration.ofSeconds(300), Duration.ofSeconds(30), Duration.ofSeconds(1800)), reloj);
+        var emitidos = new Respuesta(200, "application/json", """
+            {"codigoSuministro":"000101","moneda":"PEN","recibos":[
+              {"numeroRecibo":"EA-202611-000101","periodo":"2026-11-01","consumoLitros":5637,
+               "cargoFijo":5.00,"importeConsumo":8.46,"importeTotal":13.46,
+               "fechaDisponibilidad":"2026-12-01","fechaVencimiento":"2026-12-08","codigoTarifa":"DOMESTICA","versionTarifa":1}
+            ]}
+            """);
+        recibosProveedor.set(emitidos);
+        assertEquals(new RepositorioRecibos.Incorporacion(1, 0),
+            incorporarRecibos.ejecutar(new CodigoSuministro("000101"), 60).orElseThrow());
+        recibosProveedor.set(CAIDA);
+        agua.set(CAIDA);
+        identidad.set(CAIDA);
+
+        var falloLecturas = lecturas.ejecutarCiclo().getFirst();
+        var falloRecibos = sincronizarRecibos.ejecutarCiclo().getFirst();
+        assertEquals(EstadoSincronizacion.ERROR_FUENTE, falloLecturas.estado());
+        assertEquals(RepositorioSincronizacionRecibos.Estado.ERROR_FUENTE, falloRecibos.estado());
+        var lecturasDuranteCaida = consultarJson(SUPERVISION, admin);
+        assertEquals(1, lecturasDuranteCaida.at("/almacenamiento/lecturasGuardadas").intValue());
+        assertEquals("1", lecturasDuranteCaida.at("/recuperacion/cursorConfirmado").stringValue());
+        assertEquals("ERROR_FUENTE", consultarJson(SUPERVISION_RECIBOS, admin).at("/programacion/ultimoResultado").stringValue());
+        var abiertas = consultarJson(INCIDENCIAS, admin).path("incidencias");
+        assertEquals(2, abiertas.size());
+        assertTrue(abiertas.valueStream().allMatch(i -> "ABIERTA".equals(i.path("estado").stringValue())));
+        var reciboDuranteCaida = consultarJson(RECIBOS, consulta).at("/recibos/0");
+        assertEquals("13.46", reciboDuranteCaida.path("importeTotal").stringValue());
+        assertEquals("2026-12-01T05:00:00Z", reciboDuranteCaida.at("/periodoFacturado/finExclusivo").stringValue());
+        assertEquals("2026-12-05T05:00:00Z", reciboDuranteCaida.at("/periodoAnalisis/finExclusivo").stringValue());
+        assertFalse(reciboDuranteCaida.path("coincideConPeriodoAnalisis").booleanValue());
+        enviar("POST", SUPERVISION + "/reintentos", null, consulta, 401);
+        enviar("POST", SUPERVISION_RECIBOS + "/reintentos", null, consulta, 401);
+        assertTrue(lecturas.ejecutarCiclo().isEmpty());
+        assertTrue(sincronizarRecibos.ejecutarCiclo().isEmpty());
+
+        var reintento = diaDePrueba.plusSeconds(5);
+        instantePrueba.set(reintento);
+        enviar("POST", SUPERVISION + "/reintentos", null, admin, 202);
+        enviar("POST", SUPERVISION_RECIBOS + "/reintentos", null, admin, 202);
+        paginaLecturasPendiente.set(new Respuesta(200, "application/json", """
+            {"fuente":"empresa-agua","codigoSuministro":"000101","tipoMedicion":"ACUMULADA","unidad":"L",
+             "lecturas":[{"idLectura":"2","idMedidor":"1","fechaMedicion":"2026-12-02T05:00:00Z","valorLitros":500}],
+             "hayMas":false,"siguienteDespuesDe":"2"}
+            """));
+        recibosProveedor.set(emitidos);
+        var lecturaRecuperada = lecturas.ejecutarCiclo().getFirst();
+        assertEquals(EstadoSincronizacion.RECORRIDO_COMPLETO, lecturaRecuperada.estado());
+        assertEquals(new ResultadoIncorporacion(1, 0, 0), lecturaRecuperada.recuperacion().incorporacion());
+        assertEquals(new RepositorioRecibos.Incorporacion(0, 1), sincronizarRecibos.ejecutarCiclo().getFirst().incorporacion());
+        assertEquals(List.of("0", "1", "1"), consultasPaginasLecturas);
+        var supervision = consultarJson(SUPERVISION, admin);
+        assertEquals("2", supervision.at("/recuperacion/cursorConfirmado").stringValue());
+        assertEquals(2, supervision.at("/almacenamiento/lecturasGuardadas").intValue());
+        assertEquals(reintento.toString(), supervision.at("/programacion/ultimoExito").stringValue());
+        var cerradas = consultarJson(INCIDENCIAS, admin).path("incidencias");
+        assertEquals(2, cerradas.size());
+        assertTrue(cerradas.valueStream().allMatch(i -> "RESUELTA".equals(i.path("estado").stringValue())
+            && reintento.toString().equals(i.path("ultimaResolucion").stringValue())));
+        assertEquals(reciboDuranteCaida, consultarJson(RECIBOS, consulta).at("/recibos/0"));
+
+        enviar("DELETE", ADMIN + "/sesion", null, admin, 204);
+        enviar("GET", ACCESOS, null, admin, 401);
+        enviar("POST", SUPERVISION_RECIBOS + "/reintentos", null, admin, 401);
+        var consumo = consultarJson(CONSUMO, consulta);
+        assertEquals("2026-11", consumo.path("periodo").stringValue());
+        assertEquals("400", consumo.at("/consumo/litros").stringValue());
+        assertEquals(1, llamadasAgua.get());
+        assertEquals(1, llamadasIdentidad.get());
+    }
+
+    @Test
     void publicaPeriodosFuturosYConservaLasRevisiones() throws Exception {
         enviar("GET", PERIODOS, null, null, 401);
         var consulta = token(enviar("POST", CONSULTA + "/sesiones", SOLICITUD, null, 201));
@@ -1685,6 +1800,10 @@ class AccesoConsultaIntegradoTests {
 
     private String iniciarAdminTarifas() throws Exception {
         inicializar.ejecutar("admin", "Admin de prueba", CLAVE_ADMIN.toCharArray());
+        return autenticarAdmin();
+    }
+
+    private String autenticarAdmin() throws Exception {
         return token(enviar("POST", ADMIN + "/sesiones",
             "{\"usuario\":\"admin\",\"clave\":\"" + CLAVE_ADMIN + "\"}", null, 201));
     }
@@ -1822,6 +1941,23 @@ class AccesoConsultaIntegradoTests {
             servidor.createContext("/api/v1/suministros/000101/tarifas", intercambio -> {
                 llamadasTarifas.incrementAndGet();
                 responder(intercambio, tarifasProveedor.get());
+            });
+            servidor.createContext("/api/v1/lecturas/corte", intercambio -> responder(intercambio,
+                new Respuesta(200, "application/json", """
+                    {"fuente":"empresa-agua","hastaIdLectura":"2","confirmadoHasta":"2026-12-02T06:00:00Z"}
+                    """)));
+            servidor.createContext("/api/v1/suministros/000101/medidores", intercambio -> responder(intercambio,
+                new Respuesta(200, "application/json", """
+                    {"fuente":"empresa-agua","codigoSuministro":"000101","zonaFechas":"America/Lima",
+                     "medidores":[{"idMedidor":"1","fechaInstalacion":"2026-11-01","fechaRetiro":null}]}
+                    """)));
+            servidor.createContext("/api/v1/suministros/000101/lecturas", intercambio -> {
+                String query = intercambio.getRequestURI().getRawQuery();
+                String cursor = java.util.Arrays.stream(query.split("&"))
+                    .filter(parametro -> parametro.startsWith("despuesDe="))
+                    .map(parametro -> parametro.substring("despuesDe=".length())).findFirst().orElseThrow();
+                consultasPaginasLecturas.add(cursor);
+                responder(intercambio, "0".equals(cursor) ? PRIMERA_PAGINA_LECTURAS : paginaLecturasPendiente.get());
             });
             servidor.createContext("/api/v1/suministros/000101/recibos", intercambio -> {
                 llamadasRecibos.incrementAndGet();
