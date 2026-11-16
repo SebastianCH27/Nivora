@@ -459,6 +459,12 @@ El usuario puede consultar los recibos guardados de su suministro desde
 El recorrido de emisión, sincronización y consulta está documentado en
 [Verificación integrada de recibos](documentacion/verificacion-recibos.md).
 
+La supervisión administrativa consulta los recibos guardados y el estado
+de su sincronización por suministro en
+`GET /api/v1/supervision/suministros/{codigo}/recibos`.
+El contrato y la comprobación están en
+[Supervisión de recibos](documentacion/supervision-recibos.md).
+
 ## Alerta de consumo
 
 Aplica `base-datos/14-alertas-consumo.sql`. Tras completar la sincronización

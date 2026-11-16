@@ -92,6 +92,7 @@ class AccesoConsultaIntegradoTests {
     private static final String GESTION_TARIFAS = "/api/v1/administracion/suministros/000101/tarifas";
     private static final String CONTROL_ALERTAS = "/api/v1/administracion/notificaciones/alertas-consumo";
     private static final String SUPERVISION = "/api/v1/supervision/suministros/000101/lecturas";
+    private static final String SUPERVISION_RECIBOS = "/api/v1/supervision/suministros/000101/recibos";
     private static final String DNI = "00000001";
     private static final String TOKEN_PROVEEDOR = "token-ficticio-integracion";
     private static final String SOLICITUD = "{\"codigoSuministro\":\"000101\",\"dni\":\"00000001\"}";
@@ -1099,8 +1100,55 @@ class AccesoConsultaIntegradoTests {
     }
 
     @Test
+    void supervisionDeRecibosExigePermisoYReconoceUnSuministroSinRecibos() throws Exception {
+        enviar("GET", SUPERVISION_RECIBOS, null, null, 401);
+        var consulta = token(enviar("POST", CONSULTA + "/sesiones", SOLICITUD, null, 201));
+        enviar("GET", SUPERVISION_RECIBOS, null, consulta, 401);
+        var admin = iniciarAdminTarifas();
+        enviar("GET", "/api/v1/supervision/suministros/000999/recibos", null, admin, 404);
+        enviar("GET", "/api/v1/supervision/suministros/abc/recibos", null, admin, 400);
+        var respuesta = enviar("GET", SUPERVISION_RECIBOS, null, admin, 200);
+        assertEquals("no-store", respuesta.headers().firstValue("Cache-Control").orElseThrow());
+        var datos = json.readTree(respuesta.body());
+        assertEquals("empresa-agua", datos.path("fuente").stringValue());
+        assertEquals("000101", datos.path("codigoSuministro").stringValue());
+        assertEquals(AHORA.toString(), datos.path("consultadoEn").stringValue());
+        assertFalse(datos.path("sincronizacionAutomaticaHabilitada").booleanValue());
+        assertEquals(0, datos.at("/almacenamiento/recibosGuardados").intValue());
+        assertTrue(datos.at("/almacenamiento/ultimoPeriodo").isNull());
+        assertTrue(datos.at("/almacenamiento/ultimaRecepcion").isNull());
+        assertTrue(datos.path("programacion").isNull());
+        jdbc.update("UPDATE administradores SET cambio_clave_requerido = TRUE WHERE usuario = 'admin'");
+        enviar("GET", SUPERVISION_RECIBOS, null, admin, 403);
+    }
+
+    @Test
+    void supervisionDeRecibosDistingueReservaVigenteYVencida() throws Exception {
+        enviar("POST", CONSULTA + "/sesiones", SOLICITUD, null, 201);
+        var admin = iniciarAdminTarifas();
+        programacionRecibos.prepararSuministros(AHORA);
+        var reserva = programacionRecibos.reservar(AHORA, AHORA, Duration.ofSeconds(60)).orElseThrow();
+        var respuesta = enviar("GET", SUPERVISION_RECIBOS, null, admin, 200);
+        var programacion = json.readTree(respuesta.body()).path("programacion");
+        assertEquals(reserva.venceEn().toString(), programacion.path("reservaHasta").stringValue());
+        assertTrue(programacion.path("reservaVigente").booleanValue());
+        assertFalse(programacion.path("reservaVencida").booleanValue());
+        assertFalse(respuesta.body().contains(reserva.token()));
+
+        instantePrueba.set(reserva.venceEn());
+        var vencida = consultarJson(SUPERVISION_RECIBOS, admin).path("programacion");
+        assertFalse(vencida.path("reservaVigente").booleanValue());
+        assertTrue(vencida.path("reservaVencida").booleanValue());
+
+        jdbc.execute("DROP TABLE programacion_sincronizacion_recibos");
+        var fallo = enviar("GET", SUPERVISION_RECIBOS, null, admin, 503);
+        assertEquals("Supervision no disponible", json.readTree(fallo.body()).path("title").stringValue());
+    }
+
+    @Test
     void recibosEmitidosSeSincronizanYSePuedenConsultarDuranteUnaCaida() throws Exception {
         var sesion = token(enviar("POST", CONSULTA + "/sesiones", SOLICITUD, null, 201));
+        var admin = iniciarAdminTarifas();
         assertTrue(consultarJson(RECIBOS, sesion).path("recibos").isEmpty());
         var sincronizar = new SincronizarRecibos(programacionRecibos, incorporarRecibos,
             new SincronizarRecibos.Politica(1, 60, Duration.ofSeconds(60),
@@ -1122,6 +1170,13 @@ class AccesoConsultaIntegradoTests {
         assertEquals(RepositorioSincronizacionRecibos.Estado.ACTUALIZADO, primera.estado());
         assertTrue(primera.programacionConfirmada());
         assertEquals(new RepositorioRecibos.Incorporacion(2, 0), primera.incorporacion());
+        var supervision = consultarJson(SUPERVISION_RECIBOS, admin);
+        var almacenamiento = supervision.path("almacenamiento");
+        assertEquals(2, almacenamiento.path("recibosGuardados").intValue());
+        assertEquals("2026-10", almacenamiento.path("ultimoPeriodo").stringValue());
+        assertEquals(AHORA.toString(), almacenamiento.path("ultimaRecepcion").stringValue());
+        assertEquals("ACTUALIZADO", supervision.at("/programacion/ultimoResultado").stringValue());
+        assertEquals(AHORA.toString(), supervision.at("/programacion/ultimoExito").stringValue());
 
         var pagina = consultarJson(RECIBOS + "?limite=1", sesion);
         var octubre = pagina.at("/recibos/0");
@@ -1146,6 +1201,13 @@ class AccesoConsultaIntegradoTests {
         var fallo = sincronizar.ejecutarCiclo().getFirst();
         assertEquals(RepositorioSincronizacionRecibos.Estado.ERROR_FUENTE, fallo.estado());
         assertEquals(primera.proximoIntento().plusSeconds(30), fallo.proximoIntento());
+        var supervisionConFallo = consultarJson(SUPERVISION_RECIBOS, admin);
+        assertEquals(almacenamiento, supervisionConFallo.path("almacenamiento"));
+        assertEquals("ERROR_FUENTE", supervisionConFallo.at("/programacion/ultimoResultado").stringValue());
+        assertEquals(1, supervisionConFallo.at("/programacion/fallosConsecutivos").intValue());
+        assertEquals(AHORA.toString(), supervisionConFallo.at("/programacion/ultimoExito").stringValue());
+        assertEquals(primera.proximoIntento().toString(), supervisionConFallo.at("/programacion/ultimoIntento").stringValue());
+        assertEquals(fallo.proximoIntento().toString(), supervisionConFallo.at("/programacion/proximoIntento").stringValue());
         assertTrue(sincronizar.ejecutarCiclo().isEmpty());
         assertEquals(pagina, consultarJson(RECIBOS + "?limite=1", sesion));
 
@@ -1154,6 +1216,10 @@ class AccesoConsultaIntegradoTests {
         var recuperado = sincronizar.ejecutarCiclo().getFirst();
         assertEquals(RepositorioSincronizacionRecibos.Estado.ACTUALIZADO, recuperado.estado());
         assertEquals(new RepositorioRecibos.Incorporacion(0, 2), recuperado.incorporacion());
+        var supervisionRecuperada = consultarJson(SUPERVISION_RECIBOS, admin);
+        assertEquals(almacenamiento, supervisionRecuperada.path("almacenamiento"));
+        assertEquals(0, supervisionRecuperada.at("/programacion/fallosConsecutivos").intValue());
+        assertEquals(fallo.proximoIntento().toString(), supervisionRecuperada.at("/programacion/ultimoExito").stringValue());
         assertEquals(pagina, consultarJson(RECIBOS + "?limite=1", sesion));
         assertEquals(septiembre, consultarJson(RECIBOS + "?limite=1&antesDe=2026-10", sesion));
         assertEquals(2, recibos.buscarRecientes(new CodigoSuministro("000101"), 60).size());
