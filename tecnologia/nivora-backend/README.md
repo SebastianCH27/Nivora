@@ -22,6 +22,7 @@ El puerto 8080 esta ocupado por Jenkins en el equipo de desarrollo.
 | `tarifas` | Tarifas, costos y proyecciones | Historial versionado, gestión administrativa de vigencias, costos estimados y proyección mensual. |
 | `notificaciones` | Alertas y notificaciones | Registra y consulta avisos, guarda marcas de lectura y configura las preferencias por dispositivo y la evaluación de consumo. |
 | `recibos` | Recibos | Importación, sincronización automática y consulta de recibos por suministro. |
+| `integracion` | Incidencias de integración | Consulta administrativa de incidencias de lecturas y recibos por suministro. |
 
 Las capas de cada modulo se incorporaran cuando se implementen sus
 responsabilidades: dominio, aplicacion, infraestructura y presentacion.
@@ -450,7 +451,8 @@ consulta de comprobación están en
 
 La tarea web sincroniza los recibos de los suministros registrados.
 Aplica `base-datos/13-sincronizacion-recibos.sql` para habilitar el
-calendario persistido. Los pasos y el comportamiento ante fallos están en
+calendario persistido y `base-datos/19-incidencias-sincronizacion-recibos.sql`
+para conservar los fallos y su resolución. Los pasos están en
 [Sincronización automática de recibos](documentacion/sincronizacion-recibos.md).
 
 El usuario puede consultar los recibos guardados de su suministro desde
@@ -464,6 +466,11 @@ de su sincronización por suministro en
 `GET /api/v1/supervision/suministros/{codigo}/recibos`.
 El contrato y la comprobación están en
 [Supervisión de recibos](documentacion/supervision-recibos.md).
+
+Los administradores con permiso de supervisión pueden consultar las incidencias
+de lecturas y recibos en `GET /api/v1/supervision/suministros/{codigo}/incidencias`.
+El contrato y el comando de comprobación están en
+[Incidencias de integración](documentacion/incidencias-integracion.md).
 
 ## Alerta de consumo
 

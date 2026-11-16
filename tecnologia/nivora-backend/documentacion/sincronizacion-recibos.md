@@ -24,6 +24,8 @@ el token y el vencimiento antes de modificar el calendario.
 Los reintentos crecen desde 30 segundos a 60, 120 y así sucesivamente
 hasta 1800 segundos. El contador y las fechas se guardan en MySQL.
 La tarea de recibos mantiene un calendario independiente del de lecturas.
+El resultado confirmado y el historial de incidencias se guardan en la misma
+transacción. Consulta los estados en [Incidencias de integración](incidencias-integracion.md).
 
 | Propiedad bajo `nivora.recibos.sincronizacion` | Valor inicial |
 |---|---:|
@@ -46,10 +48,11 @@ se conservan en `recibos`.
 ## Preparar y comprobar en Windows
 
 Desde `mysql>`, con la cuenta administradora y la tabla `recibos` ya creada,
-aplica el script.
+aplica los scripts.
 
 ```sql
 SOURCE C:/Users/HP/Desktop/Nivora/tecnologia/nivora-backend/base-datos/13-sincronizacion-recibos.sql;
+SOURCE C:/Users/HP/Desktop/Nivora/tecnologia/nivora-backend/base-datos/19-incidencias-sincronizacion-recibos.sql;
 SHOW TABLES FROM nivora LIKE 'programacion_sincronizacion_recibos';
 ```
 

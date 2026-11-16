@@ -93,6 +93,7 @@ class AccesoConsultaIntegradoTests {
     private static final String CONTROL_ALERTAS = "/api/v1/administracion/notificaciones/alertas-consumo";
     private static final String SUPERVISION = "/api/v1/supervision/suministros/000101/lecturas";
     private static final String SUPERVISION_RECIBOS = "/api/v1/supervision/suministros/000101/recibos";
+    private static final String INCIDENCIAS = "/api/v1/supervision/suministros/000101/incidencias";
     private static final String DNI = "00000001";
     private static final String TOKEN_PROVEEDOR = "token-ficticio-integracion";
     private static final String SOLICITUD = "{\"codigoSuministro\":\"000101\",\"dni\":\"00000001\"}";
@@ -105,7 +106,7 @@ class AccesoConsultaIntegradoTests {
         "08-sesiones-administrativas.sql", "09-sesiones-consulta.sql", "10-tarifas.sql",
         "11-gestion-tarifas.sql", "12-recibos.sql", "13-sincronizacion-recibos.sql",
         "14-alertas-consumo.sql", "15-avisos-recibo.sql", "16-notificaciones-leidas.sql",
-        "17-configuracion-notificaciones.sql");
+        "17-configuracion-notificaciones.sql", "19-incidencias-sincronizacion-recibos.sql");
 
     private static final Respuesta AGUA_OK = new Respuesta(200, "application/json",
         "{\"codigoSuministro\":\"000101\",\"titular\":\"Titular ficticio\"}");
@@ -173,6 +174,7 @@ class AccesoConsultaIntegradoTests {
                 "sesiones_administrativas", "limites_acceso_administrativo",
                 "tarifas_publicaciones", "auditoria_administradores", "configuracion_alertas_consumo",
                 "administradores", "lecturas",
+                "incidencias_lecturas", "incidencias_recuperacion_lecturas", "incidencias_sincronizacion_recibos",
                 "control_incorporacion_lecturas",
                 "contexto_recuperacion_lecturas", "progreso_recuperacion_lecturas",
                 "programacion_sincronizacion_lecturas", "tarifas_asignaciones", "tarifas_historiales",
@@ -1100,6 +1102,79 @@ class AccesoConsultaIntegradoTests {
     }
 
     @Test
+    void incidenciasConservaEmpatesAlPaginarYAislaCadaSuministro() throws Exception {
+        enviar("POST", CONSULTA + "/sesiones", SOLICITUD, null, 201);
+        var admin = iniciarAdminTarifas();
+        jdbc.update("INSERT INTO suministros VALUES ('000102', 'Otro suministro', '2026-11-11 13:00:00')");
+        jdbc.update("""
+            INSERT INTO incidencias_lecturas (fuente, id_lectura, codigo_suministro, motivo, datos_recibidos,
+                huella, primera_recepcion_utc, ultima_recepcion_utc, repeticiones)
+            VALUES ('empresa-agua', '41', '000101', 'ID_EN_CONFLICTO', 'otro-payload-ficticio', ?,
+                    '2026-11-11 12:59:59', '2026-11-11 13:00:00', 1),
+                   ('empresa-agua', '42', '000101', 'ID_EN_CONFLICTO', 'payload-ficticio', ?,
+                    '2026-11-11 13:00:00', '2026-11-11 13:10:00', 2)
+            """, "0".repeat(64), "1".repeat(64));
+        jdbc.update("""
+            INSERT INTO incidencias_recuperacion_lecturas
+                (fuente, codigo_suministro, tipo, primera_recepcion_utc, ultima_recepcion_utc)
+            VALUES ('empresa-agua', '000101', 'SUMINISTRO_NO_ENCONTRADO', '2026-11-11 13:00:00', '2026-11-11 13:01:00'),
+                   ('empresa-agua', '000101', 'ERROR_FUENTE', '2026-11-11 13:00:00', '2026-11-11 13:02:00'),
+                   ('empresa-agua', '000102', 'ERROR_FUENTE', '2026-11-11 13:00:00', '2026-11-11 13:02:00')
+            """);
+        jdbc.update("""
+            UPDATE incidencias_recuperacion_lecturas SET abierta = FALSE, ultima_resolucion_utc = '2026-11-11 13:03:00'
+            WHERE codigo_suministro = '000101' AND tipo = 'ERROR_FUENTE'
+            """);
+
+        var respuesta = enviar("GET", INCIDENCIAS + "?limite=1", null, admin, 200);
+        assertEquals("no-store", respuesta.headers().firstValue("Cache-Control").orElseThrow());
+        assertFalse(respuesta.body().contains("payload-ficticio"));
+        var primera = json.readTree(respuesta.body());
+        assertEquals("000101", primera.path("codigoSuministro").stringValue());
+        assertEquals("SUMINISTRO_NO_ENCONTRADO", primera.at("/incidencias/0/motivo").stringValue());
+        assertEquals("ABIERTA", primera.at("/incidencias/0/estado").stringValue());
+        assertEquals(AHORA.toString(), primera.at("/incidencias/0/primeraRecepcion").stringValue());
+        assertTrue(primera.path("hayMas").booleanValue());
+
+        var segunda = consultarJson(INCIDENCIAS + "?limite=1&antesDe="
+            + primera.path("siguienteAntesDe").stringValue(), admin);
+        assertEquals("ERROR_FUENTE", segunda.at("/incidencias/0/motivo").stringValue());
+        assertEquals("RESUELTA", segunda.at("/incidencias/0/estado").stringValue());
+        assertEquals("2026-11-11T13:03:00Z", segunda.at("/incidencias/0/ultimaResolucion").stringValue());
+
+        var tercera = consultarJson(INCIDENCIAS + "?limite=1&antesDe="
+            + segunda.path("siguienteAntesDe").stringValue(), admin);
+        assertEquals(1, tercera.path("incidencias").size());
+        assertEquals("ID_EN_CONFLICTO", tercera.at("/incidencias/0/motivo").stringValue());
+        assertEquals("POR_REVISAR", tercera.at("/incidencias/0/estado").stringValue());
+        assertEquals("42", tercera.at("/incidencias/0/idLectura").stringValue());
+        assertEquals(2, tercera.at("/incidencias/0/repeticiones").intValue());
+        assertFalse(tercera.toString().contains("payload-ficticio"));
+        assertTrue(tercera.path("hayMas").booleanValue());
+        var ultima = consultarJson(INCIDENCIAS + "?limite=1&antesDe="
+            + tercera.path("siguienteAntesDe").stringValue(), admin);
+        assertEquals("41", ultima.at("/incidencias/0/idLectura").stringValue());
+        assertFalse(ultima.path("hayMas").booleanValue());
+        assertTrue(ultima.path("siguienteAntesDe").isNull());
+    }
+
+    @Test
+    void incidenciasRequierePermisoYValidaParametros() throws Exception {
+        enviar("GET", INCIDENCIAS, null, null, 401);
+        var consulta = token(enviar("POST", CONSULTA + "/sesiones", SOLICITUD, null, 201));
+        enviar("GET", INCIDENCIAS, null, consulta, 401);
+        var admin = iniciarAdminTarifas();
+        assertTrue(consultarJson(INCIDENCIAS, admin).path("incidencias").isEmpty());
+        enviar("GET", INCIDENCIAS + "?antesDe=incorrecto", null, admin, 400);
+        enviar("GET", INCIDENCIAS + "?limite=101", null, admin, 400);
+        enviar("GET", "/api/v1/supervision/suministros/000202/incidencias", null, admin, 404);
+        jdbc.execute("DROP TABLE incidencias_sincronizacion_recibos");
+        enviar("GET", INCIDENCIAS, null, admin, 503);
+        jdbc.update("UPDATE administradores SET cambio_clave_requerido = TRUE WHERE usuario = 'admin'");
+        enviar("GET", INCIDENCIAS, null, admin, 403);
+    }
+
+    @Test
     void supervisionDeRecibosExigePermisoYReconoceUnSuministroSinRecibos() throws Exception {
         enviar("GET", SUPERVISION_RECIBOS, null, null, 401);
         var consulta = token(enviar("POST", CONSULTA + "/sesiones", SOLICITUD, null, 201));
@@ -1208,6 +1283,13 @@ class AccesoConsultaIntegradoTests {
         assertEquals(AHORA.toString(), supervisionConFallo.at("/programacion/ultimoExito").stringValue());
         assertEquals(primera.proximoIntento().toString(), supervisionConFallo.at("/programacion/ultimoIntento").stringValue());
         assertEquals(fallo.proximoIntento().toString(), supervisionConFallo.at("/programacion/proximoIntento").stringValue());
+        var incidencia = consultarJson(INCIDENCIAS, admin).at("/incidencias/0");
+        assertEquals("SINCRONIZACION_RECIBOS", incidencia.path("origen").stringValue());
+        assertEquals("ERROR_FUENTE", incidencia.path("motivo").stringValue());
+        assertEquals("ABIERTA", incidencia.path("estado").stringValue());
+        assertEquals(primera.proximoIntento().toString(), incidencia.path("primeraRecepcion").stringValue());
+        assertEquals(1, incidencia.path("repeticiones").intValue());
+        assertTrue(incidencia.path("ultimaResolucion").isNull());
         assertTrue(sincronizar.ejecutarCiclo().isEmpty());
         assertEquals(pagina, consultarJson(RECIBOS + "?limite=1", sesion));
 
@@ -1220,6 +1302,10 @@ class AccesoConsultaIntegradoTests {
         assertEquals(almacenamiento, supervisionRecuperada.path("almacenamiento"));
         assertEquals(0, supervisionRecuperada.at("/programacion/fallosConsecutivos").intValue());
         assertEquals(fallo.proximoIntento().toString(), supervisionRecuperada.at("/programacion/ultimoExito").stringValue());
+        var cerradas = consultarJson(INCIDENCIAS, admin).path("incidencias");
+        assertEquals(1, cerradas.size());
+        assertEquals("RESUELTA", cerradas.get(0).path("estado").stringValue());
+        assertEquals(fallo.proximoIntento().toString(), cerradas.get(0).path("ultimaResolucion").stringValue());
         assertEquals(pagina, consultarJson(RECIBOS + "?limite=1", sesion));
         assertEquals(septiembre, consultarJson(RECIBOS + "?limite=1&antesDe=2026-10", sesion));
         assertEquals(2, recibos.buscarRecientes(new CodigoSuministro("000101"), 60).size());

@@ -107,8 +107,10 @@ class AlmacenamientoRecibosTests {
             new ResourceDatabasePopulator(new FileSystemResource("base-datos/02-suministros.sql"),
                 new FileSystemResource("base-datos/12-recibos.sql"),
                 new FileSystemResource("base-datos/13-sincronizacion-recibos.sql"),
-                new FileSystemResource("base-datos/15-avisos-recibo.sql")).populate(esquema);
+                new FileSystemResource("base-datos/15-avisos-recibo.sql"),
+                new FileSystemResource("base-datos/19-incidencias-sincronizacion-recibos.sql")).populate(esquema);
         }
+        jdbc.execute("DELETE FROM incidencias_sincronizacion_recibos");
         jdbc.execute("DELETE FROM programacion_sincronizacion_recibos");
         jdbc.execute("DELETE FROM avisos_recibo");
         jdbc.execute("DELETE FROM recibos");
@@ -291,6 +293,8 @@ class AlmacenamientoRecibosTests {
         assertEquals(List.of(previo), repositorio.buscarRecientes(SUMINISTRO, 60));
 
         ciclo(segundoFallo, 2);
+        assertEquals(2L, jdbc.queryForObject("SELECT repeticiones FROM incidencias_sincronizacion_recibos",
+            Long.class));
         Instant reintento = segundoFallo.plusSeconds(60);
         assertEquals(new Calendario("ERROR_FUENTE", 2, RECIBIDO, reintento), calendario(SUMINISTRO));
         publicar(NOVIEMBRE, OCTUBRE);
@@ -327,6 +331,7 @@ class AlmacenamientoRecibosTests {
         var nueva = programacion.reservar(vencimiento, vencimiento, duracion).orElseThrow();
         assertFalse(programacion.finalizar(primera, Estado.ERROR_FUENTE, 1, vencimiento.plusSeconds(30), vencimiento));
         assertTrue(programacion.finalizar(nueva, Estado.ACTUALIZADO, 0, vencimiento.plusSeconds(300), vencimiento));
+        assertEquals(0, jdbc.queryForObject("SELECT COUNT(*) FROM incidencias_sincronizacion_recibos", Integer.class));
         assertEquals(new Calendario("ACTUALIZADO", 0, vencimiento, vencimiento.plusSeconds(300)),
             calendario(SUMINISTRO));
     }

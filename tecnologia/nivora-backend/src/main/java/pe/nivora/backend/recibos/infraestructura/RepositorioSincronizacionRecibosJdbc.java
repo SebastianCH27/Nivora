@@ -10,6 +10,7 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.TransactionException;
+import org.springframework.transaction.support.TransactionTemplate;
 
 import pe.nivora.backend.acceso.dominio.CodigoSuministro;
 import pe.nivora.backend.compartido.infraestructura.sincronizacion.ProgramacionSincronizacionJdbc;
@@ -19,8 +20,13 @@ import pe.nivora.backend.recibos.dominio.RepositorioSincronizacionRecibos;
 public class RepositorioSincronizacionRecibosJdbc implements RepositorioSincronizacionRecibos {
     private static final String FUENTE = "empresa-agua";
     private final ProgramacionSincronizacionJdbc programacion;
+    private final JdbcTemplate jdbc;
+    private final TransactionTemplate transaccion;
 
     public RepositorioSincronizacionRecibosJdbc(JdbcTemplate jdbc, PlatformTransactionManager gestor) {
+        this.jdbc = jdbc;
+        this.transaccion = new TransactionTemplate(gestor);
+        this.transaccion.setTimeout(10);
         this.programacion = new ProgramacionSincronizacionJdbc(jdbc, gestor,
             ProgramacionSincronizacionJdbc.Tabla.RECIBOS);
     }
@@ -42,8 +48,32 @@ public class RepositorioSincronizacionRecibosJdbc implements RepositorioSincroni
 
     @Override
     public boolean finalizar(Reserva reserva, Estado estado, int fallos, Instant proximoIntento, Instant ahora) {
-        return acceder(() -> programacion.finalizar(FUENTE, reserva.suministro().valor(), reserva.token(),
-            estado.name(), estado == Estado.ACTUALIZADO, fallos, proximoIntento, ahora));
+        return acceder(() -> transaccion.execute(transaccionActual -> {
+            var codigo = reserva.suministro().valor();
+            boolean exitosa = estado == Estado.ACTUALIZADO;
+            if (!programacion.finalizar(FUENTE, codigo, reserva.token(), estado.name(), exitosa, fallos,
+                    proximoIntento, ahora)) {
+                return false;
+            }
+            var fecha = ProgramacionSincronizacionJdbc.utc(ahora);
+            if (exitosa) {
+                jdbc.update("""
+                    UPDATE incidencias_sincronizacion_recibos
+                    SET abierta = FALSE, ultima_resolucion_utc = ?
+                    WHERE fuente = ? AND codigo_suministro = ? AND abierta = TRUE
+                    """, fecha, FUENTE, codigo);
+            } else {
+                jdbc.update("""
+                    INSERT INTO incidencias_sincronizacion_recibos (fuente, codigo_suministro, motivo,
+                        primera_recepcion_utc, ultima_recepcion_utc)
+                    VALUES (?, ?, ?, ?, ?)
+                    ON DUPLICATE KEY UPDATE
+                        ultima_recepcion_utc = GREATEST(ultima_recepcion_utc, ?),
+                        repeticiones = repeticiones + 1, abierta = TRUE
+                    """, FUENTE, codigo, estado.name(), fecha, fecha, fecha);
+            }
+            return true;
+        }));
     }
 
     private static <T> T acceder(Supplier<T> operacion) {
