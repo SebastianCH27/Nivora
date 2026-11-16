@@ -541,6 +541,15 @@ El contrato HTTP, los vencimientos y la prueba sin publicar el token estan en
 Las rutas, reglas y recorrido de otra persona estan en
 [Gestion de administradores](documentacion/gestion-administradores.md).
 
+## Consulta administrativa de suministros y accesos
+
+Las cuentas con `CONSULTAR_ACCESOS` pueden listar los suministros que
+Nivora ha verificado y consultar por suministro el historial de sesiones
+de consulta. El historial muestra las fechas de apertura, vencimiento y
+revocación, junto con un DNI enmascarado. Los datos se leen de las tablas
+creadas por los scripts 02 y 09. Consulta el contrato y la prueba en
+[Suministros y registros de acceso](documentacion/registros-acceso.md).
+
 ## Configuracion y comprobaciones
 
 La ejecucion normal utiliza `application.properties` y obtiene la

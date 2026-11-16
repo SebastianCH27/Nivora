@@ -66,6 +66,8 @@ public class SeguridadConfiguracion {
                 .requestMatchers("/api/v1/acceso/administradores/sesion").hasRole("ADMIN")
                 .requestMatchers("/api/v1/administracion/administradores", "/api/v1/administracion/administradores/**")
                     .hasAuthority("GESTIONAR_ADMINISTRADORES")
+                .requestMatchers(HttpMethod.GET, "/api/v1/administracion/suministros",
+                    "/api/v1/administracion/suministros/*/accesos").hasAuthority("CONSULTAR_ACCESOS")
                 .requestMatchers(HttpMethod.GET, "/api/v1/administracion/suministros/*/tarifas",
                     "/api/v1/administracion/suministros/*/tarifas/revisiones/*").hasAuthority("GESTIONAR_TARIFAS")
                 .requestMatchers(HttpMethod.PUT, "/api/v1/administracion/suministros/*/tarifas")

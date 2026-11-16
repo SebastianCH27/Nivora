@@ -87,6 +87,8 @@ class AccesoConsultaIntegradoTests {
     private static final String NOTIFICACIONES = CONSULTA + "/notificaciones";
     private static final String DISPOSITIVO = NOTIFICACIONES + "/dispositivos/d782d504-7031-4d2c-b319-94db17e13c58";
     private static final String ADMIN = "/api/v1/acceso/administradores";
+    private static final String REGISTROS = "/api/v1/administracion/suministros";
+    private static final String ACCESOS = REGISTROS + "/000101/accesos";
     private static final String GESTION_TARIFAS = "/api/v1/administracion/suministros/000101/tarifas";
     private static final String CONTROL_ALERTAS = "/api/v1/administracion/notificaciones/alertas-consumo";
     private static final String SUPERVISION = "/api/v1/supervision/suministros/000101/lecturas";
@@ -197,6 +199,86 @@ class AccesoConsultaIntegradoTests {
             esquema.close();
         }
         http.close();
+    }
+
+    @Test
+    void listaSuministrosLocalesConCursorQueConservaLosCeros() throws Exception {
+        var admin = iniciarAdminTarifas();
+        assertTrue(consultarJson(REGISTROS, admin).path("suministros").isEmpty());
+        token(enviar("POST", CONSULTA + "/sesiones", SOLICITUD, null, 201));
+        agua.set(CAIDA);
+        identidad.set(CAIDA);
+        jdbc.update("INSERT INTO suministros (codigo, titular, verificado_en_utc) VALUES (?, ?, ?)",
+            "000202", "Otro titular ficticio", LocalDateTime.ofInstant(AHORA, ZoneOffset.UTC));
+
+        var primera = consultarJson(REGISTROS + "?limite=1", admin);
+        assertEquals("000101", primera.at("/suministros/0/codigoSuministro").stringValue());
+        assertEquals("Titular ficticio", primera.at("/suministros/0/titular").stringValue());
+        assertEquals(AHORA.toString(), primera.at("/suministros/0/verificadoEn").stringValue());
+        assertTrue(primera.path("hayMas").booleanValue());
+        assertEquals("000101", primera.path("siguienteDespuesDe").stringValue());
+
+        var segunda = consultarJson(REGISTROS + "?limite=1&despuesDe=000101", admin);
+        assertEquals("000202", segunda.at("/suministros/0/codigoSuministro").stringValue());
+        assertFalse(segunda.path("hayMas").booleanValue());
+        assertTrue(segunda.path("siguienteDespuesDe").isNull());
+        assertTrue(consultarJson(REGISTROS + "/000202/accesos", admin).path("accesos").isEmpty());
+        enviar("GET", REGISTROS + "/000999/accesos", null, admin, 404);
+    }
+
+    @Test
+    void paginaAccesosPorSuministroYProtegeElDni() throws Exception {
+        var consulta = token(enviar("POST", CONSULTA + "/sesiones", SOLICITUD, null, 201));
+        identidad.set(new Respuesta(200, "application/json", IDENTIDAD_OK.cuerpo().replace(DNI, "00000042")));
+        token(enviar("POST", CONSULTA + "/sesiones", SOLICITUD.replace(DNI, "00000042"), null, 201));
+        instantePrueba.set(AHORA.plusSeconds(1));
+        identidad.set(IDENTIDAD_OK);
+        token(enviar("POST", CONSULTA + "/sesiones", SOLICITUD, null, 201));
+        enviar("DELETE", CONSULTA + "/sesion", null, consulta, 204);
+        agua.set(new Respuesta(200, "application/json", AGUA_OK.cuerpo().replace("000101", "000202")));
+        token(enviar("POST", CONSULTA + "/sesiones", SOLICITUD.replace("000101", "000202"), null, 201));
+
+        var admin = iniciarAdminTarifas();
+        var primera = consultarJson(ACCESOS + "?limite=1", admin);
+        assertEquals("000101", primera.path("codigoSuministro").stringValue());
+        assertEquals(AHORA.plusSeconds(1).toString(), primera.at("/accesos/0/creadaEn").stringValue());
+        assertEquals("******01", primera.at("/accesos/0/dniEnmascarado").stringValue());
+        assertTrue(primera.path("hayMas").booleanValue());
+        var segunda = consultarJson(ACCESOS + "?limite=1&antesDe="
+            + primera.path("siguienteAntesDe").stringValue(), admin);
+        assertTrue(segunda.path("hayMas").booleanValue());
+        var tercera = consultarJson(ACCESOS + "?limite=1&antesDe="
+            + segunda.path("siguienteAntesDe").stringValue(), admin);
+        assertFalse(tercera.path("hayMas").booleanValue());
+        assertTrue(tercera.path("siguienteAntesDe").isNull());
+
+        var accesos = List.of(segunda.at("/accesos/0"), tercera.at("/accesos/0"));
+        assertEquals(List.of("******01", "******42"), accesos.stream()
+            .map(acceso -> acceso.path("dniEnmascarado").stringValue()).sorted().toList());
+        var revocada = accesos.stream().filter(acceso -> !acceso.path("revocadaEn").isNull()).findFirst().orElseThrow();
+        assertEquals(AHORA.plusSeconds(1).toString(), revocada.path("revocadaEn").stringValue());
+        var historial = enviar("GET", ACCESOS, null, admin, 200);
+        assertEquals(3, json.readTree(historial.body()).path("accesos").size());
+        assertFalse(historial.body().contains(DNI));
+        assertFalse(historial.body().contains(consulta));
+        assertFalse(historial.body().contains("Persona Ficticia"));
+    }
+
+    @Test
+    void requierePermisoParaConsultarRegistrosYValidaLaPaginacion() throws Exception {
+        enviar("GET", REGISTROS, null, null, 401);
+        enviar("GET", ACCESOS, null, null, 401);
+        var consulta = token(enviar("POST", CONSULTA + "/sesiones", SOLICITUD, null, 201));
+        enviar("GET", ACCESOS, null, consulta, 401);
+        var admin = iniciarAdminTarifas();
+        enviar("GET", REGISTROS + "?limite=0", null, admin, 400);
+        enviar("GET", REGISTROS + "?despuesDe=abc", null, admin, 400);
+        enviar("GET", ACCESOS + "?limite=101", null, admin, 400);
+        enviar("GET", ACCESOS + "?antesDe=incorrecto", null, admin, 400);
+        enviar("GET", REGISTROS + "/abc/accesos", null, admin, 400);
+        jdbc.update("UPDATE administradores SET cambio_clave_requerido = TRUE WHERE usuario = 'admin'");
+        enviar("GET", REGISTROS, null, admin, 403);
+        enviar("GET", ACCESOS, null, admin, 403);
     }
 
     @Test

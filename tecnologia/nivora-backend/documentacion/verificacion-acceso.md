@@ -38,5 +38,7 @@ secuencia **201 → 200 → 204 → 401**. Se puede repetir con los pasos de
 [Sesiones de consulta](sesiones-consulta.md). Las operaciones con una cuenta
 administrativa se describen en [Sesiones administrativas](sesiones-administrativas.md).
 
-Para el escenario EQ-06 quedan pendientes la prueba de un despliegue con
-HTTPS y la verificación de las futuras rutas de consulta de registros de acceso.
+El conjunto de integración también comprueba los permisos, la paginación
+y el enmascarado de DNI en las rutas de
+[suministros y registros de acceso](registros-acceso.md).
+Para EQ-06 queda pendiente la prueba de un despliegue con HTTPS.

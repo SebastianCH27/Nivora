@@ -8,7 +8,8 @@ public record SesionAdministrativa(String id, Administrador cuenta, Instant crea
     public Set<String> permisos() {
         if (cuenta.cambioClaveRequerido()) return Set.of();
         return cuenta.gestionarAdministradores()
-            ? Set.of("SUPERVISAR_INTEGRACION", "GESTIONAR_ADMINISTRADORES", "GESTIONAR_TARIFAS", "GESTIONAR_ALERTAS")
-            : Set.of("SUPERVISAR_INTEGRACION", "GESTIONAR_TARIFAS", "GESTIONAR_ALERTAS");
+            ? Set.of("SUPERVISAR_INTEGRACION", "GESTIONAR_ADMINISTRADORES", "GESTIONAR_TARIFAS", "GESTIONAR_ALERTAS",
+                "CONSULTAR_ACCESOS")
+            : Set.of("SUPERVISAR_INTEGRACION", "GESTIONAR_TARIFAS", "GESTIONAR_ALERTAS", "CONSULTAR_ACCESOS");
     }
 }
