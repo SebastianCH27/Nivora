@@ -10,21 +10,24 @@ import pe.nivora.backend.lecturas.dominio.EstadoRecuperacion;
 import pe.nivora.backend.lecturas.dominio.MesConsumo;
 import pe.nivora.backend.lecturas.dominio.contratos.ConsultaLecturasPeriodo;
 import pe.nivora.backend.lecturas.dominio.contratos.SuministroNoRegistradoException;
+import pe.nivora.backend.periodos.dominio.RepositorioPeriodosMensuales;
 
 public class ConsultarConsumoActual {
     private static final String FUENTE = "empresa-agua";
 
     private final ConsultaLecturasPeriodo consulta;
+    private final RepositorioPeriodosMensuales periodos;
     private final Clock reloj;
 
-    public ConsultarConsumoActual(ConsultaLecturasPeriodo consulta, Clock reloj) {
+    public ConsultarConsumoActual(ConsultaLecturasPeriodo consulta, RepositorioPeriodosMensuales periodos, Clock reloj) {
         this.consulta = consulta;
+        this.periodos = periodos;
         this.reloj = reloj;
     }
 
     public Resultado ejecutar(CodigoSuministro suministro) {
         Instant ahora = reloj.instant().truncatedTo(ChronoUnit.MICROS);
-        var mes = MesConsumo.de(ahora);
+        var mes = periodos.consultar().actual(ahora);
         Instant inicio = mes.inicio();
         var datos = consulta.consultar(FUENTE, suministro, inicio, ahora)
             .orElseThrow(SuministroNoRegistradoException::new);

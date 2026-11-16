@@ -13,23 +13,28 @@ import pe.nivora.backend.lecturas.dominio.LecturaAcumulada;
 import pe.nivora.backend.lecturas.dominio.MesConsumo;
 import pe.nivora.backend.lecturas.dominio.contratos.ConsultaLecturasPeriodo;
 import pe.nivora.backend.lecturas.dominio.contratos.SuministroNoRegistradoException;
+import pe.nivora.backend.periodos.dominio.CalendarioMensual;
+import pe.nivora.backend.periodos.dominio.RepositorioPeriodosMensuales;
 
 public class ConsultarHistorialMensual {
     private static final String FUENTE = "empresa-agua";
     private static final int MAXIMO_MESES = 12;
 
     private final ConsultaLecturasPeriodo consulta;
+    private final RepositorioPeriodosMensuales periodos;
     private final Clock reloj;
 
-    public ConsultarHistorialMensual(ConsultaLecturasPeriodo consulta, Clock reloj) {
+    public ConsultarHistorialMensual(ConsultaLecturasPeriodo consulta, RepositorioPeriodosMensuales periodos, Clock reloj) {
         this.consulta = consulta;
+        this.periodos = periodos;
         this.reloj = reloj;
     }
 
     public Resultado ejecutar(CodigoSuministro suministro, int meses, YearMonth hasta) {
         validarMeses(meses);
         Instant ahora = reloj.instant().truncatedTo(ChronoUnit.MICROS);
-        YearMonth actual = MesConsumo.de(ahora).valor();
+        var calendario = periodos.consultar();
+        YearMonth actual = calendario.actual(ahora).valor();
         YearMonth ultimo = hasta == null ? actual.minusMonths(1) : hasta;
         YearMonth primero = ultimo.minusMonths(meses - 1L);
         if (!ultimo.isBefore(actual) || primero.getYear() < 1000) {
@@ -37,11 +42,11 @@ public class ConsultarHistorialMensual {
         }
 
         var lecturas = consulta.consultar(FUENTE, suministro,
-                new MesConsumo(primero).inicio(), new MesConsumo(ultimo).fin())
+                calendario.obtener(primero).inicio(), calendario.obtener(ultimo).fin())
             .orElseThrow(SuministroNoRegistradoException::new)
             .lecturas();
         return new Resultado(FUENTE, suministro.valor(), MesConsumo.ZONA.getId(), ahora,
-            calcularPeriodos(primero, meses, lecturas));
+            calcularPeriodos(calendario, primero, meses, lecturas));
     }
 
     static void validarMeses(int meses) {
@@ -50,12 +55,13 @@ public class ConsultarHistorialMensual {
         }
     }
 
-    static List<Periodo> calcularPeriodos(YearMonth primero, int meses, List<LecturaAcumulada> lecturas) {
+    static List<Periodo> calcularPeriodos(CalendarioMensual calendario, YearMonth primero,
+            int meses, List<LecturaAcumulada> lecturas) {
         var periodos = new ArrayList<Periodo>(meses);
         int inicioLecturas = 0;
         int finLecturas = 0;
         for (int i = 0; i < meses; i++) {
-            var mes = new MesConsumo(primero.plusMonths(i));
+            var mes = calendario.obtener(primero.plusMonths(i));
             Instant inicio = mes.inicio();
             Instant fin = mes.fin();
             while (finLecturas < lecturas.size()

@@ -22,6 +22,13 @@ se envían como cadenas decimales en PEN. `fechaDisponibilidad` y
 `fechaVencimiento` se expresan en el calendario de Lima. `recibidoEn`
 es el instante de primera recepción en Nivora, en UTC.
 
+`periodoFacturado` muestra los límites del mes civil facturado por Empresa de
+Agua. `periodoAnalisis` muestra los límites usados por Nivora para el mismo
+identificador mensual. Ambos rangos se expresan en UTC. Consulta
+`coincideConPeriodoAnalisis` antes de comparar el consumo facturado con un
+cálculo de Nivora. La [configuración mensual](periodos-mensuales.md) cambia
+el calendario de análisis.
+
 | Respuesta | Significado |
 |---|---|
 | HTTP 200 | Consulta válida, con recibos o con un arreglo vacío. |

@@ -16,7 +16,8 @@ se requiere una sesión de consulta vigente y HTTP 503 indica un fallo
 al consultar los datos propios. Todas las respuestas llevan
 `Cache-Control: no-store`.
 
-El mes se determina al consultar en `America/Lima`. Las fechas se expresan
+El mes se determina al consultar el [calendario mensual](periodos-mensuales.md)
+en `America/Lima`. Las fechas se expresan
 en UTC. El cálculo usa lecturas desde el inicio exacto del mes hasta la última
 medición disponible a la hora de la consulta. Una lectura del mes anterior
 se puede mostrar como última medición cuando el mes actual está vacío.

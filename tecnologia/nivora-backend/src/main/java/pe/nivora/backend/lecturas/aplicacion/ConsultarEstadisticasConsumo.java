@@ -16,28 +16,33 @@ import pe.nivora.backend.lecturas.dominio.ConsumoPeriodo.Estado;
 import pe.nivora.backend.lecturas.dominio.MesConsumo;
 import pe.nivora.backend.lecturas.dominio.contratos.ConsultaLecturasPeriodo;
 import pe.nivora.backend.lecturas.dominio.contratos.SuministroNoRegistradoException;
+import pe.nivora.backend.periodos.dominio.RepositorioPeriodosMensuales;
 
 public class ConsultarEstadisticasConsumo {
     private static final String FUENTE = "empresa-agua";
 
     private final ConsultaLecturasPeriodo consulta;
+    private final RepositorioPeriodosMensuales periodos;
     private final Clock reloj;
 
-    public ConsultarEstadisticasConsumo(ConsultaLecturasPeriodo consulta, Clock reloj) {
+    public ConsultarEstadisticasConsumo(ConsultaLecturasPeriodo consulta, RepositorioPeriodosMensuales periodos,
+            Clock reloj) {
         this.consulta = consulta;
+        this.periodos = periodos;
         this.reloj = reloj;
     }
 
     public Resultado ejecutar(CodigoSuministro suministro, int meses) {
         ConsultarHistorialMensual.validarMeses(meses);
         Instant ahora = reloj.instant().truncatedTo(ChronoUnit.MICROS);
-        var actual = MesConsumo.de(ahora);
-        var primero = new MesConsumo(actual.valor().minusMonths(meses));
+        var calendario = periodos.consultar();
+        var actual = calendario.actual(ahora);
+        var primero = calendario.obtener(actual.valor().minusMonths(meses));
 
         var lecturas = consulta.consultar(FUENTE, suministro, primero.inicio(), ahora)
             .orElseThrow(SuministroNoRegistradoException::new)
             .lecturas();
-        var historial = ConsultarHistorialMensual.calcularPeriodos(primero.valor(), meses, lecturas);
+        var historial = ConsultarHistorialMensual.calcularPeriodos(calendario, primero.valor(), meses, lecturas);
 
         Instant inicioActual = actual.inicio();
         int inicioLecturas = lecturas.size();

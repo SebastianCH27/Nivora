@@ -6,27 +6,29 @@ import java.time.YearMonth;
 import pe.nivora.backend.acceso.dominio.CodigoSuministro;
 import pe.nivora.backend.lecturas.aplicacion.ConsultarEstadisticasConsumo;
 import pe.nivora.backend.lecturas.dominio.ConsumoPeriodo;
-import pe.nivora.backend.lecturas.dominio.MesConsumo;
 import pe.nivora.backend.notificaciones.dominio.AlertaConsumo;
 import pe.nivora.backend.notificaciones.dominio.RepositorioAlertasConsumo;
+import pe.nivora.backend.periodos.dominio.RepositorioPeriodosMensuales;
 
 public class EvaluarAlertaConsumo {
     private final ConsultarEstadisticasConsumo estadisticas;
     private final RepositorioAlertasConsumo repositorio;
     private final ConfigurarNotificaciones configuracion;
+    private final RepositorioPeriodosMensuales periodos;
     private final Clock reloj;
 
     public EvaluarAlertaConsumo(ConsultarEstadisticasConsumo estadisticas, RepositorioAlertasConsumo repositorio,
-            ConfigurarNotificaciones configuracion, Clock reloj) {
+            ConfigurarNotificaciones configuracion, RepositorioPeriodosMensuales periodos, Clock reloj) {
         this.estadisticas = estadisticas;
         this.repositorio = repositorio;
         this.configuracion = configuracion;
+        this.periodos = periodos;
         this.reloj = reloj;
     }
 
     public Resultado ejecutar(CodigoSuministro suministro) {
         if (!configuracion.evaluarAlertas()) {
-            return new Resultado(MesConsumo.de(reloj.instant()).valor(), Estado.PAUSADA);
+            return new Resultado(periodos.consultar().actual(reloj.instant()).valor(), Estado.PAUSADA);
         }
         var datos = estadisticas.ejecutar(suministro, 1);
         var actual = datos.comparacion().actual();

@@ -51,13 +51,18 @@ public class RecibosConsultaController {
         return YearMonth.parse(periodo);
     }
 
-    private static Recibo recibo(RepositorioRecibos.Guardado guardado) {
-        var emitido = guardado.recibo();
+    private static Recibo recibo(ConsultarRecibos.Detalle detalle) {
+        var emitido = detalle.guardado().recibo();
         return new Recibo(emitido.numeroRecibo(), emitido.periodo().toString(),
             emitido.consumoLitros().toPlainString(), emitido.cargoFijo().toPlainString(),
             emitido.importeConsumo().toPlainString(), emitido.importeTotal().toPlainString(),
             emitido.fechaDisponibilidad(), emitido.fechaVencimiento(), emitido.codigoTarifa(),
-            emitido.versionTarifa(), guardado.recibidoEn());
+            emitido.versionTarifa(), detalle.guardado().recibidoEn(), ventana(detalle.facturado()),
+            ventana(detalle.analisis()), detalle.facturado().equals(detalle.analisis()));
+    }
+
+    private static Ventana ventana(MesConsumo mes) {
+        return new Ventana(mes.inicio(), mes.fin());
     }
 
     @ExceptionHandler({IllegalArgumentException.class, MethodArgumentTypeMismatchException.class})
@@ -84,5 +89,8 @@ public class RecibosConsultaController {
 
     public record Recibo(String numeroRecibo, String periodo, String consumoLitros, String cargoFijo,
             String importeConsumo, String importeTotal, LocalDate fechaDisponibilidad, LocalDate fechaVencimiento,
-            String codigoTarifa, int versionTarifa, Instant recibidoEn) {}
+            String codigoTarifa, int versionTarifa, Instant recibidoEn, Ventana periodoFacturado,
+            Ventana periodoAnalisis, boolean coincideConPeriodoAnalisis) {}
+
+    public record Ventana(Instant inicio, Instant finExclusivo) {}
 }

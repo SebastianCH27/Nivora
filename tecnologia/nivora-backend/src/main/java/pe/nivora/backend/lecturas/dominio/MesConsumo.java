@@ -5,19 +5,15 @@ import java.time.YearMonth;
 import java.time.ZoneId;
 
 /** Calendario de los periodos mensuales de consumo. */
-public record MesConsumo(YearMonth valor) {
+public record MesConsumo(YearMonth valor, Instant inicio, Instant fin) {
     public static final ZoneId ZONA = ZoneId.of("America/Lima");
 
     public static MesConsumo de(Instant instante) {
         return new MesConsumo(YearMonth.from(instante.atZone(ZONA)));
     }
 
-    public Instant inicio() {
-        return inicioDe(valor);
-    }
-
-    public Instant fin() {
-        return inicioDe(valor.plusMonths(1));
+    public MesConsumo(YearMonth valor) {
+        this(valor, inicioDe(valor), inicioDe(valor.plusMonths(1)));
     }
 
     private static Instant inicioDe(YearMonth mes) {

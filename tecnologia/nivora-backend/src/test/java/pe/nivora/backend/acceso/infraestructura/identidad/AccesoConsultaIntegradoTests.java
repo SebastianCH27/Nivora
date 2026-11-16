@@ -92,6 +92,7 @@ class AccesoConsultaIntegradoTests {
     private static final String ACCESOS = REGISTROS + "/000101/accesos";
     private static final String GESTION_TARIFAS = "/api/v1/administracion/suministros/000101/tarifas";
     private static final String CONTROL_ALERTAS = "/api/v1/administracion/notificaciones/alertas-consumo";
+    private static final String PERIODOS = "/api/v1/administracion/periodos-mensuales";
     private static final String SUPERVISION = "/api/v1/supervision/suministros/000101/lecturas";
     private static final String SUPERVISION_RECIBOS = "/api/v1/supervision/suministros/000101/recibos";
     private static final String INCIDENCIAS = "/api/v1/supervision/suministros/000101/incidencias";
@@ -107,7 +108,8 @@ class AccesoConsultaIntegradoTests {
         "08-sesiones-administrativas.sql", "09-sesiones-consulta.sql", "10-tarifas.sql",
         "11-gestion-tarifas.sql", "12-recibos.sql", "13-sincronizacion-recibos.sql",
         "14-alertas-consumo.sql", "15-avisos-recibo.sql", "16-notificaciones-leidas.sql",
-        "17-configuracion-notificaciones.sql", "19-incidencias-sincronizacion-recibos.sql");
+        "17-configuracion-notificaciones.sql", "19-incidencias-sincronizacion-recibos.sql",
+        "20-periodos-mensuales.sql");
 
     private static final Respuesta AGUA_OK = new Respuesta(200, "application/json",
         "{\"codigoSuministro\":\"000101\",\"titular\":\"Titular ficticio\"}");
@@ -174,7 +176,8 @@ class AccesoConsultaIntegradoTests {
         new ResourceDatabasePopulator(scripts).populate(esquema);
         for (String tabla : List.of("sesiones_consulta", "limites_acceso_consulta",
                 "sesiones_administrativas", "limites_acceso_administrativo",
-                "tarifas_publicaciones", "auditoria_administradores", "configuracion_alertas_consumo",
+                "tarifas_publicaciones", "publicaciones_periodos_mensuales", "auditoria_administradores",
+                "configuracion_alertas_consumo",
                 "administradores", "lecturas",
                 "incidencias_lecturas", "incidencias_recuperacion_lecturas", "incidencias_sincronizacion_recibos",
                 "control_incorporacion_lecturas",
@@ -1101,6 +1104,100 @@ class AccesoConsultaIntegradoTests {
         jdbc.execute("DROP TABLE recibos");
         var respuesta = enviar("GET", RECIBOS, null, sesion, 503);
         assertEquals("Recibos no disponibles", json.readTree(respuesta.body()).path("title").stringValue());
+    }
+
+    @Test
+    void publicaPeriodosFuturosYConservaLasRevisiones() throws Exception {
+        enviar("GET", PERIODOS, null, null, 401);
+        var consulta = token(enviar("POST", CONSULTA + "/sesiones", SOLICITUD, null, 201));
+        enviar("PUT", PERIODOS, reglaPeriodo(0, "2026-12", 5), consulta, 401);
+        var admin = iniciarAdminTarifas();
+        var vacio = consultarJson(PERIODOS, admin);
+        assertEquals("0", vacio.path("revision").stringValue());
+        assertEquals(1, vacio.path("diaInicioPredeterminado").intValue());
+        assertTrue(vacio.path("reglas").isEmpty());
+        assertEquals("2026-11-01T05:00:00Z", vacio.at("/actual/inicioMes").stringValue());
+
+        enviar("PUT", PERIODOS, reglaPeriodo(0, "2026-11", 5), admin, 400);
+        enviar("PUT", PERIODOS, reglaPeriodo(0, "2026-12", 32), admin, 400);
+        enviar("PUT", PERIODOS, reglaPeriodo(0, "2026-13", 5), admin, 400);
+        var publicada = enviar("PUT", PERIODOS, reglaPeriodo(0, "2026-12", 5), admin, 200);
+        assertEquals("no-store", publicada.headers().firstValue("Cache-Control").orElseThrow());
+        assertEquals("admin", json.readTree(publicada.body()).path("publicadaPor").stringValue());
+        enviar("PUT", PERIODOS, reglaPeriodo(0, "2026-12", 10), admin, 409);
+        enviar("PUT", PERIODOS, reglaPeriodo(1, "2026-12", 6), admin, 200);
+        var vista = consultarJson(PERIODOS, admin);
+        assertEquals("2", vista.path("revision").stringValue());
+        assertEquals(1, vista.path("reglas").size());
+        assertEquals(6, vista.at("/reglas/0/diaInicio").intValue());
+        assertEquals("2026-12-06T05:00:00Z", vista.at("/actual/finMesExclusivo").stringValue());
+        assertEquals(List.of(5, 6), jdbc.queryForList("""
+            SELECT dia_inicio FROM publicaciones_periodos_mensuales ORDER BY revision
+            """, Integer.class));
+        jdbc.update("UPDATE administradores SET cambio_clave_requerido = TRUE WHERE usuario = 'admin'");
+        enviar("GET", PERIODOS, null, admin, 403);
+        enviar("PUT", PERIODOS, reglaPeriodo(2, "2027-01", 1), admin, 403);
+    }
+
+    @Test
+    void elCorteConfiguradoSeAplicaAlConsumoEIdentificaLosRecibosConRangosDistintos() throws Exception {
+        var admin = iniciarAdminTarifas();
+        enviar("PUT", PERIODOS, reglaPeriodo(0, "2026-12", 5), admin, 200);
+        enviar("POST", CONSULTA + "/sesiones", SOLICITUD, null, 201);
+        lectura("empresa-agua", "1", "000101", "2026-11-01T05:00:00", 100);
+        lectura("empresa-agua", "2", "000101", "2026-12-05T05:00:00", 500);
+        lectura("empresa-agua", "3", "000101", "2026-12-06T05:00:00", 700);
+        instantePrueba.set(Instant.parse("2026-12-05T04:59:59.999999Z"));
+        var antes = token(enviar("POST", CONSULTA + "/sesiones", SOLICITUD, null, 201));
+        assertEquals("2026-11", consultarJson(CONSUMO, antes).path("periodo").stringValue());
+        enviar("GET", HISTORIAL + "?meses=1&hasta=2026-11", null, antes, 400);
+
+        instantePrueba.set(Instant.parse("2026-12-05T05:00:00Z"));
+        assertEquals("2026-12", consultarJson(CONSUMO, antes).path("periodo").stringValue());
+        var historial = consultarJson(HISTORIAL + "?meses=2", antes);
+        assertEquals("2026-12-05T05:00:00Z", historial.at("/periodos/0/finMesExclusivo").stringValue());
+        assertEquals("400", historial.at("/periodos/0/consumo/litros").stringValue());
+        assertEquals("2026-11-01T05:00:00Z", historial.at("/periodos/1/finMesExclusivo").stringValue());
+
+        instantePrueba.set(Instant.parse("2026-12-06T05:10:00Z"));
+        var sesion = token(enviar("POST", CONSULTA + "/sesiones", SOLICITUD, null, 201));
+        var actual = consultarJson(CONSUMO, sesion);
+        assertEquals("2026-12-05T05:00:00Z", actual.path("inicioMes").stringValue());
+        assertEquals("2027-01-05T05:00:00Z", actual.path("finMesExclusivo").stringValue());
+        assertEquals("200", actual.at("/consumo/litros").stringValue());
+        var comparacion = consultarJson(ESTADISTICAS + "?meses=1", sesion).path("comparacion");
+        assertEquals("200", comparacion.at("/actual/consumo/litros").stringValue());
+        assertEquals("400", comparacion.at("/anterior/consumo/litros").stringValue());
+        assertEquals("2026-12-05T05:00:00Z",
+            consultarJson(COSTOS + "?meses=1", sesion).at("/actual/inicioMes").stringValue());
+        assertEquals("2027-01-05T05:00:00Z", consultarJson(PROYECCION, sesion).path("finMesExclusivo").stringValue());
+
+        var suministro = new CodigoSuministro("000101");
+        recibos.guardar(new RecibosEmitidos(suministro, List.of(recibo("REC-101-11", YearMonth.of(2026, 11)))),
+            instantePrueba.get());
+        var guardado = consultarJson(RECIBOS, sesion).at("/recibos/0");
+        assertEquals("2026-11", guardado.path("periodo").stringValue());
+        assertEquals("13.46", guardado.path("importeTotal").stringValue());
+        assertEquals("2026-12-01T05:00:00Z", guardado.at("/periodoFacturado/finExclusivo").stringValue());
+        assertEquals("2026-12-05T05:00:00Z", guardado.at("/periodoAnalisis/finExclusivo").stringValue());
+        assertFalse(guardado.path("coincideConPeriodoAnalisis").booleanValue());
+    }
+
+    @Test
+    void calendarioNoDisponibleDevuelve503EnGestionYConsultas() throws Exception {
+        var sesion = token(enviar("POST", CONSULTA + "/sesiones", SOLICITUD, null, 201));
+        var admin = iniciarAdminTarifas();
+        jdbc.execute("DROP TABLE publicaciones_periodos_mensuales");
+        enviar("GET", PERIODOS, null, admin, 503);
+        enviar("PUT", PERIODOS, reglaPeriodo(0, "2026-12", 5), admin, 503);
+        enviar("GET", CONSUMO, null, sesion, 503);
+        enviar("GET", RECIBOS, null, sesion, 503);
+    }
+
+    private static String reglaPeriodo(long revision, String desde, int dia) {
+        return """
+            {"revisionEsperada":"%d","desde":"%s","diaInicio":%d}
+            """.formatted(revision, desde, dia);
     }
 
     @Test

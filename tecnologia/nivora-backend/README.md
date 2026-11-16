@@ -23,6 +23,7 @@ El puerto 8080 esta ocupado por Jenkins en el equipo de desarrollo.
 | `notificaciones` | Alertas y notificaciones | Registra y consulta avisos, guarda marcas de lectura y configura las preferencias por dispositivo y la evaluación de consumo. |
 | `recibos` | Recibos | Importación, sincronización automática y consulta de recibos por suministro. |
 | `integracion` | Supervisión de integración | Consulta de incidencias y programación administrativa de reintentos de lecturas y recibos por suministro. |
+| `periodos` | Calendario mensual | Publicación de reglas futuras para consumo, comparaciones, alertas y contexto de los recibos. |
 
 Las capas de cada modulo se incorporaran cuando se implementen sus
 responsabilidades: dominio, aplicacion, infraestructura y presentacion.
@@ -375,9 +376,15 @@ El contrato, las fechas y los ejemplos estan en
 
 ## Consumo acumulado del mes
 
+Aplica `base-datos/20-periodos-mensuales.sql` antes de arrancar esta versión.
+El calendario usa el día 1 de cada mes en `America/Lima` como regla
+predeterminada. Los administradores pueden publicar un día de inicio
+para meses futuros en `/api/v1/administracion/periodos-mensuales`.
+Consulta el contrato en [Configuración de periodos](documentacion/periodos-mensuales.md).
+
 La sesión de consulta permite leer el consumo de su suministro mediante
 `GET /api/v1/acceso/consulta/consumo-actual`. El cálculo usa las lecturas
-aceptadas en MySQL y el mes de `America/Lima`. La respuesta muestra
+aceptadas en MySQL y el periodo configurado en `America/Lima`. La respuesta muestra
 litros, m³, fechas, referencias, cobertura y estado de actualización.
 El contrato y la prueba desde CMD están en
 [Consumo acumulado del mes](documentacion/consumo-actual.md).

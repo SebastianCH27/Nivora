@@ -11,6 +11,7 @@ import pe.nivora.backend.notificaciones.aplicacion.ConfigurarNotificaciones;
 import pe.nivora.backend.notificaciones.aplicacion.EvaluarAlertaConsumo;
 import pe.nivora.backend.notificaciones.dominio.RepositorioAlertasConsumo;
 import pe.nivora.backend.notificaciones.dominio.RepositorioConfiguracionNotificaciones;
+import pe.nivora.backend.periodos.dominio.RepositorioPeriodosMensuales;
 
 @Configuration(proxyBeanMethods = false)
 public class AlertasConsumoConfiguracion {
@@ -22,7 +23,8 @@ public class AlertasConsumoConfiguracion {
 
     @Bean
     EvaluarAlertaConsumo evaluarAlertaConsumo(ConsultarEstadisticasConsumo estadisticas,
-            RepositorioAlertasConsumo repositorio, ConfigurarNotificaciones configuracion, Clock reloj) {
-        return new EvaluarAlertaConsumo(estadisticas, repositorio, configuracion, reloj);
+            RepositorioAlertasConsumo repositorio, ConfigurarNotificaciones configuracion,
+            RepositorioPeriodosMensuales periodos, Clock reloj) {
+        return new EvaluarAlertaConsumo(estadisticas, repositorio, configuracion, periodos, reloj);
     }
 }

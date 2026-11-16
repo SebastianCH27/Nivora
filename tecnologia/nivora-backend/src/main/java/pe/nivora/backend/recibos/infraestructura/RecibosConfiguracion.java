@@ -5,6 +5,7 @@ import java.time.Clock;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
+import pe.nivora.backend.periodos.dominio.RepositorioPeriodosMensuales;
 import pe.nivora.backend.recibos.aplicacion.ConsultarRecibos;
 import pe.nivora.backend.recibos.aplicacion.ConsultarSupervisionRecibos;
 import pe.nivora.backend.recibos.aplicacion.IncorporarRecibos;
@@ -20,8 +21,8 @@ public class RecibosConfiguracion {
     }
 
     @Bean
-    ConsultarRecibos consultarRecibos(RepositorioRecibos repositorio) {
-        return new ConsultarRecibos(repositorio);
+    ConsultarRecibos consultarRecibos(RepositorioRecibos repositorio, RepositorioPeriodosMensuales periodos) {
+        return new ConsultarRecibos(repositorio, periodos);
     }
 
     @Bean
