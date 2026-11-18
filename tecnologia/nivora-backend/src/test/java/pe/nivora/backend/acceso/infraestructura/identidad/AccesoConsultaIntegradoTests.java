@@ -8,6 +8,9 @@ import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.nio.charset.StandardCharsets;
+import java.security.KeyPairGenerator;
+import java.security.interfaces.ECPublicKey;
+import java.security.spec.ECGenParameterSpec;
 import java.sql.Connection;
 import java.time.Clock;
 import java.time.Duration;
@@ -18,6 +21,10 @@ import java.time.YearMonth;
 import java.time.ZoneId;
 import java.time.ZoneOffset;
 import java.util.List;
+import java.util.ArrayList;
+import java.util.Base64;
+import java.util.HexFormat;
+import java.util.Set;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
@@ -43,6 +50,7 @@ import org.springframework.jdbc.datasource.init.ResourceDatabasePopulator;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
+import org.springframework.transaction.PlatformTransactionManager;
 
 import tools.jackson.databind.JsonNode;
 import tools.jackson.databind.json.JsonMapper;
@@ -61,6 +69,11 @@ import pe.nivora.backend.lecturas.dominio.contratos.RepositorioSincronizacion;
 import pe.nivora.backend.notificaciones.aplicacion.ConfigurarNotificaciones;
 import pe.nivora.backend.notificaciones.aplicacion.EvaluarAlertaConsumo;
 import pe.nivora.backend.notificaciones.aplicacion.GenerarAvisosRecibo;
+import pe.nivora.backend.notificaciones.aplicacion.DespacharWebPush;
+import pe.nivora.backend.notificaciones.dominio.EmisorWebPush;
+import pe.nivora.backend.notificaciones.dominio.Notificacion;
+import pe.nivora.backend.notificaciones.dominio.RepositorioWebPush;
+import pe.nivora.backend.notificaciones.infraestructura.RepositorioWebPushJdbc;
 import pe.nivora.backend.notificaciones.dominio.RepositorioConfiguracionNotificaciones;
 import pe.nivora.backend.recibos.aplicacion.IncorporarRecibos;
 import pe.nivora.backend.recibos.aplicacion.SincronizarRecibos;
@@ -113,7 +126,7 @@ class AccesoConsultaIntegradoTests {
         "08-sesiones-administrativas.sql", "09-sesiones-consulta.sql", "10-tarifas.sql",
         "11-gestion-tarifas.sql", "12-recibos.sql", "13-sincronizacion-recibos.sql",
         "14-alertas-consumo.sql", "15-avisos-recibo.sql", "16-notificaciones-leidas.sql",
-        "17-configuracion-notificaciones.sql", "19-incidencias-sincronizacion-recibos.sql",
+        "17-configuracion-notificaciones.sql", "18-entregas-web-push.sql", "19-incidencias-sincronizacion-recibos.sql",
         "20-periodos-mensuales.sql");
 
     private static final Respuesta AGUA_OK = new Respuesta(200, "application/json",
@@ -155,6 +168,9 @@ class AccesoConsultaIntegradoTests {
     @Autowired private RepositorioRecibos recibos;
     @Autowired private IncorporarRecibos incorporarRecibos;
     @Autowired private RepositorioSincronizacionRecibos programacionRecibos;
+    @Autowired private RepositorioWebPush colaWebPush;
+    @Autowired private PlatformTransactionManager transacciones;
+    @Autowired private EmisorControlado emisorPrueba;
     @Value("${local.server.port}") private int puerto;
 
     private Connection esquema;
@@ -175,6 +191,10 @@ class AccesoConsultaIntegradoTests {
 
         @Bean @Primary Clock relojDePrueba() {
             return new RelojPrueba(ZoneOffset.UTC);
+        }
+
+        @Bean EmisorControlado emisorControlado() {
+            return new EmisorControlado();
         }
     }
 
@@ -197,7 +217,7 @@ class AccesoConsultaIntegradoTests {
                 "contexto_recuperacion_lecturas", "progreso_recuperacion_lecturas",
                 "programacion_sincronizacion_lecturas", "tarifas_asignaciones", "tarifas_historiales",
                 "tarifas_versiones", "programacion_sincronizacion_recibos", "notificaciones_leidas",
-                "preferencias_notificaciones_dispositivo", "avisos_recibo", "recibos",
+                "suscripciones_web_push", "preferencias_notificaciones_dispositivo", "avisos_recibo", "recibos",
                 "alertas_consumo", "suministros")) {
             jdbc.execute("DELETE FROM " + tabla);
         }
@@ -213,6 +233,8 @@ class AccesoConsultaIntegradoTests {
         llamadasIdentidad.set(0);
         peticionAgua.set(null);
         peticionIdentidad.set(null);
+        emisorPrueba.envios.clear();
+        emisorPrueba.respuesta = new EmisorWebPush.Respuesta(EmisorWebPush.Resultado.TEMPORAL, AHORA.plusSeconds(90));
     }
 
     @AfterAll
@@ -1121,6 +1143,105 @@ class AccesoConsultaIntegradoTests {
         assertEquals("Recibos no disponibles", json.readTree(respuesta.body()).path("title").stringValue());
     }
 
+    @ParameterizedTest
+    @ValueSource(booleans = {false, true})
+    void consultasYBandejaContinuanDuranteFallosDePushYDeLaEmpresa(boolean empresaCaida) throws Exception {
+        var sesion = token(enviar("POST", CONSULTA + "/sesiones", SOLICITUD, null, 201));
+        prepararAvisosWebPush(sesion);
+        var rutas = List.of(CONSUMO, COSTOS, PROYECCION, HISTORIAL, ESTADISTICAS, RECIBOS, NOTIFICACIONES);
+        var antes = new ArrayList<JsonNode>();
+        for (String ruta : rutas) {
+            antes.add(consultarJson(ruta, sesion));
+        }
+        if (empresaCaida) {
+            agua.set(CAIDA);
+            identidad.set(CAIDA);
+            recibosProveedor.set(CAIDA);
+        }
+
+        var reloj = new RelojPrueba(ZoneOffset.UTC);
+        new DespacharWebPush(colaWebPush, emisorPrueba, reloj).ejecutar();
+        assertEquals(2, emisorPrueba.envios.size());
+        assertEquals(Set.of(Notificacion.Tipo.ALERTA_CONSUMO, Notificacion.Tipo.RECIBO_DISPONIBLE),
+            emisorPrueba.envios.stream().map(Notificacion.Clave::tipo).collect(java.util.stream.Collectors.toSet()));
+        assertEquals(List.of(1, 1), jdbc.queryForList("SELECT intentos FROM entregas_web_push", Integer.class));
+        assertEquals(2, jdbc.queryForObject("SELECT COUNT(*) FROM entregas_web_push WHERE estado = 'PENDIENTE'",
+            Integer.class));
+        for (int i = 0; i < rutas.size(); i++) {
+            assertEquals(antes.get(i), consultarJson(rutas.get(i), sesion), rutas.get(i));
+        }
+        assertEquals(1, llamadasAgua.get());
+        assertEquals(1, llamadasIdentidad.get());
+        assertEquals(0, llamadasRecibos.get());
+        assertEquals(0, llamadasTarifas.get());
+
+        // Una nueva instancia recupera de JDBC el calendario y las entregas pendientes.
+        var colaReiniciada = new RepositorioWebPushJdbc(jdbc, transacciones);
+        var nuevoDespachador = new DespacharWebPush(colaReiniciada, emisorPrueba, reloj);
+        instantePrueba.set(AHORA.plusSeconds(89));
+        nuevoDespachador.ejecutar();
+        assertEquals(2, emisorPrueba.envios.size());
+        instantePrueba.set(AHORA.plusSeconds(90));
+        emisorPrueba.respuesta = new EmisorWebPush.Respuesta(EmisorWebPush.Resultado.ACEPTADA, null);
+        nuevoDespachador.ejecutar();
+        nuevoDespachador.ejecutar();
+        assertEquals(4, emisorPrueba.envios.size());
+        assertEquals(List.of(2, 2), jdbc.queryForList("SELECT intentos FROM entregas_web_push", Integer.class));
+        assertEquals(2, jdbc.queryForObject("SELECT COUNT(*) FROM entregas_web_push WHERE estado = 'ACEPTADA'",
+            Integer.class));
+        assertEquals(antes.get(5), consultarJson(RECIBOS, sesion));
+        assertEquals(antes.get(6), consultarJson(NOTIFICACIONES, sesion));
+        var actual = consultarJson(CONSUMO, sesion);
+        assertEquals(antes.getFirst().path("consumo"), actual.path("consumo"));
+        assertEquals("2200", actual.at("/consumo/litros").stringValue());
+    }
+
+    @Test
+    void desactivarUnDispositivoDetieneLosReintentosYConservaLaBandeja() throws Exception {
+        var sesion = token(enviar("POST", CONSULTA + "/sesiones", SOLICITUD, null, 201));
+        prepararAvisosWebPush(sesion);
+        var bandeja = consultarJson(NOTIFICACIONES, sesion);
+        var recibo = consultarJson(RECIBOS, sesion);
+        var reloj = new RelojPrueba(ZoneOffset.UTC);
+        new DespacharWebPush(colaWebPush, emisorPrueba, reloj).ejecutar();
+        assertEquals(2, emisorPrueba.envios.size());
+        instantePrueba.set(AHORA.plusSeconds(1));
+        enviar("PUT", DISPOSITIVO, "{\"permiso\":\"CONCEDIDO\",\"habilitadas\":false}", sesion, 200);
+
+        instantePrueba.set(AHORA.plusSeconds(90));
+        emisorPrueba.respuesta = new EmisorWebPush.Respuesta(EmisorWebPush.Resultado.ACEPTADA, null);
+        new DespacharWebPush(new RepositorioWebPushJdbc(jdbc, transacciones), emisorPrueba, reloj).ejecutar();
+        assertEquals(2, emisorPrueba.envios.size());
+        assertEquals(2, jdbc.queryForObject("SELECT COUNT(*) FROM entregas_web_push", Integer.class));
+        enviar("DELETE", DISPOSITIVO + "/suscripcion", null, sesion, 204);
+        assertEquals(0, jdbc.queryForObject("SELECT COUNT(*) FROM entregas_web_push", Integer.class));
+        assertEquals(0, jdbc.queryForObject("SELECT COUNT(*) FROM suscripciones_web_push", Integer.class));
+        assertEquals(bandeja, consultarJson(NOTIFICACIONES, sesion));
+        assertEquals(recibo, consultarJson(RECIBOS, sesion));
+    }
+
+    private void prepararAvisosWebPush(String sesion) throws Exception {
+        enviar("PUT", DISPOSITIVO, "{\"permiso\":\"CONCEDIDO\",\"habilitadas\":true}", sesion, 200);
+        var generador = KeyPairGenerator.getInstance("EC");
+        generador.initialize(new ECGenParameterSpec("secp256r1"));
+        var punto = ((ECPublicKey) generador.generateKeyPair().getPublic()).getW();
+        var publica = Base64.getUrlEncoder().withoutPadding().encodeToString(HexFormat.of()
+            .parseHex("04%064x%064x".formatted(punto.getAffineX(), punto.getAffineY())));
+        var suscripcion = json.createObjectNode();
+        suscripcion.put("endpoint", "https://fcm.googleapis.com/fcm/send/prueba-integrada");
+        suscripcion.putObject("keys").put("p256dh", publica)
+            .put("auth", Base64.getUrlEncoder().withoutPadding().encodeToString(new byte[16]));
+        enviar("PUT", DISPOSITIVO + "/suscripcion", json.writeValueAsString(suscripcion), sesion, 204);
+        incorporarLectura("1", "2026-10-01T05:00:00Z", 100);
+        incorporarLectura("2", "2026-11-01T05:00:00Z", 2100);
+        incorporarLectura("3", "2026-11-11T05:00:00Z", 4300);
+        var suministro = new CodigoSuministro("000101");
+        assertEquals(EvaluarAlertaConsumo.Estado.GENERADA, evaluarAlertaConsumo.ejecutar(suministro).estado());
+        recibos.guardar(new RecibosEmitidos(suministro, List.of(recibo("REC-101-10", YearMonth.of(2026, 10)))), AHORA);
+        assertEquals(1, generarAvisosRecibo.ejecutar());
+        assertEquals(2, consultarJson(NOTIFICACIONES, sesion).path("notificaciones").size());
+    }
+
     @Test
     void flujoAdministrativoRecuperaLecturasYRecibosConCalendarioPublicado() throws Exception {
         var administrador = iniciarAdminTarifas();
@@ -1999,6 +2120,22 @@ class AccesoConsultaIntegradoTests {
     }
 
     private record Respuesta(int estado, String tipo, String cuerpo) {}
+
+    static class EmisorControlado implements EmisorWebPush {
+        private final List<Notificacion.Clave> envios = new CopyOnWriteArrayList<>();
+        private EmisorWebPush.Respuesta respuesta;
+
+        @Override
+        public String clavePublica() {
+            return "clave-publica-de-prueba";
+        }
+
+        @Override
+        public EmisorWebPush.Respuesta enviar(RepositorioWebPush.Reserva reserva, Instant ahora) {
+            envios.add(reserva.aviso());
+            return respuesta;
+        }
+    }
 
     private record PeticionIdentidad(String metodo, String ruta, String consulta, String autorizacion) {}
 }

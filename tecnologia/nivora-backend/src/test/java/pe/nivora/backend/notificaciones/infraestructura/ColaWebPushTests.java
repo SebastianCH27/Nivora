@@ -80,6 +80,49 @@ class ColaWebPushTests {
     }
 
     @Test
+    void agotaSeisIntentosTemporalesYConservaLaEntregaFallidaSinDuplicarla() throws Exception {
+        asociar("agotada");
+        alerta("2026-11-01", AHORA);
+        Instant ahora = AHORA;
+        for (int intento = 0; intento < 6; intento++) {
+            emisor.respuestas.add(new EmisorWebPush.Respuesta(EmisorWebPush.Resultado.TEMPORAL, null));
+            despachar(ahora);
+            assertEquals(intento + 1, emisor.envios);
+            assertEquals(intento + 1, jdbc.queryForObject("SELECT intentos FROM entregas_web_push", Integer.class));
+            ahora = ahora.plusSeconds(30L << intento);
+        }
+        assertEquals("FALLIDA", estado());
+        despachar(AHORA.plusSeconds(7200));
+        assertEquals(6, emisor.envios);
+        assertEquals(1, jdbc.queryForObject("SELECT COUNT(*) FROM entregas_web_push", Integer.class));
+    }
+
+    @Test
+    void unaReservaVencidaNoPuedeConfirmarLaEntregaReservadaPorOtroTrabajador() throws Exception {
+        asociar("reserva-vencida");
+        alerta("2026-11-01", AHORA);
+        cola.encolar(AHORA);
+        var primera = cola.reservar(AHORA).orElseThrow();
+        var otraInstancia = new RepositorioWebPushJdbc(jdbc, new DataSourceTransactionManager(jdbc.getDataSource()));
+        assertTrue(otraInstancia.reservar(AHORA.plusSeconds(59)).isEmpty());
+        var nueva = otraInstancia.reservar(AHORA.plusSeconds(60)).orElseThrow();
+        assertEquals(primera.idSuscripcion(), nueva.idSuscripcion());
+        assertNotEquals(primera.token(), nueva.token());
+        assertFalse(cola.vigente(primera, AHORA.plusSeconds(60)));
+        assertTrue(otraInstancia.vigente(nueva, AHORA.plusSeconds(60)));
+
+        cola.finalizar(primera, RepositorioWebPush.Estado.ACEPTADA, AHORA.plusSeconds(60), AHORA.plusSeconds(60));
+        assertEquals("PENDIENTE", estado());
+        assertEquals(0, jdbc.queryForObject("SELECT intentos FROM entregas_web_push", Integer.class));
+        otraInstancia.finalizar(nueva, RepositorioWebPush.Estado.ACEPTADA, AHORA.plusSeconds(60), AHORA.plusSeconds(60));
+        cola.encolar(AHORA.plusSeconds(90));
+        assertEquals("ACEPTADA", estado());
+        assertEquals(1, jdbc.queryForObject("SELECT intentos FROM entregas_web_push", Integer.class));
+        assertEquals(1, jdbc.queryForObject("SELECT COUNT(*) FROM entregas_web_push", Integer.class));
+        assertTrue(cola.reservar(AHORA.plusSeconds(90)).isEmpty());
+    }
+
+    @Test
     void expiraSuscripcionYDescartaLosEnviosPendientes() throws Exception {
         asociar("expirada");
         alerta("2026-11-01", AHORA);

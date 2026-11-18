@@ -487,6 +487,13 @@ El recorrido de administración, calendario y recuperación de lecturas y
 recibos está documentado en
 [Verificación del bloque administrativo](documentacion/verificacion-administracion.md).
 
+## Verificación final de continuidad
+
+Las consultas locales, la bandeja y los reintentos Web Push se comprueban
+con fallos del emisor y de Empresa de Agua. Los casos, los resultados
+y los comandos para repetirlos están en
+[Continuidad de consultas y avisos](documentacion/verificacion-continuidad-avisos.md).
+
 ## Alerta de consumo
 
 Aplica `base-datos/14-alertas-consumo.sql`. Tras completar la sincronización
