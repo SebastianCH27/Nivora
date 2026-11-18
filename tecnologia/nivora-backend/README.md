@@ -494,6 +494,11 @@ con fallos del emisor y de Empresa de Agua. Los casos, los resultados
 y los comandos para repetirlos están en
 [Continuidad de consultas y avisos](documentacion/verificacion-continuidad-avisos.md).
 
+La matriz de contratos HTTP comprueba el suministro de la sesión, las
+respuestas de error y los permisos antes de las operaciones administrativas.
+Los casos y comandos están en
+[Contratos y aislamiento de la API](documentacion/verificacion-contratos-api.md).
+
 ## Alerta de consumo
 
 Aplica `base-datos/14-alertas-consumo.sql`. Tras completar la sincronización

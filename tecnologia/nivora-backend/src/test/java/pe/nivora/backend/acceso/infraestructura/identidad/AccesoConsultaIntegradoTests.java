@@ -25,6 +25,7 @@ import java.util.ArrayList;
 import java.util.Base64;
 import java.util.HexFormat;
 import java.util.Set;
+import java.util.stream.Stream;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
@@ -38,6 +39,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -245,6 +247,166 @@ class AccesoConsultaIntegradoTests {
         }
         http.close();
     }
+
+    @ParameterizedTest
+    @MethodSource("contratosDeConsulta")
+    void contratoDeConsultaConservaElSuministroYEquivaleEntreSesiones(ContratoConsulta contrato) throws Exception {
+        var propia = token(enviar("POST", CONSULTA + "/sesiones", SOLICITUD, null, 201));
+        var otroDispositivo = token(enviar("POST", CONSULTA + "/sesiones", SOLICITUD, null, 201));
+        agua.set(new Respuesta(200, "application/json", AGUA_OK.cuerpo().replace("000101", "000202")));
+        var ajena = token(enviar("POST", CONSULTA + "/sesiones",
+            SOLICITUD.replace("000101", "000202"), null, 201));
+        lectura("empresa-agua", "1", "000101", "2026-10-01T05:00:00", 100);
+        lectura("empresa-agua", "2", "000101", "2026-11-01T05:00:00", 2100);
+        lectura("empresa-agua", "3", "000101", "2026-11-11T05:00:00", 4300);
+        lectura("empresa-agua", "4", "000202", "2026-10-01T05:00:00", 500);
+        lectura("empresa-agua", "5", "000202", "2026-11-01T05:00:00", 10500);
+        lectura("empresa-agua", "6", "000202", "2026-11-11T05:00:00", 19500);
+        recibos.guardar(new RecibosEmitidos(new CodigoSuministro("000101"),
+            List.of(recibo("REC-101-10", YearMonth.of(2026, 10)))), AHORA);
+        recibos.guardar(new RecibosEmitidos(new CodigoSuministro("000202"),
+            List.of(recibo("REC-202-10", YearMonth.of(2026, 10)))), AHORA);
+        assertEquals(2, generarAvisosRecibo.ejecutar());
+        agua.set(CAIDA);
+        identidad.set(CAIDA);
+
+        var respuesta = enviar("GET", contrato.ruta(), null, propia, 200);
+        assertTrue(respuesta.headers().firstValue("Content-Type").orElseThrow().startsWith("application/json"));
+        var datos = json.readTree(respuesta.body());
+        assertEquals("000101", datos.path("codigoSuministro").stringValue());
+        assertTrue(datos.at(contrato.campo()).isString());
+        assertEquals(contrato.propio(), datos.at(contrato.campo()).stringValue());
+        assertFalse(respuesta.body().contains(DNI));
+        assertFalse(respuesta.body().contains(propia));
+        assertFalse(respuesta.body().contains("REC-202-10"));
+        assertEquals(datos, consultarJson(contrato.ruta(), otroDispositivo));
+        String separador = contrato.ruta().contains("?") ? "&" : "?";
+        assertEquals(datos, consultarJson(contrato.ruta() + separador + "codigoSuministro=000202", propia));
+        var otrosDatos = consultarJson(contrato.ruta() + separador + "codigoSuministro=000101", ajena);
+        assertEquals("000202", otrosDatos.path("codigoSuministro").stringValue());
+        assertEquals(contrato.ajeno(), otrosDatos.at(contrato.campo()).stringValue());
+
+        comprobarProblema(enviar("GET", contrato.ruta(), null, null, 401), 401);
+        var admin = iniciarAdminTarifas();
+        comprobarProblema(enviar("GET", contrato.ruta(), null, admin, 401), 401);
+        enviar("DELETE", CONSULTA + "/sesion", null, propia, 204);
+        comprobarProblema(enviar("GET", contrato.ruta(), null, propia, 401), 401);
+        assertEquals(datos, consultarJson(contrato.ruta(), otroDispositivo));
+        assertEquals(3, llamadasAgua.get());
+        assertEquals(3, llamadasIdentidad.get());
+    }
+
+    static Stream<ContratoConsulta> contratosDeConsulta() {
+        return Stream.of(
+            new ContratoConsulta(CONSUMO, "/consumo/litros", "2200", "9000"),
+            new ContratoConsulta(HISTORIAL + "?meses=1", "/periodos/0/consumo/litros", "2000", "10000"),
+            new ContratoConsulta(ESTADISTICAS + "?meses=1", "/comparacion/actual/consumo/litros", "2200", "9000"),
+            new ContratoConsulta(COSTOS + "?meses=1", "/actual/consumo/litros", "2200", "9000"),
+            new ContratoConsulta(PROYECCION, "/observado/litros", "2200", "9000"),
+            new ContratoConsulta(RECIBOS, "/recibos/0/numeroRecibo", "REC-101-10", "REC-202-10"),
+            new ContratoConsulta(NOTIFICACIONES, "/notificaciones/0/recibo/numeroRecibo", "REC-101-10", "REC-202-10"));
+    }
+
+    @ParameterizedTest
+    @MethodSource("operacionesAdministrativas")
+    void contratoAdministrativoRequierePermisoAntesDeConsultarOEscribir(OperacionAdministrativa operacion)
+            throws Exception {
+        var consulta = token(enviar("POST", CONSULTA + "/sesiones", SOLICITUD, null, 201));
+        var admin = iniciarAdminTarifas();
+        var datosGuardados = contarConfiguraciones();
+        comprobarProblema(enviar(operacion.metodo(), operacion.ruta(), operacion.cuerpo(), null, 401), 401);
+        var errorConsulta = enviar(operacion.metodo(), operacion.ruta(), operacion.cuerpo(), consulta, 401);
+        comprobarProblema(errorConsulta, 401);
+        assertFalse(errorConsulta.body().contains(consulta));
+        jdbc.update("UPDATE administradores SET cambio_clave_requerido = TRUE WHERE usuario = 'admin'");
+        var errorPermiso = enviar(operacion.metodo(), operacion.ruta(), operacion.cuerpo(), admin, 403);
+        comprobarProblema(errorPermiso, 403);
+        assertFalse(errorPermiso.body().contains(admin));
+        assertEquals(datosGuardados, contarConfiguraciones());
+
+        jdbc.update("UPDATE administradores SET cambio_clave_requerido = FALSE WHERE usuario = 'admin'");
+        var valida = enviar(operacion.metodo(), operacion.ruta(), operacion.cuerpo(), admin, operacion.estado());
+        assertTrue(valida.headers().firstValue("Content-Type").orElseThrow().startsWith("application/json"));
+        assertEquals(1, llamadasAgua.get());
+        assertEquals(1, llamadasIdentidad.get());
+    }
+
+    static Stream<OperacionAdministrativa> operacionesAdministrativas() {
+        return Stream.of(
+            new OperacionAdministrativa("GET", REGISTROS, null, 200),
+            new OperacionAdministrativa("GET", ACCESOS, null, 200),
+            new OperacionAdministrativa("GET", GESTION_TARIFAS, null, 200),
+            new OperacionAdministrativa("PUT", GESTION_TARIFAS, solicitudTarifa(0, 1, "2026-12-01", null), 200),
+            new OperacionAdministrativa("GET", CONTROL_ALERTAS, null, 200),
+            new OperacionAdministrativa("PUT", CONTROL_ALERTAS, "{\"habilitada\":false}", 200),
+            new OperacionAdministrativa("GET", PERIODOS, null, 200),
+            new OperacionAdministrativa("PUT", PERIODOS, reglaPeriodo(0, "2026-12", 5), 200),
+            new OperacionAdministrativa("GET", SUPERVISION, null, 200),
+            new OperacionAdministrativa("GET", SUPERVISION_RECIBOS, null, 200),
+            new OperacionAdministrativa("GET", INCIDENCIAS, null, 200),
+            new OperacionAdministrativa("POST", SUPERVISION + "/reintentos", null, 202),
+            new OperacionAdministrativa("POST", SUPERVISION_RECIBOS + "/reintentos", null, 202));
+    }
+
+    @ParameterizedTest
+    @ValueSource(strings = {
+        "{\"revisionEsperada\":0,\"desde\":\"2026-12\",\"diaInicio\":5}",
+        "{\"revisionEsperada\":\"0\",\"desde\":\"2026-12\",\"diaInicio\":\"5\"}",
+        "{\"revisionEsperada\":null,\"desde\":\"2026-12\",\"diaInicio\":5}",
+        "{\"revisionEsperada\":\"0\",\"desde\":\"2026-12\",\"diaInicio\":5,\"actor\":\"intruso\"}",
+        "{\"revisionEsperada\":\"0\",\"desde\":\"2026-12\",\"diaInicio\":5,\"diaInicio\":6}",
+        "{\"revisionEsperada\":\"0\",\"desde\":\"2026-12\",\"diaInicio\":5} {}"
+    })
+    void contratoDePublicacionRechazaTiposCamposYJsonAmbiguos(String cuerpo) throws Exception {
+        var admin = iniciarAdminTarifas();
+        comprobarProblema(enviar("PUT", PERIODOS, cuerpo, admin, 400), 400);
+        assertEquals(0, jdbc.queryForObject("SELECT COUNT(*) FROM publicaciones_periodos_mensuales", Integer.class));
+        assertEquals("0", consultarJson(PERIODOS, admin).path("revision").stringValue());
+    }
+
+    @Test
+    void laSesionAjenaNoPuedeMarcarAvisosNiRetirarLaSuscripcionDelOtroSuministro() throws Exception {
+        var propia = token(enviar("POST", CONSULTA + "/sesiones", SOLICITUD, null, 201));
+        prepararAvisosWebPush(propia);
+        var suscripcion = jdbc.queryForMap("SELECT endpoint, p256dh, auth FROM suscripciones_web_push");
+        agua.set(new Respuesta(200, "application/json", AGUA_OK.cuerpo().replace("000101", "000202")));
+        var ajena = token(enviar("POST", CONSULTA + "/sesiones",
+            SOLICITUD.replace("000101", "000202"), null, 201));
+        comprobarProblema(enviar("PUT", NOTIFICACIONES + "/RECIBO_DISPONIBLE-2026-10/leida", null, ajena, 404), 404);
+        assertEquals(0, jdbc.queryForObject("SELECT COUNT(*) FROM notificaciones_leidas", Integer.class));
+        enviar("PUT", DISPOSITIVO, "{\"permiso\":\"CONCEDIDO\",\"habilitadas\":true}", ajena, 200);
+        var datos = json.createObjectNode();
+        datos.put("endpoint", (String) suscripcion.get("endpoint"));
+        datos.putObject("keys").put("p256dh", (String) suscripcion.get("p256dh")).put("auth", (String) suscripcion.get("auth"));
+        comprobarProblema(enviar("PUT", DISPOSITIVO + "/suscripcion", json.writeValueAsString(datos), ajena, 409), 409);
+        enviar("DELETE", DISPOSITIVO + "/suscripcion", null, ajena, 204);
+        assertEquals("000101", jdbc.queryForObject("SELECT codigo_suministro FROM suscripciones_web_push", String.class));
+        assertEquals(2, consultarJson(NOTIFICACIONES, propia).path("notificaciones").size());
+        assertTrue(consultarJson(NOTIFICACIONES, ajena).path("notificaciones").isEmpty());
+    }
+
+    private List<Long> contarConfiguraciones() {
+        return List.of("publicaciones_periodos_mensuales", "tarifas_publicaciones", "configuracion_alertas_consumo",
+                "programacion_sincronizacion_lecturas", "programacion_sincronizacion_recibos").stream()
+            .map(tabla -> jdbc.queryForObject("SELECT COUNT(*) FROM " + tabla, Long.class)).toList();
+    }
+
+    private void comprobarProblema(HttpResponse<String> respuesta, int estado) {
+        assertTrue(respuesta.headers().firstValue("Content-Type").orElseThrow().startsWith("application/problem+json"));
+        var datos = json.readTree(respuesta.body());
+        assertEquals(estado, datos.path("status").intValue());
+        assertTrue(datos.path("title").isString());
+        assertTrue(datos.path("detail").isString());
+        assertFalse(respuesta.body().contains(DNI));
+        assertFalse(respuesta.body().contains(CLAVE_ADMIN));
+        if (estado == 401) {
+            assertEquals("Bearer", respuesta.headers().firstValue("WWW-Authenticate").orElseThrow());
+        }
+    }
+
+    private record ContratoConsulta(String ruta, String campo, String propio, String ajeno) {}
+
+    private record OperacionAdministrativa(String metodo, String ruta, String cuerpo, int estado) {}
 
     @Test
     void listaSuministrosLocalesConCursorQueConservaLosCeros() throws Exception {
