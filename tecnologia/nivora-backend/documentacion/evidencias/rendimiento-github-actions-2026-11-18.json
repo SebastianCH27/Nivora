@@ -1,0 +1,2781 @@
+{
+  "versionFormato": 1,
+  "fechaLocal": "2026-11-18",
+  "zonaHoraria": "America/Lima",
+  "alcance": "Consultas autenticadas del backend real y MySQL con datos ficticios; carga cerrada con pausa de 1000 ms; servidor, fuente y generador comparten la VM.",
+  "criterios": {
+    "usuariosActivos": 5000,
+    "medicionSegundos": 1800,
+    "p95MaximoMsPorOperacion": 2000,
+    "erroresInternosOTransporteMenorQuePorcentaje": 1,
+    "muestrasMinimasPorOperacion": 100
+  },
+  "estado": {
+    "EQ-01": "VERIFICADO_EN_EL_ENTORNO_DOCUMENTADO",
+    "EQ-02": "EVIDENCIA_PARCIAL_COMPARACION_OBSERVACIONAL_DE_POOLS",
+    "detalleEQ02": "Se observa mayor carga dentro de los umbrales con 20 conexiones, usando el mismo JAR. Los hosts de GitHub son distintos; este ensayo no aisla el efecto del pool ni demuestra ampliacion controlada de CPU/RAM o instancias."
+  },
+  "ejecuciones": [
+    {
+      "idEjecucionGitHub": "44445646813",
+      "url": "https://github.com/SebastianCH27/Nivora/actions/runs/44445646813",
+      "identificadorMontaje": "638edfd57aa1",
+      "perfil": "completa",
+      "poolConexiones": 10,
+      "commit": "2d43391996ded72eb03d3743728ca78df0aa4ae2",
+      "zipOrigen": "logs_120311975258.zip",
+      "sha256ZipOrigen": "a77ce4a92202074d0df89ea71a477531dd824239b919670f34d723cd9f771d62",
+      "construccion": {
+        "pruebas": 559,
+        "fallos": 0,
+        "errores": 0,
+        "omitidas": 0,
+        "buildSuccess": true
+      },
+      "limpiezaConfirmadaEnLog": true,
+      "resumenEtapas": [
+        {
+          "usuarios": 500,
+          "usuariosMinimosEnMedicion": 500,
+          "medicionSegundos": 120,
+          "solicitudes": 59840,
+          "errores": 0,
+          "p95MaximoMs": 6,
+          "cumpleUmbrales": true,
+          "sincronizacionDuranteMedicion": true,
+          "alertasGeneradasDuranteMedicion": true
+        },
+        {
+          "usuarios": 1000,
+          "usuariosMinimosEnMedicion": 1000,
+          "medicionSegundos": 120,
+          "solicitudes": 119229,
+          "errores": 0,
+          "p95MaximoMs": 25,
+          "cumpleUmbrales": true,
+          "sincronizacionDuranteMedicion": true,
+          "alertasGeneradasDuranteMedicion": true
+        },
+        {
+          "usuarios": 2500,
+          "usuariosMinimosEnMedicion": 2500,
+          "medicionSegundos": 120,
+          "solicitudes": 169611,
+          "errores": 0,
+          "p95MaximoMs": 1026,
+          "cumpleUmbrales": true,
+          "sincronizacionDuranteMedicion": true,
+          "alertasGeneradasDuranteMedicion": true
+        },
+        {
+          "usuarios": 5000,
+          "usuariosMinimosEnMedicion": 5000,
+          "medicionSegundos": 1800,
+          "solicitudes": 2457146,
+          "errores": 0,
+          "p95MaximoMs": 2946,
+          "cumpleUmbrales": false,
+          "sincronizacionDuranteMedicion": true,
+          "alertasGeneradasDuranteMedicion": true
+        }
+      ],
+      "informesOriginales": {
+        "entorno.json": {
+          "creadoUTC": "2026-11-19T02:38:59.5922116Z",
+          "equipo": "runnervm8axu0",
+          "sistema": "Unix 7.0.0.1017",
+          "procesadores": 4,
+          "ramFisicaBytes": 16760344576,
+          "mysql": {
+            "version": "8.0.46-0ubuntu0.24.04.4",
+            "maxConnections": 151,
+            "innodbBufferPoolBytes": 134217728
+          },
+          "java": "openjdk 21.0.13 2026-10-20 LTS\nOpenJDK Runtime Environment Temurin-21.0.13+9 (build 21.0.13+9-LTS)\nOpenJDK 64-Bit Server VM Temurin-21.0.13+9 (build 21.0.13+9-LTS, mixed mode, sharing)",
+          "jarSHA256": "064237E55F59B0CC73AA0579612B2551E11351D5156294AF8EFBF78B771CD44E",
+          "baseTemporal": "nivora_carga_638edfd57aa1",
+          "usuariosFicticios": 5000,
+          "lecturasPorSuministro": 4,
+          "recibosPorSuministro": 1,
+          "periodosConConsumo": 3,
+          "sesionesIndependientes": 5000,
+          "memoriaBackendMb": 512,
+          "memoriaGeneradorMb": 512,
+          "poolConexiones": 10,
+          "hilosHttp": 200,
+          "pausaMs": 1000,
+          "diagnostico": false,
+          "medirRecursos": true,
+          "intervaloDiagnosticoSegundos": 5,
+          "sinInteraccion": true,
+          "powershell": "7.6.10",
+          "etapas": [
+            500,
+            1000,
+            2500,
+            5000
+          ],
+          "completa": true,
+          "generadorYServidorEnMismoEquipo": true,
+          "sincronizacionLecturasIntervaloMs": 1000,
+          "intentosPorCiclo": 1,
+          "intervaloCompletoSegundos": 30
+        },
+        "etapa-1-500-antes.json": {
+          "suministrosActualizados": 0,
+          "ultimoExitoUTC": null,
+          "alertasRegistradas": 0,
+          "lecturasGuardadas": 20000,
+          "suministrosConExitoDuranteMedicion": null,
+          "alertasDuranteMedicion": null,
+          "lecturasDuranteMedicion": null,
+          "ultimaAlertaUTC": null
+        },
+        "etapa-1-500-despues.json": {
+          "suministrosActualizados": 176,
+          "ultimoExitoUTC": "2026-11-19 02:42:17.900975",
+          "alertasRegistradas": 176,
+          "lecturasGuardadas": 20176,
+          "suministrosConExitoDuranteMedicion": 108,
+          "alertasDuranteMedicion": 108,
+          "lecturasDuranteMedicion": 108,
+          "ultimaAlertaUTC": "2026-11-19 02:42:17.904095"
+        },
+        "etapa-1-500-diagnostico.json": {
+          "inicioMedicionUTC": "2026-11-19T02:40:16.094204940Z",
+          "finMedicionUTC": "2026-11-19T02:42:16.094204940Z",
+          "usuarios": 500,
+          "usuariosMinimosEnMedicion": 500,
+          "fallosGenerador": 0,
+          "cumpleUmbralesDeEstaEtapa": true,
+          "operaciones": [
+            {
+              "nombre": "consumo",
+              "solicitudes": 8549,
+              "p95MsHasta": 4,
+              "internosOTransporte": 0,
+              "otrosErrores": 0
+            },
+            {
+              "nombre": "historial",
+              "solicitudes": 8548,
+              "p95MsHasta": 4,
+              "internosOTransporte": 0,
+              "otrosErrores": 0
+            },
+            {
+              "nombre": "estadisticas",
+              "solicitudes": 8547,
+              "p95MsHasta": 4,
+              "internosOTransporte": 0,
+              "otrosErrores": 0
+            },
+            {
+              "nombre": "costos",
+              "solicitudes": 8547,
+              "p95MsHasta": 6,
+              "internosOTransporte": 0,
+              "otrosErrores": 0
+            },
+            {
+              "nombre": "proyeccion",
+              "solicitudes": 8548,
+              "p95MsHasta": 6,
+              "internosOTransporte": 0,
+              "otrosErrores": 0
+            },
+            {
+              "nombre": "recibos",
+              "solicitudes": 8551,
+              "p95MsHasta": 3,
+              "internosOTransporte": 0,
+              "otrosErrores": 0
+            },
+            {
+              "nombre": "notificaciones",
+              "solicitudes": 8550,
+              "p95MsHasta": 3,
+              "internosOTransporte": 0,
+              "otrosErrores": 0
+            }
+          ],
+          "alcance": "Diagnostico instrumentado; requiere interpretar muestras, logs GC y capturas de hilos.",
+          "backend": {
+            "muestras": 24,
+            "cpuProcesoPorcentajeDeUnNucleo": 50.345,
+            "cpuSistemaPorcentaje": {
+              "muestras": 24,
+              "promedio": 34.278,
+              "minimo": 31.827,
+              "maximo": 38.624
+            },
+            "memoriaFisicaLibreBytes": {
+              "muestras": 24,
+              "promedio": 13450682709.333,
+              "minimo": 13418233856.0,
+              "maximo": 13467693056.0
+            },
+            "heapUsadoBytes": {
+              "muestras": 24,
+              "promedio": 49871033.333,
+              "minimo": 38178672.0,
+              "maximo": 61758296.0
+            },
+            "conexionesActivas": {
+              "muestras": 24,
+              "promedio": 0.792,
+              "minimo": 0.0,
+              "maximo": 2.0
+            },
+            "conexionesInactivas": {
+              "muestras": 24,
+              "promedio": 9.208,
+              "minimo": 8.0,
+              "maximo": 10.0
+            },
+            "conexionesTotales": {
+              "muestras": 24,
+              "promedio": 10.0,
+              "minimo": 10.0,
+              "maximo": 10.0
+            },
+            "hilosEsperandoConexion": {
+              "muestras": 24,
+              "promedio": 0.0,
+              "minimo": 0.0,
+              "maximo": 0.0
+            },
+            "hilosHttpOcupados": {
+              "muestras": 24,
+              "promedio": 0.75,
+              "minimo": 0.0,
+              "maximo": 4.0
+            },
+            "hilosHttpMaximos": {
+              "muestras": 24,
+              "promedio": 200.0,
+              "minimo": 200.0,
+              "maximo": 200.0
+            },
+            "gcTiempoMsEntrePrimeraYUltimaMuestra": 472,
+            "gcCantidadEntrePrimeraYUltimaMuestra": 215
+          },
+          "generador": {
+            "muestras": 24,
+            "cpuProcesoPorcentajeDeUnNucleo": 20.558,
+            "cpuSistemaPorcentaje": {
+              "muestras": 24,
+              "promedio": 34.073,
+              "minimo": 31.767,
+              "maximo": 39.415
+            },
+            "memoriaFisicaLibreBytes": {
+              "muestras": 24,
+              "promedio": 13448205994.667,
+              "minimo": 13417988096.0,
+              "maximo": 13467693056.0
+            },
+            "heapUsadoBytes": {
+              "muestras": 24,
+              "promedio": 91313503.333,
+              "minimo": 23853528.0,
+              "maximo": 160988408.0
+            },
+            "conexionesActivas": null,
+            "conexionesInactivas": null,
+            "conexionesTotales": null,
+            "hilosEsperandoConexion": null,
+            "hilosHttpOcupados": null,
+            "hilosHttpMaximos": null,
+            "gcTiempoMsEntrePrimeraYUltimaMuestra": 42,
+            "gcCantidadEntrePrimeraYUltimaMuestra": 10
+          },
+          "mysql": {
+            "muestras": 24,
+            "cpuPorcentajeDeUnNucleo": {
+              "muestras": 24,
+              "promedio": 62.122,
+              "minimo": 61.2,
+              "maximo": 64.3
+            },
+            "memoriaProcesoBytes": {
+              "muestras": 24,
+              "promedio": 497184085.333,
+              "minimo": 496181248.0,
+              "maximo": 497680384.0
+            }
+          }
+        },
+        "etapa-1-500-evaluacion.json": {
+          "sincronizacionDuranteMedicion": true,
+          "alertasGeneradasDuranteMedicion": true,
+          "alertasAlFinal": 176,
+          "lecturasIncorporadasDuranteMedicion": 108,
+          "cumpleUmbralesDeEstaEtapa": true,
+          "cubre5000Durante30Minutos": false,
+          "requiereComparacionDeRecursos": true
+        },
+        "etapa-1-500.json": {
+          "inicioUTC": "2026-11-19T02:39:00.885526540Z",
+          "finUTC": "2026-11-19T02:42:17.102106964Z",
+          "inicioMedicionUTC": "2026-11-19T02:40:16.094204940Z",
+          "finMedicionUTC": "2026-11-19T02:42:16.094204940Z",
+          "usuarios": 500,
+          "usuariosMinimosEnMedicion": 500,
+          "rampaSegundos": 60,
+          "calentamientoSegundos": 15,
+          "medicionSegundos": 120,
+          "pausaMs": 1000,
+          "fallosGenerador": 0,
+          "cumpleUmbralesDeEstaEtapa": true,
+          "cubre5000Durante30Minutos": false,
+          "generador": {
+            "procesadores": 4,
+            "heapMaximoBytes": 536870912,
+            "heapObservadoMaximoBytes": 165866088,
+            "cpuMediaPorcentajeDeUnNucleo": 23.81
+          },
+          "operaciones": [
+            {
+              "nombre": "consumo",
+              "solicitudes": 8549,
+              "internosOTransporte": 0,
+              "otrosErrores": 0,
+              "erroresPorcentaje": 0.0,
+              "solicitudesPorSegundo": 71.242,
+              "mediaMs": 2.118,
+              "p50MsHasta": 2,
+              "p95MsHasta": 4,
+              "p99MsHasta": 5,
+              "maximoMs": 24.051,
+              "cumple": true
+            },
+            {
+              "nombre": "historial",
+              "solicitudes": 8548,
+              "internosOTransporte": 0,
+              "otrosErrores": 0,
+              "erroresPorcentaje": 0.0,
+              "solicitudesPorSegundo": 71.233,
+              "mediaMs": 2.125,
+              "p50MsHasta": 2,
+              "p95MsHasta": 4,
+              "p99MsHasta": 5,
+              "maximoMs": 18.049,
+              "cumple": true
+            },
+            {
+              "nombre": "estadisticas",
+              "solicitudes": 8547,
+              "internosOTransporte": 0,
+              "otrosErrores": 0,
+              "erroresPorcentaje": 0.0,
+              "solicitudesPorSegundo": 71.225,
+              "mediaMs": 2.146,
+              "p50MsHasta": 2,
+              "p95MsHasta": 4,
+              "p99MsHasta": 6,
+              "maximoMs": 28.801,
+              "cumple": true
+            },
+            {
+              "nombre": "costos",
+              "solicitudes": 8547,
+              "internosOTransporte": 0,
+              "otrosErrores": 0,
+              "erroresPorcentaje": 0.0,
+              "solicitudesPorSegundo": 71.225,
+              "mediaMs": 4.021,
+              "p50MsHasta": 4,
+              "p95MsHasta": 6,
+              "p99MsHasta": 9,
+              "maximoMs": 33.034,
+              "cumple": true
+            },
+            {
+              "nombre": "proyeccion",
+              "solicitudes": 8548,
+              "internosOTransporte": 0,
+              "otrosErrores": 0,
+              "erroresPorcentaje": 0.0,
+              "solicitudesPorSegundo": 71.233,
+              "mediaMs": 3.964,
+              "p50MsHasta": 4,
+              "p95MsHasta": 6,
+              "p99MsHasta": 8,
+              "maximoMs": 21.957,
+              "cumple": true
+            },
+            {
+              "nombre": "recibos",
+              "solicitudes": 8551,
+              "internosOTransporte": 0,
+              "otrosErrores": 0,
+              "erroresPorcentaje": 0.0,
+              "solicitudesPorSegundo": 71.258,
+              "mediaMs": 1.702,
+              "p50MsHasta": 2,
+              "p95MsHasta": 3,
+              "p99MsHasta": 5,
+              "maximoMs": 14.041,
+              "cumple": true
+            },
+            {
+              "nombre": "notificaciones",
+              "solicitudes": 8550,
+              "internosOTransporte": 0,
+              "otrosErrores": 0,
+              "erroresPorcentaje": 0.0,
+              "solicitudesPorSegundo": 71.25,
+              "mediaMs": 1.712,
+              "p50MsHasta": 2,
+              "p95MsHasta": 3,
+              "p99MsHasta": 5,
+              "maximoMs": 16.815,
+              "cumple": true
+            }
+          ]
+        },
+        "etapa-2-1000-antes.json": {
+          "suministrosActualizados": 177,
+          "ultimoExitoUTC": "2026-11-19 02:42:19.031054",
+          "alertasRegistradas": 177,
+          "lecturasGuardadas": 20177,
+          "suministrosConExitoDuranteMedicion": null,
+          "alertasDuranteMedicion": null,
+          "lecturasDuranteMedicion": null,
+          "ultimaAlertaUTC": "2026-11-19 02:42:19.032937"
+        },
+        "etapa-2-1000-despues.json": {
+          "suministrosActualizados": 349,
+          "ultimoExitoUTC": "2026-11-19 02:45:35.772027",
+          "alertasRegistradas": 349,
+          "lecturasGuardadas": 20349,
+          "suministrosConExitoDuranteMedicion": 104,
+          "alertasDuranteMedicion": 104,
+          "lecturasDuranteMedicion": 104,
+          "ultimaAlertaUTC": "2026-11-19 02:45:35.774013"
+        },
+        "etapa-2-1000-diagnostico.json": {
+          "inicioMedicionUTC": "2026-11-19T02:43:34.916735533Z",
+          "finMedicionUTC": "2026-11-19T02:45:34.916735533Z",
+          "usuarios": 1000,
+          "usuariosMinimosEnMedicion": 1000,
+          "fallosGenerador": 0,
+          "cumpleUmbralesDeEstaEtapa": true,
+          "operaciones": [
+            {
+              "nombre": "consumo",
+              "solicitudes": 17032,
+              "p95MsHasta": 16,
+              "internosOTransporte": 0,
+              "otrosErrores": 0
+            },
+            {
+              "nombre": "historial",
+              "solicitudes": 17032,
+              "p95MsHasta": 16,
+              "internosOTransporte": 0,
+              "otrosErrores": 0
+            },
+            {
+              "nombre": "estadisticas",
+              "solicitudes": 17033,
+              "p95MsHasta": 16,
+              "internosOTransporte": 0,
+              "otrosErrores": 0
+            },
+            {
+              "nombre": "costos",
+              "solicitudes": 17032,
+              "p95MsHasta": 25,
+              "internosOTransporte": 0,
+              "otrosErrores": 0
+            },
+            {
+              "nombre": "proyeccion",
+              "solicitudes": 17034,
+              "p95MsHasta": 25,
+              "internosOTransporte": 0,
+              "otrosErrores": 0
+            },
+            {
+              "nombre": "recibos",
+              "solicitudes": 17028,
+              "p95MsHasta": 15,
+              "internosOTransporte": 0,
+              "otrosErrores": 0
+            },
+            {
+              "nombre": "notificaciones",
+              "solicitudes": 17038,
+              "p95MsHasta": 14,
+              "internosOTransporte": 0,
+              "otrosErrores": 0
+            }
+          ],
+          "alcance": "Diagnostico instrumentado; requiere interpretar muestras, logs GC y capturas de hilos.",
+          "backend": {
+            "muestras": 24,
+            "cpuProcesoPorcentajeDeUnNucleo": 109.692,
+            "cpuSistemaPorcentaje": {
+              "muestras": 24,
+              "promedio": 70.097,
+              "minimo": 68.602,
+              "maximo": 80.772
+            },
+            "memoriaFisicaLibreBytes": {
+              "muestras": 24,
+              "promedio": 13349965312.0,
+              "minimo": 13332365312.0,
+              "maximo": 13374795776.0
+            },
+            "heapUsadoBytes": {
+              "muestras": 24,
+              "promedio": 65296786.667,
+              "minimo": 39087136.0,
+              "maximo": 88869560.0
+            },
+            "conexionesActivas": {
+              "muestras": 24,
+              "promedio": 3.917,
+              "minimo": 0.0,
+              "maximo": 10.0
+            },
+            "conexionesInactivas": {
+              "muestras": 24,
+              "promedio": 6.083,
+              "minimo": 0.0,
+              "maximo": 10.0
+            },
+            "conexionesTotales": {
+              "muestras": 24,
+              "promedio": 10.0,
+              "minimo": 10.0,
+              "maximo": 10.0
+            },
+            "hilosEsperandoConexion": {
+              "muestras": 24,
+              "promedio": 0.75,
+              "minimo": 0.0,
+              "maximo": 9.0
+            },
+            "hilosHttpOcupados": {
+              "muestras": 24,
+              "promedio": 4.917,
+              "minimo": 0.0,
+              "maximo": 18.0
+            },
+            "hilosHttpMaximos": {
+              "muestras": 24,
+              "promedio": 200.0,
+              "minimo": 200.0,
+              "maximo": 200.0
+            },
+            "gcTiempoMsEntrePrimeraYUltimaMuestra": 1932,
+            "gcCantidadEntrePrimeraYUltimaMuestra": 642
+          },
+          "generador": {
+            "muestras": 24,
+            "cpuProcesoPorcentajeDeUnNucleo": 36.43,
+            "cpuSistemaPorcentaje": {
+              "muestras": 24,
+              "promedio": 70.122,
+              "minimo": 68.387,
+              "maximo": 77.075
+            },
+            "memoriaFisicaLibreBytes": {
+              "muestras": 24,
+              "promedio": 13348444330.667,
+              "minimo": 13332107264.0,
+              "maximo": 13374795776.0
+            },
+            "heapUsadoBytes": {
+              "muestras": 24,
+              "promedio": 99003286.333,
+              "minimo": 24091592.0,
+              "maximo": 171114256.0
+            },
+            "conexionesActivas": null,
+            "conexionesInactivas": null,
+            "conexionesTotales": null,
+            "hilosEsperandoConexion": null,
+            "hilosHttpOcupados": null,
+            "hilosHttpMaximos": null,
+            "gcTiempoMsEntrePrimeraYUltimaMuestra": 127,
+            "gcCantidadEntrePrimeraYUltimaMuestra": 19
+          },
+          "mysql": {
+            "muestras": 24,
+            "cpuPorcentajeDeUnNucleo": {
+              "muestras": 24,
+              "promedio": 126.437,
+              "minimo": 124.92,
+              "maximo": 127.82
+            },
+            "memoriaProcesoBytes": {
+              "muestras": 24,
+              "promedio": 499966634.667,
+              "minimo": 498933760.0,
+              "maximo": 500637696.0
+            }
+          }
+        },
+        "etapa-2-1000-evaluacion.json": {
+          "sincronizacionDuranteMedicion": true,
+          "alertasGeneradasDuranteMedicion": true,
+          "alertasAlFinal": 349,
+          "lecturasIncorporadasDuranteMedicion": 104,
+          "cumpleUmbralesDeEstaEtapa": true,
+          "cubre5000Durante30Minutos": false,
+          "requiereComparacionDeRecursos": true
+        },
+        "etapa-2-1000.json": {
+          "inicioUTC": "2026-11-19T02:42:19.708019167Z",
+          "finUTC": "2026-11-19T02:45:35.932061729Z",
+          "inicioMedicionUTC": "2026-11-19T02:43:34.916735533Z",
+          "finMedicionUTC": "2026-11-19T02:45:34.916735533Z",
+          "usuarios": 1000,
+          "usuariosMinimosEnMedicion": 1000,
+          "rampaSegundos": 60,
+          "calentamientoSegundos": 15,
+          "medicionSegundos": 120,
+          "pausaMs": 1000,
+          "fallosGenerador": 0,
+          "cumpleUmbralesDeEstaEtapa": true,
+          "cubre5000Durante30Minutos": false,
+          "generador": {
+            "procesadores": 4,
+            "heapMaximoBytes": 536870912,
+            "heapObservadoMaximoBytes": 175889152,
+            "cpuMediaPorcentajeDeUnNucleo": 38.4
+          },
+          "operaciones": [
+            {
+              "nombre": "consumo",
+              "solicitudes": 17032,
+              "internosOTransporte": 0,
+              "otrosErrores": 0,
+              "erroresPorcentaje": 0.0,
+              "solicitudesPorSegundo": 141.933,
+              "mediaMs": 5.279,
+              "p50MsHasta": 4,
+              "p95MsHasta": 16,
+              "p99MsHasta": 36,
+              "maximoMs": 153.516,
+              "cumple": true
+            },
+            {
+              "nombre": "historial",
+              "solicitudes": 17032,
+              "internosOTransporte": 0,
+              "otrosErrores": 0,
+              "erroresPorcentaje": 0.0,
+              "solicitudesPorSegundo": 141.933,
+              "mediaMs": 5.324,
+              "p50MsHasta": 4,
+              "p95MsHasta": 16,
+              "p99MsHasta": 39,
+              "maximoMs": 156.087,
+              "cumple": true
+            },
+            {
+              "nombre": "estadisticas",
+              "solicitudes": 17033,
+              "internosOTransporte": 0,
+              "otrosErrores": 0,
+              "erroresPorcentaje": 0.0,
+              "solicitudesPorSegundo": 141.942,
+              "mediaMs": 5.365,
+              "p50MsHasta": 4,
+              "p95MsHasta": 16,
+              "p99MsHasta": 40,
+              "maximoMs": 200.163,
+              "cumple": true
+            },
+            {
+              "nombre": "costos",
+              "solicitudes": 17032,
+              "internosOTransporte": 0,
+              "otrosErrores": 0,
+              "erroresPorcentaje": 0.0,
+              "solicitudesPorSegundo": 141.933,
+              "mediaMs": 9.526,
+              "p50MsHasta": 7,
+              "p95MsHasta": 25,
+              "p99MsHasta": 53,
+              "maximoMs": 216.371,
+              "cumple": true
+            },
+            {
+              "nombre": "proyeccion",
+              "solicitudes": 17034,
+              "internosOTransporte": 0,
+              "otrosErrores": 0,
+              "erroresPorcentaje": 0.0,
+              "solicitudesPorSegundo": 141.95,
+              "mediaMs": 9.359,
+              "p50MsHasta": 7,
+              "p95MsHasta": 25,
+              "p99MsHasta": 52,
+              "maximoMs": 340.383,
+              "cumple": true
+            },
+            {
+              "nombre": "recibos",
+              "solicitudes": 17028,
+              "internosOTransporte": 0,
+              "otrosErrores": 0,
+              "erroresPorcentaje": 0.0,
+              "solicitudesPorSegundo": 141.9,
+              "mediaMs": 4.719,
+              "p50MsHasta": 3,
+              "p95MsHasta": 15,
+              "p99MsHasta": 38,
+              "maximoMs": 191.862,
+              "cumple": true
+            },
+            {
+              "nombre": "notificaciones",
+              "solicitudes": 17038,
+              "internosOTransporte": 0,
+              "otrosErrores": 0,
+              "erroresPorcentaje": 0.0,
+              "solicitudesPorSegundo": 141.983,
+              "mediaMs": 4.45,
+              "p50MsHasta": 3,
+              "p95MsHasta": 14,
+              "p99MsHasta": 33,
+              "maximoMs": 211.405,
+              "cumple": true
+            }
+          ]
+        },
+        "etapa-3-2500-antes.json": {
+          "suministrosActualizados": 350,
+          "ultimoExitoUTC": "2026-11-19 02:45:36.897094",
+          "alertasRegistradas": 350,
+          "lecturasGuardadas": 20350,
+          "suministrosConExitoDuranteMedicion": null,
+          "alertasDuranteMedicion": null,
+          "lecturasDuranteMedicion": null,
+          "ultimaAlertaUTC": "2026-11-19 02:45:36.899102"
+        },
+        "etapa-3-2500-despues.json": {
+          "suministrosActualizados": 477,
+          "ultimoExitoUTC": "2026-11-19 02:48:55.164128",
+          "alertasRegistradas": 477,
+          "lecturasGuardadas": 20477,
+          "suministrosConExitoDuranteMedicion": 71,
+          "alertasDuranteMedicion": 71,
+          "lecturasDuranteMedicion": 71,
+          "ultimaAlertaUTC": "2026-11-19 02:48:55.165757"
+        },
+        "etapa-3-2500-diagnostico.json": {
+          "inicioMedicionUTC": "2026-11-19T02:46:53.233459970Z",
+          "finMedicionUTC": "2026-11-19T02:48:53.233459970Z",
+          "usuarios": 2500,
+          "usuariosMinimosEnMedicion": 2500,
+          "fallosGenerador": 0,
+          "cumpleUmbralesDeEstaEtapa": true,
+          "operaciones": [
+            {
+              "nombre": "consumo",
+              "solicitudes": 24216,
+              "p95MsHasta": 961,
+              "internosOTransporte": 0,
+              "otrosErrores": 0
+            },
+            {
+              "nombre": "historial",
+              "solicitudes": 24217,
+              "p95MsHasta": 963,
+              "internosOTransporte": 0,
+              "otrosErrores": 0
+            },
+            {
+              "nombre": "estadisticas",
+              "solicitudes": 24230,
+              "p95MsHasta": 969,
+              "internosOTransporte": 0,
+              "otrosErrores": 0
+            },
+            {
+              "nombre": "costos",
+              "solicitudes": 24244,
+              "p95MsHasta": 1026,
+              "internosOTransporte": 0,
+              "otrosErrores": 0
+            },
+            {
+              "nombre": "proyeccion",
+              "solicitudes": 24244,
+              "p95MsHasta": 1021,
+              "internosOTransporte": 0,
+              "otrosErrores": 0
+            },
+            {
+              "nombre": "recibos",
+              "solicitudes": 24234,
+              "p95MsHasta": 972,
+              "internosOTransporte": 0,
+              "otrosErrores": 0
+            },
+            {
+              "nombre": "notificaciones",
+              "solicitudes": 24226,
+              "p95MsHasta": 921,
+              "internosOTransporte": 0,
+              "otrosErrores": 0
+            }
+          ],
+          "alcance": "Diagnostico instrumentado; requiere interpretar muestras, logs GC y capturas de hilos.",
+          "backend": {
+            "muestras": 24,
+            "cpuProcesoPorcentajeDeUnNucleo": 158.286,
+            "cpuSistemaPorcentaje": {
+              "muestras": 24,
+              "promedio": 99.466,
+              "minimo": 99.3,
+              "maximo": 99.6
+            },
+            "memoriaFisicaLibreBytes": {
+              "muestras": 24,
+              "promedio": 12975584938.667,
+              "minimo": 12905963520.0,
+              "maximo": 13041123328.0
+            },
+            "heapUsadoBytes": {
+              "muestras": 24,
+              "promedio": 127890345.333,
+              "minimo": 74590936.0,
+              "maximo": 165848528.0
+            },
+            "conexionesActivas": {
+              "muestras": 24,
+              "promedio": 9.583,
+              "minimo": 8.0,
+              "maximo": 10.0
+            },
+            "conexionesInactivas": {
+              "muestras": 24,
+              "promedio": 0.375,
+              "minimo": 0.0,
+              "maximo": 2.0
+            },
+            "conexionesTotales": {
+              "muestras": 24,
+              "promedio": 10.0,
+              "minimo": 10.0,
+              "maximo": 10.0
+            },
+            "hilosEsperandoConexion": {
+              "muestras": 24,
+              "promedio": 189.875,
+              "minimo": 186.0,
+              "maximo": 192.0
+            },
+            "hilosHttpOcupados": {
+              "muestras": 24,
+              "promedio": 200.0,
+              "minimo": 200.0,
+              "maximo": 200.0
+            },
+            "hilosHttpMaximos": {
+              "muestras": 24,
+              "promedio": 200.0,
+              "minimo": 200.0,
+              "maximo": 200.0
+            },
+            "gcTiempoMsEntrePrimeraYUltimaMuestra": 2188,
+            "gcCantidadEntrePrimeraYUltimaMuestra": 440
+          },
+          "generador": {
+            "muestras": 24,
+            "cpuProcesoPorcentajeDeUnNucleo": 50.633,
+            "cpuSistemaPorcentaje": {
+              "muestras": 24,
+              "promedio": 99.469,
+              "minimo": 99.349,
+              "maximo": 99.7
+            },
+            "memoriaFisicaLibreBytes": {
+              "muestras": 24,
+              "promedio": 12974633642.667,
+              "minimo": 12905963520.0,
+              "maximo": 13030371328.0
+            },
+            "heapUsadoBytes": {
+              "muestras": 24,
+              "promedio": 282700458.667,
+              "minimo": 214433792.0,
+              "maximo": 384827392.0
+            },
+            "conexionesActivas": null,
+            "conexionesInactivas": null,
+            "conexionesTotales": null,
+            "hilosEsperandoConexion": null,
+            "hilosHttpOcupados": null,
+            "hilosHttpMaximos": null,
+            "gcTiempoMsEntrePrimeraYUltimaMuestra": 2343,
+            "gcCantidadEntrePrimeraYUltimaMuestra": 57
+          },
+          "mysql": {
+            "muestras": 23,
+            "cpuPorcentajeDeUnNucleo": {
+              "muestras": 23,
+              "promedio": 181.413,
+              "minimo": 171.37,
+              "maximo": 187.32
+            },
+            "memoriaProcesoBytes": {
+              "muestras": 23,
+              "promedio": 501546295.652,
+              "minimo": 501219328.0,
+              "maximo": 501616640.0
+            }
+          }
+        },
+        "etapa-3-2500-evaluacion.json": {
+          "sincronizacionDuranteMedicion": true,
+          "alertasGeneradasDuranteMedicion": true,
+          "alertasAlFinal": 477,
+          "lecturasIncorporadasDuranteMedicion": 71,
+          "cumpleUmbralesDeEstaEtapa": true,
+          "cubre5000Durante30Minutos": false,
+          "requiereComparacionDeRecursos": true
+        },
+        "etapa-3-2500.json": {
+          "inicioUTC": "2026-11-19T02:45:38.008315845Z",
+          "finUTC": "2026-11-19T02:48:55.056408774Z",
+          "inicioMedicionUTC": "2026-11-19T02:46:53.233459970Z",
+          "finMedicionUTC": "2026-11-19T02:48:53.233459970Z",
+          "usuarios": 2500,
+          "usuariosMinimosEnMedicion": 2500,
+          "rampaSegundos": 60,
+          "calentamientoSegundos": 15,
+          "medicionSegundos": 120,
+          "pausaMs": 1000,
+          "fallosGenerador": 0,
+          "cumpleUmbralesDeEstaEtapa": true,
+          "cubre5000Durante30Minutos": false,
+          "generador": {
+            "procesadores": 4,
+            "heapMaximoBytes": 536870912,
+            "heapObservadoMaximoBytes": 391540640,
+            "cpuMediaPorcentajeDeUnNucleo": 53.2
+          },
+          "operaciones": [
+            {
+              "nombre": "consumo",
+              "solicitudes": 24216,
+              "internosOTransporte": 0,
+              "otrosErrores": 0,
+              "erroresPorcentaje": 0.0,
+              "solicitudesPorSegundo": 201.8,
+              "mediaMs": 759.391,
+              "p50MsHasta": 745,
+              "p95MsHasta": 961,
+              "p99MsHasta": 1085,
+              "maximoMs": 1418.184,
+              "cumple": true
+            },
+            {
+              "nombre": "historial",
+              "solicitudes": 24217,
+              "internosOTransporte": 0,
+              "otrosErrores": 0,
+              "erroresPorcentaje": 0.0,
+              "solicitudesPorSegundo": 201.808,
+              "mediaMs": 760.417,
+              "p50MsHasta": 747,
+              "p95MsHasta": 963,
+              "p99MsHasta": 1081,
+              "maximoMs": 1465.866,
+              "cumple": true
+            },
+            {
+              "nombre": "estadisticas",
+              "solicitudes": 24230,
+              "internosOTransporte": 0,
+              "otrosErrores": 0,
+              "erroresPorcentaje": 0.0,
+              "solicitudesPorSegundo": 201.917,
+              "mediaMs": 761.534,
+              "p50MsHasta": 747,
+              "p95MsHasta": 969,
+              "p99MsHasta": 1087,
+              "maximoMs": 1407.501,
+              "cumple": true
+            },
+            {
+              "nombre": "costos",
+              "solicitudes": 24244,
+              "internosOTransporte": 0,
+              "otrosErrores": 0,
+              "erroresPorcentaje": 0.0,
+              "solicitudesPorSegundo": 202.033,
+              "mediaMs": 798.32,
+              "p50MsHasta": 783,
+              "p95MsHasta": 1026,
+              "p99MsHasta": 1152,
+              "maximoMs": 1481.654,
+              "cumple": true
+            },
+            {
+              "nombre": "proyeccion",
+              "solicitudes": 24244,
+              "internosOTransporte": 0,
+              "otrosErrores": 0,
+              "erroresPorcentaje": 0.0,
+              "solicitudesPorSegundo": 202.033,
+              "mediaMs": 793.989,
+              "p50MsHasta": 779,
+              "p95MsHasta": 1021,
+              "p99MsHasta": 1149,
+              "maximoMs": 1497.112,
+              "cumple": true
+            },
+            {
+              "nombre": "recibos",
+              "solicitudes": 24234,
+              "internosOTransporte": 0,
+              "otrosErrores": 0,
+              "erroresPorcentaje": 0.0,
+              "solicitudesPorSegundo": 201.95,
+              "mediaMs": 764.683,
+              "p50MsHasta": 750,
+              "p95MsHasta": 972,
+              "p99MsHasta": 1092,
+              "maximoMs": 1464.051,
+              "cumple": true
+            },
+            {
+              "nombre": "notificaciones",
+              "solicitudes": 24226,
+              "internosOTransporte": 0,
+              "otrosErrores": 0,
+              "erroresPorcentaje": 0.0,
+              "solicitudesPorSegundo": 201.883,
+              "mediaMs": 736.361,
+              "p50MsHasta": 724,
+              "p95MsHasta": 921,
+              "p99MsHasta": 1030,
+              "maximoMs": 1410.517,
+              "cumple": true
+            }
+          ]
+        },
+        "etapa-4-5000-antes.json": {
+          "suministrosActualizados": 478,
+          "ultimoExitoUTC": "2026-11-19 02:48:56.280791",
+          "alertasRegistradas": 478,
+          "lecturasGuardadas": 20478,
+          "suministrosConExitoDuranteMedicion": null,
+          "alertasDuranteMedicion": null,
+          "lecturasDuranteMedicion": null,
+          "ultimaAlertaUTC": "2026-11-19 02:48:56.283396"
+        },
+        "etapa-4-5000-despues.json": {
+          "suministrosActualizados": 1562,
+          "ultimoExitoUTC": "2026-11-19 03:20:16.494530",
+          "alertasRegistradas": 1562,
+          "lecturasGuardadas": 21562,
+          "suministrosConExitoDuranteMedicion": 1032,
+          "alertasDuranteMedicion": 1032,
+          "lecturasDuranteMedicion": 1032,
+          "ultimaAlertaUTC": "2026-11-19 03:20:16.496547"
+        },
+        "etapa-4-5000-diagnostico.json": {
+          "inicioMedicionUTC": "2026-11-19T02:50:12.273645114Z",
+          "finMedicionUTC": "2026-11-19T03:20:12.273645114Z",
+          "usuarios": 5000,
+          "usuariosMinimosEnMedicion": 5000,
+          "fallosGenerador": 0,
+          "cumpleUmbralesDeEstaEtapa": false,
+          "operaciones": [
+            {
+              "nombre": "consumo",
+              "solicitudes": 351021,
+              "p95MsHasta": 2880,
+              "internosOTransporte": 0,
+              "otrosErrores": 0
+            },
+            {
+              "nombre": "historial",
+              "solicitudes": 351022,
+              "p95MsHasta": 2883,
+              "internosOTransporte": 0,
+              "otrosErrores": 0
+            },
+            {
+              "nombre": "estadisticas",
+              "solicitudes": 351031,
+              "p95MsHasta": 2882,
+              "internosOTransporte": 0,
+              "otrosErrores": 0
+            },
+            {
+              "nombre": "costos",
+              "solicitudes": 350995,
+              "p95MsHasta": 2946,
+              "internosOTransporte": 0,
+              "otrosErrores": 0
+            },
+            {
+              "nombre": "proyeccion",
+              "solicitudes": 351016,
+              "p95MsHasta": 2938,
+              "internosOTransporte": 0,
+              "otrosErrores": 0
+            },
+            {
+              "nombre": "recibos",
+              "solicitudes": 351029,
+              "p95MsHasta": 2890,
+              "internosOTransporte": 0,
+              "otrosErrores": 0
+            },
+            {
+              "nombre": "notificaciones",
+              "solicitudes": 351032,
+              "p95MsHasta": 2839,
+              "internosOTransporte": 0,
+              "otrosErrores": 0
+            }
+          ],
+          "alcance": "Diagnostico instrumentado; requiere interpretar muestras, logs GC y capturas de hilos.",
+          "backend": {
+            "muestras": 359,
+            "cpuProcesoPorcentajeDeUnNucleo": 158.739,
+            "cpuSistemaPorcentaje": {
+              "muestras": 359,
+              "promedio": 99.471,
+              "minimo": 99.25,
+              "maximo": 99.699
+            },
+            "memoriaFisicaLibreBytes": {
+              "muestras": 359,
+              "promedio": 12670227846.774,
+              "minimo": 12612624384.0,
+              "maximo": 12762394624.0
+            },
+            "heapUsadoBytes": {
+              "muestras": 359,
+              "promedio": 166622665.827,
+              "minimo": 122072240.0,
+              "maximo": 213598568.0
+            },
+            "conexionesActivas": {
+              "muestras": 359,
+              "promedio": 9.772,
+              "minimo": 8.0,
+              "maximo": 10.0
+            },
+            "conexionesInactivas": {
+              "muestras": 359,
+              "promedio": 0.273,
+              "minimo": 0.0,
+              "maximo": 2.0
+            },
+            "conexionesTotales": {
+              "muestras": 359,
+              "promedio": 10.0,
+              "minimo": 10.0,
+              "maximo": 10.0
+            },
+            "hilosEsperandoConexion": {
+              "muestras": 359,
+              "promedio": 189.891,
+              "minimo": 186.0,
+              "maximo": 192.0
+            },
+            "hilosHttpOcupados": {
+              "muestras": 359,
+              "promedio": 200.0,
+              "minimo": 200.0,
+              "maximo": 200.0
+            },
+            "hilosHttpMaximos": {
+              "muestras": 359,
+              "promedio": 200.0,
+              "minimo": 200.0,
+              "maximo": 200.0
+            },
+            "gcTiempoMsEntrePrimeraYUltimaMuestra": 36635,
+            "gcCantidadEntrePrimeraYUltimaMuestra": 7730
+          },
+          "generador": {
+            "muestras": 359,
+            "cpuProcesoPorcentajeDeUnNucleo": 56.0,
+            "cpuSistemaPorcentaje": {
+              "muestras": 359,
+              "promedio": 99.471,
+              "minimo": 99.248,
+              "maximo": 99.653
+            },
+            "memoriaFisicaLibreBytes": {
+              "muestras": 359,
+              "promedio": 12670163987.967,
+              "minimo": 12612624384.0,
+              "maximo": 12761665536.0
+            },
+            "heapUsadoBytes": {
+              "muestras": 359,
+              "promedio": 434802351.51,
+              "minimo": 214950992.0,
+              "maximo": 496842264.0
+            },
+            "conexionesActivas": null,
+            "conexionesInactivas": null,
+            "conexionesTotales": null,
+            "hilosEsperandoConexion": null,
+            "hilosHttpOcupados": null,
+            "hilosHttpMaximos": null,
+            "gcTiempoMsEntrePrimeraYUltimaMuestra": 90772,
+            "gcCantidadEntrePrimeraYUltimaMuestra": 1535
+          },
+          "mysql": {
+            "muestras": 350,
+            "cpuPorcentajeDeUnNucleo": {
+              "muestras": 350,
+              "promedio": 175.244,
+              "minimo": 165.08,
+              "maximo": 184.26
+            },
+            "memoriaProcesoBytes": {
+              "muestras": 350,
+              "promedio": 504908314.331,
+              "minimo": 502042624.0,
+              "maximo": 507658240.0
+            }
+          }
+        },
+        "etapa-4-5000-evaluacion.json": {
+          "sincronizacionDuranteMedicion": true,
+          "alertasGeneradasDuranteMedicion": true,
+          "alertasAlFinal": 1562,
+          "lecturasIncorporadasDuranteMedicion": 1032,
+          "cumpleUmbralesDeEstaEtapa": false,
+          "cubre5000Durante30Minutos": true,
+          "requiereComparacionDeRecursos": true
+        },
+        "etapa-4-5000.json": {
+          "inicioUTC": "2026-11-19T02:48:57.025739636Z",
+          "finUTC": "2026-11-19T03:20:15.900789295Z",
+          "inicioMedicionUTC": "2026-11-19T02:50:12.273645114Z",
+          "finMedicionUTC": "2026-11-19T03:20:12.273645114Z",
+          "usuarios": 5000,
+          "usuariosMinimosEnMedicion": 5000,
+          "rampaSegundos": 60,
+          "calentamientoSegundos": 15,
+          "medicionSegundos": 1800,
+          "pausaMs": 1000,
+          "fallosGenerador": 0,
+          "cumpleUmbralesDeEstaEtapa": false,
+          "cubre5000Durante30Minutos": true,
+          "generador": {
+            "procesadores": 4,
+            "heapMaximoBytes": 536870912,
+            "heapObservadoMaximoBytes": 535885024,
+            "cpuMediaPorcentajeDeUnNucleo": 56.42
+          },
+          "operaciones": [
+            {
+              "nombre": "consumo",
+              "solicitudes": 351021,
+              "internosOTransporte": 0,
+              "otrosErrores": 0,
+              "erroresPorcentaje": 0.0,
+              "solicitudesPorSegundo": 195.012,
+              "mediaMs": 2649.299,
+              "p50MsHasta": 2638,
+              "p95MsHasta": 2880,
+              "p99MsHasta": 3016,
+              "maximoMs": 3938.338,
+              "cumple": false
+            },
+            {
+              "nombre": "historial",
+              "solicitudes": 351022,
+              "internosOTransporte": 0,
+              "otrosErrores": 0,
+              "erroresPorcentaje": 0.0,
+              "solicitudesPorSegundo": 195.012,
+              "mediaMs": 2652.298,
+              "p50MsHasta": 2641,
+              "p95MsHasta": 2883,
+              "p99MsHasta": 3020,
+              "maximoMs": 3926.671,
+              "cumple": false
+            },
+            {
+              "nombre": "estadisticas",
+              "solicitudes": 351031,
+              "internosOTransporte": 0,
+              "otrosErrores": 0,
+              "erroresPorcentaje": 0.0,
+              "solicitudesPorSegundo": 195.017,
+              "mediaMs": 2651.016,
+              "p50MsHasta": 2640,
+              "p95MsHasta": 2882,
+              "p99MsHasta": 3016,
+              "maximoMs": 4045.159,
+              "cumple": false
+            },
+            {
+              "nombre": "costos",
+              "solicitudes": 350995,
+              "internosOTransporte": 0,
+              "otrosErrores": 0,
+              "erroresPorcentaje": 0.0,
+              "solicitudesPorSegundo": 194.997,
+              "mediaMs": 2691.309,
+              "p50MsHasta": 2678,
+              "p95MsHasta": 2946,
+              "p99MsHasta": 3089,
+              "maximoMs": 3931.085,
+              "cumple": false
+            },
+            {
+              "nombre": "proyeccion",
+              "solicitudes": 351016,
+              "internosOTransporte": 0,
+              "otrosErrores": 0,
+              "erroresPorcentaje": 0.0,
+              "solicitudesPorSegundo": 195.009,
+              "mediaMs": 2685.835,
+              "p50MsHasta": 2673,
+              "p95MsHasta": 2938,
+              "p99MsHasta": 3083,
+              "maximoMs": 3942.363,
+              "cumple": false
+            },
+            {
+              "nombre": "recibos",
+              "solicitudes": 351029,
+              "internosOTransporte": 0,
+              "otrosErrores": 0,
+              "erroresPorcentaje": 0.0,
+              "solicitudesPorSegundo": 195.016,
+              "mediaMs": 2656.102,
+              "p50MsHasta": 2645,
+              "p95MsHasta": 2890,
+              "p99MsHasta": 3023,
+              "maximoMs": 3897.161,
+              "cumple": false
+            },
+            {
+              "nombre": "notificaciones",
+              "solicitudes": 351032,
+              "internosOTransporte": 0,
+              "otrosErrores": 0,
+              "erroresPorcentaje": 0.0,
+              "solicitudesPorSegundo": 195.018,
+              "mediaMs": 2626.497,
+              "p50MsHasta": 2616,
+              "p95MsHasta": 2839,
+              "p99MsHasta": 2967,
+              "maximoMs": 3939.101,
+              "cumple": false
+            }
+          ]
+        },
+        "mysql.json": {
+          "version": "8.0.46-0ubuntu0.24.04.4",
+          "maxConnections": 151,
+          "innodbBufferPoolBytes": 134217728
+        }
+      }
+    },
+    {
+      "idEjecucionGitHub": "44452718181",
+      "url": "https://github.com/SebastianCH27/Nivora/actions/runs/44452718181",
+      "identificadorMontaje": "d6e9e84eb9d7",
+      "perfil": "completa",
+      "poolConexiones": 20,
+      "commit": "2d43391996ded72eb03d3743728ca78df0aa4ae2",
+      "zipOrigen": "logs_120330389144.zip",
+      "sha256ZipOrigen": "6cc8af5c218df5eb4a774a8a32b4abdb806ff9b989adc3a227b444b95baadfb9",
+      "construccion": {
+        "pruebas": 559,
+        "fallos": 0,
+        "errores": 0,
+        "omitidas": 0,
+        "buildSuccess": true
+      },
+      "limpiezaConfirmadaEnLog": true,
+      "resumenEtapas": [
+        {
+          "usuarios": 500,
+          "usuariosMinimosEnMedicion": 500,
+          "medicionSegundos": 120,
+          "solicitudes": 59869,
+          "errores": 0,
+          "p95MaximoMs": 6,
+          "cumpleUmbrales": true,
+          "sincronizacionDuranteMedicion": true,
+          "alertasGeneradasDuranteMedicion": true
+        },
+        {
+          "usuarios": 1000,
+          "usuariosMinimosEnMedicion": 1000,
+          "medicionSegundos": 120,
+          "solicitudes": 119766,
+          "errores": 0,
+          "p95MaximoMs": 5,
+          "cumpleUmbrales": true,
+          "sincronizacionDuranteMedicion": true,
+          "alertasGeneradasDuranteMedicion": true
+        },
+        {
+          "usuarios": 2500,
+          "usuariosMinimosEnMedicion": 2500,
+          "medicionSegundos": 120,
+          "solicitudes": 234408,
+          "errores": 0,
+          "p95MaximoMs": 452,
+          "cumpleUmbrales": true,
+          "sincronizacionDuranteMedicion": true,
+          "alertasGeneradasDuranteMedicion": true
+        },
+        {
+          "usuarios": 5000,
+          "usuariosMinimosEnMedicion": 5000,
+          "medicionSegundos": 1800,
+          "solicitudes": 3375041,
+          "errores": 0,
+          "p95MaximoMs": 1867,
+          "cumpleUmbrales": true,
+          "sincronizacionDuranteMedicion": true,
+          "alertasGeneradasDuranteMedicion": true
+        }
+      ],
+      "informesOriginales": {
+        "entorno.json": {
+          "creadoUTC": "2026-11-19T03:38:51.3904847Z",
+          "equipo": "ip-10-0-137-87",
+          "sistema": "Unix 7.0.0.1014",
+          "procesadores": 4,
+          "ramFisicaBytes": 16464306176,
+          "mysql": {
+            "version": "8.0.46-0ubuntu0.24.04.4",
+            "maxConnections": 151,
+            "innodbBufferPoolBytes": 134217728
+          },
+          "java": "openjdk 21.0.13 2026-10-20 LTS\nOpenJDK Runtime Environment Temurin-21.0.13+9 (build 21.0.13+9-LTS)\nOpenJDK 64-Bit Server VM Temurin-21.0.13+9 (build 21.0.13+9-LTS, mixed mode, sharing)",
+          "jarSHA256": "064237E55F59B0CC73AA0579612B2551E11351D5156294AF8EFBF78B771CD44E",
+          "baseTemporal": "nivora_carga_d6e9e84eb9d7",
+          "usuariosFicticios": 5000,
+          "lecturasPorSuministro": 4,
+          "recibosPorSuministro": 1,
+          "periodosConConsumo": 3,
+          "sesionesIndependientes": 5000,
+          "memoriaBackendMb": 512,
+          "memoriaGeneradorMb": 512,
+          "poolConexiones": 20,
+          "hilosHttp": 200,
+          "pausaMs": 1000,
+          "diagnostico": false,
+          "medirRecursos": true,
+          "intervaloDiagnosticoSegundos": 5,
+          "sinInteraccion": true,
+          "powershell": "7.6.10",
+          "etapas": [
+            500,
+            1000,
+            2500,
+            5000
+          ],
+          "completa": true,
+          "generadorYServidorEnMismoEquipo": true,
+          "sincronizacionLecturasIntervaloMs": 1000,
+          "intentosPorCiclo": 1,
+          "intervaloCompletoSegundos": 30
+        },
+        "etapa-1-500-antes.json": {
+          "suministrosActualizados": 0,
+          "ultimoExitoUTC": null,
+          "alertasRegistradas": 0,
+          "lecturasGuardadas": 20000,
+          "suministrosConExitoDuranteMedicion": null,
+          "alertasDuranteMedicion": null,
+          "lecturasDuranteMedicion": null,
+          "ultimaAlertaUTC": null
+        },
+        "etapa-1-500-despues.json": {
+          "suministrosActualizados": 179,
+          "ultimoExitoUTC": "2026-11-19 03:42:09.268317",
+          "alertasRegistradas": 179,
+          "lecturasGuardadas": 20179,
+          "suministrosConExitoDuranteMedicion": 109,
+          "alertasDuranteMedicion": 109,
+          "lecturasDuranteMedicion": 109,
+          "ultimaAlertaUTC": "2026-11-19 03:42:09.269654"
+        },
+        "etapa-1-500-diagnostico.json": {
+          "inicioMedicionUTC": "2026-11-19T03:40:07.566041535Z",
+          "finMedicionUTC": "2026-11-19T03:42:07.566041535Z",
+          "usuarios": 500,
+          "usuariosMinimosEnMedicion": 500,
+          "fallosGenerador": 0,
+          "cumpleUmbralesDeEstaEtapa": true,
+          "operaciones": [
+            {
+              "nombre": "consumo",
+              "solicitudes": 8554,
+              "p95MsHasta": 3,
+              "internosOTransporte": 0,
+              "otrosErrores": 0
+            },
+            {
+              "nombre": "historial",
+              "solicitudes": 8554,
+              "p95MsHasta": 3,
+              "internosOTransporte": 0,
+              "otrosErrores": 0
+            },
+            {
+              "nombre": "estadisticas",
+              "solicitudes": 8553,
+              "p95MsHasta": 4,
+              "internosOTransporte": 0,
+              "otrosErrores": 0
+            },
+            {
+              "nombre": "costos",
+              "solicitudes": 8550,
+              "p95MsHasta": 6,
+              "internosOTransporte": 0,
+              "otrosErrores": 0
+            },
+            {
+              "nombre": "proyeccion",
+              "solicitudes": 8551,
+              "p95MsHasta": 5,
+              "internosOTransporte": 0,
+              "otrosErrores": 0
+            },
+            {
+              "nombre": "recibos",
+              "solicitudes": 8554,
+              "p95MsHasta": 3,
+              "internosOTransporte": 0,
+              "otrosErrores": 0
+            },
+            {
+              "nombre": "notificaciones",
+              "solicitudes": 8553,
+              "p95MsHasta": 3,
+              "internosOTransporte": 0,
+              "otrosErrores": 0
+            }
+          ],
+          "alcance": "Diagnostico instrumentado; requiere interpretar muestras, logs GC y capturas de hilos.",
+          "backend": {
+            "muestras": 24,
+            "cpuProcesoPorcentajeDeUnNucleo": 37.118,
+            "cpuSistemaPorcentaje": {
+              "muestras": 24,
+              "promedio": 24.659,
+              "minimo": 23.19,
+              "maximo": 27.213
+            },
+            "memoriaFisicaLibreBytes": {
+              "muestras": 24,
+              "promedio": 13067008512.0,
+              "minimo": 13033218048.0,
+              "maximo": 13127041024.0
+            },
+            "heapUsadoBytes": {
+              "muestras": 24,
+              "promedio": 64835091.333,
+              "minimo": 36220920.0,
+              "maximo": 94202856.0
+            },
+            "conexionesActivas": {
+              "muestras": 24,
+              "promedio": 0.5,
+              "minimo": 0.0,
+              "maximo": 5.0
+            },
+            "conexionesInactivas": {
+              "muestras": 24,
+              "promedio": 19.5,
+              "minimo": 15.0,
+              "maximo": 20.0
+            },
+            "conexionesTotales": {
+              "muestras": 24,
+              "promedio": 20.0,
+              "minimo": 20.0,
+              "maximo": 20.0
+            },
+            "hilosEsperandoConexion": {
+              "muestras": 24,
+              "promedio": 0.0,
+              "minimo": 0.0,
+              "maximo": 0.0
+            },
+            "hilosHttpOcupados": {
+              "muestras": 24,
+              "promedio": 0.333,
+              "minimo": 0.0,
+              "maximo": 3.0
+            },
+            "hilosHttpMaximos": {
+              "muestras": 24,
+              "promedio": 200.0,
+              "minimo": 200.0,
+              "maximo": 200.0
+            },
+            "gcTiempoMsEntrePrimeraYUltimaMuestra": 273,
+            "gcCantidadEntrePrimeraYUltimaMuestra": 194
+          },
+          "generador": {
+            "muestras": 24,
+            "cpuProcesoPorcentajeDeUnNucleo": 13.761,
+            "cpuSistemaPorcentaje": {
+              "muestras": 24,
+              "promedio": 24.575,
+              "minimo": 23.179,
+              "maximo": 28.231
+            },
+            "memoriaFisicaLibreBytes": {
+              "muestras": 24,
+              "promedio": 13063405226.667,
+              "minimo": 13030580224.0,
+              "maximo": 13126033408.0
+            },
+            "heapUsadoBytes": {
+              "muestras": 24,
+              "promedio": 85272898.0,
+              "minimo": 17041920.0,
+              "maximo": 156688280.0
+            },
+            "conexionesActivas": null,
+            "conexionesInactivas": null,
+            "conexionesTotales": null,
+            "hilosEsperandoConexion": null,
+            "hilosHttpOcupados": null,
+            "hilosHttpMaximos": null,
+            "gcTiempoMsEntrePrimeraYUltimaMuestra": 33,
+            "gcCantidadEntrePrimeraYUltimaMuestra": 10
+          },
+          "mysql": {
+            "muestras": 24,
+            "cpuPorcentajeDeUnNucleo": {
+              "muestras": 24,
+              "promedio": 46.04,
+              "minimo": 43.9,
+              "maximo": 48.29
+            },
+            "memoriaProcesoBytes": {
+              "muestras": 24,
+              "promedio": 527979349.333,
+              "minimo": 495738880.0,
+              "maximo": 538177536.0
+            }
+          }
+        },
+        "etapa-1-500-evaluacion.json": {
+          "sincronizacionDuranteMedicion": true,
+          "alertasGeneradasDuranteMedicion": true,
+          "alertasAlFinal": 179,
+          "lecturasIncorporadasDuranteMedicion": 109,
+          "cumpleUmbralesDeEstaEtapa": true,
+          "cubre5000Durante30Minutos": false,
+          "requiereComparacionDeRecursos": true
+        },
+        "etapa-1-500.json": {
+          "inicioUTC": "2026-11-19T03:38:52.355975292Z",
+          "finUTC": "2026-11-19T03:42:08.558831863Z",
+          "inicioMedicionUTC": "2026-11-19T03:40:07.566041535Z",
+          "finMedicionUTC": "2026-11-19T03:42:07.566041535Z",
+          "usuarios": 500,
+          "usuariosMinimosEnMedicion": 500,
+          "rampaSegundos": 60,
+          "calentamientoSegundos": 15,
+          "medicionSegundos": 120,
+          "pausaMs": 1000,
+          "fallosGenerador": 0,
+          "cumpleUmbralesDeEstaEtapa": true,
+          "cubre5000Durante30Minutos": false,
+          "generador": {
+            "procesadores": 4,
+            "heapMaximoBytes": 536870912,
+            "heapObservadoMaximoBytes": 162979736,
+            "cpuMediaPorcentajeDeUnNucleo": 16.74
+          },
+          "operaciones": [
+            {
+              "nombre": "consumo",
+              "solicitudes": 8554,
+              "internosOTransporte": 0,
+              "otrosErrores": 0,
+              "erroresPorcentaje": 0.0,
+              "solicitudesPorSegundo": 71.283,
+              "mediaMs": 1.77,
+              "p50MsHasta": 2,
+              "p95MsHasta": 3,
+              "p99MsHasta": 5,
+              "maximoMs": 12.017,
+              "cumple": true
+            },
+            {
+              "nombre": "historial",
+              "solicitudes": 8554,
+              "internosOTransporte": 0,
+              "otrosErrores": 0,
+              "erroresPorcentaje": 0.0,
+              "solicitudesPorSegundo": 71.283,
+              "mediaMs": 1.801,
+              "p50MsHasta": 2,
+              "p95MsHasta": 3,
+              "p99MsHasta": 5,
+              "maximoMs": 11.416,
+              "cumple": true
+            },
+            {
+              "nombre": "estadisticas",
+              "solicitudes": 8553,
+              "internosOTransporte": 0,
+              "otrosErrores": 0,
+              "erroresPorcentaje": 0.0,
+              "solicitudesPorSegundo": 71.275,
+              "mediaMs": 1.843,
+              "p50MsHasta": 2,
+              "p95MsHasta": 4,
+              "p99MsHasta": 5,
+              "maximoMs": 11.636,
+              "cumple": true
+            },
+            {
+              "nombre": "costos",
+              "solicitudes": 8550,
+              "internosOTransporte": 0,
+              "otrosErrores": 0,
+              "erroresPorcentaje": 0.0,
+              "solicitudesPorSegundo": 71.25,
+              "mediaMs": 3.224,
+              "p50MsHasta": 3,
+              "p95MsHasta": 6,
+              "p99MsHasta": 8,
+              "maximoMs": 17.025,
+              "cumple": true
+            },
+            {
+              "nombre": "proyeccion",
+              "solicitudes": 8551,
+              "internosOTransporte": 0,
+              "otrosErrores": 0,
+              "erroresPorcentaje": 0.0,
+              "solicitudesPorSegundo": 71.258,
+              "mediaMs": 3.122,
+              "p50MsHasta": 3,
+              "p95MsHasta": 5,
+              "p99MsHasta": 8,
+              "maximoMs": 18.922,
+              "cumple": true
+            },
+            {
+              "nombre": "recibos",
+              "solicitudes": 8554,
+              "internosOTransporte": 0,
+              "otrosErrores": 0,
+              "erroresPorcentaje": 0.0,
+              "solicitudesPorSegundo": 71.283,
+              "mediaMs": 1.455,
+              "p50MsHasta": 2,
+              "p95MsHasta": 3,
+              "p99MsHasta": 4,
+              "maximoMs": 13.241,
+              "cumple": true
+            },
+            {
+              "nombre": "notificaciones",
+              "solicitudes": 8553,
+              "internosOTransporte": 0,
+              "otrosErrores": 0,
+              "erroresPorcentaje": 0.0,
+              "solicitudesPorSegundo": 71.275,
+              "mediaMs": 1.47,
+              "p50MsHasta": 2,
+              "p95MsHasta": 3,
+              "p99MsHasta": 4,
+              "maximoMs": 13.08,
+              "cumple": true
+            }
+          ]
+        },
+        "etapa-2-1000-antes.json": {
+          "suministrosActualizados": 180,
+          "ultimoExitoUTC": "2026-11-19 03:42:10.388484",
+          "alertasRegistradas": 180,
+          "lecturasGuardadas": 20180,
+          "suministrosConExitoDuranteMedicion": null,
+          "alertasDuranteMedicion": null,
+          "lecturasDuranteMedicion": null,
+          "ultimaAlertaUTC": "2026-11-19 03:42:10.390653"
+        },
+        "etapa-2-1000-despues.json": {
+          "suministrosActualizados": 358,
+          "ultimoExitoUTC": "2026-11-19 03:45:27.055717",
+          "alertasRegistradas": 358,
+          "lecturasGuardadas": 20358,
+          "suministrosConExitoDuranteMedicion": 109,
+          "alertasDuranteMedicion": 109,
+          "lecturasDuranteMedicion": 109,
+          "ultimaAlertaUTC": "2026-11-19 03:45:27.056999"
+        },
+        "etapa-2-1000-diagnostico.json": {
+          "inicioMedicionUTC": "2026-11-19T03:43:26.044333420Z",
+          "finMedicionUTC": "2026-11-19T03:45:26.044333420Z",
+          "usuarios": 1000,
+          "usuariosMinimosEnMedicion": 1000,
+          "fallosGenerador": 0,
+          "cumpleUmbralesDeEstaEtapa": true,
+          "operaciones": [
+            {
+              "nombre": "consumo",
+              "solicitudes": 17110,
+              "p95MsHasta": 3,
+              "internosOTransporte": 0,
+              "otrosErrores": 0
+            },
+            {
+              "nombre": "historial",
+              "solicitudes": 17108,
+              "p95MsHasta": 3,
+              "internosOTransporte": 0,
+              "otrosErrores": 0
+            },
+            {
+              "nombre": "estadisticas",
+              "solicitudes": 17112,
+              "p95MsHasta": 3,
+              "internosOTransporte": 0,
+              "otrosErrores": 0
+            },
+            {
+              "nombre": "costos",
+              "solicitudes": 17108,
+              "p95MsHasta": 5,
+              "internosOTransporte": 0,
+              "otrosErrores": 0
+            },
+            {
+              "nombre": "proyeccion",
+              "solicitudes": 17108,
+              "p95MsHasta": 5,
+              "internosOTransporte": 0,
+              "otrosErrores": 0
+            },
+            {
+              "nombre": "recibos",
+              "solicitudes": 17110,
+              "p95MsHasta": 3,
+              "internosOTransporte": 0,
+              "otrosErrores": 0
+            },
+            {
+              "nombre": "notificaciones",
+              "solicitudes": 17110,
+              "p95MsHasta": 3,
+              "internosOTransporte": 0,
+              "otrosErrores": 0
+            }
+          ],
+          "alcance": "Diagnostico instrumentado; requiere interpretar muestras, logs GC y capturas de hilos.",
+          "backend": {
+            "muestras": 24,
+            "cpuProcesoPorcentajeDeUnNucleo": 63.045,
+            "cpuSistemaPorcentaje": {
+              "muestras": 24,
+              "promedio": 45.276,
+              "minimo": 44.088,
+              "maximo": 52.787
+            },
+            "memoriaFisicaLibreBytes": {
+              "muestras": 24,
+              "promedio": 12977131349.333,
+              "minimo": 12953522176.0,
+              "maximo": 12990554112.0
+            },
+            "heapUsadoBytes": {
+              "muestras": 24,
+              "promedio": 65182408.0,
+              "minimo": 36278016.0,
+              "maximo": 91950976.0
+            },
+            "conexionesActivas": {
+              "muestras": 24,
+              "promedio": 1.625,
+              "minimo": 0.0,
+              "maximo": 6.0
+            },
+            "conexionesInactivas": {
+              "muestras": 24,
+              "promedio": 18.375,
+              "minimo": 14.0,
+              "maximo": 20.0
+            },
+            "conexionesTotales": {
+              "muestras": 24,
+              "promedio": 20.0,
+              "minimo": 20.0,
+              "maximo": 20.0
+            },
+            "hilosEsperandoConexion": {
+              "muestras": 24,
+              "promedio": 0.0,
+              "minimo": 0.0,
+              "maximo": 0.0
+            },
+            "hilosHttpOcupados": {
+              "muestras": 24,
+              "promedio": 1.75,
+              "minimo": 0.0,
+              "maximo": 6.0
+            },
+            "hilosHttpMaximos": {
+              "muestras": 24,
+              "promedio": 200.0,
+              "minimo": 200.0,
+              "maximo": 200.0
+            },
+            "gcTiempoMsEntrePrimeraYUltimaMuestra": 297,
+            "gcCantidadEntrePrimeraYUltimaMuestra": 272
+          },
+          "generador": {
+            "muestras": 24,
+            "cpuProcesoPorcentajeDeUnNucleo": 26.557,
+            "cpuSistemaPorcentaje": {
+              "muestras": 24,
+              "promedio": 45.248,
+              "minimo": 44.255,
+              "maximo": 53.381
+            },
+            "memoriaFisicaLibreBytes": {
+              "muestras": 24,
+              "promedio": 12977027754.667,
+              "minimo": 12953010176.0,
+              "maximo": 12990554112.0
+            },
+            "heapUsadoBytes": {
+              "muestras": 24,
+              "promedio": 102336400.333,
+              "minimo": 37048152.0,
+              "maximo": 166773328.0
+            },
+            "conexionesActivas": null,
+            "conexionesInactivas": null,
+            "conexionesTotales": null,
+            "hilosEsperandoConexion": null,
+            "hilosHttpOcupados": null,
+            "hilosHttpMaximos": null,
+            "gcTiempoMsEntrePrimeraYUltimaMuestra": 77,
+            "gcCantidadEntrePrimeraYUltimaMuestra": 20
+          },
+          "mysql": {
+            "muestras": 24,
+            "cpuPorcentajeDeUnNucleo": {
+              "muestras": 24,
+              "promedio": 87.325,
+              "minimo": 85.94,
+              "maximo": 89.35
+            },
+            "memoriaProcesoBytes": {
+              "muestras": 24,
+              "promedio": 541875882.667,
+              "minimo": 541749248.0,
+              "maximo": 541990912.0
+            }
+          }
+        },
+        "etapa-2-1000-evaluacion.json": {
+          "sincronizacionDuranteMedicion": true,
+          "alertasGeneradasDuranteMedicion": true,
+          "alertasAlFinal": 358,
+          "lecturasIncorporadasDuranteMedicion": 109,
+          "cumpleUmbralesDeEstaEtapa": true,
+          "cubre5000Durante30Minutos": false,
+          "requiereComparacionDeRecursos": true
+        },
+        "etapa-2-1000.json": {
+          "inicioUTC": "2026-11-19T03:42:10.907827995Z",
+          "finUTC": "2026-11-19T03:45:27.047111231Z",
+          "inicioMedicionUTC": "2026-11-19T03:43:26.044333420Z",
+          "finMedicionUTC": "2026-11-19T03:45:26.044333420Z",
+          "usuarios": 1000,
+          "usuariosMinimosEnMedicion": 1000,
+          "rampaSegundos": 60,
+          "calentamientoSegundos": 15,
+          "medicionSegundos": 120,
+          "pausaMs": 1000,
+          "fallosGenerador": 0,
+          "cumpleUmbralesDeEstaEtapa": true,
+          "cubre5000Durante30Minutos": false,
+          "generador": {
+            "procesadores": 4,
+            "heapMaximoBytes": 536870912,
+            "heapObservadoMaximoBytes": 171946064,
+            "cpuMediaPorcentajeDeUnNucleo": 27.86
+          },
+          "operaciones": [
+            {
+              "nombre": "consumo",
+              "solicitudes": 17110,
+              "internosOTransporte": 0,
+              "otrosErrores": 0,
+              "erroresPorcentaje": 0.0,
+              "solicitudesPorSegundo": 142.583,
+              "mediaMs": 1.64,
+              "p50MsHasta": 2,
+              "p95MsHasta": 3,
+              "p99MsHasta": 4,
+              "maximoMs": 8.216,
+              "cumple": true
+            },
+            {
+              "nombre": "historial",
+              "solicitudes": 17108,
+              "internosOTransporte": 0,
+              "otrosErrores": 0,
+              "erroresPorcentaje": 0.0,
+              "solicitudesPorSegundo": 142.567,
+              "mediaMs": 1.66,
+              "p50MsHasta": 2,
+              "p95MsHasta": 3,
+              "p99MsHasta": 4,
+              "maximoMs": 8.631,
+              "cumple": true
+            },
+            {
+              "nombre": "estadisticas",
+              "solicitudes": 17112,
+              "internosOTransporte": 0,
+              "otrosErrores": 0,
+              "erroresPorcentaje": 0.0,
+              "solicitudesPorSegundo": 142.6,
+              "mediaMs": 1.666,
+              "p50MsHasta": 2,
+              "p95MsHasta": 3,
+              "p99MsHasta": 4,
+              "maximoMs": 8.151,
+              "cumple": true
+            },
+            {
+              "nombre": "costos",
+              "solicitudes": 17108,
+              "internosOTransporte": 0,
+              "otrosErrores": 0,
+              "erroresPorcentaje": 0.0,
+              "solicitudesPorSegundo": 142.567,
+              "mediaMs": 2.995,
+              "p50MsHasta": 3,
+              "p95MsHasta": 5,
+              "p99MsHasta": 7,
+              "maximoMs": 14.042,
+              "cumple": true
+            },
+            {
+              "nombre": "proyeccion",
+              "solicitudes": 17108,
+              "internosOTransporte": 0,
+              "otrosErrores": 0,
+              "erroresPorcentaje": 0.0,
+              "solicitudesPorSegundo": 142.567,
+              "mediaMs": 2.974,
+              "p50MsHasta": 3,
+              "p95MsHasta": 5,
+              "p99MsHasta": 7,
+              "maximoMs": 14.105,
+              "cumple": true
+            },
+            {
+              "nombre": "recibos",
+              "solicitudes": 17110,
+              "internosOTransporte": 0,
+              "otrosErrores": 0,
+              "erroresPorcentaje": 0.0,
+              "solicitudesPorSegundo": 142.583,
+              "mediaMs": 1.34,
+              "p50MsHasta": 2,
+              "p95MsHasta": 3,
+              "p99MsHasta": 4,
+              "maximoMs": 7.046,
+              "cumple": true
+            },
+            {
+              "nombre": "notificaciones",
+              "solicitudes": 17110,
+              "internosOTransporte": 0,
+              "otrosErrores": 0,
+              "erroresPorcentaje": 0.0,
+              "solicitudesPorSegundo": 142.583,
+              "mediaMs": 1.354,
+              "p50MsHasta": 2,
+              "p95MsHasta": 3,
+              "p99MsHasta": 4,
+              "maximoMs": 9.99,
+              "cumple": true
+            }
+          ]
+        },
+        "etapa-3-2500-antes.json": {
+          "suministrosActualizados": 358,
+          "ultimoExitoUTC": "2026-11-19 03:45:27.055717",
+          "alertasRegistradas": 358,
+          "lecturasGuardadas": 20358,
+          "suministrosConExitoDuranteMedicion": null,
+          "alertasDuranteMedicion": null,
+          "lecturasDuranteMedicion": null,
+          "ultimaAlertaUTC": "2026-11-19 03:45:27.056999"
+        },
+        "etapa-3-2500-despues.json": {
+          "suministrosActualizados": 494,
+          "ultimoExitoUTC": "2026-11-19 03:48:45.122701",
+          "alertasRegistradas": 494,
+          "lecturasGuardadas": 20494,
+          "suministrosConExitoDuranteMedicion": 74,
+          "alertasDuranteMedicion": 74,
+          "lecturasDuranteMedicion": 74,
+          "ultimaAlertaUTC": "2026-11-19 03:48:45.123695"
+        },
+        "etapa-3-2500-diagnostico.json": {
+          "inicioMedicionUTC": "2026-11-19T03:46:43.548698368Z",
+          "finMedicionUTC": "2026-11-19T03:48:43.548698368Z",
+          "usuarios": 2500,
+          "usuariosMinimosEnMedicion": 2500,
+          "fallosGenerador": 0,
+          "cumpleUmbralesDeEstaEtapa": true,
+          "operaciones": [
+            {
+              "nombre": "consumo",
+              "solicitudes": 33484,
+              "p95MsHasta": 404,
+              "internosOTransporte": 0,
+              "otrosErrores": 0
+            },
+            {
+              "nombre": "historial",
+              "solicitudes": 33474,
+              "p95MsHasta": 404,
+              "internosOTransporte": 0,
+              "otrosErrores": 0
+            },
+            {
+              "nombre": "estadisticas",
+              "solicitudes": 33504,
+              "p95MsHasta": 407,
+              "internosOTransporte": 0,
+              "otrosErrores": 0
+            },
+            {
+              "nombre": "costos",
+              "solicitudes": 33501,
+              "p95MsHasta": 452,
+              "internosOTransporte": 0,
+              "otrosErrores": 0
+            },
+            {
+              "nombre": "proyeccion",
+              "solicitudes": 33476,
+              "p95MsHasta": 443,
+              "internosOTransporte": 0,
+              "otrosErrores": 0
+            },
+            {
+              "nombre": "recibos",
+              "solicitudes": 33492,
+              "p95MsHasta": 408,
+              "internosOTransporte": 0,
+              "otrosErrores": 0
+            },
+            {
+              "nombre": "notificaciones",
+              "solicitudes": 33477,
+              "p95MsHasta": 376,
+              "internosOTransporte": 0,
+              "otrosErrores": 0
+            }
+          ],
+          "alcance": "Diagnostico instrumentado; requiere interpretar muestras, logs GC y capturas de hilos.",
+          "backend": {
+            "muestras": 24,
+            "cpuProcesoPorcentajeDeUnNucleo": 165.855,
+            "cpuSistemaPorcentaje": {
+              "muestras": 24,
+              "promedio": 99.637,
+              "minimo": 99.499,
+              "maximo": 99.75
+            },
+            "memoriaFisicaLibreBytes": {
+              "muestras": 24,
+              "promedio": 12677837994.667,
+              "minimo": 12648013824.0,
+              "maximo": 12755193856.0
+            },
+            "heapUsadoBytes": {
+              "muestras": 24,
+              "promedio": 94946910.667,
+              "minimo": 66085744.0,
+              "maximo": 142833312.0
+            },
+            "conexionesActivas": {
+              "muestras": 24,
+              "promedio": 19.875,
+              "minimo": 19.0,
+              "maximo": 20.0
+            },
+            "conexionesInactivas": {
+              "muestras": 24,
+              "promedio": 0.083,
+              "minimo": 0.0,
+              "maximo": 1.0
+            },
+            "conexionesTotales": {
+              "muestras": 24,
+              "promedio": 20.0,
+              "minimo": 20.0,
+              "maximo": 20.0
+            },
+            "hilosEsperandoConexion": {
+              "muestras": 24,
+              "promedio": 180.083,
+              "minimo": 179.0,
+              "maximo": 181.0
+            },
+            "hilosHttpOcupados": {
+              "muestras": 24,
+              "promedio": 200.0,
+              "minimo": 200.0,
+              "maximo": 200.0
+            },
+            "hilosHttpMaximos": {
+              "muestras": 24,
+              "promedio": 200.0,
+              "minimo": 200.0,
+              "maximo": 200.0
+            },
+            "gcTiempoMsEntrePrimeraYUltimaMuestra": 2861,
+            "gcCantidadEntrePrimeraYUltimaMuestra": 725
+          },
+          "generador": {
+            "muestras": 24,
+            "cpuProcesoPorcentajeDeUnNucleo": 47.015,
+            "cpuSistemaPorcentaje": {
+              "muestras": 24,
+              "promedio": 99.635,
+              "minimo": 99.45,
+              "maximo": 99.75
+            },
+            "memoriaFisicaLibreBytes": {
+              "muestras": 24,
+              "promedio": 12673893376.0,
+              "minimo": 12647067648.0,
+              "maximo": 12744527872.0
+            },
+            "heapUsadoBytes": {
+              "muestras": 24,
+              "promedio": 217623210.667,
+              "minimo": 172490752.0,
+              "maximo": 256901120.0
+            },
+            "conexionesActivas": null,
+            "conexionesInactivas": null,
+            "conexionesTotales": null,
+            "hilosEsperandoConexion": null,
+            "hilosHttpOcupados": null,
+            "hilosHttpMaximos": null,
+            "gcTiempoMsEntrePrimeraYUltimaMuestra": 2038,
+            "gcCantidadEntrePrimeraYUltimaMuestra": 93
+          },
+          "mysql": {
+            "muestras": 24,
+            "cpuPorcentajeDeUnNucleo": {
+              "muestras": 24,
+              "promedio": 182.45,
+              "minimo": 178.39,
+              "maximo": 185.47
+            },
+            "memoriaProcesoBytes": {
+              "muestras": 24,
+              "promedio": 546623658.667,
+              "minimo": 545218560.0,
+              "maximo": 547504128.0
+            }
+          }
+        },
+        "etapa-3-2500-evaluacion.json": {
+          "sincronizacionDuranteMedicion": true,
+          "alertasGeneradasDuranteMedicion": true,
+          "alertasAlFinal": 494,
+          "lecturasIncorporadasDuranteMedicion": 74,
+          "cumpleUmbralesDeEstaEtapa": true,
+          "cubre5000Durante30Minutos": false,
+          "requiereComparacionDeRecursos": true
+        },
+        "etapa-3-2500.json": {
+          "inicioUTC": "2026-11-19T03:45:28.410700149Z",
+          "finUTC": "2026-11-19T03:48:44.742580290Z",
+          "inicioMedicionUTC": "2026-11-19T03:46:43.548698368Z",
+          "finMedicionUTC": "2026-11-19T03:48:43.548698368Z",
+          "usuarios": 2500,
+          "usuariosMinimosEnMedicion": 2500,
+          "rampaSegundos": 60,
+          "calentamientoSegundos": 15,
+          "medicionSegundos": 120,
+          "pausaMs": 1000,
+          "fallosGenerador": 0,
+          "cumpleUmbralesDeEstaEtapa": true,
+          "cubre5000Durante30Minutos": false,
+          "generador": {
+            "procesadores": 4,
+            "heapMaximoBytes": 536870912,
+            "heapObservadoMaximoBytes": 281542568,
+            "cpuMediaPorcentajeDeUnNucleo": 46.36
+          },
+          "operaciones": [
+            {
+              "nombre": "consumo",
+              "solicitudes": 33484,
+              "internosOTransporte": 0,
+              "otrosErrores": 0,
+              "erroresPorcentaje": 0.0,
+              "solicitudesPorSegundo": 279.033,
+              "mediaMs": 270.939,
+              "p50MsHasta": 263,
+              "p95MsHasta": 404,
+              "p99MsHasta": 480,
+              "maximoMs": 706.635,
+              "cumple": true
+            },
+            {
+              "nombre": "historial",
+              "solicitudes": 33474,
+              "internosOTransporte": 0,
+              "otrosErrores": 0,
+              "erroresPorcentaje": 0.0,
+              "solicitudesPorSegundo": 278.95,
+              "mediaMs": 273.121,
+              "p50MsHasta": 265,
+              "p95MsHasta": 404,
+              "p99MsHasta": 481,
+              "maximoMs": 682.899,
+              "cumple": true
+            },
+            {
+              "nombre": "estadisticas",
+              "solicitudes": 33504,
+              "internosOTransporte": 0,
+              "otrosErrores": 0,
+              "erroresPorcentaje": 0.0,
+              "solicitudesPorSegundo": 279.2,
+              "mediaMs": 273.434,
+              "p50MsHasta": 265,
+              "p95MsHasta": 407,
+              "p99MsHasta": 481,
+              "maximoMs": 671.606,
+              "cumple": true
+            },
+            {
+              "nombre": "costos",
+              "solicitudes": 33501,
+              "internosOTransporte": 0,
+              "otrosErrores": 0,
+              "erroresPorcentaje": 0.0,
+              "solicitudesPorSegundo": 279.175,
+              "mediaMs": 303.748,
+              "p50MsHasta": 295,
+              "p95MsHasta": 452,
+              "p99MsHasta": 536,
+              "maximoMs": 786.784,
+              "cumple": true
+            },
+            {
+              "nombre": "proyeccion",
+              "solicitudes": 33476,
+              "internosOTransporte": 0,
+              "otrosErrores": 0,
+              "erroresPorcentaje": 0.0,
+              "solicitudesPorSegundo": 278.967,
+              "mediaMs": 299.268,
+              "p50MsHasta": 290,
+              "p95MsHasta": 443,
+              "p99MsHasta": 526,
+              "maximoMs": 873.703,
+              "cumple": true
+            },
+            {
+              "nombre": "recibos",
+              "solicitudes": 33492,
+              "internosOTransporte": 0,
+              "otrosErrores": 0,
+              "erroresPorcentaje": 0.0,
+              "solicitudesPorSegundo": 279.1,
+              "mediaMs": 274.178,
+              "p50MsHasta": 266,
+              "p95MsHasta": 408,
+              "p99MsHasta": 483,
+              "maximoMs": 726.935,
+              "cumple": true
+            },
+            {
+              "nombre": "notificaciones",
+              "solicitudes": 33477,
+              "internosOTransporte": 0,
+              "otrosErrores": 0,
+              "erroresPorcentaje": 0.0,
+              "solicitudesPorSegundo": 278.975,
+              "mediaMs": 256.611,
+              "p50MsHasta": 250,
+              "p95MsHasta": 376,
+              "p99MsHasta": 444,
+              "maximoMs": 724.716,
+              "cumple": true
+            }
+          ]
+        },
+        "etapa-4-5000-antes.json": {
+          "suministrosActualizados": 495,
+          "ultimoExitoUTC": "2026-11-19 03:48:46.225784",
+          "alertasRegistradas": 495,
+          "lecturasGuardadas": 20495,
+          "suministrosConExitoDuranteMedicion": null,
+          "alertasDuranteMedicion": null,
+          "lecturasDuranteMedicion": null,
+          "ultimaAlertaUTC": "2026-11-19 03:48:46.227302"
+        },
+        "etapa-4-5000-despues.json": {
+          "suministrosActualizados": 1673,
+          "ultimoExitoUTC": "2026-11-19 04:20:04.404322",
+          "alertasRegistradas": 1673,
+          "lecturasGuardadas": 21673,
+          "suministrosConExitoDuranteMedicion": 1124,
+          "alertasDuranteMedicion": 1124,
+          "lecturasDuranteMedicion": 1124,
+          "ultimaAlertaUTC": "2026-11-19 04:20:04.405331"
+        },
+        "etapa-4-5000-diagnostico.json": {
+          "inicioMedicionUTC": "2026-11-19T03:50:01.758331006Z",
+          "finMedicionUTC": "2026-11-19T04:20:01.758331006Z",
+          "usuarios": 5000,
+          "usuariosMinimosEnMedicion": 5000,
+          "fallosGenerador": 0,
+          "cumpleUmbralesDeEstaEtapa": true,
+          "operaciones": [
+            {
+              "nombre": "consumo",
+              "solicitudes": 482157,
+              "p95MsHasta": 1820,
+              "internosOTransporte": 0,
+              "otrosErrores": 0
+            },
+            {
+              "nombre": "historial",
+              "solicitudes": 482164,
+              "p95MsHasta": 1823,
+              "internosOTransporte": 0,
+              "otrosErrores": 0
+            },
+            {
+              "nombre": "estadisticas",
+              "solicitudes": 482166,
+              "p95MsHasta": 1822,
+              "internosOTransporte": 0,
+              "otrosErrores": 0
+            },
+            {
+              "nombre": "costos",
+              "solicitudes": 482129,
+              "p95MsHasta": 1867,
+              "internosOTransporte": 0,
+              "otrosErrores": 0
+            },
+            {
+              "nombre": "proyeccion",
+              "solicitudes": 482124,
+              "p95MsHasta": 1861,
+              "internosOTransporte": 0,
+              "otrosErrores": 0
+            },
+            {
+              "nombre": "recibos",
+              "solicitudes": 482143,
+              "p95MsHasta": 1824,
+              "internosOTransporte": 0,
+              "otrosErrores": 0
+            },
+            {
+              "nombre": "notificaciones",
+              "solicitudes": 482158,
+              "p95MsHasta": 1793,
+              "internosOTransporte": 0,
+              "otrosErrores": 0
+            }
+          ],
+          "alcance": "Diagnostico instrumentado; requiere interpretar muestras, logs GC y capturas de hilos.",
+          "backend": {
+            "muestras": 360,
+            "cpuProcesoPorcentajeDeUnNucleo": 164.189,
+            "cpuSistemaPorcentaje": {
+              "muestras": 360,
+              "promedio": 99.649,
+              "minimo": 99.399,
+              "maximo": 99.85
+            },
+            "memoriaFisicaLibreBytes": {
+              "muestras": 360,
+              "promedio": 12249519980.089,
+              "minimo": 12182749184.0,
+              "maximo": 12346224640.0
+            },
+            "heapUsadoBytes": {
+              "muestras": 360,
+              "promedio": 150958624.889,
+              "minimo": 113369704.0,
+              "maximo": 193046928.0
+            },
+            "conexionesActivas": {
+              "muestras": 360,
+              "promedio": 19.769,
+              "minimo": 17.0,
+              "maximo": 20.0
+            },
+            "conexionesInactivas": {
+              "muestras": 360,
+              "promedio": 0.225,
+              "minimo": 0.0,
+              "maximo": 2.0
+            },
+            "conexionesTotales": {
+              "muestras": 360,
+              "promedio": 20.0,
+              "minimo": 20.0,
+              "maximo": 20.0
+            },
+            "hilosEsperandoConexion": {
+              "muestras": 360,
+              "promedio": 180.022,
+              "minimo": 177.0,
+              "maximo": 182.0
+            },
+            "hilosHttpOcupados": {
+              "muestras": 360,
+              "promedio": 200.0,
+              "minimo": 200.0,
+              "maximo": 200.0
+            },
+            "hilosHttpMaximos": {
+              "muestras": 360,
+              "promedio": 200.0,
+              "minimo": 200.0,
+              "maximo": 200.0
+            },
+            "gcTiempoMsEntrePrimeraYUltimaMuestra": 47294,
+            "gcCantidadEntrePrimeraYUltimaMuestra": 12034
+          },
+          "generador": {
+            "muestras": 359,
+            "cpuProcesoPorcentajeDeUnNucleo": 54.778,
+            "cpuSistemaPorcentaje": {
+              "muestras": 359,
+              "promedio": 99.65,
+              "minimo": 99.45,
+              "maximo": 99.85
+            },
+            "memoriaFisicaLibreBytes": {
+              "muestras": 359,
+              "promedio": 12249464809.181,
+              "minimo": 12182994944.0,
+              "maximo": 12346224640.0
+            },
+            "heapUsadoBytes": {
+              "muestras": 359,
+              "promedio": 438765484.68,
+              "minimo": 231505008.0,
+              "maximo": 498021008.0
+            },
+            "conexionesActivas": null,
+            "conexionesInactivas": null,
+            "conexionesTotales": null,
+            "hilosEsperandoConexion": null,
+            "hilosHttpOcupados": null,
+            "hilosHttpMaximos": null,
+            "gcTiempoMsEntrePrimeraYUltimaMuestra": 67486,
+            "gcCantidadEntrePrimeraYUltimaMuestra": 1994
+          },
+          "mysql": {
+            "muestras": 357,
+            "cpuPorcentajeDeUnNucleo": {
+              "muestras": 357,
+              "promedio": 175.732,
+              "minimo": 167.42,
+              "maximo": 181.71
+            },
+            "memoriaProcesoBytes": {
+              "muestras": 357,
+              "promedio": 553224943.507,
+              "minimo": 548745216.0,
+              "maximo": 557350912.0
+            }
+          }
+        },
+        "etapa-4-5000-evaluacion.json": {
+          "sincronizacionDuranteMedicion": true,
+          "alertasGeneradasDuranteMedicion": true,
+          "alertasAlFinal": 1673,
+          "lecturasIncorporadasDuranteMedicion": 1124,
+          "cumpleUmbralesDeEstaEtapa": true,
+          "cubre5000Durante30Minutos": true,
+          "requiereComparacionDeRecursos": true
+        },
+        "etapa-4-5000.json": {
+          "inicioUTC": "2026-11-19T03:48:46.596306377Z",
+          "finUTC": "2026-11-19T04:20:04.355723988Z",
+          "inicioMedicionUTC": "2026-11-19T03:50:01.758331006Z",
+          "finMedicionUTC": "2026-11-19T04:20:01.758331006Z",
+          "usuarios": 5000,
+          "usuariosMinimosEnMedicion": 5000,
+          "rampaSegundos": 60,
+          "calentamientoSegundos": 15,
+          "medicionSegundos": 1800,
+          "pausaMs": 1000,
+          "fallosGenerador": 0,
+          "cumpleUmbralesDeEstaEtapa": true,
+          "cubre5000Durante30Minutos": true,
+          "generador": {
+            "procesadores": 4,
+            "heapMaximoBytes": 536870912,
+            "heapObservadoMaximoBytes": 535705792,
+            "cpuMediaPorcentajeDeUnNucleo": 54.76
+          },
+          "operaciones": [
+            {
+              "nombre": "consumo",
+              "solicitudes": 482157,
+              "internosOTransporte": 0,
+              "otrosErrores": 0,
+              "erroresPorcentaje": 0.0,
+              "solicitudesPorSegundo": 267.865,
+              "mediaMs": 1657.448,
+              "p50MsHasta": 1650,
+              "p95MsHasta": 1820,
+              "p99MsHasta": 1907,
+              "maximoMs": 2791.543,
+              "cumple": true
+            },
+            {
+              "nombre": "historial",
+              "solicitudes": 482164,
+              "internosOTransporte": 0,
+              "otrosErrores": 0,
+              "erroresPorcentaje": 0.0,
+              "solicitudesPorSegundo": 267.869,
+              "mediaMs": 1659.449,
+              "p50MsHasta": 1653,
+              "p95MsHasta": 1823,
+              "p99MsHasta": 1908,
+              "maximoMs": 2797.685,
+              "cumple": true
+            },
+            {
+              "nombre": "estadisticas",
+              "solicitudes": 482166,
+              "internosOTransporte": 0,
+              "otrosErrores": 0,
+              "erroresPorcentaje": 0.0,
+              "solicitudesPorSegundo": 267.87,
+              "mediaMs": 1659.36,
+              "p50MsHasta": 1652,
+              "p95MsHasta": 1822,
+              "p99MsHasta": 1909,
+              "maximoMs": 2844.781,
+              "cumple": true
+            },
+            {
+              "nombre": "costos",
+              "solicitudes": 482129,
+              "internosOTransporte": 0,
+              "otrosErrores": 0,
+              "erroresPorcentaje": 0.0,
+              "solicitudesPorSegundo": 267.849,
+              "mediaMs": 1691.491,
+              "p50MsHasta": 1684,
+              "p95MsHasta": 1867,
+              "p99MsHasta": 1959,
+              "maximoMs": 2820.609,
+              "cumple": true
+            },
+            {
+              "nombre": "proyeccion",
+              "solicitudes": 482124,
+              "internosOTransporte": 0,
+              "otrosErrores": 0,
+              "erroresPorcentaje": 0.0,
+              "solicitudesPorSegundo": 267.847,
+              "mediaMs": 1687.035,
+              "p50MsHasta": 1680,
+              "p95MsHasta": 1861,
+              "p99MsHasta": 1953,
+              "maximoMs": 2796.902,
+              "cumple": true
+            },
+            {
+              "nombre": "recibos",
+              "solicitudes": 482143,
+              "internosOTransporte": 0,
+              "otrosErrores": 0,
+              "erroresPorcentaje": 0.0,
+              "solicitudesPorSegundo": 267.857,
+              "mediaMs": 1660.587,
+              "p50MsHasta": 1654,
+              "p95MsHasta": 1824,
+              "p99MsHasta": 1910,
+              "maximoMs": 2776.157,
+              "cumple": true
+            },
+            {
+              "nombre": "notificaciones",
+              "solicitudes": 482158,
+              "internosOTransporte": 0,
+              "otrosErrores": 0,
+              "erroresPorcentaje": 0.0,
+              "solicitudesPorSegundo": 267.866,
+              "mediaMs": 1641.819,
+              "p50MsHasta": 1636,
+              "p95MsHasta": 1793,
+              "p99MsHasta": 1872,
+              "maximoMs": 2822.825,
+              "cumple": true
+            }
+          ]
+        },
+        "mysql.json": {
+          "version": "8.0.46-0ubuntu0.24.04.4",
+          "maxConnections": 151,
+          "innodbBufferPoolBytes": 134217728
+        }
+      }
+    }
+  ],
+  "comparacion5000": {
+    "p95MaximoMsPool10": 2946,
+    "p95MaximoMsPool20": 1867,
+    "reduccionObservadaP95Porcentaje": 36.626,
+    "solicitudesPool10": 2457146,
+    "solicitudesPool20": 3375041,
+    "aumentoObservadoSolicitudesPorcentaje": 37.356,
+    "atribucionCausalExclusivaAlPool": false
+  },
+  "limitesInterpretacion": [
+    "Una sola ejecucion completa por configuracion, en VMs diferentes; no se registro modelo o frecuencia de CPU ni se controlo el host.",
+    "La CPU total promedio con pool 20 fue 99.649%; el resultado cumple con 133 ms de margen de p95 y no demuestra capacidad adicional.",
+    "El generador comparte CPU con el backend y MySQL, tiene heap maximo de 512 MiB y uso observado cercano al limite. Cero fallos no demuestra holgura del generador.",
+    "Se conservaron los 22 informes JSON permitidos de cada ejecucion; el ZIP de logs no contiene los CSV, capturas de hilos ni logs GC originales del montaje temporal.",
+    "Las sesiones fueron preparadas antes de medir: no se mide autenticacion mediante proveedores externos, frontend, red de usuarios finales ni entrega Web Push.",
+    "La verificacion de carga comprueba HTTP 200, JSON y suministro; el detalle funcional y aislamiento se verifican mediante las 559 pruebas automatizadas."
+  ]
+}

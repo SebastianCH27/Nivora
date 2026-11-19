@@ -1,8 +1,11 @@
 # Rendimiento y carga de consultas
 
 Bloque 9, parte 3. Procedimiento reproducible para EQ-01 y EQ-02.
-Las metas completas siguen pendientes hasta conservar las mediciones de
-5000 usuarios durante 1800 segundos y comparar dos configuraciones de recursos.
+EQ-01 se verifico en GitHub Actions con pool 20 el 18 de noviembre de 2026:
+5000 usuarios mantenidos durante 1800 segundos, siete operaciones dentro del
+limite de p95 y cero errores. La [evidencia completa y sus limites](resultados-carga-github-actions.md)
+incluyen la comparacion con pool 10. EQ-02 conserva evidencia parcial;
+queda pendiente una ampliacion de recursos comparada de forma controlada.
 
 Para ejecutar el montaje fuera de la laptop, seguir
 [Carga en GitHub Actions](carga-github-actions.md). El flujo manual prepara
@@ -164,9 +167,11 @@ DROP USER IF EXISTS 'ncarga_IDENTIFICADOR'@'127.0.0.1';
 La regresion del backend conserva 559 pruebas, sin fallos ni errores.
 Las herramientas de carga se verifican por separado mediante compilacion
 y un recorrido contra MySQL 8.0.46 y el JAR real.
-La comprobacion de consultas en Windows esta registrada al final de este
-documento. Queda por repetir el recorrido completo con el supervisor corregido
-y ejecutar la prueba completa de capacidad.
+Las comprobaciones anteriores en Windows se conservan como antecedentes.
+Las dos ejecuciones completas de GitHub construyeron y verificaron el mismo
+commit y el mismo JAR. La ejecucion con pool 20 aprobo EQ-01 en el montaje
+documentado; la comparacion con pool 10 es evidencia parcial para EQ-02.
+Los resultados vigentes estan en [Resultados de carga en GitHub Actions](resultados-carga-github-actions.md).
 
 
 ## Comprobacion breve del 18 de noviembre de 2026
@@ -198,8 +203,10 @@ La base termino con 500 lecturas y 100 alertas. La limpieza automatica retiro
 la base y la cuenta temporales al terminar.
 
 La segunda etapa comparte la JVM ya calentada por la primera. Los resultados
-caracterizan este recorrido breve. Quedan pendientes los 5000 usuarios durante
-30 minutos, las condiciones de despliegue y la comparacion de recursos.
+caracterizan este recorrido breve. En ese momento no acreditaban 5000 usuarios
+durante 30 minutos; la medicion posterior de GitHub y su alcance se conservan
+en los resultados vigentes. Las condiciones de despliegue y la comparacion
+controlada de recursos requieren su propia evaluacion.
 El medidor tambien se comprobo con una fuente HTTP local que respondia 503,
 otra que devolvia un codigo de suministro ajeno y otra que enviaba cabeceras
 pero retenia el cuerpo. Clasifico los errores, rechazo los umbrales y limito
@@ -238,8 +245,9 @@ el recorrido breve contra MySQL y el JAR real con el supervisor corregido
 termino con codigo 0, guardo la evaluacion posterior y retiro el entorno temporal. La comprobacion definitiva de esta correccion en Windows queda
 pendiente de repetir el comando habitual en el equipo del proyecto.
 La ejecucion anterior no alcanzo a guardar el estado posterior de sincronizacion;
-esa parte se comprobara en la repeticion. Las metas EQ-01 y EQ-02 conservan
-sus mediciones completas pendientes.
+esa parte quedo pendiente en aquel recorrido breve. Los resultados de GitHub
+posteriores conservan la medicion completa de EQ-01 y una comparacion
+observacional de configuraciones para EQ-02.
 
 
 ## Comparacion de 10 y 20 conexiones en Windows
@@ -263,7 +271,8 @@ heap ni esperas. El diagnostico posterior se describe al final de esta guia.
 La evidencia descriptiva esta en
 [evidencias/comparacion-carga-windows-2026-11-18.json](evidencias/comparacion-carga-windows-2026-11-18.json).
 Las etapas de 500 y 1000 usuarios cumplieron los umbrales segun las salidas de
-consola compartidas. La meta de 5000 usuarios durante 30 minutos sigue pendiente.
+consola compartidas. Esas ejecuciones Windows no acreditaron los 5000 usuarios;
+la medicion posterior de GitHub se conserva en los resultados vigentes.
 
 ## Diagnostico de una etapa
 
@@ -395,9 +404,11 @@ cambio debe medirse con la misma mezcla, datos y criterios. La herramienta
 actual inicia todos los procesos localmente; separar equipos requiere adaptar
 la preparacion y la direccion del servidor antes de ejecutar.
 
-No se ejecuto la etapa de 5000 usuarios. EQ-01 y EQ-02 siguen pendientes;
-el diagnostico no sustituye la medicion formal de 30 minutos ni la comparacion
-de una configuracion inicial con otra que sostenga una carga mayor.
+En ese diagnostico Windows no se ejecuto la etapa de 5000 usuarios. La
+medicion formal posterior en GitHub acredita EQ-01 dentro del montaje
+documentado. La comparacion de pools aporta evidencia parcial de EQ-02;
+falta aislar una ampliacion de recursos de infraestructura. El diagnostico
+breve no sustituye ninguna de esas comprobaciones.
 Como referencia de metodologia, la [guia oficial de pruebas grandes de Grafana
 k6](https://grafana.com/docs/k6/latest/testing-guides/running-large-tests/)
 explica la necesidad de vigilar los recursos del generador y del sistema bajo

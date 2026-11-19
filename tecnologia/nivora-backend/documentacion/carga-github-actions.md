@@ -2,8 +2,9 @@
 
 Bloque 9, parte 3. Este procedimiento ejecuta el montaje de datos ficticios en
 una maquina temporal de GitHub. La laptop se utiliza para iniciar la ejecucion
-y consultar sus resultados. La meta de 5000 usuarios durante 30 minutos sigue
-pendiente hasta obtener la evidencia correspondiente.
+y consultar sus resultados. EQ-01 se verifico con el perfil completo y pool 20
+el 18 de noviembre de 2026; ver los [resultados conservados](resultados-carga-github-actions.md).
+La comparacion de pools es observacional y no cierra por si sola EQ-02.
 
 ## Condicion de gratuidad
 
@@ -134,8 +135,26 @@ del resumen y la exclusion de archivos no permitidos. Se comprobo tambien que
 el modo automatico rechace una clave administrativa ausente.
 La evidencia esta en
 [validacion-automatizacion-carga-2026-11-18.json](evidencias/validacion-automatizacion-carga-2026-11-18.json).
-Estas comprobaciones no son una ejecucion en GitHub: el primer resultado del
-runner remoto debe obtenerse mediante el perfil breve descrito arriba.
+Estas comprobaciones locales precedieron a las ejecuciones reales en GitHub.
+El perfil breve remoto aprobo con 20 usuarios, 895 consultas y p95 maximo de
+13 ms, segun el resumen compartido. Los ZIP de las ejecuciones completas
+con pools 10 y 20 permitieron conservar 22 informes originales de cada una,
+incluidos entorno, resultados, recursos y continuidad por etapa.
+
+## Resultados remotos conservados
+
+La [comparacion completa](resultados-carga-github-actions.md) documenta el
+commit probado, los ZIP originales y sus huellas, los parametros y los limites.
+Con pool 20, las cuatro etapas cumplieron los controles. Con 5000 usuarios se
+midieron 1800 segundos, 3 375 041 consultas sin errores y p95 maximo de 1867 ms.
+Hubo sincronizacion y generacion de alertas durante esa ventana.
+
+El pool 10 incumplio el p95 con 5000 usuarios. La mejora observada con pool 20
+no se atribuye exclusivamente al pool: cada ejecucion uso una VM diferente.
+Estos resultados verifican EQ-01 dentro del montaje descrito; EQ-02 conserva
+evidencia parcial de configuraciones, no una prueba controlada de ampliacion
+de CPU/RAM o de varias instancias. La configuracion de produccion no cambia
+al elegir un pool en este flujo de prueba.
 
 ## Referencias
 

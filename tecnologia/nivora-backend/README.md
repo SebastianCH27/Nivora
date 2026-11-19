@@ -503,9 +503,14 @@ La herramienta de carga prepara datos ficticios y mide las siete consultas
 con sesiones independientes, sincronizacion y alertas en segundo plano.
 La ejecucion breve y el perfil de 5000 usuarios estan descritos en
 [Rendimiento y carga](documentacion/verificacion-rendimiento.md).
-La meta de 5000 usuarios durante 30 minutos y una mejora de capacidad al ampliar
-recursos siguen pendientes. El diagnostico de 2500 usuarios en Windows registro
-saturacion de CPU del equipo compartido y latencias fuera del umbral.
+EQ-01 esta verificado en el montaje de GitHub Actions del 18 de noviembre de
+2026, con pool 20: 5000 usuarios durante 30 minutos, 3 375 041 consultas sin
+errores y p95 maximo de 1867 ms. Continuaron la sincronizacion y las alertas.
+Los [resultados y la comparacion de pools](documentacion/resultados-carga-github-actions.md)
+conservan el entorno y sus limites. EQ-02 cuenta con evidencia parcial;
+la ampliacion controlada de recursos de infraestructura sigue pendiente.
+El diagnostico anterior de Windows registro saturacion de CPU del equipo
+compartido y latencias fuera del umbral.
 El modo `-Diagnostico` permite observar conexiones, hilos HTTP, CPU, heap y GC
 en una etapa. `-SuministrosDatos` controla el tamano de los datos preparados;
 el comando y la comparacion observada en Windows estan en esa misma guia.
@@ -514,7 +519,8 @@ El flujo manual [Carga en GitHub Actions](documentacion/carga-github-actions.md)
 prepara el montaje ficticio en una VM temporal. Ofrece perfiles breve,
 diagnostico y completo, con recursos instrumentados y resumen en los logs.
 Esta condicionado a repositorios publicos y usa el runner estandar gratuito.
-El primer resultado remoto y la capacidad de 5000 usuarios siguen pendientes.
+Las ejecuciones completas con pools 10 y 20 y sus 44 informes JSON originales
+estan conservados en la evidencia enlazada desde los resultados.
 
 ## Alerta de consumo
 
