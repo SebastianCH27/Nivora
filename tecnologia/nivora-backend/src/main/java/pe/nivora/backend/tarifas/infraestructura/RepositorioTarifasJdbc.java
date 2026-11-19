@@ -13,9 +13,11 @@ import java.util.List;
 import java.util.Optional;
 
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.dao.DataAccessException;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.TransactionDefinition;
+import org.springframework.transaction.TransactionException;
 import org.springframework.transaction.support.TransactionTemplate;
 
 import tools.jackson.databind.json.JsonMapper;
@@ -45,7 +47,11 @@ public class RepositorioTarifasJdbc implements RepositorioTarifas {
     @Override
     public Guardado guardar(HistorialTarifario historial, Instant consultadoEn) {
         var instante = consultadoEn.truncatedTo(ChronoUnit.MICROS);
-        return transaccion.execute(estado -> guardarEnTransaccion(historial, instante));
+        try {
+            return transaccion.execute(estado -> guardarEnTransaccion(historial, instante));
+        } catch (DataAccessException | TransactionException error) {
+            throw new NoDisponible(error);
+        }
     }
 
     private Guardado guardarEnTransaccion(HistorialTarifario historial, Instant consultadoEn) {

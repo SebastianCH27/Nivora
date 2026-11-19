@@ -97,3 +97,13 @@ RF20 añade una operación, dos DTO y un enum. El contrato actual tiene
 la regresión de 632 pruebas. Las validaciones anteriores conservan su
 fecha y alcance; la evidencia actual está en
 [comparación de costos](evidencias/comparacion-costos-2026-11-19.json).
+
+
+## Corrección de sincronización de tarifas
+
+La incorporación y el refresco automáticos no añaden rutas ni cambian los
+DTO públicos. Los tres controles de OpenAPI pasaron dentro de la nueva
+regresión de 656 pruebas. El contrato conserva 41 operaciones de negocio,
+una de salud, 104 esquemas, 64 registros y 16 enums enlazados.
+La [guía de sincronización](sincronizacion-tarifas.md) documenta la migración,
+el calendario persistido y la comprobación operativa.

@@ -88,6 +88,7 @@ import pe.nivora.backend.recibos.dominio.RecibosEmitidos;
 import pe.nivora.backend.recibos.dominio.RepositorioRecibos;
 import pe.nivora.backend.recibos.dominio.RepositorioSincronizacionRecibos;
 import pe.nivora.backend.tarifas.aplicacion.IncorporarTarifas;
+import pe.nivora.backend.tarifas.aplicacion.SincronizarTarifas;
 import pe.nivora.backend.tarifas.dominio.HistorialTarifario;
 import pe.nivora.backend.tarifas.dominio.RepositorioTarifas;
 import pe.nivora.backend.tarifas.dominio.VersionTarifaria;
@@ -134,7 +135,7 @@ class AccesoConsultaIntegradoTests {
         "11-gestion-tarifas.sql", "12-recibos.sql", "13-sincronizacion-recibos.sql",
         "14-alertas-consumo.sql", "15-avisos-recibo.sql", "16-notificaciones-leidas.sql",
         "17-configuracion-notificaciones.sql", "18-entregas-web-push.sql", "19-incidencias-sincronizacion-recibos.sql",
-        "20-periodos-mensuales.sql");
+        "20-periodos-mensuales.sql", "22-sincronizacion-tarifas.sql");
 
     private static final Respuesta AGUA_OK = new Respuesta(200, "application/json",
         "{\"codigoSuministro\":\"000101\",\"titular\":\"Titular ficticio\"}");
@@ -172,6 +173,7 @@ class AccesoConsultaIntegradoTests {
     @Autowired private RepositorioConfiguracionNotificaciones configuracionNotificaciones;
     @Autowired private RepositorioTarifas tarifas;
     @Autowired private IncorporarTarifas incorporarTarifas;
+    @Autowired private SincronizarTarifas sincronizarTarifas;
     @Autowired private RepositorioRecibos recibos;
     @Autowired private IncorporarRecibos incorporarRecibos;
     @Autowired private RepositorioSincronizacionRecibos programacionRecibos;
@@ -223,7 +225,7 @@ class AccesoConsultaIntegradoTests {
                 "control_incorporacion_lecturas",
                 "contexto_recuperacion_lecturas", "progreso_recuperacion_lecturas",
                 "programacion_sincronizacion_lecturas", "tarifas_asignaciones", "tarifas_historiales",
-                "tarifas_versiones", "programacion_sincronizacion_recibos", "notificaciones_leidas",
+                "tarifas_versiones", "programacion_sincronizacion_recibos", "programacion_sincronizacion_tarifas", "notificaciones_leidas",
                 "suscripciones_web_push", "preferencias_notificaciones_dispositivo", "avisos_recibo", "recibos",
                 "alertas_consumo", "suministros")) {
             jdbc.execute("DELETE FROM " + tabla);
@@ -393,7 +395,7 @@ class AccesoConsultaIntegradoTests {
 
     private List<Long> contarConfiguraciones() {
         return List.of("publicaciones_periodos_mensuales", "tarifas_publicaciones", "configuracion_alertas_consumo",
-                "programacion_sincronizacion_lecturas", "programacion_sincronizacion_recibos").stream()
+                "programacion_sincronizacion_lecturas", "programacion_sincronizacion_recibos", "programacion_sincronizacion_tarifas").stream()
             .map(tabla -> jdbc.queryForObject("SELECT COUNT(*) FROM " + tabla, Long.class)).toList();
     }
 
@@ -1145,6 +1147,88 @@ class AccesoConsultaIntegradoTests {
         assertEquals("0", consultarJson(GESTION_TARIFAS, admin).path("revisionAdministrativa").stringValue());
         jdbc.update("UPDATE administradores SET cambio_clave_requerido = TRUE WHERE usuario = 'admin'");
         enviar("PUT", GESTION_TARIFAS, primera, admin, 403);
+    }
+
+    @Test
+    void tarifasAutomaticasDelSuministroNuevoHabilitanCostosProyeccionYComparacion() throws Exception {
+        tarifasProveedor.set(respuestaTarifaria(tarifaImportada(1, "2026-10-01", null, "5.00")));
+        var sesion = token(enviar("POST", CONSULTA + "/sesiones", SOLICITUD, null, 201));
+        incorporarLectura("1", "2026-10-01T05:00:00Z", 100);
+        incorporarLectura("2", "2026-11-01T05:00:00Z", 1100);
+        incorporarLectura("3", "2026-11-11T05:00:00Z", 3100);
+        assertEquals("SIN_TARIFA_COMPATIBLE", consultarJson(COSTOS + "?meses=1", sesion).at("/actual/estado").stringValue());
+        assertEquals(0, llamadasTarifas.get());
+
+        var intento = sincronizarTarifas.ejecutarCiclo().getFirst();
+        assertTrue(intento.programacionConfirmada());
+        assertEquals("ACTUALIZADO", intento.estado().name());
+        var costos = consultarJson(COSTOS + "?meses=1", sesion);
+        assertEquals("ESTIMADO", costos.at("/actual/estado").stringValue());
+        assertEquals("10.62", costos.at("/actual/desglose/totalEstimado").stringValue());
+        assertEquals("8.26", costos.at("/anteriores/0/desglose/totalEstimado").stringValue());
+        assertEquals("20.06", consultarJson(PROYECCION, sesion).at("/costoProyectado/desglose/totalEstimado").stringValue());
+        var comparacion = consultarJson(COMPARACION, sesion);
+        assertEquals("PARCIAL", comparacion.path("estado").stringValue());
+        assertEquals("2.36", comparacion.path("diferenciaCostoEstimado").stringValue());
+        assertTrue(sincronizarTarifas.ejecutarCiclo().isEmpty());
+        assertEquals(1, llamadasTarifas.get());
+    }
+
+    @ParameterizedTest
+    @ValueSource(strings = {"caida", "incompatible", "ausencia", "conflicto"})
+    void tarifasAutomaticasConservanLosCostosDuranteElFalloYRecuperanUnaVersionNueva(String caso) throws Exception {
+        tarifasProveedor.set(respuestaTarifaria(tarifaImportada(1, "2026-10-01", null, "5.00")));
+        var sesion = token(enviar("POST", CONSULTA + "/sesiones", SOLICITUD, null, 201));
+        incorporarLectura("1", "2026-11-01T05:00:00Z", 1100);
+        incorporarLectura("2", "2026-11-11T05:00:00Z", 3100);
+        sincronizarTarifas.ejecutarCiclo();
+        instantePrueba.set(AHORA.plusSeconds(300));
+        tarifasProveedor.set(switch (caso) {
+            case "caida" -> CAIDA;
+            case "incompatible" -> new Respuesta(200, "application/json", "{\"asignaciones\":[]}");
+            case "ausencia" -> new Respuesta(404, "application/problem+json",
+                "{\"status\":404,\"title\":\"Suministro no encontrado\",\"instance\":\"/api/v1/suministros/000101/tarifas\"}");
+            case "conflicto" -> respuestaTarifaria(tarifaImportada(1, "2026-10-01", null, "9.00"));
+            default -> throw new AssertionError(caso);
+        });
+        var fallo = sincronizarTarifas.ejecutarCiclo().getFirst();
+        assertEquals(switch (caso) { case "ausencia" -> "SUMINISTRO_NO_ENCONTRADO";
+            case "conflicto" -> "CONFLICTO"; default -> "ERROR_FUENTE"; }, fallo.estado().name());
+        assertEquals(AHORA.plusSeconds(330), fallo.proximoIntento());
+        var conservado = consultarJson(COSTOS + "?meses=1", sesion);
+        assertEquals("1", conservado.path("revisionTarifaria").stringValue());
+        assertEquals("10.62", conservado.at("/actual/desglose/totalEstimado").stringValue());
+        assertEquals(1, jdbc.queryForObject("SELECT COUNT(*) FROM tarifas_historiales", Integer.class));
+
+        tarifasProveedor.set(respuestaTarifaria(tarifaImportada(1, "2026-10-01", "2026-11-01", "5.00"),
+            tarifaImportada(2, "2026-11-01", null, "9.00")));
+        instantePrueba.set(AHORA.plusSeconds(330));
+        assertEquals("ACTUALIZADO", sincronizarTarifas.ejecutarCiclo().getFirst().estado().name());
+        var actualizado = consultarJson(COSTOS + "?meses=1", sesion);
+        assertEquals("2", actualizado.path("revisionTarifaria").stringValue());
+        assertEquals("15.34", actualizado.at("/actual/desglose/totalEstimado").stringValue());
+        assertEquals(2, jdbc.queryForObject("SELECT COUNT(*) FROM tarifas_historiales", Integer.class));
+        assertEquals(0, jdbc.queryForObject("SELECT fallos_consecutivos FROM programacion_sincronizacion_tarifas", Integer.class));
+    }
+
+    @Test
+    void elRefrescoAutomaticoConservaLaPrioridadDeLaTarifaAdministrativa() throws Exception {
+        tarifasProveedor.set(respuestaTarifaria(tarifaImportada(1, "2026-10-01", null, "5.00")));
+        var sesion = token(enviar("POST", CONSULTA + "/sesiones", SOLICITUD, null, 201));
+        incorporarLectura("1", "2026-11-01T05:00:00Z", 1100);
+        incorporarLectura("2", "2026-11-11T05:00:00Z", 3100);
+        sincronizarTarifas.ejecutarCiclo();
+        var admin = iniciarAdminTarifas();
+        enviar("PUT", GESTION_TARIFAS, solicitudTarifa(0, 1, "2026-11-01", null), admin, 200);
+        tarifasProveedor.set(respuestaTarifaria(tarifaImportada(1, "2026-10-01", "2026-11-01", "5.00"),
+            tarifaImportada(2, "2026-11-01", null, "9.00")));
+        instantePrueba.set(AHORA.plusSeconds(300));
+        sincronizarTarifas.ejecutarCiclo();
+        var costos = consultarJson(COSTOS + "?meses=1", sesion);
+        assertEquals("2", costos.path("revisionTarifaria").stringValue());
+        assertEquals("1", costos.path("revisionTarifariaAdministrativa").stringValue());
+        assertEquals("nivora", costos.at("/actual/tarifa/fuenteTarifaria").stringValue());
+        assertEquals("10.00", costos.at("/actual/desglose/totalEstimado").stringValue());
     }
 
     @Test

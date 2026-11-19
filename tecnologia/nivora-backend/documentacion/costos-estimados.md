@@ -77,7 +77,11 @@ usa el redondeo descrito en esta página.
 
 ## Comprobación en Windows
 
-Usa la tarifa guardada siguiendo [la incorporación de tarifas](almacenamiento-tarifas.md).
+La [sincronización de tarifas](sincronizacion-tarifas.md) incorpora el historial
+después del registro del suministro y lo refresca automáticamente. Aplicar la
+migración 22 y permitir que termine un ciclo con la fuente disponible antes
+de comprobar las estimaciones. La [incorporación por consola](almacenamiento-tarifas.md)
+sigue disponible para una comprobación explícita.
 Compila con `mvnw.cmd clean verify` y arranca el nuevo JAR de Nivora en
 8082 con Empresa de Agua en 8081, según los pasos de
 [sesiones de consulta](sesiones-consulta.md#probar-desde-windows).

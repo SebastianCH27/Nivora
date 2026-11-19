@@ -1,0 +1,455 @@
+{
+  "fecha": "2026-11-19T12:39:42.331684-05:00",
+  "base_git": "457b96c2481e79b24bac5dc6d4865e026f450a1b",
+  "cambio": "Incorporacion inicial y refresco automatico de tarifas por suministro con programacion persistida.",
+  "regresion": {
+    "clases": 37,
+    "tests": 656,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0,
+    "informes": [
+      {
+        "clase": "pe.nivora.backend.NivoraBackendApplicationTests",
+        "tests": 2,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      {
+        "clase": "pe.nivora.backend.acceso.administradores.ClavesAdministrativasTests",
+        "tests": 17,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      {
+        "clase": "pe.nivora.backend.acceso.administradores.GestionAdministradoresApiTests",
+        "tests": 43,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      {
+        "clase": "pe.nivora.backend.acceso.administradores.InicializacionAdministrativaTests",
+        "tests": 10,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      {
+        "clase": "pe.nivora.backend.acceso.administradores.InicializadorAdministrativoConfiguracionTests",
+        "tests": 6,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      {
+        "clase": "pe.nivora.backend.acceso.aplicacion.ActualizarSuministroTests",
+        "tests": 5,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      {
+        "clase": "pe.nivora.backend.acceso.infraestructura.empresaagua.FuenteSuministrosHttpTests",
+        "tests": 29,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      {
+        "clase": "pe.nivora.backend.acceso.infraestructura.identidad.AccesoConsultaIntegradoTests",
+        "tests": 128,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0,
+        "casos_nuevos": [
+          "tarifasAutomaticasConservanLosCostosDuranteElFalloYRecuperanUnaVersionNueva(String)[1]",
+          "tarifasAutomaticasConservanLosCostosDuranteElFalloYRecuperanUnaVersionNueva(String)[2]",
+          "tarifasAutomaticasConservanLosCostosDuranteElFalloYRecuperanUnaVersionNueva(String)[3]",
+          "tarifasAutomaticasConservanLosCostosDuranteElFalloYRecuperanUnaVersionNueva(String)[4]",
+          "elRefrescoAutomaticoConservaLaPrioridadDeLaTarifaAdministrativa",
+          "tarifasAutomaticasDelSuministroNuevoHabilitanCostosProyeccionYComparacion"
+        ]
+      },
+      {
+        "clase": "pe.nivora.backend.acceso.infraestructura.identidad.FuenteIdentidadApisPeruTests",
+        "tests": 23,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      {
+        "clase": "pe.nivora.backend.acceso.infraestructura.persistencia.RepositorioSuministrosJdbcTests",
+        "tests": 15,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      {
+        "clase": "pe.nivora.backend.acceso.sesiones.SesionesAdministrativasApiTests",
+        "tests": 31,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      {
+        "clase": "pe.nivora.backend.acceso.sesiones.SesionesConsultaApiTests",
+        "tests": 21,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      {
+        "clase": "pe.nivora.backend.documentacion.DocumentacionApiTests",
+        "tests": 3,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      {
+        "clase": "pe.nivora.backend.lecturas.aplicacion.ImportarPaginaLecturasTests",
+        "tests": 5,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      {
+        "clase": "pe.nivora.backend.lecturas.aplicacion.RecuperacionConCorteTests",
+        "tests": 36,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      {
+        "clase": "pe.nivora.backend.lecturas.aplicacion.RecuperarLecturasTests",
+        "tests": 10,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      {
+        "clase": "pe.nivora.backend.lecturas.dominio.ConsumoIntervalosTests",
+        "tests": 13,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      {
+        "clase": "pe.nivora.backend.lecturas.dominio.ConsumoPeriodoTests",
+        "tests": 4,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      {
+        "clase": "pe.nivora.backend.lecturas.infraestructura.empresaagua.FuenteLecturasHttpTests",
+        "tests": 74,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      {
+        "clase": "pe.nivora.backend.lecturas.infraestructura.persistencia.LecturasIntervaloJdbcTests",
+        "tests": 9,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      {
+        "clase": "pe.nivora.backend.lecturas.infraestructura.persistencia.RepositorioLecturasJdbcTests",
+        "tests": 28,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      {
+        "clase": "pe.nivora.backend.lecturas.infraestructura.persistencia.RepositorioRecuperacionLecturasJdbcTests",
+        "tests": 8,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      {
+        "clase": "pe.nivora.backend.lecturas.sincronizacion.PoliticaSincronizacionTests",
+        "tests": 6,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      {
+        "clase": "pe.nivora.backend.lecturas.sincronizacion.ProgramacionSincronizacionTests",
+        "tests": 11,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      {
+        "clase": "pe.nivora.backend.lecturas.sincronizacion.SincronizarLecturasTests",
+        "tests": 14,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      {
+        "clase": "pe.nivora.backend.lecturas.supervision.SupervisionLecturasApiTests",
+        "tests": 20,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      {
+        "clase": "pe.nivora.backend.notificaciones.infraestructura.ColaWebPushTests",
+        "tests": 5,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      {
+        "clase": "pe.nivora.backend.notificaciones.infraestructura.EmisorWebPushHttpTests",
+        "tests": 3,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      {
+        "clase": "pe.nivora.backend.periodos.dominio.CalendarioMensualTests",
+        "tests": 1,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      {
+        "clase": "pe.nivora.backend.recibos.infraestructura.AlmacenamientoRecibosTests",
+        "tests": 13,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      {
+        "clase": "pe.nivora.backend.recibos.infraestructura.FuenteRecibosHttpTests",
+        "tests": 18,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      {
+        "clase": "pe.nivora.backend.tarifas.ComparacionCostosTests",
+        "tests": 8,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      {
+        "clase": "pe.nivora.backend.tarifas.CostoEstimadoTests",
+        "tests": 6,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      {
+        "clase": "pe.nivora.backend.tarifas.ProyeccionMensualTests",
+        "tests": 4,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      {
+        "clase": "pe.nivora.backend.tarifas.SincronizacionTarifasTests",
+        "tests": 17,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0,
+        "casos": [
+          "descubreAltasSinImportacionManualYRespetaElLimiteDelCiclo",
+          "rechazaPoliticasQueNoPermitenUnCalendarioAcotado(int)[1]",
+          "rechazaPoliticasQueNoPermitenUnCalendarioAcotado(int)[2]",
+          "rechazaPoliticasQueNoPermitenUnCalendarioAcotado(int)[3]",
+          "rechazaPoliticasQueNoPermitenUnCalendarioAcotado(int)[4]",
+          "rechazaPoliticasQueNoPermitenUnCalendarioAcotado(int)[5]",
+          "rechazaPoliticasQueNoPermitenUnCalendarioAcotado(int)[6]",
+          "unFalloJdbcDeImportacionSeProgramaComoErrorDeAlmacenamiento",
+          "laAusenciaConfirmadaNoBorraElHistorialYPermiteRecuperarloDespues",
+          "unaReservaVencidaPuedeRecuperarseSinQueSuPropietarioAnteriorLaSobrescriba",
+          "elTransporteSeEjecutaFueraDeUnaTransaccionSql",
+          "repetirLaMigracionYPreparacionConservaElCalendarioYLaReserva",
+          "unaFuenteQueRespondePorOtroSuministroNoCreaTarifasAjena",
+          "dosInstanciasNoReservanElMismoSuministro",
+          "unaCaidaConservaTarifasYElReintentoPersisteEntreInstancias",
+          "unCambioInmutableFallaSinPerderElHistorialNiImpedirOtroSuministro",
+          "refrescaSinDuplicarRevisionesYConservaLasVersionesAlCambiarLaTarifa"
+        ]
+      },
+      {
+        "clase": "pe.nivora.backend.tarifas.TarifasAutomaticasTests",
+        "tests": 1,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0,
+        "casos": [
+          "elAltaHttpDesencadenaLaPrimeraImportacionMedianteElPlanificador"
+        ]
+      },
+      {
+        "clase": "pe.nivora.backend.tarifas.TarifasIntegracionTests",
+        "tests": 9,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      }
+    ]
+  },
+  "mysql_8_0_46": {
+    "clases": 3,
+    "tests": 130,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0,
+    "informes": [
+      {
+        "clase": "pe.nivora.backend.acceso.infraestructura.identidad.AccesoConsultaIntegradoTests",
+        "tests": 128,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0,
+        "casos_nuevos": [
+          "tarifasAutomaticasConservanLosCostosDuranteElFalloYRecuperanUnaVersionNueva(String)[1]",
+          "tarifasAutomaticasConservanLosCostosDuranteElFalloYRecuperanUnaVersionNueva(String)[2]",
+          "tarifasAutomaticasConservanLosCostosDuranteElFalloYRecuperanUnaVersionNueva(String)[3]",
+          "tarifasAutomaticasConservanLosCostosDuranteElFalloYRecuperanUnaVersionNueva(String)[4]",
+          "elRefrescoAutomaticoConservaLaPrioridadDeLaTarifaAdministrativa",
+          "tarifasAutomaticasDelSuministroNuevoHabilitanCostosProyeccionYComparacion"
+        ]
+      },
+      {
+        "clase": "pe.nivora.backend.tarifas.MigracionTarifasMySqlTests",
+        "tests": 1,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0,
+        "casos": [
+          "laMigracionEsRepetibleConservaHistorialYCoordinaDosInstancias"
+        ]
+      },
+      {
+        "clase": "pe.nivora.backend.tarifas.TarifasAutomaticasTests",
+        "tests": 1,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0,
+        "casos": [
+          "elAltaHttpDesencadenaLaPrimeraImportacionMedianteElPlanificador"
+        ]
+      }
+    ]
+  },
+  "compilacion": {
+    "java": "21.0.13",
+    "compilador": "ECJ 3.38.0 mediante POM temporal; POM del proyecto sin cambios",
+    "objetivo": "clean verify",
+    "jar_sha256": "4c61779bf271abb9b33949398ba37b69d14dbd6f3e4400c7f7c99f062ebfd9b9"
+  },
+  "carga_breve": {
+    "usuarios": 20,
+    "medicion_segundos": 45,
+    "fallos_generador": 0,
+    "cumple": true,
+    "sincronizacion_tarifas_habilitada": false,
+    "evaluacion": {
+      "sincronizacionDuranteMedicion": true,
+      "alertasGeneradasDuranteMedicion": true,
+      "alertasAlFinal": 20,
+      "lecturasIncorporadasDuranteMedicion": 14,
+      "cumpleUmbralesDeEstaEtapa": true,
+      "cubre5000Durante30Minutos": false,
+      "requiereComparacionDeRecursos": true
+    },
+    "limite": "Comprobacion del ejecutor historico con tarifas precargadas; no evalua el rendimiento del trabajador nuevo ni acredita 5000 usuarios."
+  },
+  "migracion": "22-sincronizacion-tarifas.sql; repetible y comprobada con historial y reservas existentes en MySQL aislado.",
+  "fuentes_verificadas": [
+    {
+      "ruta": "tecnologia/nivora-backend/base-datos/22-sincronizacion-tarifas.sql",
+      "sha256": "a6094af6eed2dd1ff79d6ca445b985526e6f0c2d90776bacf025af4f557091c9"
+    },
+    {
+      "ruta": "tecnologia/nivora-backend/herramientas/EjecutarPruebaCarga.ps1",
+      "sha256": "29683eff56738e78b9c4f41df91b9963a72ccfc3ccde036e4e978dc92676842f"
+    },
+    {
+      "ruta": "tecnologia/nivora-backend/herramientas/PrepararDatosCarga.java",
+      "sha256": "593d8d08ae3e54a0d9a73fb6bdfe482f1d6333ec7495ca17e3f3e1e81f1b560e"
+    },
+    {
+      "ruta": "tecnologia/nivora-backend/src/main/java/pe/nivora/backend/compartido/infraestructura/sincronizacion/ProgramacionSincronizacionJdbc.java",
+      "sha256": "301d03cb9b143cb0763c8f5e3cfaff4960c3979a70841f1aa87990ea65bf6304"
+    },
+    {
+      "ruta": "tecnologia/nivora-backend/src/main/java/pe/nivora/backend/tarifas/aplicacion/IncorporarTarifas.java",
+      "sha256": "53930ce0b26dc1544b442e0cf378debfe19e5900d8f5b19615e95e23d4b9c373"
+    },
+    {
+      "ruta": "tecnologia/nivora-backend/src/main/java/pe/nivora/backend/tarifas/aplicacion/SincronizarTarifas.java",
+      "sha256": "2d84da998953b50250eb452ffe95a8c43180895c9bbcf9d775f0018330d5afe3"
+    },
+    {
+      "ruta": "tecnologia/nivora-backend/src/main/java/pe/nivora/backend/tarifas/dominio/FuenteTarifasNoDisponibleException.java",
+      "sha256": "41b73bf4054458118bb309452e9fdb5dee537f3221feb103b0bc8e1a16286398"
+    },
+    {
+      "ruta": "tecnologia/nivora-backend/src/main/java/pe/nivora/backend/tarifas/dominio/RepositorioSincronizacionTarifas.java",
+      "sha256": "5420ae91cb839853fa3c166f02cb9bff0c2fc7902386bc10f6cda634b482d1e6"
+    },
+    {
+      "ruta": "tecnologia/nivora-backend/src/main/java/pe/nivora/backend/tarifas/dominio/RepositorioTarifas.java",
+      "sha256": "5fe1f54ad251e6eea3b9a3ae813dcce604a673f48f73278093baa5cc9f054675"
+    },
+    {
+      "ruta": "tecnologia/nivora-backend/src/main/java/pe/nivora/backend/tarifas/infraestructura/FuenteTarifasHttp.java",
+      "sha256": "f9dae3f412f43eaead7cf5af6c6c9e76eeb6b0f6e399f13ef744cff85baadf7a"
+    },
+    {
+      "ruta": "tecnologia/nivora-backend/src/main/java/pe/nivora/backend/tarifas/infraestructura/RepositorioSincronizacionTarifasJdbc.java",
+      "sha256": "691f5cc8127923c31fc7be3af5d3c83e39ca2a4d946c8f31c9579be259c85f53"
+    },
+    {
+      "ruta": "tecnologia/nivora-backend/src/main/java/pe/nivora/backend/tarifas/infraestructura/RepositorioTarifasJdbc.java",
+      "sha256": "2bf4edf3c489eb226bbc79b8811bd5819253876571a7c13484bd930f5fcfb9df"
+    },
+    {
+      "ruta": "tecnologia/nivora-backend/src/main/java/pe/nivora/backend/tarifas/infraestructura/SincronizacionTarifasAutomatica.java",
+      "sha256": "42fabec2ce971a691378db3b0e78f27b10d19d424d3f597e7546972ebd5bcc21"
+    },
+    {
+      "ruta": "tecnologia/nivora-backend/src/main/java/pe/nivora/backend/tarifas/infraestructura/TarifasConfiguracion.java",
+      "sha256": "6adc865c5dd4e38803f9400bc4a5a1d1d6d03daa5c5fab9c7c44d2cb259754f3"
+    },
+    {
+      "ruta": "tecnologia/nivora-backend/src/main/resources/application.properties",
+      "sha256": "0073c0f0976aa8466a94922d29ac74f32906e1cce817a23e899ef59f9f306e86"
+    },
+    {
+      "ruta": "tecnologia/nivora-backend/src/test/java/pe/nivora/backend/acceso/infraestructura/identidad/AccesoConsultaIntegradoTests.java",
+      "sha256": "dcf9ad9d96965ddc0c71abeb3b2944520c6548364dffc6410d580fa7c2dab34f"
+    },
+    {
+      "ruta": "tecnologia/nivora-backend/src/test/java/pe/nivora/backend/tarifas/SincronizacionTarifasTests.java",
+      "sha256": "d6693bdb5019c265503120824c9e3cb4e28be2aa5f72153187094b58d568231e"
+    },
+    {
+      "ruta": "tecnologia/nivora-backend/src/test/java/pe/nivora/backend/tarifas/TarifasAutomaticasTests.java",
+      "sha256": "d18856a098addf41abba164b802c49aa8124897ba537d8ebbded90d6e371a93b"
+    },
+    {
+      "ruta": "tecnologia/nivora-backend/src/test/resources/application-test.properties",
+      "sha256": "910a35a98220f158e25a49d1628362a66b6dbc0831fc716be599b3f59c6f17f0"
+    }
+  ],
+  "reservas": [
+    "La primera importacion es eventual y depende de ciclos, cola y disponibilidad de la fuente.",
+    "La tarifa simulada sin IGV o alcantarillado puede seguir dando CONCEPTOS_INCOMPLETOS.",
+    "Las pruebas de identidad y Web Push usan fuentes controladas; no se consumen servicios reales.",
+    "HTTPS, dispositivos y escalabilidad conservan los pendientes documentados."
+  ]
+}

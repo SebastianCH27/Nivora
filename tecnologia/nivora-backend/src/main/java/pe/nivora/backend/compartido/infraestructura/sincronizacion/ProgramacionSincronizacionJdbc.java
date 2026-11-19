@@ -16,7 +16,8 @@ import org.springframework.transaction.support.TransactionTemplate;
 public final class ProgramacionSincronizacionJdbc {
     public enum Tabla {
         LECTURAS("programacion_sincronizacion_lecturas"),
-        RECIBOS("programacion_sincronizacion_recibos");
+        RECIBOS("programacion_sincronizacion_recibos"),
+        TARIFAS("programacion_sincronizacion_tarifas");
 
         private final String nombre;
 

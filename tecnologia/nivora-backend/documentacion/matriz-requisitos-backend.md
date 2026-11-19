@@ -31,6 +31,16 @@ sobre `cf2f699`, completa RF20/P02 con 632 pruebas de regresión aprobadas.
 Su [evidencia](evidencias/comparacion-costos-2026-11-19.json) conserva los
 casos de pares mensuales, coberturas, conceptos ausentes y aislamiento.
 
+## Corrección de incorporación automática de tarifas
+
+La revisión integral posterior a `457b96c` detectó que el importador tarifario
+solo se ejecutaba manualmente. La [corrección de sincronización](sincronizacion-tarifas.md)
+conecta la incorporación inicial y el refresco de los suministros registrados,
+con calendario persistido, reservas y reintentos. La regresión actual tiene
+656 pruebas aprobadas. E21 identifica el recorrido sin preparación manual,
+la conservación durante fallos y la prioridad de publicaciones administrativas.
+Los registros de 562, 602 y 632 pruebas conservan su alcance histórico.
+
 ## Requisitos funcionales
 
 | ID | Función | Estado en esta revisión | Alcance comprobado y reserva | Evidencia |
@@ -49,12 +59,12 @@ casos de pares mensuales, coberturas, conceptos ausentes y aislamiento.
 | RF12 | Acumulado mensual y fechas | Backend comprobado | Usa los límites del calendario configurado y las fechas efectivamente medidas. | [E04](#e04), [E12](#e12) |
 | RF13 | Cobertura e incompatibilidades | Backend comprobado | Distingue SIN_DATOS, PARCIAL, COMPLETO e INCOMPATIBLE; un dato ausente no se convierte en cero. | [E04](#e04) |
 | RF14 | Última medición y actualización | Backend comprobado | Publica fecha de medición y estado aun cuando falle la fuente o empiece un mes sin lecturas. | [E04](#e04), [E14](#e14) |
-| RF15 | Costo acumulado estimado | Backend comprobado | Aplica la vigencia y versión tarifaria al consumo calculable del periodo. | [E06](#e06) |
-| RF16 | Detalle del costo estimado | Backend comprobado | Entrega consumo, selección tarifaria y conceptos; indica conceptos faltantes. | [E06](#e06) |
-| RF17 | Proyección de consumo y costo | Backend comprobado | Proyecta con el ritmo observado, duración mensual y tramos de la tarifa aplicable. | [E06](#e06), [E07](#e07) |
+| RF15 | Costo acumulado estimado | Backend comprobado | Incorpora y refresca tarifas automáticamente; aplica la vigencia y versión tarifaria al consumo calculable del periodo. | [E06](#e06), [E21](#e21) |
+| RF16 | Detalle del costo estimado | Backend comprobado | Entrega consumo, selección tarifaria y conceptos; indica conceptos faltantes. | [E06](#e06), [E21](#e21) |
+| RF17 | Proyección de consumo y costo | Backend comprobado | Proyecta con el ritmo observado, duración mensual y tramos de la tarifa aplicable. | [E06](#e06), [E21](#e21), [E07](#e07) |
 | RF18 | Fecha, supuestos e insuficiencia | Backend comprobado | Expone fecha y supuesto de ritmo constante; diferencia insuficiencia de lecturas, tarifa y conceptos. | [E07](#e07) |
-| RF19 | Consumo y costos anteriores | Backend comprobado | Devuelve periodos anteriores con cobertura, consumo y estimación versionada. | [E04](#e04), [E06](#e06) |
-| RF20 | Comparación entre periodos | Backend comprobado | Compara dos meses elegidos o el anterior y el actual; devuelve fechas, duraciones, diferencias de litros, m³ y costo estimado, cobertura y tarifas. Distingue datos parciales y totales ausentes. P02 completado en los casos definidos. | [E05](#e05), [E06](#e06), [E20](#e20) |
+| RF19 | Consumo y costos anteriores | Backend comprobado | Devuelve periodos anteriores con cobertura, consumo y estimación versionada. | [E04](#e04), [E06](#e06), [E21](#e21) |
+| RF20 | Comparación entre periodos | Backend comprobado | Compara dos meses elegidos o el anterior y el actual; devuelve fechas, duraciones, diferencias de litros, m³ y costo estimado, cobertura y tarifas. Distingue datos parciales y totales ausentes. P02 completado en los casos definidos. | [E05](#e05), [E06](#e06), [E20](#e20), [E21](#e21) |
 | RF21 | Gráficos y estadísticas | Parcial | Existe serie mensual con huecos y resumen basado en meses completos. P03: falta la interfaz que represente los gráficos y su validación visual. | [E05](#e05) |
 | RF22 | Alerta por superar el mes anterior | Backend comprobado | Exige cobertura suficiente; contempla consumo anterior cero y conserva la primera detección. | [E09](#e09) |
 | RF23 | Preferencias por dispositivo | Backend comprobado | Asocia UUID y suministro de la sesión y exige permiso para habilitar los avisos. | [E09](#e09), [E10](#e10) |
@@ -82,7 +92,7 @@ casos de pares mensuales, coberturas, conceptos ausentes y aislamiento.
 | EQ-01 | Verificado en entorno | 5000 sesiones durante 1800 s; p95 por operación 1793–1867 ms, cero errores y continuidad de sincronización/alertas. [E16](#e16). | Montaje ficticio compartido, carga cerrada y JAR de 2d43391; no extrapolar al despliegue final. |
 | EQ-02 | Parcial | Dos perfiles completos con pools 10 y 20. [E16](#e16). | P05: hosts diferentes; falta comparación controlada de ampliación de recursos. |
 | EQ-03 | Verificado en casos | Acumuladas e intervalos, validación, unicidad, cobertura, costos y proyecciones comprobados. [E19](#e19). | Alcance: contratos, datos y casos definidos; incluye periodos incompatibles o incompletos. |
-| EQ-04 | Verificado en casos | Las consultas locales y avisos se conservan durante caídas y los reintentos recuperan pendientes. [E03](#e03), [E08](#e08), [E10](#e10), [E14](#e14). | Casos definidos con fuentes y emisor controlados; no es una certificación general de disponibilidad. |
+| EQ-04 | Verificado en casos | Las consultas locales y avisos se conservan durante caídas y los reintentos recuperan pendientes. [E03](#e03), [E08](#e08), [E10](#e10), [E14](#e14), [E21](#e21). | Casos definidos con fuentes y emisor controlados; no es una certificación general de disponibilidad. |
 | EQ-05 | Verificado en casos | Fechas, referencias de lecturas, vigencias, revisiones y supuestos comprobados. [E04](#e04), [E06](#e06), [E07](#e07), [E12](#e12). | Alcance de las lecturas y consultas implementadas. |
 | EQ-06 | Parcial | Sesiones, caducidad, revocación, permisos y protección de registros comprobados. [E01](#e01), [E11](#e11), [E14](#e14). | P04: falta comprobar comunicaciones HTTPS en un despliegue de pruebas. |
 | EQ-07 | Parcial | Hay pruebas de adaptadores HTTP para agua e identidad y preparación/clasificación de Web Push. [E10](#e10), [E13](#e13), [E17](#e17). | P06: completar matriz de contratos externos y compatibilidad con cada proveedor al conectarlo. |
@@ -273,3 +283,14 @@ Incluye `ComparacionCostosTests`, los 21 casos `comparacion*` y la octava
 operación de la matriz de contratos HTTP. Los dos casos de continuidad
 existentes también incluyen la nueva ruta. Los 31 casos HTTP seleccionados
 pasaron con MySQL 8.0.46 aislado.
+
+### E21
+
+[Incorporación y actualización automática de tarifas](sincronizacion-tarifas.md) y
+[evidencia de la corrección](evidencias/sincronizacion-tarifas-2026-11-19.json).
+Incluye `SincronizacionTarifasTests`, `TarifasAutomaticasTests` y los seis
+casos HTTP `tarifasAutomaticas*`/`elRefrescoAutomatico*` de
+`AccesoConsultaIntegradoTests`. Comprueba el primer historial después de un
+alta, refresco, reintentos persistidos, reservas concurrentes y vencidas,
+conservación ante fallos/conflictos y prioridad de tarifas administrativas.
+La migración 22 añade el calendario sin modificar los historiales existentes.

@@ -5,6 +5,7 @@ import java.util.Optional;
 
 import pe.nivora.backend.acceso.dominio.CodigoSuministro;
 import pe.nivora.backend.tarifas.dominio.FuenteTarifas;
+import pe.nivora.backend.tarifas.dominio.FuenteTarifasNoDisponibleException;
 import pe.nivora.backend.tarifas.dominio.RepositorioTarifas;
 
 public class IncorporarTarifas {
@@ -21,8 +22,8 @@ public class IncorporarTarifas {
     public Optional<RepositorioTarifas.Guardado> ejecutar(CodigoSuministro suministro) {
         var consultadoEn = reloj.instant();
         return fuente.consultar(suministro).map(historial -> {
-            if (!suministro.equals(historial.suministro())) {
-                throw new IllegalStateException("La fuente devolvio tarifas de otro suministro.");
+            if (!suministro.equals(historial.suministro()) || !"empresa-agua".equals(historial.fuente())) {
+                throw new FuenteTarifasNoDisponibleException();
             }
             return repositorio.guardar(historial, consultadoEn);
         });

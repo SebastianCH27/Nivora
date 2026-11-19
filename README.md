@@ -65,7 +65,11 @@ sesiones durante 30 minutos en el entorno descrito. La
 identifica el alcance comprobado y las funciones y evaluaciones pendientes.
 La ampliación de [lecturas de intervalo](tecnologia/nivora-backend/documentacion/lecturas-intervalo.md)
 se complementa con la [comparación de costos](tecnologia/nivora-backend/documentacion/comparacion-costos.md):
-la regresión actual tiene 632 pruebas aprobadas. El frontend está previsto con Flutter.
+la regresión de esa entrega tiene 632 pruebas aprobadas. La corrección de
+[sincronización de tarifas](tecnologia/nivora-backend/documentacion/sincronizacion-tarifas.md)
+incorpora y refresca automáticamente las tarifas de los suministros registrados,
+conserva los historiales ante fallos y eleva la regresión a 656 pruebas aprobadas.
+El frontend está previsto con Flutter.
 
 La base de Node.js y el boilerplate se conservan como material
 de los laboratorios iniciales.

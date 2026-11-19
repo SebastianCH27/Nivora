@@ -308,7 +308,7 @@ estado requieren sus pruebas funcionales; OpenAPI no sustituye esa validacion.
 - [Sesiones de consulta](sesiones-consulta.md) y [sesiones administrativas](sesiones-administrativas.md).
 - [Cuentas administrativas](gestion-administradores.md) y [registros de acceso](registros-acceso.md).
 - [Consumo actual](consumo-actual.md), [historial](historial-mensual.md) y [estadisticas](estadisticas-consumo.md).
-- [Costos estimados](costos-estimados.md), [proyeccion](proyeccion-mensual.md) y [gestion tarifaria](gestion-tarifas.md).
+- [Costos estimados](costos-estimados.md), [proyeccion](proyeccion-mensual.md), [gestion tarifaria](gestion-tarifas.md) y [sincronización automática](sincronizacion-tarifas.md).
 - [Recibos](consulta-recibos.md) y [periodos mensuales](periodos-mensuales.md).
 - [Bandeja](bandeja-notificaciones.md), [configuracion de avisos](configuracion-notificaciones.md) y [Web Push](web-push.md).
 - [Supervision de lecturas](supervision-lecturas.md), [recibos](supervision-recibos.md), [incidencias](incidencias-integracion.md) y [reintentos](reintentos-integracion.md).

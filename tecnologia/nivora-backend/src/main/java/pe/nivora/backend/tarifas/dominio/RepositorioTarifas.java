@@ -36,4 +36,10 @@ public interface RepositorioTarifas {
     class RevisionNoEncontrada extends RuntimeException {}
 
     class SuministroNoEncontrado extends RuntimeException {}
+
+    class NoDisponible extends RuntimeException {
+        public NoDisponible(Throwable causa) {
+            super("No se pudo guardar el historial tarifario.", causa);
+        }
+    }
 }

@@ -13,6 +13,7 @@ import tools.jackson.databind.JsonNode;
 import pe.nivora.backend.acceso.dominio.CodigoSuministro;
 import pe.nivora.backend.compartido.infraestructura.empresaagua.ClienteEmpresaAgua;
 import pe.nivora.backend.tarifas.dominio.FuenteTarifas;
+import pe.nivora.backend.tarifas.dominio.FuenteTarifasNoDisponibleException;
 import pe.nivora.backend.tarifas.dominio.HistorialTarifario;
 import pe.nivora.backend.tarifas.dominio.VersionTarifaria;
 
@@ -101,7 +102,7 @@ public class FuenteTarifasHttp implements FuenteTarifas {
         return objeto.has(campo) ? decimal(objeto, campo, true) : null;
     }
 
-    private static IllegalStateException noDisponible() {
-        return new IllegalStateException("La Empresa de Agua no devolvio un historial tarifario utilizable.");
+    private static FuenteTarifasNoDisponibleException noDisponible() {
+        return new FuenteTarifasNoDisponibleException();
     }
 }

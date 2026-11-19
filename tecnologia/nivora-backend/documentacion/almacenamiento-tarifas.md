@@ -41,6 +41,11 @@ Deben aparecer `tarifas_asignaciones`, `tarifas_historiales` y
 
 ## Incorporar un suministro de prueba
 
+El arranque web habitual ya incorpora y refresca los historiales de todos los
+suministros registrados mediante la [sincronización automática](sincronizacion-tarifas.md).
+Requiere aplicar la migración 22. El comprobador de esta sección permite
+ejecutar una incorporación explícita por consola.
+
 Con Empresa de Agua funcionando en 8081, ejecuta desde el CMD del módulo
 `nivora-backend` el JAR compilado. Usa un suministro previamente registrado
 en Nivora. El comando predeterminado usa `13100390`.

@@ -143,7 +143,8 @@ try {
         "--spring.datasource.username=$cuenta","--spring.datasource.hikari.maximum-pool-size=$PoolConexiones",
         "--server.tomcat.threads.max=$HilosHttp","--nivora.empresa-agua.url-base=http://127.0.0.1:$PuertoFuente",
         '--nivora.sincronizacion.intervalo-ms=1000','--nivora.sincronizacion.maximo-intentos-por-ciclo=1',
-        '--nivora.sincronizacion.intervalo-completo-segundos=30','--nivora.web-push.habilitado=false')
+        '--nivora.sincronizacion.intervalo-completo-segundos=30','--nivora.web-push.habilitado=false',
+        '--nivora.tarifas.sincronizacion.habilitada=false')
     if ($instrumentada) {
         $argumentos += @('--spring.datasource.hikari.register-mbeans=true',
             '--spring.datasource.hikari.pool-name=NivoraCarga','--server.tomcat.mbeanregistry.enabled=true')
@@ -183,6 +184,7 @@ try {
         sinInteraccion = [bool]$SinInteraccion; powershell = $PSVersionTable.PSVersion.ToString()
         etapas = $Etapas; completa = [bool]$Completa; generadorYServidorEnMismoEquipo = $true
         sincronizacionLecturasIntervaloMs = 1000; intentosPorCiclo = 1; intervaloCompletoSegundos = 30
+        sincronizacionTarifasHabilitada = $false
     }) (Join-Path $salida 'entorno.json')
     $numero = 0
     foreach ($cantidad in $Etapas) {
