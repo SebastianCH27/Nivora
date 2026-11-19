@@ -1,0 +1,452 @@
+{
+  "versionFormato": 1,
+  "fechaLocal": "2026-11-19",
+  "zonaHoraria": "America/Lima",
+  "baseContenidoReportada": "cf2f699",
+  "alcance": "RF20/P02: comparación de consumo y costo estimado entre dos periodos del suministro de la sesión.",
+  "endpoint": {
+    "metodo": "GET",
+    "ruta": "/api/v1/acceso/consulta/comparacion",
+    "sesion": "CONSULTA",
+    "parametros": [
+      "periodoBase",
+      "periodoComparado"
+    ],
+    "predeterminados": "Anterior y actual según el calendario mensual.",
+    "separacionMaximaMeses": 12,
+    "permiteInvertirOrden": true,
+    "permiteMismoPeriodo": true
+  },
+  "regresion": {
+    "tests": 632,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0,
+    "clases": 35,
+    "buildSuccess": true,
+    "comando": "clean verify",
+    "java": "21.0.13",
+    "compilador": "ECJ 3.38.0 para Java 21",
+    "pomVersionadoModificado": false,
+    "jarSha256": "5ad1cad40dfb02a5f2beee1e81e53be5219cedc4c4860427e38e5f7117377c03",
+    "inventario": [
+      {
+        "clase": "pe.nivora.backend.NivoraBackendApplicationTests",
+        "tests": 2,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      {
+        "clase": "pe.nivora.backend.acceso.administradores.ClavesAdministrativasTests",
+        "tests": 17,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      {
+        "clase": "pe.nivora.backend.acceso.administradores.GestionAdministradoresApiTests",
+        "tests": 43,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      {
+        "clase": "pe.nivora.backend.acceso.administradores.InicializacionAdministrativaTests",
+        "tests": 10,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      {
+        "clase": "pe.nivora.backend.acceso.administradores.InicializadorAdministrativoConfiguracionTests",
+        "tests": 6,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      {
+        "clase": "pe.nivora.backend.acceso.aplicacion.ActualizarSuministroTests",
+        "tests": 5,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      {
+        "clase": "pe.nivora.backend.acceso.infraestructura.empresaagua.FuenteSuministrosHttpTests",
+        "tests": 29,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      {
+        "clase": "pe.nivora.backend.acceso.infraestructura.identidad.AccesoConsultaIntegradoTests",
+        "tests": 122,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      {
+        "clase": "pe.nivora.backend.acceso.infraestructura.identidad.FuenteIdentidadApisPeruTests",
+        "tests": 23,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      {
+        "clase": "pe.nivora.backend.acceso.infraestructura.persistencia.RepositorioSuministrosJdbcTests",
+        "tests": 15,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      {
+        "clase": "pe.nivora.backend.acceso.sesiones.SesionesAdministrativasApiTests",
+        "tests": 31,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      {
+        "clase": "pe.nivora.backend.acceso.sesiones.SesionesConsultaApiTests",
+        "tests": 21,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      {
+        "clase": "pe.nivora.backend.documentacion.DocumentacionApiTests",
+        "tests": 3,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      {
+        "clase": "pe.nivora.backend.lecturas.aplicacion.ImportarPaginaLecturasTests",
+        "tests": 5,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      {
+        "clase": "pe.nivora.backend.lecturas.aplicacion.RecuperacionConCorteTests",
+        "tests": 36,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      {
+        "clase": "pe.nivora.backend.lecturas.aplicacion.RecuperarLecturasTests",
+        "tests": 10,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      {
+        "clase": "pe.nivora.backend.lecturas.dominio.ConsumoIntervalosTests",
+        "tests": 13,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      {
+        "clase": "pe.nivora.backend.lecturas.dominio.ConsumoPeriodoTests",
+        "tests": 4,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      {
+        "clase": "pe.nivora.backend.lecturas.infraestructura.empresaagua.FuenteLecturasHttpTests",
+        "tests": 74,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      {
+        "clase": "pe.nivora.backend.lecturas.infraestructura.persistencia.LecturasIntervaloJdbcTests",
+        "tests": 9,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      {
+        "clase": "pe.nivora.backend.lecturas.infraestructura.persistencia.RepositorioLecturasJdbcTests",
+        "tests": 28,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      {
+        "clase": "pe.nivora.backend.lecturas.infraestructura.persistencia.RepositorioRecuperacionLecturasJdbcTests",
+        "tests": 8,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      {
+        "clase": "pe.nivora.backend.lecturas.sincronizacion.PoliticaSincronizacionTests",
+        "tests": 6,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      {
+        "clase": "pe.nivora.backend.lecturas.sincronizacion.ProgramacionSincronizacionTests",
+        "tests": 11,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      {
+        "clase": "pe.nivora.backend.lecturas.sincronizacion.SincronizarLecturasTests",
+        "tests": 14,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      {
+        "clase": "pe.nivora.backend.lecturas.supervision.SupervisionLecturasApiTests",
+        "tests": 20,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      {
+        "clase": "pe.nivora.backend.notificaciones.infraestructura.ColaWebPushTests",
+        "tests": 5,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      {
+        "clase": "pe.nivora.backend.notificaciones.infraestructura.EmisorWebPushHttpTests",
+        "tests": 3,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      {
+        "clase": "pe.nivora.backend.periodos.dominio.CalendarioMensualTests",
+        "tests": 1,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      {
+        "clase": "pe.nivora.backend.recibos.infraestructura.AlmacenamientoRecibosTests",
+        "tests": 13,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      {
+        "clase": "pe.nivora.backend.recibos.infraestructura.FuenteRecibosHttpTests",
+        "tests": 18,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      {
+        "clase": "pe.nivora.backend.tarifas.ComparacionCostosTests",
+        "tests": 8,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      {
+        "clase": "pe.nivora.backend.tarifas.CostoEstimadoTests",
+        "tests": 6,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      {
+        "clase": "pe.nivora.backend.tarifas.ProyeccionMensualTests",
+        "tests": 4,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      {
+        "clase": "pe.nivora.backend.tarifas.TarifasIntegracionTests",
+        "tests": 9,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      }
+    ]
+  },
+  "ampliacion": {
+    "pruebasAnteriores": 602,
+    "pruebasNuevas": 30,
+    "clasesYMetodos": [
+      {
+        "clase": "pe.nivora.backend.acceso.infraestructura.identidad.AccesoConsultaIntegradoTests",
+        "archivo": "tecnologia/nivora-backend/src/test/java/pe/nivora/backend/acceso/infraestructura/identidad/AccesoConsultaIntegradoTests.java",
+        "casosAdicionales": 22,
+        "metodosNuevos": [
+          "comparacionConHuecosEnUnMesCerradoConservaUnaDiferenciaParcial",
+          "comparacionConTarifasDistintasExponeLaCausaAunqueElConsumoSeaIgual",
+          "comparacionDeCostosEntreMesesCompletosConservaFechasTarifasYSigno",
+          "comparacionDeCrucesMensualesNoDistribuyeLosLitrosDesconocidos",
+          "comparacionNoAdmiteUnPeriodoCivilQueElCalendarioAunNoInicia",
+          "comparacionNoRestaSubtotalesCuandoFaltanConceptosTarifarios",
+          "comparacionPredeterminadaMarcaElMesEnCursoSinNormalizarLosImportes",
+          "comparacionRechazaPeriodosMalFormadosIncompletosFuturosOExcesivos",
+          "comparacionRespetaElCalendarioMensualConfigurado",
+          "comparacionSinLecturasOConCalendarioIndisponibleInformaSuEstado",
+          "comparacionSinTarifaConservaElVolumenYNoInventaUnImporte"
+        ]
+      },
+      {
+        "clase": "pe.nivora.backend.tarifas.ComparacionCostosTests",
+        "archivo": "tecnologia/nivora-backend/src/test/java/pe/nivora/backend/tarifas/ComparacionCostosTests.java",
+        "casosAdicionales": 8,
+        "metodosNuevos": [
+          "diferenciaPositivaNegativaOCeroConservaCentimosYSigno",
+          "laCoberturaParcialImpideDeclararLaComparacionCompleta",
+          "lasLecturasIncalculablesDejanAmbasDiferenciasIndefinidas",
+          "losExtremosDeLongNoDesbordanLaDiferenciaDeVolumen",
+          "unPeriodoNoCerradoOIncompletoConservaSoloUnaComparacionParcial",
+          "unSubtotalConConceptosAusentesNoSeConvierteEnUnaDiferenciaMonetaria"
+        ]
+      }
+    ],
+    "desglose": {
+      "dominio": 8,
+      "httpComparacion": 21,
+      "contratoConsultaAdicional": 1
+    },
+    "continuidad": "Los dos casos existentes incluyen ahora ocho consultas, sin aumentar su número de casos."
+  },
+  "mysql": {
+    "version": "8.0.46",
+    "tests": 31,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0,
+    "buildSuccess": true,
+    "inventario": [
+      {
+        "clase": "pe.nivora.backend.acceso.infraestructura.identidad.AccesoConsultaIntegradoTests",
+        "tests": 31,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      }
+    ],
+    "procedencia": "Instancia aislada y copia temporal del mismo backend; propiedades del datasource ajustadas a MySQL.",
+    "casos": {
+      "comparacion": 21,
+      "contratosConsulta": 8,
+      "continuidad": 2
+    }
+  },
+  "contrato": {
+    "archivo": "documentacion/openapi.json",
+    "openapi": "3.1.0",
+    "operacionesNegocio": 41,
+    "operacionesSalud": 1,
+    "plantillasRuta": 34,
+    "esquemas": 104,
+    "registrosJavaEnlazados": 64,
+    "enumsJavaEnlazados": 16,
+    "referenciasResueltas": 516,
+    "ejemplosValidados": 16,
+    "ejemploPowerShell": "Sintaxis validada con ParseFile; no se ejecutaron llamadas con credenciales del usuario."
+  },
+  "reglas": [
+    "Todas las diferencias son comparado menos base.",
+    "Una comparación completa requiere ambos periodos cerrados y totalmente cubiertos y totales estimados disponibles.",
+    "El tramo observado del mes actual puede estar completo aunque el periodo siga en curso; la comparación se marca parcial.",
+    "Un subtotal con conceptos faltantes no sustituye al total estimado.",
+    "Las diferencias parciales conservan solo el consumo y costo conocidos; no se normalizan por días ni se proyectan.",
+    "Los cruces y huecos de intervalos conservan las reglas de RF10.",
+    "Las versiones y revisiones de cada estimación y la duración entre extremos se publican para interpretar la diferencia.",
+    "El alcance del suministro se obtiene de la sesión, incluso si se envía un código ajeno en la URL.",
+    "Una sola consulta local obtiene las lecturas de ambos periodos y se reutiliza una selección del historial tarifario."
+  ],
+  "ejemplos": {
+    "mesesCompletos": {
+      "base": "2026-09",
+      "comparado": "2026-10",
+      "litrosBase": 10000,
+      "litrosComparado": 13200,
+      "costoBase": "30.00",
+      "costoComparado": "38.00",
+      "diferenciaLitros": "3200",
+      "diferenciaCostoEstimado": "8.00",
+      "estado": "COMPLETA",
+      "mismaDuracionTramo": false,
+      "mismaVersionTarifaria": true
+    },
+    "mesActualEnCurso": {
+      "base": "2026-10",
+      "comparado": "2026-11",
+      "diferenciaLitros": "-6800",
+      "diferenciaCostoEstimado": "-17.00",
+      "estado": "PARCIAL"
+    },
+    "tarifaCambiaConMismoConsumo": {
+      "diferenciaLitros": "0",
+      "diferenciaCostoEstimado": "8.00",
+      "mismaVersionTarifaria": false
+    }
+  },
+  "limites": [
+    "Los resultados son estimaciones; el importe definitivo procede de los recibos.",
+    "La evidencia previa de carga de 5000 usuarios conserva su JAR y siete operaciones; no acredita esta ruta nueva ni su versión del backend.",
+    "La comparación tiene alcance de API y procesos locales; las interfaces y las evaluaciones pendientes de calidad conservan sus reservas.",
+    "P01 y P02 quedan implementados y verificados en los casos definidos; la matriz RF/EQ mantiene los demás pendientes."
+  ],
+  "huellasSha256": {
+    "README.md": "b1750611aede7cdd5ad2a06b8f0df9baab1799273ecf65d511fd7a085d114d9d",
+    "tecnologia/nivora-backend/README.md": "b06057a710e7abb314fcd4049abea60ca993c584cbfb33ddc77a23a201dce20e",
+    "tecnologia/nivora-backend/documentacion/api.md": "1fbf0aeae214c73d10aa7995734e0c4c1d1494953e9bbb593f3dece377ca06e3",
+    "tecnologia/nivora-backend/documentacion/comparacion-costos.md": "0171f9e2026c398c9409a425f207bf39c089b296d911be31e89eae0fe5f9cff7",
+    "tecnologia/nivora-backend/documentacion/costos-estimados.md": "10086326469de3616a4b30519fe491bbfe1eeb9eda536602cb5ba9262c5ba83d",
+    "tecnologia/nivora-backend/documentacion/estadisticas-consumo.md": "c058bfa50208e9f0c482955f97cd43de8ddbeac9efe645fc38384fb6b03e3d39",
+    "tecnologia/nivora-backend/documentacion/lecturas-intervalo.md": "3cbae6099d6521823bc1c1f50a88a6840df94fd94a824020092d9cf7f85c48aa",
+    "tecnologia/nivora-backend/documentacion/matriz-requisitos-backend.md": "69df11da22014d20a8e8e6583cdf58a1fe9840f76134fa3bdbf6d1f00ee23f4f",
+    "tecnologia/nivora-backend/documentacion/openapi.json": "3cbc57502eb75bb0a79aa80bb731be69d80a616cf0a575eae6a21bad7ba3affd",
+    "tecnologia/nivora-backend/documentacion/verificacion-continuidad-avisos.md": "92aa165bfbc21d8e11d4844878396bab48e0f39ed7340e751731f1ac8255e5cb",
+    "tecnologia/nivora-backend/documentacion/verificacion-contratos-api.md": "a8acae1d755de4d37252f087729494bf5df8bf06173656b1810579c8371ae09b",
+    "tecnologia/nivora-backend/documentacion/verificacion-documentacion-api.md": "a5865b61f5c644788be14b178fcd9033fa61721902b09ed2b1351c16dc4911ce",
+    "tecnologia/nivora-backend/documentacion/verificacion-final-backend.md": "dd06087bb8d817d94a9f1b668f3c1b6ad27f63a811869118adf6a94a4fbca03a",
+    "tecnologia/nivora-backend/src/main/java/pe/nivora/backend/acceso/infraestructura/seguridad/SeguridadConfiguracion.java": "f41cfe507199362818b278c0cf3bfe93a076d7a75369c3101d340dbca9812f69",
+    "tecnologia/nivora-backend/src/main/java/pe/nivora/backend/tarifas/aplicacion/ConsultarComparacionCostos.java": "c9b12ef2126c0b4c2641758a5e8999718023dd7598fbe44edfed51a7ccca8cbd",
+    "tecnologia/nivora-backend/src/main/java/pe/nivora/backend/tarifas/aplicacion/ConsultarCostosConsumo.java": "d4980cd929ad55abd7eb2b6e9dca009627841dd23e58f2128946e9fe8c1c93dc",
+    "tecnologia/nivora-backend/src/main/java/pe/nivora/backend/tarifas/dominio/ComparacionCostos.java": "4f6ee6f87990e015843386be99cd432a8a99c72df177e9334f406ccfc412073c",
+    "tecnologia/nivora-backend/src/main/java/pe/nivora/backend/tarifas/infraestructura/TarifasConfiguracion.java": "d1ddf9e9071be5a55cb36980dff6c3b8bfa44a644437239dfa62eb30b26779a8",
+    "tecnologia/nivora-backend/src/main/java/pe/nivora/backend/tarifas/presentacion/ComparacionCostosController.java": "91e273d6924b24ccf64a9fb029a66aec2f85f59b7b8fab9044e6a70e4c8fb355",
+    "tecnologia/nivora-backend/src/main/java/pe/nivora/backend/tarifas/presentacion/CostosConsumoController.java": "45d3a414ebb3d0b81db6033463dd1a3ca6b3f1a2e6ed3fabf9b07a2e98b2d06e",
+    "tecnologia/nivora-backend/src/test/java/pe/nivora/backend/acceso/infraestructura/identidad/AccesoConsultaIntegradoTests.java": "72185078d2209740ca4c20603988ac9090d0898bb0849826142752916d2d9e5a",
+    "tecnologia/nivora-backend/src/test/java/pe/nivora/backend/tarifas/ComparacionCostosTests.java": "bc783cf91e125ad0c57b386610492c7ceff45361913547732957bdfe761ee341"
+  },
+  "archivosEntrega": [
+    "README.md",
+    "tecnologia/nivora-backend/README.md",
+    "tecnologia/nivora-backend/documentacion/api.md",
+    "tecnologia/nivora-backend/documentacion/comparacion-costos.md",
+    "tecnologia/nivora-backend/documentacion/costos-estimados.md",
+    "tecnologia/nivora-backend/documentacion/estadisticas-consumo.md",
+    "tecnologia/nivora-backend/documentacion/evidencias/comparacion-costos-2026-11-19.json",
+    "tecnologia/nivora-backend/documentacion/lecturas-intervalo.md",
+    "tecnologia/nivora-backend/documentacion/matriz-requisitos-backend.md",
+    "tecnologia/nivora-backend/documentacion/openapi.json",
+    "tecnologia/nivora-backend/documentacion/verificacion-continuidad-avisos.md",
+    "tecnologia/nivora-backend/documentacion/verificacion-contratos-api.md",
+    "tecnologia/nivora-backend/documentacion/verificacion-documentacion-api.md",
+    "tecnologia/nivora-backend/documentacion/verificacion-final-backend.md",
+    "tecnologia/nivora-backend/src/main/java/pe/nivora/backend/acceso/infraestructura/seguridad/SeguridadConfiguracion.java",
+    "tecnologia/nivora-backend/src/main/java/pe/nivora/backend/tarifas/aplicacion/ConsultarComparacionCostos.java",
+    "tecnologia/nivora-backend/src/main/java/pe/nivora/backend/tarifas/aplicacion/ConsultarCostosConsumo.java",
+    "tecnologia/nivora-backend/src/main/java/pe/nivora/backend/tarifas/dominio/ComparacionCostos.java",
+    "tecnologia/nivora-backend/src/main/java/pe/nivora/backend/tarifas/infraestructura/TarifasConfiguracion.java",
+    "tecnologia/nivora-backend/src/main/java/pe/nivora/backend/tarifas/presentacion/ComparacionCostosController.java",
+    "tecnologia/nivora-backend/src/main/java/pe/nivora/backend/tarifas/presentacion/CostosConsumoController.java",
+    "tecnologia/nivora-backend/src/test/java/pe/nivora/backend/acceso/infraestructura/identidad/AccesoConsultaIntegradoTests.java",
+    "tecnologia/nivora-backend/src/test/java/pe/nivora/backend/tarifas/ComparacionCostosTests.java"
+  ]
+}

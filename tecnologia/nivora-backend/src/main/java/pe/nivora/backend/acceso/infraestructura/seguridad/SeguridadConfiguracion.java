@@ -30,6 +30,7 @@ public class SeguridadConfiguracion {
                     "/api/v1/acceso/consulta/historial",
                     "/api/v1/acceso/consulta/estadisticas",
                     "/api/v1/acceso/consulta/costos",
+                    "/api/v1/acceso/consulta/comparacion",
                     "/api/v1/acceso/consulta/proyeccion",
                     "/api/v1/acceso/consulta/recibos",
                     "/api/v1/acceso/consulta/notificaciones",

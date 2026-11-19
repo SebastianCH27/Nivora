@@ -21,8 +21,8 @@ refactorizar. `x-permisos-requeridos` describe las autoridades administrativas
 revisadas en `SeguridadConfiguracion`; las pruebas funcionales de permisos
 siguen en los contratos e integraciones existentes.
 
-Los controles recorren las 40 operaciones explicitas de negocio y los
-62 registros y 15 enums enlazados. La consulta de salud pertenece a Actuator:
+Los controles recorren las 41 operaciones explícitas de negocio y los
+64 registros y 16 enums enlazados. La consulta de salud pertenece a Actuator:
 se documenta aparte y mantiene su prueba HTTP existente.
 
 ## Ejecucion desde CMD
@@ -88,3 +88,12 @@ enlazados; la regresión de la ampliación tiene 602 pruebas aprobadas.
 La validación de 100 esquemas y 562 pruebas descrita antes conserva su
 condición de registro histórico de la parte 4. La evidencia actual está en
 [lecturas de intervalo](evidencias/lecturas-intervalo-2026-11-19.json).
+
+## Ampliación de comparación
+
+RF20 añade una operación, dos DTO y un enum. El contrato actual tiene
+41 operaciones de negocio y una de salud, 104 esquemas, 64 registros y
+16 enums enlazados. Los tres controles de documentación pasaron dentro de
+la regresión de 632 pruebas. Las validaciones anteriores conservan su
+fecha y alcance; la evidencia actual está en
+[comparación de costos](evidencias/comparacion-costos-2026-11-19.json).

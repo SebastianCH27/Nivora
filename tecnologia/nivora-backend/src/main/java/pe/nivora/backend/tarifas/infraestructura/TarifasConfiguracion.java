@@ -9,6 +9,9 @@ import pe.nivora.backend.compartido.infraestructura.empresaagua.ClienteEmpresaAg
 import pe.nivora.backend.lecturas.aplicacion.ConsultarConsumoActual;
 import pe.nivora.backend.lecturas.aplicacion.ConsultarEstadisticasConsumo;
 import pe.nivora.backend.tarifas.aplicacion.ConsultarCostosConsumo;
+import pe.nivora.backend.tarifas.aplicacion.ConsultarComparacionCostos;
+import pe.nivora.backend.lecturas.dominio.contratos.ConsultaLecturasPeriodo;
+import pe.nivora.backend.periodos.dominio.RepositorioPeriodosMensuales;
 import pe.nivora.backend.tarifas.aplicacion.ConsultarProyeccionMensual;
 import pe.nivora.backend.tarifas.aplicacion.GestionarTarifas;
 import pe.nivora.backend.tarifas.aplicacion.IncorporarTarifas;
@@ -30,6 +33,12 @@ public class TarifasConfiguracion {
     @Bean
     ConsultarCostosConsumo consultarCostosConsumo(ConsultarEstadisticasConsumo consumos, RepositorioTarifas tarifas) {
         return new ConsultarCostosConsumo(consumos, tarifas);
+    }
+
+    @Bean
+    ConsultarComparacionCostos consultarComparacionCostos(ConsultaLecturasPeriodo lecturas,
+            RepositorioTarifas tarifas, RepositorioPeriodosMensuales periodos, Clock reloj) {
+        return new ConsultarComparacionCostos(lecturas, tarifas, periodos, reloj);
     }
 
     @Bean

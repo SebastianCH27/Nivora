@@ -11,7 +11,7 @@ ponen en estado de caída después del inicio de las sesiones.
 
 ## Consultas por suministro
 
-Las siete rutas están bajo `/api/v1/acceso/consulta`.
+Las ocho rutas están bajo `/api/v1/acceso/consulta`.
 
 | Ruta GET | Dato comprobado para 000101 | Dato comprobado para 000202 |
 | --- | --- | --- |
@@ -19,6 +19,7 @@ Las siete rutas están bajo `/api/v1/acceso/consulta`.
 | `/historial?meses=1` | Octubre con 2000 L. | Octubre con 10000 L. |
 | `/estadisticas?meses=1` | Acumulado actual de 2200 L. | Acumulado actual de 9000 L. |
 | `/costos?meses=1` | Consumo usado para el costo de 2200 L. | Consumo usado para el costo de 9000 L. |
+| `/comparacion` | Acumulado comparado de 2200 L. | Acumulado comparado de 9000 L. |
 | `/proyeccion` | Consumo observado de 2200 L. | Consumo observado de 9000 L. |
 | `/recibos` | Recibo `REC-101-10`. | Recibo `REC-202-10`. |
 | `/notificaciones` | Aviso del recibo `REC-101-10`. | Aviso del recibo `REC-202-10`. |
@@ -79,7 +80,7 @@ Ctrl+C y ejecuta la suite completa.
 mvnw.cmd clean verify
 ```
 
-Para repetir los 27 casos de esta matriz, usa esta línea.
+Para repetir la matriz actual, usa esta línea.
 
 ```cmd
 mvnw.cmd "-Dtest=AccesoConsultaIntegradoTests#contrato*+laSesionAjenaNoPuedeMarcarAvisosNiRetirarLaSuscripcionDelOtroSuministro" test
@@ -88,3 +89,12 @@ mvnw.cmd "-Dtest=AccesoConsultaIntegradoTests#contrato*+laSesionAjenaNoPuedeMarc
 La suite usa H2 y fuentes controladas. Los mismos 27 casos también se
 ejecutaron con MySQL 8.0.46 en una base aislada. La equivalencia se comprueba
 en las respuestas HTTP de sesiones independientes.
+
+## Ampliación de RF20
+
+La nueva comparación conserva el suministro de la sesión y la equivalencia
+entre dispositivos, aun con las fuentes externas caídas. La matriz de
+consulta tiene ahora ocho operaciones. Los 27 casos del corte original
+se conservan como registro histórico; la ejecución actual de ese comando
+incluye 28. La [evidencia de comparación](evidencias/comparacion-costos-2026-11-19.json)
+registra la regresión y los casos MySQL de esta ampliación.

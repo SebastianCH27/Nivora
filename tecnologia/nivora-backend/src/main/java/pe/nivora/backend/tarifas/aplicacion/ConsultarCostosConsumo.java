@@ -31,7 +31,7 @@ public class ConsultarCostosConsumo {
             actual, anteriores);
     }
 
-    private static Estimacion estimar(Periodo periodo, TarifasParaCalculo historial) {
+    static Estimacion estimar(Periodo periodo, TarifasParaCalculo historial) {
         Long litros = periodo.consumo().litros();
         if (litros == null) {
             return new Estimacion(periodo, Estado.SIN_CONSUMO_CALCULABLE, null, null);

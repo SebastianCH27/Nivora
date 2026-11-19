@@ -26,6 +26,11 @@ noviembre de 2026, completa RF10/P01 y amplía los casos de EQ-03. Su
 la regresión de 602 pruebas. El resumen de revisión final enlazado arriba
 conserva el corte histórico de 562 pruebas del bloque 9.
 
+La [comparación de consumo y costos](comparacion-costos.md), ampliación
+sobre `cf2f699`, completa RF20/P02 con 632 pruebas de regresión aprobadas.
+Su [evidencia](evidencias/comparacion-costos-2026-11-19.json) conserva los
+casos de pares mensuales, coberturas, conceptos ausentes y aislamiento.
+
 ## Requisitos funcionales
 
 | ID | Función | Estado en esta revisión | Alcance comprobado y reserva | Evidencia |
@@ -49,7 +54,7 @@ conserva el corte histórico de 562 pruebas del bloque 9.
 | RF17 | Proyección de consumo y costo | Backend comprobado | Proyecta con el ritmo observado, duración mensual y tramos de la tarifa aplicable. | [E06](#e06), [E07](#e07) |
 | RF18 | Fecha, supuestos e insuficiencia | Backend comprobado | Expone fecha y supuesto de ritmo constante; diferencia insuficiencia de lecturas, tarifa y conceptos. | [E07](#e07) |
 | RF19 | Consumo y costos anteriores | Backend comprobado | Devuelve periodos anteriores con cobertura, consumo y estimación versionada. | [E04](#e04), [E06](#e06) |
-| RF20 | Comparación entre periodos | Parcial | Estadísticas devuelve fechas, duración y diferencia de volumen; costos entrega estimaciones por periodo. P02: falta completar y probar la diferencia de costo estimado entre los periodos comparados. | [E05](#e05), [E06](#e06) |
+| RF20 | Comparación entre periodos | Backend comprobado | Compara dos meses elegidos o el anterior y el actual; devuelve fechas, duraciones, diferencias de litros, m³ y costo estimado, cobertura y tarifas. Distingue datos parciales y totales ausentes. P02 completado en los casos definidos. | [E05](#e05), [E06](#e06), [E20](#e20) |
 | RF21 | Gráficos y estadísticas | Parcial | Existe serie mensual con huecos y resumen basado en meses completos. P03: falta la interfaz que represente los gráficos y su validación visual. | [E05](#e05) |
 | RF22 | Alerta por superar el mes anterior | Backend comprobado | Exige cobertura suficiente; contempla consumo anterior cero y conserva la primera detección. | [E09](#e09) |
 | RF23 | Preferencias por dispositivo | Backend comprobado | Asocia UUID y suministro de la sesión y exige permiso para habilitar los avisos. | [E09](#e09), [E10](#e10) |
@@ -90,7 +95,7 @@ conserva el corte histórico de 562 pruebas del bloque 9.
 | ID | Trabajo | Referencias | Para considerarlo verificado |
 |---|---|---|---|
 | P01 | Lecturas de intervalo — completado | RF10, EQ-03 | Incorporación, suma exacta, huecos, superposiciones, duplicados, límites y mezcla verificados en [E19](#e19). |
-| P02 | Comparación de costos | RF20 | Definir y devolver la diferencia estimada con los periodos, duraciones y revisiones comparadas; comprobar datos parciales y conceptos o tarifas insuficientes. |
+| P02 | Comparación de costos — completado | RF20 | Diferencias, signo, fechas, duraciones, tarifas y datos parciales o ausentes verificados en [E20](#e20). |
 | P03 | Interfaz, gráficos y usabilidad | RF21, EQ-08, RC01 | Implementar las vistas de consulta y administración; representar huecos y distinguir importes; ejecutar las tareas propuestas con cinco participantes y las dos resoluciones. |
 | P04 | Transporte HTTPS | EQ-06 | Preparar un despliegue de pruebas y comprobar TLS y las comunicaciones protegidas desde sus clientes. |
 | P05 | Escalabilidad controlada | EQ-02 | Comparar recursos iniciales y ampliados con el mismo JAR, datos, mezcla y generador controlado; medir capacidad sostenible y recursos sin atribuir diferencias entre hosts solo al pool. |
@@ -98,8 +103,8 @@ conserva el corte histórico de 562 pruebas del bloque 9.
 | P07 | Sustitución del adaptador | EQ-10 | Sustituir una implementación conservando el contrato; registrar archivos/dependencias y demostrar regresión sin cambios de negocio motivados solo por el protocolo. |
 | P08 | Dispositivos y recepción visual | RF26, EQ-09, RC07 | Comparar valores y fechas desde celular y computadora y documentar Web Push con aplicación cerrada, permiso y conectividad en los dispositivos/navegadores que se declaren admitidos. |
 
-P01 está completado para los casos definidos. P02 sigue como brecha funcional
-del backend. P06 y P07 completan sus
+P01 y P02 están completados en el backend para los casos definidos.
+P06 y P07 completan sus
 evaluaciones de integración y mantenibilidad. P03 y P08 requieren las
 interfaces y dispositivos finales. P04 y P05 requieren definir y evaluar
 el despliegue correspondiente. Esta revisión conserva todos esos pendientes.
@@ -259,3 +264,12 @@ de intervalo de `FuenteLecturasHttpTests`, reanudación en
 `RecuperacionConCorteTests` y los seis métodos `intervalos*` de
 `AccesoConsultaIntegradoTests`. Los métodos exactos y las huellas de sus
 fuentes se conservan en el resumen estructurado.
+
+### E20
+
+[Comparación de consumo y costos](comparacion-costos.md) y
+[evidencia de RF20](evidencias/comparacion-costos-2026-11-19.json).
+Incluye `ComparacionCostosTests`, los 21 casos `comparacion*` y la octava
+operación de la matriz de contratos HTTP. Los dos casos de continuidad
+existentes también incluyen la nueva ruta. Los 31 casos HTTP seleccionados
+pasaron con MySQL 8.0.46 aislado.

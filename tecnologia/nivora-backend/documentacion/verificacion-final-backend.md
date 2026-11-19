@@ -3,6 +3,10 @@
 Parte 5, 19 de noviembre de 2026, zona America/Lima.
 Base de la revisión: contenido publicado como `6cc8260`.
 
+Este registro conserva el corte anterior a las ampliaciones de RF10 y RF20.
+La [matriz actual](matriz-requisitos-backend.md) y las evidencias enlazadas
+al final identifican sus avances y la regresión posterior.
+
 La regresión del backend está aprobada en las 562 pruebas ejecutadas.
 La documentación API y la carga disponen de evidencias. La revisión de
 requisitos conserva brechas funcionales y evaluaciones pendientes; el
@@ -16,7 +20,7 @@ producto completo todavía requiere las interfaces y su despliegue evaluado.
 | 2 | [Contratos HTTP y aislamiento](verificacion-contratos-api.md) | `ce72c35` |
 | 3 | [Herramientas y evidencia de carga](resultados-carga-github-actions.md) | `2d43391`, `4fd156a` |
 | 4 | [Documentación API y controles de deriva](verificacion-documentacion-api.md) | `6cc8260` |
-| 5 | [Revisión de requisitos y reservas](matriz-requisitos-backend.md) | Esta entrega; su commit se asigna al publicarla. |
+| 5 | [Revisión de requisitos y reservas](matriz-requisitos-backend.md) | `cc65d63` |
 
 La quinta parte deja trazado el resultado de la verificación. Cada reserva
 mantiene su estado aunque los entregables del bloque estén registrados.
@@ -62,10 +66,10 @@ diferencia de costos entre periodos (RF20) y los gráficos del frontend
 contratos externos completos, sustitución de adaptador y uso desde los
 dispositivos finales.
 
-El backend de la demostración usa lecturas acumuladas. La API devuelve
-costos por periodo y diferencias de volumen; aún no devuelve una diferencia
-explícita de costos. Se mantienen estos límites en vez de deducir el
-cumplimiento total a partir de las 562 pruebas.
+En ese corte, el backend de la demostración usaba lecturas acumuladas y
+la API devolvía costos por periodo y diferencias de volumen. Las ampliaciones
+posteriores completan intervalos y diferencias de costos, según los enlaces
+del final. Las 562 pruebas de este registro conservan su alcance histórico.
 
 ## Repetir o ampliar las comprobaciones
 
@@ -83,6 +87,8 @@ Para otra prueba de carga, conservar el JAR, configuración, mezcla y datos
 del escenario a evaluar y seguir [la guía de Actions](carga-github-actions.md).
 Repetir la carga completa corresponde a un cambio que justifique evaluarla.
 
-El siguiente trabajo funcional puede concentrarse en P01 y P02. Los
-criterios de comprobación de P01–P08 permiten continuar desde esta base
-sin perder las verificaciones ni declarar resueltos sus pendientes.
+Los avances posteriores completan [P01: intervalos](lecturas-intervalo.md)
+en `cf2f699` y [P02: comparación de costos](comparacion-costos.md) en la
+entrega siguiente. Este documento conserva el corte del bloque 9; la
+[matriz actual](matriz-requisitos-backend.md) identifica las reservas
+restantes de interfaces, despliegue y evaluaciones de calidad.

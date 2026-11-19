@@ -30,6 +30,13 @@ intervalos excluidos por cruzar un corte mantienen la cobertura parcial;
 el costo corresponde al volumen conocido y conserva el cargo fijo mensual.
 Ver [lecturas de intervalo](lecturas-intervalo.md).
 
+## Comparar dos periodos
+
+La [consulta de comparación](comparacion-costos.md) devuelve las diferencias
+de consumo y costo estimado entre dos meses, con sus fechas, duración,
+estados de cobertura y versiones tarifarias. Reutiliza las mismas reglas
+de estimación de esta página y no resta subtotales como si fueran totales.
+
 ## Cálculo
 
 Se divide el volumen en litros entre 1000 y se aplica cada precio a la

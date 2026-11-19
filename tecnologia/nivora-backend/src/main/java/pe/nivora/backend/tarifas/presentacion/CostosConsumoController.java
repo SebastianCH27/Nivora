@@ -72,7 +72,7 @@ public class CostosConsumoController {
             resultado.proyeccion().estado(), consumo(observado.consumo()), observado.actualizacion(), volumen, costo));
     }
 
-    private static PeriodoCosto periodo(ConsultarCostosConsumo.Estimacion estimacion) {
+    static PeriodoCosto periodo(ConsultarCostosConsumo.Estimacion estimacion) {
         var periodo = estimacion.periodo();
         return new PeriodoCosto(periodo.periodo(), periodo.inicioMes(), periodo.finMesExclusivo(), estimacion.estado(),
             consumo(periodo.consumo()), tarifa(estimacion.seleccion()), desglose(estimacion.costo()));

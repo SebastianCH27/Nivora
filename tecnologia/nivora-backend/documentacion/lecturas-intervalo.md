@@ -152,7 +152,8 @@ Los resultados, métodos y huellas están en
 [la evidencia de intervalos](evidencias/lecturas-intervalo-2026-11-19.json).
 La evidencia previa de 5000 usuarios conserva su JAR de `2d43391`; esta
 ampliación requiere su propia evaluación de rendimiento para extrapolar
-esa capacidad a la nueva versión. La comparación de costos RF20 sigue pendiente.
+esa capacidad a la nueva versión. La ampliación posterior de
+[comparación de costos](comparacion-costos.md) completa RF20/P02.
 
 ## Aplicar en Windows
 

@@ -64,7 +64,8 @@ sesiones durante 30 minutos en el entorno descrito. La
 [matriz de requisitos](tecnologia/nivora-backend/documentacion/matriz-requisitos-backend.md)
 identifica el alcance comprobado y las funciones y evaluaciones pendientes.
 La ampliación de [lecturas de intervalo](tecnologia/nivora-backend/documentacion/lecturas-intervalo.md)
-cuenta con 602 pruebas de regresión aprobadas. El frontend está previsto con Flutter.
+se complementa con la [comparación de costos](tecnologia/nivora-backend/documentacion/comparacion-costos.md):
+la regresión actual tiene 632 pruebas aprobadas. El frontend está previsto con Flutter.
 
 La base de Node.js y el boilerplate se conservan como material
 de los laboratorios iniciales.

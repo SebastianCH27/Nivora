@@ -1,14 +1,14 @@
 # Guia de la API de Nivora
 
-La ampliación posterior a `cc65d63` incorpora [lecturas de intervalo](lecturas-intervalo.md).
-Los detalles de consumo añaden `tipoMedicion` (`ACUMULADA`, `INTERVALO` o null),
-y los motivos incluyen huecos, cruces, superposiciones, mezcla y desbordamiento.
-El contrato actual conserva 40 operaciones de negocio y una de salud;
-contiene 101 esquemas, con 62 registros y 15 enums Java enlazados.
+La API actual incorpora [lecturas de intervalo](lecturas-intervalo.md) y
+[comparación de consumo y costos](comparacion-costos.md), ampliación sobre
+`cf2f699`. Tiene 41 operaciones de negocio y una de salud, con 104 esquemas,
+64 registros y 16 enums Java enlazados. Los detalles de consumo identifican
+`tipoMedicion` y la comparación informa cobertura, duración y tarifas.
 
-Bloque 9, parte 4. Contrato revisado sobre el codigo de `4fd156a`.
-La API de negocio tiene 40 operaciones explicitas. Se documenta ademas
-`GET /actuator/health`. Las rutas de la Empresa de Agua son contratos externos
+La documentación comenzó en el bloque 9, parte 4, sobre `4fd156a` y se
+actualiza junto con el código.
+Las rutas de la Empresa de Agua son contratos externos
 y se describen en su propio modulo.
 
 La especificacion [openapi.json](openapi.json) usa OpenAPI 3.1.0 e incluye
@@ -121,6 +121,7 @@ detalladas en la descripcion de cada operacion de OpenAPI.
 | GET | `/api/v1/acceso/consulta/historial` | `CONSULTA` | 200 | `HistorialMensual` |
 | GET | `/api/v1/acceso/consulta/estadisticas` | `CONSULTA` | 200 | `EstadisticasConsumo` |
 | GET | `/api/v1/acceso/consulta/costos` | `CONSULTA` | 200 | `CostosConsumo` |
+| GET | `/api/v1/acceso/consulta/comparacion` | CONSULTA | 200 | `ComparacionCostos` |
 | GET | `/api/v1/acceso/consulta/proyeccion` | `CONSULTA` | 200 | `ProyeccionMensual` |
 | GET | `/api/v1/acceso/consulta/recibos` | `CONSULTA` | 200 | `PaginaRecibos` |
 | GET | `/api/v1/acceso/consulta/notificaciones` | `CONSULTA` | 200 | `PaginaNotificaciones` |
@@ -204,6 +205,16 @@ los periodos mas recientes primero. Costos usa `meses=3`, tambien de 1 a 12.
 - Las publicaciones de tarifas y periodos usan una revision esperada como
   cadena. Ante 409, volver a consultar el estado y revisar el cambio antes
   de enviarlo otra vez. Las reglas mensuales comienzan en un mes civil futuro.
+
+## Comparación de periodos
+
+`GET /api/v1/acceso/consulta/comparacion` usa por defecto el mes anterior
+como base y el actual como comparado. Se pueden enviar ambos parámetros
+`periodoBase` y `periodoComparado` en formato `AAAA-MM`, con hasta 12 meses
+de separación y sin periodos futuros. Las diferencias son comparado menos base.
+Los estados son `COMPLETA`, `PARCIAL` y `NO_CALCULABLE`. Un periodo en curso,
+los huecos y los conceptos tarifarios faltantes conservan su significado.
+Ver [campos, ejemplos y límites](comparacion-costos.md).
 
 ## Errores y cabeceras
 

@@ -63,3 +63,11 @@ La suite utiliza H2 con esquemas de prueba. Los tres casos HTTP también se
 ejecutaron con MySQL 8.0.46 en una base aislada. El perfil de prueba mantiene
 desactivados los procesos automáticos y los casos invocan sus ciclos con
 un reloj controlado.
+
+## Ampliación de RF20
+
+Los dos casos de continuidad también consultan `/comparacion` antes y
+durante el fallo. La lista actual tiene ocho consultas; la matriz anterior
+describe las siete del corte original. Se mantienen los datos, la cobertura
+y la selección de tarifas de la nueva respuesta. Ver
+[la evidencia de comparación](evidencias/comparacion-costos-2026-11-19.json).

@@ -7,7 +7,7 @@ Clean Architecture.
 ## Documentacion de la API
 
 La [guia de la API](documentacion/api.md) centraliza autenticacion, permisos,
-formatos, paginacion, errores y el inventario de 40 operaciones de negocio
+formatos, paginacion, errores y el inventario de 41 operaciones de negocio
 y una consulta de salud. El contrato importable esta en
 [OpenAPI 3.1](documentacion/openapi.json).
 Los [controles de documentacion](documentacion/verificacion-documentacion-api.md)
@@ -18,10 +18,11 @@ comparan las rutas, parametros y DTO reales con la especificacion versionada.
 El [balance del bloque 9](documentacion/verificacion-final-backend.md)
 conserva las 562 pruebas de ese corte y la evidencia de carga. La ampliación de
 [lecturas de intervalo](documentacion/lecturas-intervalo.md) eleva la regresión
-a 602 pruebas aprobadas.
+a 602 pruebas aprobadas. La [comparación de costos entre periodos](documentacion/comparacion-costos.md)
+completa RF20/P02 con una regresión de 632 pruebas aprobadas.
 La [matriz RF/EQ](documentacion/matriz-requisitos-backend.md) identifica
-la cobertura del backend y los pendientes: comparación de costos,
-interfaces y evaluaciones de calidad restantes.
+la cobertura del backend y los pendientes de interfaces y evaluaciones
+de calidad restantes.
 
 ## Servicios del entorno local
 
@@ -38,7 +39,7 @@ El puerto 8080 esta ocupado por Jenkins en el equipo de desarrollo.
 |---|---|---|
 | `acceso` | Acceso y suministros | Suministros, consulta de DNI mediante APIsPERU, sesiones de consulta y administrativas, gestion de cuentas y supervision protegida. |
 | `lecturas` | Lecturas, consumo e historial | Recuperación con corte e inventario persistidos; consumo acumulado, historial, estadísticas y supervisión local. Suma de intervalos con validación de cobertura y superposiciones. |
-| `tarifas` | Tarifas, costos y proyecciones | Historial versionado, gestión administrativa de vigencias, costos estimados y proyección mensual. |
+| `tarifas` | Tarifas, costos y proyecciones | Historial versionado, vigencias, costos estimados, comparación de consumo/costos entre periodos y proyección mensual. |
 | `notificaciones` | Alertas y notificaciones | Alertas, bandeja, marcas de lectura, preferencias por dispositivo y entrega Web Push con reintentos. |
 | `recibos` | Recibos | Importación, sincronización automática y consulta de recibos por suministro. |
 | `integracion` | Supervisión de integración | Consulta de incidencias y programación administrativa de reintentos de lecturas y recibos por suministro. |
@@ -222,6 +223,13 @@ Nivora consume esos datos mediante `FuenteLecturasConCorteHttp` y los guarda
 en `contexto_recuperacion_lecturas` para reanudar el mismo recorrido.
 Un acumulado mensual no equivale a un incremento nuevo que deba sumarse
 cada vez que se consulta.
+
+## Comparación entre periodos
+
+`GET /api/v1/acceso/consulta/comparacion` añade la comparación de consumo
+y costos con fechas, duración y revisiones. Permite elegir dos meses o
+usar el actual y el anterior. Distingue comparación completa, parcial
+y sin importe calculable. Ver [RF20/P02](documentacion/comparacion-costos.md).
 
 ## Lecturas de intervalo
 

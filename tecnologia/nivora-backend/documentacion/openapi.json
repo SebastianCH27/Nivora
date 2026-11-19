@@ -3,7 +3,7 @@
   "info": {
     "title": "API de Nivora",
     "version": "0.0.1-SNAPSHOT",
-    "description": "Contrato documentado del backend: 40 operaciones de negocio y una de salud. Ampliación de lecturas de intervalo sobre la base cc65d63. Los detalles de consumo identifican tipoMedicion y motivos de cobertura. Usa dos sesiones Bearer opacas distintas; los permisos administrativos estan indicados en x-permisos-requeridos. Las consultas del suministro obtienen su alcance de la sesion. Ejemplos ficticios; reemplazar las fechas futuras antes de ejecutar publicaciones."
+    "description": "Contrato documentado del backend: 41 operaciones de negocio y una de salud. Comparación de consumo y costos añadida sobre cf2f699, incluida la incorporación de intervalos. Los detalles de consumo identifican tipoMedicion y motivos de cobertura. Usa dos sesiones Bearer opacas distintas; los permisos administrativos estan indicados en x-permisos-requeridos. Las consultas del suministro obtienen su alcance de la sesion. Ejemplos ficticios; reemplazar las fechas futuras antes de ejecutar publicaciones."
   },
   "servers": [
     {
@@ -2635,6 +2635,76 @@
             }
           }
         }
+      }
+    },
+    "/api/v1/acceso/consulta/comparacion": {
+      "get": {
+        "tags": [
+          "Consultas del suministro"
+        ],
+        "operationId": "compararConsumoYCostos",
+        "summary": "Comparar consumo y costo estimado entre periodos",
+        "description": "Por defecto compara el mes actual con el anterior según el calendario configurado. Para elegir otros periodos, indicar ambos parámetros AAAA-MM, sin meses futuros y con hasta 12 meses de separación; admite invertir el orden y comparar un periodo consigo mismo. Una sola consulta local de lecturas y una selección tarifaria compartida respaldan ambos tramos. El suministro siempre procede de la sesión.",
+        "security": [
+          {
+            "sesionConsulta": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Operacion completada.",
+            "headers": {
+              "Cache-Control": {
+                "$ref": "#/components/headers/NoStore"
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ComparacionCostos"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/400"
+          },
+          "401": {
+            "$ref": "#/components/responses/401"
+          },
+          "403": {
+            "$ref": "#/components/responses/403"
+          },
+          "404": {
+            "$ref": "#/components/responses/404"
+          },
+          "503": {
+            "$ref": "#/components/responses/503"
+          }
+        },
+        "parameters": [
+          {
+            "name": "periodoBase",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "pattern": "[0-9]{4}-(0[1-9]|1[0-2])"
+            },
+            "description": "Periodo del que se resta; por defecto, el anterior al actual."
+          },
+          {
+            "name": "periodoComparado",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "pattern": "[0-9]{4}-(0[1-9]|1[0-2])"
+            },
+            "description": "Periodo al que se resta el base; por defecto, el actual."
+          }
+        ],
+        "x-java-handler": "pe.nivora.backend.tarifas.presentacion.ComparacionCostosController#comparar"
       }
     }
   },
@@ -6374,6 +6444,182 @@
           "INTERVALO"
         ],
         "x-java-enum": "pe.nivora.backend.lecturas.dominio.Lectura$Tipo"
+      },
+      "EstadoComparacionCostos": {
+        "type": "string",
+        "enum": [
+          "COMPLETA",
+          "PARCIAL",
+          "NO_CALCULABLE"
+        ],
+        "x-java-enum": "pe.nivora.backend.tarifas.dominio.ComparacionCostos$Estado"
+      },
+      "TramoComparacionCostos": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "estimacion",
+          "enCurso",
+          "periodoCompleto",
+          "duracionPeriodoSegundos",
+          "duracionTramoSegundos"
+        ],
+        "properties": {
+          "estimacion": {
+            "$ref": "#/components/schemas/PeriodoCosto"
+          },
+          "enCurso": {
+            "type": "boolean",
+            "description": "El periodo de análisis todavía no ha finalizado al consultar."
+          },
+          "periodoCompleto": {
+            "type": "boolean",
+            "description": "Periodo cerrado y consumo completo en ambos límites exactos."
+          },
+          "duracionPeriodoSegundos": {
+            "$ref": "#/components/schemas/DecimalTexto"
+          },
+          "duracionTramoSegundos": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/DecimalTexto"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          }
+        },
+        "description": "La duración del tramo es la separación entre extremos medidos; consultar la cobertura para identificar huecos. No normaliza importes por duración.",
+        "x-java-types": [
+          "pe.nivora.backend.tarifas.presentacion.ComparacionCostosController$Tramo"
+        ]
+      },
+      "ComparacionCostos": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "fuente",
+          "codigoSuministro",
+          "moneda",
+          "zonaHoraria",
+          "consultadoEn",
+          "revisionTarifaria",
+          "revisionTarifariaAdministrativa",
+          "base",
+          "comparado",
+          "estado",
+          "diferenciaLitros",
+          "diferenciaMetrosCubicos",
+          "diferenciaCostoEstimado",
+          "mismaDuracionTramo",
+          "mismaVersionTarifaria"
+        ],
+        "properties": {
+          "fuente": {
+            "type": "string",
+            "const": "empresa-agua"
+          },
+          "codigoSuministro": {
+            "$ref": "#/components/schemas/CodigoSuministro"
+          },
+          "moneda": {
+            "type": "string",
+            "const": "PEN"
+          },
+          "zonaHoraria": {
+            "type": "string",
+            "const": "America/Lima"
+          },
+          "consultadoEn": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Instante UTC, serializado con sufijo Z."
+          },
+          "revisionTarifaria": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/RevisionTexto"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "revisionTarifariaAdministrativa": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/RevisionTexto"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "base": {
+            "$ref": "#/components/schemas/TramoComparacionCostos"
+          },
+          "comparado": {
+            "$ref": "#/components/schemas/TramoComparacionCostos"
+          },
+          "estado": {
+            "$ref": "#/components/schemas/EstadoComparacionCostos"
+          },
+          "diferenciaLitros": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/DecimalTexto"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "diferenciaMetrosCubicos": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/DecimalTexto"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "diferenciaCostoEstimado": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/DecimalTexto"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "mismaDuracionTramo": {
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "mismaVersionTarifaria": {
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          }
+        },
+        "description": "Diferencias comparado menos base. COMPLETA requiere ambos periodos cerrados y cubiertos y totales conocidos; PARCIAL conserva diferencias de datos disponibles; NO_CALCULABLE deja el importe null si falta un total o consumo. Diferencias de duración o tarifa no invalidan la resta, pero no acreditan por sí solas un cambio en el ritmo de consumo.",
+        "x-java-types": [
+          "pe.nivora.backend.tarifas.presentacion.ComparacionCostosController$Respuesta"
+        ]
       }
     }
   },

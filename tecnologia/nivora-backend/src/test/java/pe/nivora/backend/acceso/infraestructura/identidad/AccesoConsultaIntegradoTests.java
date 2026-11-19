@@ -107,6 +107,7 @@ class AccesoConsultaIntegradoTests {
     private static final String HISTORIAL = CONSULTA + "/historial";
     private static final String ESTADISTICAS = CONSULTA + "/estadisticas";
     private static final String COSTOS = CONSULTA + "/costos";
+    private static final String COMPARACION = CONSULTA + "/comparacion";
     private static final String PROYECCION = CONSULTA + "/proyeccion";
     private static final String RECIBOS = CONSULTA + "/recibos";
     private static final String NOTIFICACIONES = CONSULTA + "/notificaciones";
@@ -306,6 +307,7 @@ class AccesoConsultaIntegradoTests {
             new ContratoConsulta(HISTORIAL + "?meses=1", "/periodos/0/consumo/litros", "2000", "10000"),
             new ContratoConsulta(ESTADISTICAS + "?meses=1", "/comparacion/actual/consumo/litros", "2200", "9000"),
             new ContratoConsulta(COSTOS + "?meses=1", "/actual/consumo/litros", "2200", "9000"),
+            new ContratoConsulta(COMPARACION, "/comparado/estimacion/consumo/litros", "2200", "9000"),
             new ContratoConsulta(PROYECCION, "/observado/litros", "2200", "9000"),
             new ContratoConsulta(RECIBOS, "/recibos/0/numeroRecibo", "REC-101-10", "REC-202-10"),
             new ContratoConsulta(NOTIFICACIONES, "/notificaciones/0/recibo/numeroRecibo", "REC-101-10", "REC-202-10"));
@@ -1314,7 +1316,7 @@ class AccesoConsultaIntegradoTests {
     void consultasYBandejaContinuanDuranteFallosDePushYDeLaEmpresa(boolean empresaCaida) throws Exception {
         var sesion = token(enviar("POST", CONSULTA + "/sesiones", SOLICITUD, null, 201));
         prepararAvisosWebPush(sesion);
-        var rutas = List.of(CONSUMO, COSTOS, PROYECCION, HISTORIAL, ESTADISTICAS, RECIBOS, NOTIFICACIONES);
+        var rutas = List.of(CONSUMO, COSTOS, COMPARACION, PROYECCION, HISTORIAL, ESTADISTICAS, RECIBOS, NOTIFICACIONES);
         var antes = new ArrayList<JsonNode>();
         for (String ruta : rutas) {
             antes.add(consultarJson(ruta, sesion));
@@ -1355,8 +1357,8 @@ class AccesoConsultaIntegradoTests {
         assertEquals(List.of(2, 2), jdbc.queryForList("SELECT intentos FROM entregas_web_push", Integer.class));
         assertEquals(2, jdbc.queryForObject("SELECT COUNT(*) FROM entregas_web_push WHERE estado = 'ACEPTADA'",
             Integer.class));
-        assertEquals(antes.get(5), consultarJson(RECIBOS, sesion));
-        assertEquals(antes.get(6), consultarJson(NOTIFICACIONES, sesion));
+        assertEquals(antes.get(rutas.indexOf(RECIBOS)), consultarJson(RECIBOS, sesion));
+        assertEquals(antes.get(rutas.indexOf(NOTIFICACIONES)), consultarJson(NOTIFICACIONES, sesion));
         var actual = consultarJson(CONSUMO, sesion);
         assertEquals(antes.getFirst().path("consumo"), actual.path("consumo"));
         assertEquals("2200", actual.at("/consumo/litros").stringValue());
@@ -2294,6 +2296,202 @@ class AccesoConsultaIntegradoTests {
         assertEquals("2026-11-01T05:00:00Z",actual.at("/actualizacion/ultimaLectura").stringValue());
         assertEquals("PENDIENTE",actual.at("/actualizacion/estado").stringValue());
         assertEquals("2000",consultarJson(HISTORIAL+"?meses=1",sesion).at("/periodos/0/consumo/litros").stringValue());
+    }
+
+    @Test
+    void comparacionDeCostosEntreMesesCompletosConservaFechasTarifasYSigno() throws Exception {
+        var sesion=prepararComparacion(10000,13200);
+        guardarTarifaComparacion(new BigDecimal("2.50"),BigDecimal.ZERO,BigDecimal.ZERO);
+        agua.set(CAIDA);identidad.set(CAIDA);
+        var resultado=consultarJson(COMPARACION+"?periodoBase=2026-09&periodoComparado=2026-10",sesion);
+        assertEquals("COMPLETA",resultado.path("estado").stringValue());
+        assertEquals("PEN",resultado.path("moneda").stringValue());
+        assertEquals("3200",resultado.path("diferenciaLitros").stringValue());
+        assertEquals("3.200",resultado.path("diferenciaMetrosCubicos").stringValue());
+        assertEquals("8.00",resultado.path("diferenciaCostoEstimado").stringValue());
+        assertEquals("30.00",resultado.at("/base/estimacion/desglose/totalEstimado").stringValue());
+        assertEquals("38.00",resultado.at("/comparado/estimacion/desglose/totalEstimado").stringValue());
+        assertEquals("2026-09-01T05:00:00Z",resultado.at("/base/estimacion/inicioMes").stringValue());
+        assertEquals("2026-11-01T05:00:00Z",resultado.at("/comparado/estimacion/finMesExclusivo").stringValue());
+        assertEquals("2592000",resultado.at("/base/duracionTramoSegundos").stringValue());
+        assertEquals("2678400",resultado.at("/comparado/duracionTramoSegundos").stringValue());
+        assertFalse(resultado.path("mismaDuracionTramo").booleanValue());
+        assertTrue(resultado.path("mismaVersionTarifaria").booleanValue());
+        assertTrue(resultado.at("/base/periodoCompleto").booleanValue());
+        assertTrue(resultado.at("/comparado/periodoCompleto").booleanValue());
+        assertFalse(resultado.at("/comparado/enCurso").booleanValue());
+        assertEquals("101",resultado.at("/base/estimacion/consumo/idLecturaFinal").stringValue());
+        assertEquals("101",resultado.at("/comparado/estimacion/consumo/idLecturaInicial").stringValue());
+        var inversa=consultarJson(COMPARACION+"?periodoBase=2026-10&periodoComparado=2026-09",sesion);
+        assertEquals("-8.00",inversa.path("diferenciaCostoEstimado").stringValue());
+        assertEquals("-3200",inversa.path("diferenciaLitros").stringValue());
+        var igual=consultarJson(COMPARACION+"?periodoBase=2026-09&periodoComparado=2026-09",sesion);
+        assertEquals("0.00",igual.path("diferenciaCostoEstimado").stringValue());
+        assertEquals(1,llamadasAgua.get());assertEquals(1,llamadasIdentidad.get());
+    }
+
+    @Test
+    void comparacionPredeterminadaMarcaElMesEnCursoSinNormalizarLosImportes() throws Exception {
+        var sesion=token(enviar("POST",CONSULTA+"/sesiones",SOLICITUD,null,201));
+        incorporarLectura("100","2026-10-01T05:00:00Z",0);
+        incorporarLectura("101","2026-11-01T05:00:00Z",10000);
+        incorporarLectura("102","2026-11-11T05:00:00Z",13200);
+        guardarTarifaComparacion(new BigDecimal("2.50"),BigDecimal.ZERO,BigDecimal.ZERO);
+        var resultado=consultarJson(COMPARACION,sesion);
+        assertEquals("2026-10",resultado.at("/base/estimacion/periodo").stringValue());
+        assertEquals("2026-11",resultado.at("/comparado/estimacion/periodo").stringValue());
+        assertEquals("PARCIAL",resultado.path("estado").stringValue());
+        assertTrue(resultado.at("/comparado/enCurso").booleanValue());
+        assertFalse(resultado.at("/comparado/periodoCompleto").booleanValue());
+        assertEquals("-17.00",resultado.path("diferenciaCostoEstimado").stringValue());
+        assertEquals("-6800",resultado.path("diferenciaLitros").stringValue());
+        var costos=consultarJson(COSTOS+"?meses=1",sesion);
+        assertEquals(costos.path("actual"),resultado.at("/comparado/estimacion"));
+        assertEquals(costos.at("/anteriores/0"),resultado.at("/base/estimacion"));
+    }
+
+    @Test
+    void comparacionConHuecosEnUnMesCerradoConservaUnaDiferenciaParcial() throws Exception {
+        var sesion=token(enviar("POST",CONSULTA+"/sesiones",SOLICITUD,null,201));
+        incorporarIntervalo("100","2026-09-01T05:00:00Z","2026-10-01T05:00:00Z",2000);
+        incorporarIntervalo("101","2026-10-01T05:00:00Z","2026-10-05T05:00:00Z",1000);
+        incorporarIntervalo("102","2026-10-06T05:00:00Z","2026-11-01T05:00:00Z",1400);
+        guardarTarifaComparacion(new BigDecimal("2.50"),BigDecimal.ZERO,BigDecimal.ZERO);
+        var resultado=consultarJson(COMPARACION+"?periodoBase=2026-09&periodoComparado=2026-10",sesion);
+        assertEquals("PARCIAL",resultado.path("estado").stringValue());
+        assertEquals("400",resultado.path("diferenciaLitros").stringValue());
+        assertEquals("1.00",resultado.path("diferenciaCostoEstimado").stringValue());
+        assertFalse(resultado.at("/comparado/enCurso").booleanValue());
+        assertFalse(resultado.at("/comparado/periodoCompleto").booleanValue());
+        assertEquals("HUECOS_ENTRE_INTERVALOS",resultado.at("/comparado/estimacion/consumo/motivo").stringValue());
+    }
+
+    @Test
+    void comparacionSinTarifaConservaElVolumenYNoInventaUnImporte() throws Exception {
+        var sesion=prepararComparacion(10000,13200);
+        var resultado=consultarJson(COMPARACION+"?periodoBase=2026-09&periodoComparado=2026-10",sesion);
+        assertEquals("NO_CALCULABLE",resultado.path("estado").stringValue());
+        assertEquals("3200",resultado.path("diferenciaLitros").stringValue());
+        assertTrue(resultado.path("diferenciaCostoEstimado").isNull());
+        assertTrue(resultado.path("mismaVersionTarifaria").isNull());
+        assertEquals("SIN_TARIFA_COMPATIBLE",resultado.at("/base/estimacion/estado").stringValue());
+    }
+
+    @Test
+    void comparacionNoRestaSubtotalesCuandoFaltanConceptosTarifarios() throws Exception {
+        var sesion=prepararComparacion(10000,13200);
+        guardarTarifaComparacion(new BigDecimal("1.50"),null,null);
+        var resultado=consultarJson(COMPARACION+"?periodoBase=2026-09&periodoComparado=2026-10",sesion);
+        assertEquals("NO_CALCULABLE",resultado.path("estado").stringValue());
+        assertEquals("CONCEPTOS_INCOMPLETOS",resultado.at("/base/estimacion/estado").stringValue());
+        assertEquals("20.00",resultado.at("/base/estimacion/desglose/subtotalConocido").stringValue());
+        assertTrue(resultado.path("diferenciaCostoEstimado").isNull());
+        assertTrue(resultado.path("mismaVersionTarifaria").booleanValue());
+    }
+
+    @Test
+    void comparacionConTarifasDistintasExponeLaCausaAunqueElConsumoSeaIgual() throws Exception {
+        var sesion=prepararComparacion(10000,10000);
+        var septiembre=LocalDate.of(2026,9,1);var octubre=LocalDate.of(2026,10,1);
+        var primera=versionComparacion(1,septiembre,new BigDecimal("2.50"),BigDecimal.ZERO,BigDecimal.ZERO);
+        var segunda=versionComparacion(2,octubre,new BigDecimal("3.30"),BigDecimal.ZERO,BigDecimal.ZERO);
+        tarifas.guardar(new HistorialTarifario("empresa-agua",new CodigoSuministro("000101"),List.of(
+            new HistorialTarifario.Asignacion(primera,octubre,septiembre,octubre),
+            new HistorialTarifario.Asignacion(segunda,null,octubre,null))),AHORA);
+        var resultado=consultarJson(COMPARACION+"?periodoBase=2026-09&periodoComparado=2026-10",sesion);
+        assertEquals("COMPLETA",resultado.path("estado").stringValue());
+        assertEquals("0",resultado.path("diferenciaLitros").stringValue());
+        assertEquals("8.00",resultado.path("diferenciaCostoEstimado").stringValue());
+        assertFalse(resultado.path("mismaVersionTarifaria").booleanValue());
+        assertEquals(1,resultado.at("/base/estimacion/tarifa/versionTarifa").intValue());
+        assertEquals(2,resultado.at("/comparado/estimacion/tarifa/versionTarifa").intValue());
+        assertEquals("1",resultado.path("revisionTarifaria").stringValue());
+    }
+
+    @Test
+    void comparacionRespetaElCalendarioMensualConfigurado() throws Exception {
+        instantePrueba.set(Instant.parse("2026-10-20T13:00:00Z"));
+        var admin=iniciarAdminTarifas();
+        enviar("PUT",PERIODOS,reglaPeriodo(0,"2026-11",5),admin,200);
+        instantePrueba.set(AHORA);
+        var sesion=token(enviar("POST",CONSULTA+"/sesiones",SOLICITUD,null,201));
+        incorporarIntervalo("100","2026-10-01T05:00:00Z","2026-11-05T05:00:00Z",1000);
+        incorporarIntervalo("101","2026-11-05T05:00:00Z","2026-11-11T05:00:00Z",600);
+        guardarTarifaComparacion(new BigDecimal("2.50"),BigDecimal.ZERO,BigDecimal.ZERO);
+        var resultado=consultarJson(COMPARACION,sesion);
+        assertEquals("2026-11-05T05:00:00Z",resultado.at("/comparado/estimacion/inicioMes").stringValue());
+        assertEquals("3024000",resultado.at("/base/duracionPeriodoSegundos").stringValue());
+        assertEquals("PARCIAL",resultado.path("estado").stringValue());
+        assertEquals("-1.00",resultado.path("diferenciaCostoEstimado").stringValue());
+    }
+
+    @Test
+    void comparacionNoAdmiteUnPeriodoCivilQueElCalendarioAunNoInicia() throws Exception {
+        instantePrueba.set(Instant.parse("2026-10-20T13:00:00Z"));
+        var admin=iniciarAdminTarifas();
+        enviar("PUT",PERIODOS,reglaPeriodo(0,"2026-11",5),admin,200);
+        instantePrueba.set(Instant.parse("2026-11-02T13:00:00Z"));
+        var sesion=token(enviar("POST",CONSULTA+"/sesiones",SOLICITUD,null,201));
+        enviar("GET",COMPARACION+"?periodoBase=2026-10&periodoComparado=2026-11",null,sesion,400);
+    }
+
+    @Test
+    void comparacionDeCrucesMensualesNoDistribuyeLosLitrosDesconocidos() throws Exception {
+        var sesion=token(enviar("POST",CONSULTA+"/sesiones",SOLICITUD,null,201));
+        incorporarIntervalo("100","2026-09-01T05:00:00Z","2026-09-30T05:00:00Z",1000);
+        incorporarIntervalo("101","2026-09-30T05:00:00Z","2026-10-02T05:00:00Z",400);
+        incorporarIntervalo("102","2026-10-02T05:00:00Z","2026-11-01T05:00:00Z",2000);
+        guardarTarifaComparacion(new BigDecimal("2.50"),BigDecimal.ZERO,BigDecimal.ZERO);
+        var resultado=consultarJson(COMPARACION+"?periodoBase=2026-09&periodoComparado=2026-10",sesion);
+        assertEquals("PARCIAL",resultado.path("estado").stringValue());
+        assertEquals("1000",resultado.path("diferenciaLitros").stringValue());
+        assertEquals("2.50",resultado.path("diferenciaCostoEstimado").stringValue());
+        assertEquals("INTERVALO_CRUZA_LIMITE",resultado.at("/base/estimacion/consumo/motivo").stringValue());
+        assertEquals("INTERVALO_CRUZA_LIMITE",resultado.at("/comparado/estimacion/consumo/motivo").stringValue());
+    }
+
+    @Test
+    void comparacionSinLecturasOConCalendarioIndisponibleInformaSuEstado() throws Exception {
+        var sesion=token(enviar("POST",CONSULTA+"/sesiones",SOLICITUD,null,201));
+        var resultado=consultarJson(COMPARACION+"?periodoBase=2025-11&periodoComparado=2026-11",sesion);
+        assertEquals("NO_CALCULABLE",resultado.path("estado").stringValue());
+        assertTrue(resultado.path("diferenciaLitros").isNull());
+        assertTrue(resultado.path("diferenciaCostoEstimado").isNull());
+        assertTrue(resultado.path("mismaDuracionTramo").isNull());
+        jdbc.execute("DROP TABLE publicaciones_periodos_mensuales");
+        comprobarProblema(enviar("GET",COMPARACION,null,sesion,503),503);
+    }
+
+    @ParameterizedTest
+    @ValueSource(strings={"?periodoBase=2026-10","?periodoComparado=2026-10",
+        "?periodoBase=&periodoComparado=2026-10","?periodoBase=2026-1&periodoComparado=2026-10",
+        "?periodoBase=2026-13&periodoComparado=2026-10","?periodoBase=0999-12&periodoComparado=2026-10",
+        "?periodoBase=2026-09&periodoComparado=2026-12","?periodoBase=2026-12&periodoComparado=2026-09",
+        "?periodoBase=2025-09&periodoComparado=2026-11","?periodoBase=2026-11&periodoComparado=2025-09",
+        "?periodoBase=2026-09&periodoBase=2026-10&periodoComparado=2026-10"})
+    void comparacionRechazaPeriodosMalFormadosIncompletosFuturosOExcesivos(String parametros) throws Exception {
+        var sesion=token(enviar("POST",CONSULTA+"/sesiones",SOLICITUD,null,201));
+        comprobarProblema(enviar("GET",COMPARACION+parametros,null,sesion,400),400);
+    }
+
+    private String prepararComparacion(long septiembre,long octubre) throws Exception {
+        var sesion=token(enviar("POST",CONSULTA+"/sesiones",SOLICITUD,null,201));
+        incorporarLectura("100","2026-09-01T05:00:00Z",0);
+        incorporarLectura("101","2026-10-01T05:00:00Z",septiembre);
+        incorporarLectura("102","2026-11-01T05:00:00Z",septiembre+octubre);
+        return sesion;
+    }
+
+    private void guardarTarifaComparacion(BigDecimal agua,BigDecimal alcantarillado,BigDecimal igv) {
+        var inicio=LocalDate.of(2026,9,1);
+        var version=versionComparacion(1,inicio,agua,alcantarillado,igv);
+        tarifas.guardar(new HistorialTarifario("empresa-agua",new CodigoSuministro("000101"),List.of(
+            new HistorialTarifario.Asignacion(version,null,inicio,null))),instantePrueba.get());
+    }
+
+    private static VersionTarifaria versionComparacion(int version,LocalDate desde,BigDecimal agua,BigDecimal alcantarillado,BigDecimal igv) {
+        return new VersionTarifaria("COMPARACION-PRUEBA",version,"Demostración",desde,new BigDecimal("5.00"),igv,
+            List.of(new VersionTarifaria.Tramo(BigDecimal.ZERO,null,agua,alcantarillado)));
     }
 
     private void guardarTarifaIntervalos() {

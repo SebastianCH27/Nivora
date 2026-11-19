@@ -6,6 +6,9 @@ El cálculo utiliza una sola consulta de las lecturas aceptadas en MySQL.
 Los periodos mensuales usan el calendario de `America/Lima` y las fechas
 de la respuesta se expresan en UTC.
 
+La ampliación [RF20/P02](comparacion-costos.md) permite elegir dos meses y
+comparar también el costo estimado, con los periodos y las tarifas aplicadas.
+
 ## Contrato HTTP
 
 `GET /api/v1/acceso/consulta/estadisticas?meses=3` requiere un token de una
