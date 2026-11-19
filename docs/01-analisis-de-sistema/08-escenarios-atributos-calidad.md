@@ -7,6 +7,10 @@ Las consultas utilizan el almacenamiento propio de Nivora.
 La actualización de datos externos y la entrega de notificaciones
 se ejecutan por separado, conforme a ADR-003.
 
+La [revisión final del backend, bloque 9](../../tecnologia/nivora-backend/documentacion/verificacion-final-backend.md)
+y su [matriz RF/EQ](../../tecnologia/nivora-backend/documentacion/matriz-requisitos-backend.md)
+consolidan la cobertura y las reservas al 19 de noviembre de 2026.
+
 ## EQ-01. Rendimiento: consultas simultáneas
 
 | Elemento | Descripción |
@@ -137,7 +141,7 @@ corresponde al despliegue de pruebas configurado para ese propósito.
 | **Respuesta esperada** | Los adaptadores generan las solicitudes correspondientes a cada servicio y transforman sus respuestas al modelo utilizado por Nivora. Distinguen los datos inexistentes de los errores de formato y comunicación, sin incorporar respuestas incompatibles como información válida. |
 | **Medida** | El 100 % de los casos válidos definidos debe respetar los campos, tipos y unidades de sus contratos, cuando corresponda. El 100 % de los resultados negativos y errores simulados debe clasificarse correctamente. Debe haber cero respuestas incompatibles incorporadas como datos válidos. |
 | **Verificación** | Ejecutar pruebas de contrato para agua, identidad y notificaciones. Comparar solicitudes, respuestas y transformaciones con los formatos documentados. Probar datos inexistentes, campos obligatorios ausentes, tipos incorrectos y tiempos de espera agotados. Revisar los resultados e incidencias generados. |
-| **Estado** | Pendiente de completar la matriz de contratos y revisar las especificaciones de los proveedores reales antes de sustituir las simulaciones. |
+| **Estado** | Parcial: existen pruebas de los adaptadores HTTP de agua e identidad y del emisor Web Push; sus referencias están en la [matriz RF/EQ](../../tecnologia/nivora-backend/documentacion/matriz-requisitos-backend.md). Falta consolidar la matriz completa de contratos externos y contrastar cada integración con la especificación de su proveedor al conectarlo. |
 | **Trazabilidad** | AC07; DA04 y DA07; RC04, RC05 y RC07; RF02, RF05, RF23–RF27 y RF38. |
 
 RENIEC se contempla como integración de identidad del sistema futuro.

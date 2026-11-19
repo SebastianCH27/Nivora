@@ -13,6 +13,14 @@ y una consulta de salud. El contrato importable esta en
 Los [controles de documentacion](documentacion/verificacion-documentacion-api.md)
 comparan las rutas, parametros y DTO reales con la especificacion versionada.
 
+## Revisión final de requisitos
+
+El [balance del bloque 9](documentacion/verificacion-final-backend.md)
+consolida las 562 pruebas de la última regresión y la evidencia de carga.
+La [matriz RF/EQ](documentacion/matriz-requisitos-backend.md) identifica
+la cobertura del backend y los pendientes: lecturas de intervalo,
+comparación de costos, interfaces y evaluaciones de calidad restantes.
+
 ## Servicios del entorno local
 
 | Componente | Puerto | Base de datos |
@@ -24,18 +32,18 @@ El puerto 8080 esta ocupado por Jenkins en el equipo de desarrollo.
 
 ## Modulos de negocio
 
-| Paquete previsto | Modulo | Estado |
+| Paquete | Modulo | Estado |
 |---|---|---|
 | `acceso` | Acceso y suministros | Suministros, consulta de DNI mediante APIsPERU, sesiones de consulta y administrativas, gestion de cuentas y supervision protegida. |
-| `lecturas` | Lecturas, consumo e historial | Recuperacion manual y automatica con corte e inventario persistidos y API local de supervision; calculos pendientes. |
+| `lecturas` | Lecturas, consumo e historial | Recuperación con corte e inventario persistidos; consumo acumulado, historial, estadísticas y supervisión local. Lecturas de intervalo pendientes. |
 | `tarifas` | Tarifas, costos y proyecciones | Historial versionado, gestión administrativa de vigencias, costos estimados y proyección mensual. |
-| `notificaciones` | Alertas y notificaciones | Registra y consulta avisos, guarda marcas de lectura y configura las preferencias por dispositivo y la evaluación de consumo. |
+| `notificaciones` | Alertas y notificaciones | Alertas, bandeja, marcas de lectura, preferencias por dispositivo y entrega Web Push con reintentos. |
 | `recibos` | Recibos | Importación, sincronización automática y consulta de recibos por suministro. |
 | `integracion` | Supervisión de integración | Consulta de incidencias y programación administrativa de reintentos de lecturas y recibos por suministro. |
 | `periodos` | Calendario mensual | Publicación de reglas futuras para consumo, comparaciones, alertas y contexto de los recibos. |
 
-Las capas de cada modulo se incorporaran cuando se implementen sus
-responsabilidades: dominio, aplicacion, infraestructura y presentacion.
+Los módulos implementados organizan sus responsabilidades en dominio,
+aplicación, infraestructura y presentación.
 El dominio no depende de Spring, JDBC ni clientes HTTP.
 
 ## Primer contrato: consulta de suministros
@@ -61,9 +69,8 @@ El inicio de sesion y el registro del acceso utilizan ambos contratos.
 El titular del suministro y la persona que consulta pueden ser diferentes.
 
 El adaptador HTTP implementa este contrato en infraestructura.
-Las consultas del panel utilizaran datos aceptados en el almacenamiento
-propio de Nivora; no dependeran de una llamada a la Empresa por cada
-solicitud del usuario.
+Las consultas del panel utilizan datos aceptados en el almacenamiento
+propio de Nivora y se resuelven localmente para la sesión vigente.
 
 ### Adaptador de la Empresa de Agua
 
@@ -187,7 +194,7 @@ El script crea la tabla si no existe. La cuenta de ejecucion `nivora_app`
 mantiene sus permisos de lectura y escritura sobre `nivora.*`; el backend
 no ejecuta cambios de estructura automaticamente.
 
-### Integracion pendiente
+### Integración incorporada
 
 El backend incorpora la consulta externa de DNI y el almacenamiento propio
 de suministros y lecturas. Las sesiones de consulta registran accesos exitosos.

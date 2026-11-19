@@ -1,0 +1,1277 @@
+{
+  "versionFormato": 1,
+  "fechaLocalRevision": "2026-11-19",
+  "zonaHoraria": "America/Lima",
+  "baseContenidoReportada": "6cc8260",
+  "alcance": "Bloque 9, parte 5: revisión documental de requisitos y consolidación de la regresión anterior; no cambia la implementación ni ejecuta otra carga.",
+  "regresionUtilizada": {
+    "procedencia": "Último clean verify de la parte 4; informes Surefire conservados en el entorno de preparación.",
+    "nuevaEjecucionEnEstaEntrega": false,
+    "tests": 562,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0,
+    "buildSuccess": true,
+    "clases": 32,
+    "inventario": [
+      {
+        "clase": "pe.nivora.backend.NivoraBackendApplicationTests",
+        "tests": 2,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      {
+        "clase": "pe.nivora.backend.acceso.administradores.ClavesAdministrativasTests",
+        "tests": 17,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      {
+        "clase": "pe.nivora.backend.acceso.administradores.GestionAdministradoresApiTests",
+        "tests": 43,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      {
+        "clase": "pe.nivora.backend.acceso.administradores.InicializacionAdministrativaTests",
+        "tests": 10,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      {
+        "clase": "pe.nivora.backend.acceso.administradores.InicializadorAdministrativoConfiguracionTests",
+        "tests": 6,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      {
+        "clase": "pe.nivora.backend.acceso.aplicacion.ActualizarSuministroTests",
+        "tests": 5,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      {
+        "clase": "pe.nivora.backend.acceso.infraestructura.empresaagua.FuenteSuministrosHttpTests",
+        "tests": 29,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      {
+        "clase": "pe.nivora.backend.acceso.infraestructura.identidad.AccesoConsultaIntegradoTests",
+        "tests": 94,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      {
+        "clase": "pe.nivora.backend.acceso.infraestructura.identidad.FuenteIdentidadApisPeruTests",
+        "tests": 23,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      {
+        "clase": "pe.nivora.backend.acceso.infraestructura.persistencia.RepositorioSuministrosJdbcTests",
+        "tests": 15,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      {
+        "clase": "pe.nivora.backend.acceso.sesiones.SesionesAdministrativasApiTests",
+        "tests": 31,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      {
+        "clase": "pe.nivora.backend.acceso.sesiones.SesionesConsultaApiTests",
+        "tests": 21,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      {
+        "clase": "pe.nivora.backend.documentacion.DocumentacionApiTests",
+        "tests": 3,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      {
+        "clase": "pe.nivora.backend.lecturas.aplicacion.ImportarPaginaLecturasTests",
+        "tests": 5,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      {
+        "clase": "pe.nivora.backend.lecturas.aplicacion.RecuperacionConCorteTests",
+        "tests": 35,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      {
+        "clase": "pe.nivora.backend.lecturas.aplicacion.RecuperarLecturasTests",
+        "tests": 10,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      {
+        "clase": "pe.nivora.backend.lecturas.dominio.ConsumoPeriodoTests",
+        "tests": 4,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      {
+        "clase": "pe.nivora.backend.lecturas.infraestructura.empresaagua.FuenteLecturasHttpTests",
+        "tests": 63,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      {
+        "clase": "pe.nivora.backend.lecturas.infraestructura.persistencia.RepositorioLecturasJdbcTests",
+        "tests": 28,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      {
+        "clase": "pe.nivora.backend.lecturas.infraestructura.persistencia.RepositorioRecuperacionLecturasJdbcTests",
+        "tests": 8,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      {
+        "clase": "pe.nivora.backend.lecturas.sincronizacion.PoliticaSincronizacionTests",
+        "tests": 6,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      {
+        "clase": "pe.nivora.backend.lecturas.sincronizacion.ProgramacionSincronizacionTests",
+        "tests": 11,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      {
+        "clase": "pe.nivora.backend.lecturas.sincronizacion.SincronizarLecturasTests",
+        "tests": 14,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      {
+        "clase": "pe.nivora.backend.lecturas.supervision.SupervisionLecturasApiTests",
+        "tests": 20,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      {
+        "clase": "pe.nivora.backend.notificaciones.infraestructura.ColaWebPushTests",
+        "tests": 5,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      {
+        "clase": "pe.nivora.backend.notificaciones.infraestructura.EmisorWebPushHttpTests",
+        "tests": 3,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      {
+        "clase": "pe.nivora.backend.periodos.dominio.CalendarioMensualTests",
+        "tests": 1,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      {
+        "clase": "pe.nivora.backend.recibos.infraestructura.AlmacenamientoRecibosTests",
+        "tests": 13,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      {
+        "clase": "pe.nivora.backend.recibos.infraestructura.FuenteRecibosHttpTests",
+        "tests": 18,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      {
+        "clase": "pe.nivora.backend.tarifas.CostoEstimadoTests",
+        "tests": 6,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      {
+        "clase": "pe.nivora.backend.tarifas.ProyeccionMensualTests",
+        "tests": 4,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      {
+        "clase": "pe.nivora.backend.tarifas.TarifasIntegracionTests",
+        "tests": 9,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      }
+    ],
+    "java": "21.0.13",
+    "compilador": "ECJ 3.38.0",
+    "pruebaWindowsReportada": {
+      "fechaLocal": "2026-11-19",
+      "horaFinalizacionLocal": "00:07:07-05:00",
+      "procedencia": "Salida Maven compartida por el responsable en el chat; no se adjunta un nuevo log Windows.",
+      "tests": 562,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "buildSuccess": true
+    }
+  },
+  "cobertura": {
+    "requisitosFuncionales": 39,
+    "escenariosCalidad": 10,
+    "referenciasDeMetodosComprobadas": 68,
+    "lecturasAdmitidas": "ACUMULADA, litros",
+    "alcanceInterfaz": "Frontend final pendiente; la página Web Push es una comprobación técnica."
+  },
+  "matrizRequisitos": [
+    {
+      "id": "RF01",
+      "tema": "Entrada de suministro y DNI",
+      "estado": "COMPROBADO_BACKEND",
+      "alcance": "Valida formato, tipos y presencia antes de invocar las fuentes.",
+      "evidencias": [
+        "E01"
+      ],
+      "reserva": ""
+    },
+    {
+      "id": "RF02",
+      "tema": "Comprobación externa de suministro e identidad",
+      "estado": "COMPROBADO_BACKEND",
+      "alcance": "Distingue inexistencia confirmada, credencial/cuota, respuesta incompatible y caída; no crea sesión sin validación.",
+      "evidencias": [
+        "E01",
+        "E17"
+      ],
+      "reserva": ""
+    },
+    {
+      "id": "RF03",
+      "tema": "Sesión asociada al suministro",
+      "estado": "COMPROBADO_BACKEND",
+      "alcance": "Inicio, consulta, cierre, caducidad y aislamiento entre suministros.",
+      "evidencias": [
+        "E01",
+        "E11"
+      ],
+      "reserva": ""
+    },
+    {
+      "id": "RF04",
+      "tema": "Registro del acceso",
+      "estado": "COMPROBADO_BACKEND",
+      "alcance": "Conserva suministro, identidad y fecha; restringe la consulta administrativa y enmascara el DNI.",
+      "evidencias": [
+        "E01",
+        "E14"
+      ],
+      "reserva": ""
+    },
+    {
+      "id": "RF05",
+      "tema": "Recuperación automática de lecturas",
+      "estado": "COMPROBADO_BACKEND",
+      "alcance": "Programación persistida, lotes acotados y reintentos separados de las consultas.",
+      "evidencias": [
+        "E03"
+      ],
+      "reserva": ""
+    },
+    {
+      "id": "RF06",
+      "tema": "Registro de lecturas",
+      "estado": "COMPROBADO_BACKEND",
+      "alcance": "Conserva fuente, identificador, medidor, fecha y recepción para las lecturas acumuladas en litros admitidas.",
+      "evidencias": [
+        "E02"
+      ],
+      "reserva": "El soporte de otro tipo de medición se revisa en RF10."
+    },
+    {
+      "id": "RF07",
+      "tema": "Validación de lecturas e incidencias",
+      "estado": "COMPROBADO_BACKEND",
+      "alcance": "Rechaza datos inválidos y registra motivos; preserva registros aceptados ante conflictos.",
+      "evidencias": [
+        "E02",
+        "E17"
+      ],
+      "reserva": "Alcance: contrato acumulado de la demostración."
+    },
+    {
+      "id": "RF08",
+      "tema": "Detección de duplicados",
+      "estado": "COMPROBADO_BACKEND",
+      "alcance": "Repetición, identidad de la medición y concurrencia no agregan una segunda copia.",
+      "evidencias": [
+        "E02"
+      ],
+      "reserva": ""
+    },
+    {
+      "id": "RF09",
+      "tema": "Recuperación tras fallos",
+      "estado": "COMPROBADO_BACKEND",
+      "alcance": "Conserva progreso y lecturas aceptadas y reanuda el recorrido sin doble conteo.",
+      "evidencias": [
+        "E03",
+        "E14"
+      ],
+      "reserva": ""
+    },
+    {
+      "id": "RF10",
+      "tema": "Cálculo según tipo de medición",
+      "estado": "PARCIAL",
+      "alcance": "La diferencia de contadores acumulados está implementada y probada.",
+      "evidencias": [
+        "E04"
+      ],
+      "reserva": "P01: falta el modelo, incorporación y suma de consumos de intervalos no superpuestos."
+    },
+    {
+      "id": "RF11",
+      "tema": "Litros y metros cúbicos",
+      "estado": "COMPROBADO_BACKEND",
+      "alcance": "La API entrega ambas magnitudes con conversión decimal explícita.",
+      "evidencias": [
+        "E04"
+      ],
+      "reserva": "La selección y presentación visual corresponden al frontend."
+    },
+    {
+      "id": "RF12",
+      "tema": "Acumulado mensual y fechas",
+      "estado": "COMPROBADO_BACKEND",
+      "alcance": "Usa los límites del calendario configurado y las fechas efectivamente medidas.",
+      "evidencias": [
+        "E04",
+        "E12"
+      ],
+      "reserva": ""
+    },
+    {
+      "id": "RF13",
+      "tema": "Cobertura e incompatibilidades",
+      "estado": "COMPROBADO_BACKEND",
+      "alcance": "Distingue SIN_DATOS, PARCIAL, COMPLETO e INCOMPATIBLE; un dato ausente no se convierte en cero.",
+      "evidencias": [
+        "E04"
+      ],
+      "reserva": ""
+    },
+    {
+      "id": "RF14",
+      "tema": "Última medición y actualización",
+      "estado": "COMPROBADO_BACKEND",
+      "alcance": "Publica fecha de medición y estado aun cuando falle la fuente o empiece un mes sin lecturas.",
+      "evidencias": [
+        "E04",
+        "E14"
+      ],
+      "reserva": ""
+    },
+    {
+      "id": "RF15",
+      "tema": "Costo acumulado estimado",
+      "estado": "COMPROBADO_BACKEND",
+      "alcance": "Aplica la vigencia y versión tarifaria al consumo calculable del periodo.",
+      "evidencias": [
+        "E06"
+      ],
+      "reserva": ""
+    },
+    {
+      "id": "RF16",
+      "tema": "Detalle del costo estimado",
+      "estado": "COMPROBADO_BACKEND",
+      "alcance": "Entrega consumo, selección tarifaria y conceptos; indica conceptos faltantes.",
+      "evidencias": [
+        "E06"
+      ],
+      "reserva": ""
+    },
+    {
+      "id": "RF17",
+      "tema": "Proyección de consumo y costo",
+      "estado": "COMPROBADO_BACKEND",
+      "alcance": "Proyecta con el ritmo observado, duración mensual y tramos de la tarifa aplicable.",
+      "evidencias": [
+        "E06",
+        "E07"
+      ],
+      "reserva": ""
+    },
+    {
+      "id": "RF18",
+      "tema": "Fecha, supuestos e insuficiencia",
+      "estado": "COMPROBADO_BACKEND",
+      "alcance": "Expone fecha y supuesto de ritmo constante; diferencia insuficiencia de lecturas, tarifa y conceptos.",
+      "evidencias": [
+        "E07"
+      ],
+      "reserva": ""
+    },
+    {
+      "id": "RF19",
+      "tema": "Consumo y costos anteriores",
+      "estado": "COMPROBADO_BACKEND",
+      "alcance": "Devuelve periodos anteriores con cobertura, consumo y estimación versionada.",
+      "evidencias": [
+        "E04",
+        "E06"
+      ],
+      "reserva": ""
+    },
+    {
+      "id": "RF20",
+      "tema": "Comparación entre periodos",
+      "estado": "PARCIAL",
+      "alcance": "Estadísticas devuelve fechas, duración y diferencia de volumen; costos entrega estimaciones por periodo.",
+      "evidencias": [
+        "E05",
+        "E06"
+      ],
+      "reserva": "P02: falta completar y probar la diferencia de costo estimado entre los periodos comparados."
+    },
+    {
+      "id": "RF21",
+      "tema": "Gráficos y estadísticas",
+      "estado": "PARCIAL",
+      "alcance": "Existe serie mensual con huecos y resumen basado en meses completos.",
+      "evidencias": [
+        "E05"
+      ],
+      "reserva": "P03: falta la interfaz que represente los gráficos y su validación visual."
+    },
+    {
+      "id": "RF22",
+      "tema": "Alerta por superar el mes anterior",
+      "estado": "COMPROBADO_BACKEND",
+      "alcance": "Exige cobertura suficiente; contempla consumo anterior cero y conserva la primera detección.",
+      "evidencias": [
+        "E09"
+      ],
+      "reserva": ""
+    },
+    {
+      "id": "RF23",
+      "tema": "Preferencias por dispositivo",
+      "estado": "COMPROBADO_BACKEND",
+      "alcance": "Asocia UUID y suministro de la sesión y exige permiso para habilitar los avisos.",
+      "evidencias": [
+        "E09",
+        "E10"
+      ],
+      "reserva": ""
+    },
+    {
+      "id": "RF24",
+      "tema": "Persistencia y unicidad de avisos",
+      "estado": "COMPROBADO_BACKEND",
+      "alcance": "Conserva evento, periodo y fecha; evita avisos duplicados y mantiene la bandeja ante fallos del emisor.",
+      "evidencias": [
+        "E08",
+        "E09",
+        "E10"
+      ],
+      "reserva": ""
+    },
+    {
+      "id": "RF25",
+      "tema": "Bandeja y marcas de lectura",
+      "estado": "COMPROBADO_BACKEND",
+      "alcance": "Consulta paginada por suministro; marca leída idempotente entre sesiones.",
+      "evidencias": [
+        "E09",
+        "E11"
+      ],
+      "reserva": ""
+    },
+    {
+      "id": "RF26",
+      "tema": "Entrega con la aplicación cerrada",
+      "estado": "PARCIAL",
+      "alcance": "Cola, suscripción y service worker Web Push implementados; recepción observada manualmente en Windows/Chrome.",
+      "evidencias": [
+        "E10"
+      ],
+      "reserva": "P08: falta documentar la matriz de dispositivos/navegadores admitidos y su recepción visual con la interfaz final."
+    },
+    {
+      "id": "RF27",
+      "tema": "Importación de recibos emitidos",
+      "estado": "COMPROBADO_BACKEND",
+      "alcance": "Sincroniza importe definitivo, disponibilidad y periodo desde la fuente simulada; conserva los datos originales.",
+      "evidencias": [
+        "E08"
+      ],
+      "reserva": ""
+    },
+    {
+      "id": "RF28",
+      "tema": "Consulta de recibos y vencimientos",
+      "estado": "COMPROBADO_BACKEND",
+      "alcance": "API autenticada y paginada; distingue la ventana facturada del periodo de análisis configurado.",
+      "evidencias": [
+        "E08",
+        "E12"
+      ],
+      "reserva": ""
+    },
+    {
+      "id": "RF29",
+      "tema": "Aviso de recibo disponible",
+      "estado": "COMPROBADO_BACKEND",
+      "alcance": "Registra un aviso por recibo y comunica periodo y vencimiento; demostración con siete días desde la disponibilidad.",
+      "evidencias": [
+        "E08",
+        "E10"
+      ],
+      "reserva": "La recepción final en cada dispositivo conserva la reserva de RF26."
+    },
+    {
+      "id": "RF30",
+      "tema": "Acceso y permisos administrativos",
+      "estado": "COMPROBADO_BACKEND",
+      "alcance": "Sesiones diferenciadas, control de permisos, cambio inicial de clave y revocación.",
+      "evidencias": [
+        "E01",
+        "E11"
+      ],
+      "reserva": ""
+    },
+    {
+      "id": "RF31",
+      "tema": "Suministros y registros de acceso",
+      "estado": "COMPROBADO_BACKEND",
+      "alcance": "Lista local, paginación, protección del DNI y permisos.",
+      "evidencias": [
+        "E14"
+      ],
+      "reserva": ""
+    },
+    {
+      "id": "RF32",
+      "tema": "Configuración de periodos mensuales",
+      "estado": "COMPROBADO_BACKEND",
+      "alcance": "Reglas futuras versionadas, control de revisión y aplicación a consultas, alertas y contexto de recibos.",
+      "evidencias": [
+        "E12",
+        "E14"
+      ],
+      "reserva": ""
+    },
+    {
+      "id": "RF33",
+      "tema": "Gestión tarifaria versionada",
+      "estado": "COMPROBADO_BACKEND",
+      "alcance": "Publica vigencias y tramos; conserva versiones y resultados de periodos anteriores.",
+      "evidencias": [
+        "E06",
+        "E13"
+      ],
+      "reserva": ""
+    },
+    {
+      "id": "RF34",
+      "tema": "Control de evaluación de alertas",
+      "estado": "COMPROBADO_BACKEND",
+      "alcance": "Pausa persistida y reanudación autorizadas sin cambiar la regla de comparación.",
+      "evidencias": [
+        "E09"
+      ],
+      "reserva": ""
+    },
+    {
+      "id": "RF35",
+      "tema": "Supervisión de integración",
+      "estado": "COMPROBADO_BACKEND",
+      "alcance": "Lecturas y recibos exponen estado, último intento/éxito y reservas por suministro.",
+      "evidencias": [
+        "E14"
+      ],
+      "reserva": ""
+    },
+    {
+      "id": "RF36",
+      "tema": "Incidencias de integración",
+      "estado": "COMPROBADO_BACKEND",
+      "alcance": "Conserva origen, motivo, fechas y estado; pagina sin mezclar suministros.",
+      "evidencias": [
+        "E02",
+        "E14"
+      ],
+      "reserva": ""
+    },
+    {
+      "id": "RF37",
+      "tema": "Reintentos administrativos",
+      "estado": "COMPROBADO_BACKEND",
+      "alcance": "HTTP 202 programa; respeta bloqueo y reserva; recuperación posterior conserva validaciones y duplicados.",
+      "evidencias": [
+        "E14",
+        "E15"
+      ],
+      "reserva": ""
+    },
+    {
+      "id": "RF38",
+      "tema": "Fuente simulada de agua",
+      "estado": "COMPROBADO_BACKEND",
+      "alcance": "El módulo empresa-agua proporciona suministros, lecturas, tarifas y recibos; los adaptadores y recorridos se prueban con HTTP controlado.",
+      "evidencias": [
+        "E08",
+        "E13",
+        "E16",
+        "E17"
+      ],
+      "reserva": "La carga usa además su propia fuente ficticia acotada, descrita en la evidencia."
+    },
+    {
+      "id": "RF39",
+      "tema": "Escenarios de prueba",
+      "estado": "COMPROBADO_BACKEND",
+      "alcance": "Fuentes, relojes y datos de prueba representan accesos válidos/erróneos, consumo elevado, huecos, duplicados, recibos y caídas.",
+      "evidencias": [
+        "E01",
+        "E02",
+        "E04",
+        "E08",
+        "E09",
+        "E10"
+      ],
+      "reserva": "La evaluación de tareas desde la interfaz corresponde a P03."
+    }
+  ],
+  "matrizCalidad": [
+    {
+      "id": "EQ-01",
+      "estado": "VERIFICADO_ENTORNO",
+      "evidencias": [
+        "E16"
+      ],
+      "alcance": "5000 sesiones durante 1800 s; p95 por operación 1793–1867 ms, cero errores y continuidad de sincronización/alertas.",
+      "reserva": "Montaje ficticio compartido, carga cerrada y JAR de 2d43391; no extrapolar al despliegue final."
+    },
+    {
+      "id": "EQ-02",
+      "estado": "PARCIAL",
+      "evidencias": [
+        "E16"
+      ],
+      "alcance": "Dos perfiles completos con pools 10 y 20.",
+      "reserva": "P05: hosts diferentes; falta comparación controlada de ampliación de recursos."
+    },
+    {
+      "id": "EQ-03",
+      "estado": "PARCIAL",
+      "evidencias": [
+        "E02",
+        "E04",
+        "E06",
+        "E07"
+      ],
+      "alcance": "Validación, unicidad, acumulados, costos y proyecciones con resultados esperados.",
+      "reserva": "P01: faltan lecturas de intervalo."
+    },
+    {
+      "id": "EQ-04",
+      "estado": "VERIFICADO_CASOS",
+      "evidencias": [
+        "E03",
+        "E08",
+        "E10",
+        "E14"
+      ],
+      "alcance": "Las consultas locales y avisos se conservan durante caídas y los reintentos recuperan pendientes.",
+      "reserva": "Casos definidos con fuentes y emisor controlados; no es una certificación general de disponibilidad."
+    },
+    {
+      "id": "EQ-05",
+      "estado": "VERIFICADO_CASOS",
+      "evidencias": [
+        "E04",
+        "E06",
+        "E07",
+        "E12"
+      ],
+      "alcance": "Fechas, referencias de lecturas, vigencias, revisiones y supuestos comprobados.",
+      "reserva": "Alcance de las lecturas y consultas implementadas."
+    },
+    {
+      "id": "EQ-06",
+      "estado": "PARCIAL",
+      "evidencias": [
+        "E01",
+        "E11",
+        "E14"
+      ],
+      "alcance": "Sesiones, caducidad, revocación, permisos y protección de registros comprobados.",
+      "reserva": "P04: falta comprobar comunicaciones HTTPS en un despliegue de pruebas."
+    },
+    {
+      "id": "EQ-07",
+      "estado": "PARCIAL",
+      "evidencias": [
+        "E10",
+        "E13",
+        "E17"
+      ],
+      "alcance": "Hay pruebas de adaptadores HTTP para agua e identidad y preparación/clasificación de Web Push.",
+      "reserva": "P06: completar matriz de contratos externos y compatibilidad con cada proveedor al conectarlo."
+    },
+    {
+      "id": "EQ-08",
+      "estado": "PENDIENTE",
+      "evidencias": [],
+      "alcance": "Existe API documentada y página técnica de Web Push.",
+      "reserva": "P03: falta la interfaz final y la prueba con participantes y ambas vistas."
+    },
+    {
+      "id": "EQ-09",
+      "estado": "PARCIAL",
+      "evidencias": [
+        "E11"
+      ],
+      "alcance": "Mismos resultados en sesiones HTTP independientes con datos y reloj iguales.",
+      "reserva": "P08: falta contraste visual entre celular y computadora con la interfaz final."
+    },
+    {
+      "id": "EQ-10",
+      "estado": "PENDIENTE",
+      "evidencias": [],
+      "alcance": "Existen contratos y separación de dominio, aplicación e infraestructura.",
+      "reserva": "P07: falta sustitución controlada de adaptador, revisión de dependencias y regresión del cambio."
+    }
+  ],
+  "pendientes": [
+    {
+      "id": "P01",
+      "tema": "Lecturas de intervalo",
+      "referencias": [
+        "RF10",
+        "EQ-03"
+      ],
+      "comprobacion": "Incorporar intervalos con límites, unidades y suministro; sumar solo intervalos no superpuestos; probar huecos, duplicados, solapes y mezcla con acumulados sin doble conteo."
+    },
+    {
+      "id": "P02",
+      "tema": "Comparación de costos",
+      "referencias": [
+        "RF20"
+      ],
+      "comprobacion": "Definir y devolver la diferencia estimada con los periodos, duraciones y revisiones comparadas; comprobar datos parciales y conceptos o tarifas insuficientes."
+    },
+    {
+      "id": "P03",
+      "tema": "Interfaz, gráficos y usabilidad",
+      "referencias": [
+        "RF21",
+        "EQ-08",
+        "RC01"
+      ],
+      "comprobacion": "Implementar las vistas de consulta y administración; representar huecos y distinguir importes; ejecutar las tareas propuestas con cinco participantes y las dos resoluciones."
+    },
+    {
+      "id": "P04",
+      "tema": "Transporte HTTPS",
+      "referencias": [
+        "EQ-06"
+      ],
+      "comprobacion": "Preparar un despliegue de pruebas y comprobar TLS y las comunicaciones protegidas desde sus clientes."
+    },
+    {
+      "id": "P05",
+      "tema": "Escalabilidad controlada",
+      "referencias": [
+        "EQ-02"
+      ],
+      "comprobacion": "Comparar recursos iniciales y ampliados con el mismo JAR, datos, mezcla y generador controlado; medir capacidad sostenible y recursos sin atribuir diferencias entre hosts solo al pool."
+    },
+    {
+      "id": "P06",
+      "tema": "Contratos externos",
+      "referencias": [
+        "EQ-07"
+      ],
+      "comprobacion": "Consolidar la matriz por adaptador de solicitudes, respuestas válidas, ausencia, formato inválido y fallos; contrastar con la especificación del proveedor antes de cada conexión real."
+    },
+    {
+      "id": "P07",
+      "tema": "Sustitución del adaptador",
+      "referencias": [
+        "EQ-10"
+      ],
+      "comprobacion": "Sustituir una implementación conservando el contrato; registrar archivos/dependencias y demostrar regresión sin cambios de negocio motivados solo por el protocolo."
+    },
+    {
+      "id": "P08",
+      "tema": "Dispositivos y recepción visual",
+      "referencias": [
+        "RF26",
+        "EQ-09",
+        "RC07"
+      ],
+      "comprobacion": "Comparar valores y fechas desde celular y computadora y documentar Web Push con aplicación cerrada, permiso y conectividad en los dispositivos/navegadores que se declaren admitidos."
+    }
+  ],
+  "evidencias": [
+    {
+      "id": "E01",
+      "documento": "verificacion-acceso.md",
+      "pruebas": [
+        {
+          "clase": "pe.nivora.backend.acceso.sesiones.SesionesConsultaApiTests",
+          "metodos": [
+            "descartaEntradasInvalidasAntesDeContactarFuentes",
+            "iniciaConUnaPersonaDistintaAlTitularYRegistraElAccesoCompleto",
+            "caducaEnLaFechaFijadaAunqueHayaActividad"
+          ],
+          "archivo": "tecnologia/nivora-backend/src/test/java/pe/nivora/backend/acceso/sesiones/SesionesConsultaApiTests.java"
+        },
+        {
+          "clase": "pe.nivora.backend.acceso.infraestructura.identidad.AccesoConsultaIntegradoTests",
+          "metodos": [
+            "consultaAmbasFuentesHttpConLosDatosCorrectosYRegistraElAcceso",
+            "losFallosDeIdentidadInterrumpenElInicioSinExponerDatos"
+          ],
+          "archivo": "tecnologia/nivora-backend/src/test/java/pe/nivora/backend/acceso/infraestructura/identidad/AccesoConsultaIntegradoTests.java"
+        }
+      ],
+      "fuentes": []
+    },
+    {
+      "id": "E02",
+      "documento": "recuperacion-lecturas.md",
+      "pruebas": [
+        {
+          "clase": "pe.nivora.backend.lecturas.infraestructura.persistencia.RepositorioLecturasJdbcTests",
+          "metodos": [
+            "guardaUnaLecturaCompletaYConservaSuFechaUtc",
+            "repetirUnaLecturaNoLaCuentaOtraVezNiActualizaLaRecepcionOriginal",
+            "unIdConOtrosDatosGeneraIncidenciaSinReemplazarElAceptado",
+            "unFalloAlGuardarUnaIncidenciaRevierteLasLecturasNuevasDelMismoLote"
+          ],
+          "archivo": "tecnologia/nivora-backend/src/test/java/pe/nivora/backend/lecturas/infraestructura/persistencia/RepositorioLecturasJdbcTests.java"
+        }
+      ],
+      "fuentes": []
+    },
+    {
+      "id": "E03",
+      "documento": "sincronizacion-lecturas.md",
+      "pruebas": [
+        {
+          "clase": "pe.nivora.backend.lecturas.sincronizacion.SincronizarLecturasTests",
+          "metodos": [
+            "completoEsperaHastaElProximoIntervalo",
+            "reintentoExponencialPersisteEntreInstanciasYRespetaElMaximo",
+            "falloDeUnaFuenteNoImpideAtenderOtroSuministro"
+          ],
+          "archivo": "tecnologia/nivora-backend/src/test/java/pe/nivora/backend/lecturas/sincronizacion/SincronizarLecturasTests.java"
+        },
+        {
+          "clase": "pe.nivora.backend.acceso.infraestructura.identidad.AccesoConsultaIntegradoTests",
+          "metodos": [
+            "flujoAdministrativoRecuperaLecturasYRecibosConCalendarioPublicado"
+          ],
+          "archivo": "tecnologia/nivora-backend/src/test/java/pe/nivora/backend/acceso/infraestructura/identidad/AccesoConsultaIntegradoTests.java"
+        }
+      ],
+      "fuentes": []
+    },
+    {
+      "id": "E04",
+      "documento": "verificacion-consumo.md",
+      "pruebas": [
+        {
+          "clase": "pe.nivora.backend.lecturas.dominio.ConsumoPeriodoTests",
+          "metodos": [
+            "calculaLaDiferenciaExactaYConservaLasReferencias",
+            "diferenciaAusenciaDeLecturasDeConsumoCero",
+            "rechazaElCambioDeMedidorYElRetrocesoAunqueLosExtremosSuban"
+          ],
+          "archivo": "tecnologia/nivora-backend/src/test/java/pe/nivora/backend/lecturas/dominio/ConsumoPeriodoTests.java"
+        },
+        {
+          "clase": "pe.nivora.backend.acceso.infraestructura.identidad.AccesoConsultaIntegradoTests",
+          "metodos": [
+            "consumoHistorialYEstadisticasCoincidenAlCambiarElMesDeLima"
+          ],
+          "archivo": "tecnologia/nivora-backend/src/test/java/pe/nivora/backend/acceso/infraestructura/identidad/AccesoConsultaIntegradoTests.java"
+        }
+      ],
+      "fuentes": [
+        "src/main/java/pe/nivora/backend/lecturas/dominio/LecturaAcumulada.java"
+      ]
+    },
+    {
+      "id": "E05",
+      "documento": "estadisticas-consumo.md",
+      "pruebas": [
+        {
+          "clase": "pe.nivora.backend.acceso.infraestructura.identidad.AccesoConsultaIntegradoTests",
+          "metodos": [
+            "estadisticasComparanLosTramosYCalculanElResumenSoloConMesesCompletos",
+            "estadisticasSinMesesCompletosConservanLaSerieYDejanLosTotalesIndefinidos"
+          ],
+          "archivo": "tecnologia/nivora-backend/src/test/java/pe/nivora/backend/acceso/infraestructura/identidad/AccesoConsultaIntegradoTests.java"
+        }
+      ],
+      "fuentes": [
+        "src/main/java/pe/nivora/backend/lecturas/aplicacion/ConsultarEstadisticasConsumo.java",
+        "src/main/java/pe/nivora/backend/tarifas/aplicacion/ConsultarCostosConsumo.java"
+      ]
+    },
+    {
+      "id": "E06",
+      "documento": "verificacion-tarifas.md",
+      "pruebas": [
+        {
+          "clase": "pe.nivora.backend.acceso.infraestructura.identidad.AccesoConsultaIntegradoTests",
+          "metodos": [
+            "costosUsanElConsumoYLaVersionAplicableDeCadaMes",
+            "costosIdentificanTarifasIncompatiblesYConceptosNoInformados",
+            "tarifasImportadasYPublicadasSeAplicanAlCambiarDeMesEnLima"
+          ],
+          "archivo": "tecnologia/nivora-backend/src/test/java/pe/nivora/backend/acceso/infraestructura/identidad/AccesoConsultaIntegradoTests.java"
+        }
+      ],
+      "fuentes": []
+    },
+    {
+      "id": "E07",
+      "documento": "proyeccion-mensual.md",
+      "pruebas": [
+        {
+          "clase": "pe.nivora.backend.acceso.infraestructura.identidad.AccesoConsultaIntegradoTests",
+          "metodos": [
+            "proyeccionUsaLaUltimaMedicionYAplicaLosTramosAlVolumenDelMes",
+            "proyeccionDistingueFaltaDeLecturasDeFaltaDeTarifaYConceptos"
+          ],
+          "archivo": "tecnologia/nivora-backend/src/test/java/pe/nivora/backend/acceso/infraestructura/identidad/AccesoConsultaIntegradoTests.java"
+        }
+      ],
+      "fuentes": []
+    },
+    {
+      "id": "E08",
+      "documento": "verificacion-recibos.md",
+      "pruebas": [
+        {
+          "clase": "pe.nivora.backend.acceso.infraestructura.identidad.AccesoConsultaIntegradoTests",
+          "metodos": [
+            "recibosEmitidosSeSincronizanYSePuedenConsultarDuranteUnaCaida"
+          ],
+          "archivo": "tecnologia/nivora-backend/src/test/java/pe/nivora/backend/acceso/infraestructura/identidad/AccesoConsultaIntegradoTests.java"
+        },
+        {
+          "clase": "pe.nivora.backend.recibos.infraestructura.AlmacenamientoRecibosTests",
+          "metodos": [
+            "guardaElReciboEmitidoYRepetirloConservaElImporteYLaRecepcion",
+            "avisaPorRecibosGuardadosCuandoLlegaSuFechaEnLima"
+          ],
+          "archivo": "tecnologia/nivora-backend/src/test/java/pe/nivora/backend/recibos/infraestructura/AlmacenamientoRecibosTests.java"
+        }
+      ],
+      "fuentes": []
+    },
+    {
+      "id": "E09",
+      "documento": "configuracion-notificaciones.md",
+      "pruebas": [
+        {
+          "clase": "pe.nivora.backend.acceso.infraestructura.identidad.AccesoConsultaIntegradoTests",
+          "metodos": [
+            "preferenciasPorDispositivoYSuministroRequierenPermisoParaActivar",
+            "pausaPersistidaSeAplicaAlEvaluadorYPermiteReanudarSinReinicio",
+            "alertaSoloAlSuperarElMesAnteriorYConservaLaPrimeraDeteccion",
+            "alertaRequiereCoberturaCompletaDelMesAnterior",
+            "bandejaMarcaLeidaUnaVezYConservaLaFechaEntreSesiones"
+          ],
+          "archivo": "tecnologia/nivora-backend/src/test/java/pe/nivora/backend/acceso/infraestructura/identidad/AccesoConsultaIntegradoTests.java"
+        }
+      ],
+      "fuentes": []
+    },
+    {
+      "id": "E10",
+      "documento": "verificacion-continuidad-avisos.md",
+      "pruebas": [
+        {
+          "clase": "pe.nivora.backend.acceso.infraestructura.identidad.AccesoConsultaIntegradoTests",
+          "metodos": [
+            "consultasYBandejaContinuanDuranteFallosDePushYDeLaEmpresa",
+            "desactivarUnDispositivoDetieneLosReintentosYConservaLaBandeja"
+          ],
+          "archivo": "tecnologia/nivora-backend/src/test/java/pe/nivora/backend/acceso/infraestructura/identidad/AccesoConsultaIntegradoTests.java"
+        },
+        {
+          "clase": "pe.nivora.backend.notificaciones.infraestructura.ColaWebPushTests",
+          "metodos": [
+            "reintentaYConservaUnSoloRegistroPorAviso",
+            "agotaSeisIntentosTemporalesYConservaLaEntregaFallidaSinDuplicarla",
+            "unaReservaVencidaNoPuedeConfirmarLaEntregaReservadaPorOtroTrabajador"
+          ],
+          "archivo": "tecnologia/nivora-backend/src/test/java/pe/nivora/backend/notificaciones/infraestructura/ColaWebPushTests.java"
+        },
+        {
+          "clase": "pe.nivora.backend.notificaciones.infraestructura.EmisorWebPushHttpTests",
+          "metodos": [
+            "preparaUnaPeticionCifradaConVapidYTopicEstable",
+            "clasificaAceptacionExpiracionYReintentos"
+          ],
+          "archivo": "tecnologia/nivora-backend/src/test/java/pe/nivora/backend/notificaciones/infraestructura/EmisorWebPushHttpTests.java"
+        }
+      ],
+      "fuentes": []
+    },
+    {
+      "id": "E11",
+      "documento": "verificacion-contratos-api.md",
+      "pruebas": [
+        {
+          "clase": "pe.nivora.backend.acceso.infraestructura.identidad.AccesoConsultaIntegradoTests",
+          "metodos": [
+            "contratoDeConsultaConservaElSuministroYEquivaleEntreSesiones",
+            "contratoAdministrativoRequierePermisoAntesDeConsultarOEscribir",
+            "laSesionAjenaNoPuedeMarcarAvisosNiRetirarLaSuscripcionDelOtroSuministro"
+          ],
+          "archivo": "tecnologia/nivora-backend/src/test/java/pe/nivora/backend/acceso/infraestructura/identidad/AccesoConsultaIntegradoTests.java"
+        },
+        {
+          "clase": "pe.nivora.backend.acceso.administradores.GestionAdministradoresApiTests",
+          "metodos": [
+            "laGestionExigeSesionYPermisoEnTodasLasRutas",
+            "ultimaCuentaConGestionNoSeDesactivaNiPierdeElPermiso"
+          ],
+          "archivo": "tecnologia/nivora-backend/src/test/java/pe/nivora/backend/acceso/administradores/GestionAdministradoresApiTests.java"
+        }
+      ],
+      "fuentes": []
+    },
+    {
+      "id": "E12",
+      "documento": "periodos-mensuales.md",
+      "pruebas": [
+        {
+          "clase": "pe.nivora.backend.acceso.infraestructura.identidad.AccesoConsultaIntegradoTests",
+          "metodos": [
+            "publicaPeriodosFuturosYConservaLasRevisiones",
+            "elCorteConfiguradoSeAplicaAlConsumoEIdentificaLosRecibosConRangosDistintos"
+          ],
+          "archivo": "tecnologia/nivora-backend/src/test/java/pe/nivora/backend/acceso/infraestructura/identidad/AccesoConsultaIntegradoTests.java"
+        },
+        {
+          "clase": "pe.nivora.backend.periodos.dominio.CalendarioMensualTests",
+          "metodos": [
+            "ajustaElDiaAlUltimoDeFebreroYConservaUnLimiteComun"
+          ],
+          "archivo": "tecnologia/nivora-backend/src/test/java/pe/nivora/backend/periodos/dominio/CalendarioMensualTests.java"
+        }
+      ],
+      "fuentes": []
+    },
+    {
+      "id": "E13",
+      "documento": "gestion-tarifas.md",
+      "pruebas": [
+        {
+          "clase": "pe.nivora.backend.acceso.infraestructura.identidad.AccesoConsultaIntegradoTests",
+          "metodos": [
+            "publicacionTarifariaConservaLaRevisionYLosExtremosDeLaVigenciaAnterior",
+            "gestionTarifariaExigePermisoYValidaFechasTramosYPrecision"
+          ],
+          "archivo": "tecnologia/nivora-backend/src/test/java/pe/nivora/backend/acceso/infraestructura/identidad/AccesoConsultaIntegradoTests.java"
+        },
+        {
+          "clase": "pe.nivora.backend.tarifas.TarifasIntegracionTests",
+          "metodos": [
+            "unCambioDeVigenciaConservaLasVersionesYSeleccionaPorIntervalo",
+            "fallaElCambioDeImportesEnUnaVersionExistenteYRevierteElLoteCompleto"
+          ],
+          "archivo": "tecnologia/nivora-backend/src/test/java/pe/nivora/backend/tarifas/TarifasIntegracionTests.java"
+        }
+      ],
+      "fuentes": []
+    },
+    {
+      "id": "E14",
+      "documento": "verificacion-administracion.md",
+      "pruebas": [
+        {
+          "clase": "pe.nivora.backend.acceso.infraestructura.identidad.AccesoConsultaIntegradoTests",
+          "metodos": [
+            "paginaAccesosPorSuministroYProtegeElDni",
+            "supervisionDeRecibosDistingueReservaVigenteYVencida",
+            "incidenciasConservaEmpatesAlPaginarYAislaCadaSuministro",
+            "flujoAdministrativoRecuperaLecturasYRecibosConCalendarioPublicado"
+          ],
+          "archivo": "tecnologia/nivora-backend/src/test/java/pe/nivora/backend/acceso/infraestructura/identidad/AccesoConsultaIntegradoTests.java"
+        }
+      ],
+      "fuentes": []
+    },
+    {
+      "id": "E15",
+      "documento": "reintentos-integracion.md",
+      "pruebas": [
+        {
+          "clase": "pe.nivora.backend.acceso.infraestructura.identidad.AccesoConsultaIntegradoTests",
+          "metodos": [
+            "reintentoDeRecibosAdelantaSoloSuCalendarioYConservaElUltimoResultado",
+            "reintentoDeLecturasRespetaElBloqueoYLaReservaDelTrabajador"
+          ],
+          "archivo": "tecnologia/nivora-backend/src/test/java/pe/nivora/backend/acceso/infraestructura/identidad/AccesoConsultaIntegradoTests.java"
+        }
+      ],
+      "fuentes": []
+    },
+    {
+      "id": "E16",
+      "documento": "resultados-carga-github-actions.md",
+      "pruebas": [],
+      "fuentes": [
+        "../empresa-agua/README.md"
+      ]
+    },
+    {
+      "id": "E17",
+      "documento": "verificacion-acceso.md",
+      "pruebas": [
+        {
+          "clase": "pe.nivora.backend.acceso.infraestructura.empresaagua.FuenteSuministrosHttpTests",
+          "metodos": [
+            "devuelveVacioSoloAnteAusenciaConfirmadaPorElContrato",
+            "noConvierteErroresNiRespuestasInvalidasEnAusencia"
+          ],
+          "archivo": "tecnologia/nivora-backend/src/test/java/pe/nivora/backend/acceso/infraestructura/empresaagua/FuenteSuministrosHttpTests.java"
+        },
+        {
+          "clase": "pe.nivora.backend.acceso.infraestructura.identidad.FuenteIdentidadApisPeruTests",
+          "metodos": [
+            "consultaLaRutaCompletaConBearerYConservaLosCerosIniciales",
+            "informaUnaConsultaNoConfirmadaSinExponerElCuerpo"
+          ],
+          "archivo": "tecnologia/nivora-backend/src/test/java/pe/nivora/backend/acceso/infraestructura/identidad/FuenteIdentidadApisPeruTests.java"
+        },
+        {
+          "clase": "pe.nivora.backend.lecturas.infraestructura.empresaagua.FuenteLecturasHttpTests",
+          "metodos": [
+            "consultaYTraduceUnaPaginaCompleta",
+            "rechazaUnaPaginaIncompatibleCompleta",
+            "limitaLaEsperaDelCuerpoDeLaPagina"
+          ],
+          "archivo": "tecnologia/nivora-backend/src/test/java/pe/nivora/backend/lecturas/infraestructura/empresaagua/FuenteLecturasHttpTests.java"
+        },
+        {
+          "clase": "pe.nivora.backend.recibos.infraestructura.FuenteRecibosHttpTests",
+          "metodos": [
+            "reportaFalloDeLaFuenteAnteUnaRespuestaInconsistente"
+          ],
+          "archivo": "tecnologia/nivora-backend/src/test/java/pe/nivora/backend/recibos/infraestructura/FuenteRecibosHttpTests.java"
+        }
+      ],
+      "fuentes": []
+    },
+    {
+      "id": "E18",
+      "documento": "verificacion-documentacion-api.md",
+      "pruebas": [
+        {
+          "clase": "pe.nivora.backend.documentacion.DocumentacionApiTests",
+          "metodos": [
+            "documentaTodasLasOperacionesRegistradasSinInventarRutas",
+            "documentaParametrosRealesConObligatoriedadYValoresPredeterminados",
+            "conservaLosCamposYTiposDeLosRegistrosYEnumsPublicados"
+          ],
+          "archivo": "tecnologia/nivora-backend/src/test/java/pe/nivora/backend/documentacion/DocumentacionApiTests.java"
+        }
+      ],
+      "fuentes": []
+    }
+  ],
+  "limites": [
+    "Las referencias a métodos demuestran trazabilidad a casos ejecutados; no constituyen una certificación de todos los valores, dispositivos o situaciones posibles.",
+    "Las filas COMPROBADO_BACKEND se limitan al comportamiento descrito y no acreditan la experiencia completa del producto.",
+    "La carga conserva su commit 2d43391, JAR y 559 pruebas originales; la regresión posterior tiene 562.",
+    "EQ-02 permanece parcial por comparación no controlada entre VMs distintas.",
+    "La revisión no ejecuta nuevamente la suite de empresa-agua, una prueba de carga, un despliegue HTTPS ni tareas con participantes."
+  ],
+  "huellasSha256": {
+    "README.md": "e30567e6a760672eb352d665606ffb81debd7660eac89aa1e9e5d003ba7b34cb",
+    "docs/01-analisis-de-sistema/03-requisitos-funcionales.md": "7a27b9b99744ac456f39d8b78a213d1c82c2cb72144c510646b72810234155bb",
+    "docs/01-analisis-de-sistema/08-escenarios-atributos-calidad.md": "7c52749476e5ce020bb28598a64d9dbc3f9e846261413d3afee0db955b33d2da",
+    "tecnologia/empresa-agua/README.md": "d4fc8ba3c1f40afdc72b380b1eb0d1046ca31ee447c8033c25b84dcb87fa9e96",
+    "tecnologia/nivora-backend/README.md": "6e897c668c53567bdf7df42738c667c04c3057b117f92dbae7dec1c456f1f37a",
+    "tecnologia/nivora-backend/documentacion/evidencias/documentacion-api-2026-11-18.json": "e7eaa89fa2ecaa30f49c3aacb26b7bb30b3c458d8752d7750c8664f0e86c206d",
+    "tecnologia/nivora-backend/documentacion/evidencias/rendimiento-github-actions-2026-11-18.json": "eb324a0bd97835313ee4fcd0b804950f6f302144066c76a87a42ba3f7d7e6f89",
+    "tecnologia/nivora-backend/documentacion/matriz-requisitos-backend.md": "9e1893bc9f7789c0f5b7e1615e96210bace81beee3a5677f1e4104ad329429ad",
+    "tecnologia/nivora-backend/documentacion/openapi.json": "967cf077395240ed22d09cf2da2411c5ec7056ea172d45acbee456aab5a6d6eb",
+    "tecnologia/nivora-backend/documentacion/verificacion-final-backend.md": "c8224731801977251964e896d0a8ac445625de99cd4751b09d66d899485bc6bc",
+    "tecnologia/nivora-backend/src/main/java/pe/nivora/backend/lecturas/aplicacion/ConsultarEstadisticasConsumo.java": "ec9c5966f56254f3f04adcec47abe06fcb0c59809ec957c69aa1e739774ce554",
+    "tecnologia/nivora-backend/src/main/java/pe/nivora/backend/lecturas/dominio/LecturaAcumulada.java": "736df5813b7002852a54ce06c7e07edcf4db91b57787bf412c8a3082b18ecaa1",
+    "tecnologia/nivora-backend/src/main/java/pe/nivora/backend/tarifas/aplicacion/ConsultarCostosConsumo.java": "202769a929f9513ca20c03e76eb7f0a40c8534f1aaa46fdb5cad0aef176ef4da",
+    "tecnologia/nivora-backend/src/test/java/pe/nivora/backend/acceso/administradores/GestionAdministradoresApiTests.java": "297d3ede8d0ffbd2fc91ef91fb3bb69f961d36abf15ca5ee3d61af286c5b73c1",
+    "tecnologia/nivora-backend/src/test/java/pe/nivora/backend/acceso/infraestructura/empresaagua/FuenteSuministrosHttpTests.java": "274f51fde81bb435249ab5eac87bf366446ac789c3af535c0b83483fd542ce02",
+    "tecnologia/nivora-backend/src/test/java/pe/nivora/backend/acceso/infraestructura/identidad/AccesoConsultaIntegradoTests.java": "f04580f3ecb6379bb0dc5537268c30f2100ff64c9feac3f1ef3da77829df3b31",
+    "tecnologia/nivora-backend/src/test/java/pe/nivora/backend/acceso/infraestructura/identidad/FuenteIdentidadApisPeruTests.java": "22419b4b279fd4086e5eaec6cfbf252b8ae7d417b6f7989845adcdd467548098",
+    "tecnologia/nivora-backend/src/test/java/pe/nivora/backend/acceso/sesiones/SesionesConsultaApiTests.java": "4e6649dbd41be4fb057bf72f9aa03ad494836ed69fee5a318fe052b91676c332",
+    "tecnologia/nivora-backend/src/test/java/pe/nivora/backend/documentacion/DocumentacionApiTests.java": "075db36ba1608b3758ca1f6de08e8b08b951801f1766e678c021c4c1322b7597",
+    "tecnologia/nivora-backend/src/test/java/pe/nivora/backend/lecturas/dominio/ConsumoPeriodoTests.java": "f855d4392a171178c5027dd3ece97717a5ff7e1fb8e3dc85bf931089b47e1e3d",
+    "tecnologia/nivora-backend/src/test/java/pe/nivora/backend/lecturas/infraestructura/empresaagua/FuenteLecturasHttpTests.java": "665ef245d79a397b7bfa745c9093d599169abc0aee95df297cdb9fa09a537c04",
+    "tecnologia/nivora-backend/src/test/java/pe/nivora/backend/lecturas/infraestructura/persistencia/RepositorioLecturasJdbcTests.java": "4db653ff716c987b3ca08406cebc1cf156b4b513014b16f40ec96b6a9db80d3c",
+    "tecnologia/nivora-backend/src/test/java/pe/nivora/backend/lecturas/sincronizacion/SincronizarLecturasTests.java": "c84b28a17bac699585d8860f2e1b1f20b2d8fdd05a6f3b305101c03325eddc04",
+    "tecnologia/nivora-backend/src/test/java/pe/nivora/backend/notificaciones/infraestructura/ColaWebPushTests.java": "79cec48f51413be191b9179a8e24d78e49737ff9702b2e41723d4cd6a651dd67",
+    "tecnologia/nivora-backend/src/test/java/pe/nivora/backend/notificaciones/infraestructura/EmisorWebPushHttpTests.java": "31b62a36abdf50045f7e7440bad6b0faed3d6124590c82da7fac3813b0e807aa",
+    "tecnologia/nivora-backend/src/test/java/pe/nivora/backend/periodos/dominio/CalendarioMensualTests.java": "8878c7eae998ab26b2d701f58f8c49c3183b834194ca80004178e4e087d79e6f",
+    "tecnologia/nivora-backend/src/test/java/pe/nivora/backend/recibos/infraestructura/AlmacenamientoRecibosTests.java": "b81d9cc3318f69b496d3a963d248e1465034449e2a8b60eeab1fe178b4ba96d6",
+    "tecnologia/nivora-backend/src/test/java/pe/nivora/backend/recibos/infraestructura/FuenteRecibosHttpTests.java": "c94bc6e15edf9f7538462988efd3648681261d816cb988cbb18bd1b518ac625d",
+    "tecnologia/nivora-backend/src/test/java/pe/nivora/backend/tarifas/TarifasIntegracionTests.java": "1cc900c6d1b9ea79b4bfd6e9941b7898119296fceef4878afb6f5bc9260fea2c"
+  },
+  "archivosEntrega": [
+    "README.md",
+    "docs/01-analisis-de-sistema/08-escenarios-atributos-calidad.md",
+    "tecnologia/nivora-backend/README.md",
+    "tecnologia/nivora-backend/documentacion/verificacion-final-backend.md",
+    "tecnologia/nivora-backend/documentacion/matriz-requisitos-backend.md",
+    "tecnologia/nivora-backend/documentacion/evidencias/revision-final-backend-2026-11-19.json"
+  ]
+}

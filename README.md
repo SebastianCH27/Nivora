@@ -53,8 +53,17 @@ historial mensual, recibos y tarifas.
 Sus instrucciones se encuentran en
 [Empresa de Agua](tecnologia/empresa-agua/README.md).
 
-La siguiente etapa corresponde al backend propio de Nivora,
-que consumirá esta API. El frontend está previsto con Flutter.
+El [backend propio de Nivora](tecnologia/nivora-backend/README.md) también
+está implementado con Java 21, Spring Boot y MySQL. Incorpora sesiones de
+consulta y administrativas, almacenamiento local, cálculos de consumo,
+tarifas, proyecciones, recibos, alertas y Web Push.
+
+La [revisión del bloque 9](tecnologia/nivora-backend/documentacion/verificacion-final-backend.md)
+consolida la regresión de 562 pruebas y la evidencia de carga con 5000
+sesiones durante 30 minutos en el entorno descrito. La
+[matriz de requisitos](tecnologia/nivora-backend/documentacion/matriz-requisitos-backend.md)
+identifica el alcance comprobado y las funciones y evaluaciones pendientes.
+El frontend está previsto con Flutter.
 
 La base de Node.js y el boilerplate se conservan como material
 de los laboratorios iniciales.
