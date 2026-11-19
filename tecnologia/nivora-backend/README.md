@@ -4,6 +4,15 @@ Implementacion del backend propio con Java 21, Spring Boot 4.1.2 y MySQL.
 Se desarrolla como monolito modular, con dependencias organizadas segun
 Clean Architecture.
 
+## Documentacion de la API
+
+La [guia de la API](documentacion/api.md) centraliza autenticacion, permisos,
+formatos, paginacion, errores y el inventario de 40 operaciones de negocio
+y una consulta de salud. El contrato importable esta en
+[OpenAPI 3.1](documentacion/openapi.json).
+Los [controles de documentacion](documentacion/verificacion-documentacion-api.md)
+comparan las rutas, parametros y DTO reales con la especificacion versionada.
+
 ## Servicios del entorno local
 
 | Componente | Puerto | Base de datos |

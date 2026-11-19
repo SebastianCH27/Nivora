@@ -1,0 +1,6358 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "API de Nivora",
+    "version": "0.0.1-SNAPSHOT",
+    "description": "Contrato documentado del backend: 40 operaciones de negocio y una de salud. Base revisada: commit 4fd156a. Usa dos sesiones Bearer opacas distintas; los permisos administrativos estan indicados en x-permisos-requeridos. Las consultas del suministro obtienen su alcance de la sesion. Ejemplos ficticios; reemplazar las fechas futuras antes de ejecutar publicaciones."
+  },
+  "servers": [
+    {
+      "url": "http://127.0.0.1:8082",
+      "description": "Desarrollo local; las rutas contienen /api/v1 cuando corresponde."
+    }
+  ],
+  "tags": [
+    {
+      "name": "Acceso consulta"
+    },
+    {
+      "name": "Acceso administrativo"
+    },
+    {
+      "name": "Cuentas administrativas"
+    },
+    {
+      "name": "Consultas del suministro"
+    },
+    {
+      "name": "Notificaciones"
+    },
+    {
+      "name": "Registros de acceso"
+    },
+    {
+      "name": "Tarifas"
+    },
+    {
+      "name": "Periodos mensuales"
+    },
+    {
+      "name": "Control de alertas"
+    },
+    {
+      "name": "Supervision"
+    },
+    {
+      "name": "Salud"
+    }
+  ],
+  "security": [],
+  "paths": {
+    "/api/v1/acceso/consulta/sesiones": {
+      "post": {
+        "tags": [
+          "Acceso consulta"
+        ],
+        "operationId": "iniciarSesionConsulta",
+        "summary": "Iniciar una sesion de consulta",
+        "description": "Valida suministro y DNI con las fuentes configuradas; devuelve una sesion de consulta con suministro fijado. Duracion predeterminada: 1800 s, configurable. No es una sesion administrativa.",
+        "security": [],
+        "responses": {
+          "201": {
+            "description": "Sesion o cuenta creada.",
+            "headers": {
+              "Cache-Control": {
+                "$ref": "#/components/headers/NoStore"
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/InicioConsulta"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/400"
+          },
+          "401": {
+            "$ref": "#/components/responses/401"
+          },
+          "413": {
+            "$ref": "#/components/responses/413"
+          },
+          "415": {
+            "$ref": "#/components/responses/415"
+          },
+          "429": {
+            "$ref": "#/components/responses/429"
+          },
+          "503": {
+            "$ref": "#/components/responses/503"
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "description": "Objeto JSON UTF-8 de hasta 4096 bytes. Rechaza campos adicionales, duplicados y contenido despues del objeto. Los tipos no se convierten implicitamente.",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/IniciarConsultaSolicitud"
+              }
+            }
+          }
+        },
+        "x-max-body-bytes": 4096,
+        "x-java-handler": "pe.nivora.backend.acceso.presentacion.SesionesConsultaController#iniciar"
+      }
+    },
+    "/api/v1/acceso/consulta/sesion": {
+      "get": {
+        "tags": [
+          "Acceso consulta"
+        ],
+        "operationId": "consultarSesionConsulta",
+        "summary": "Consultar la sesion de consulta actual",
+        "description": "Consultar la sesion de consulta actual",
+        "security": [
+          {
+            "sesionConsulta": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Operacion completada.",
+            "headers": {
+              "Cache-Control": {
+                "$ref": "#/components/headers/NoStore"
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SesionConsulta"
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/401"
+          },
+          "403": {
+            "$ref": "#/components/responses/403"
+          },
+          "503": {
+            "$ref": "#/components/responses/503"
+          }
+        },
+        "x-java-handler": "pe.nivora.backend.acceso.presentacion.SesionesConsultaController#actual"
+      },
+      "delete": {
+        "tags": [
+          "Acceso consulta"
+        ],
+        "operationId": "cerrarSesionConsulta",
+        "summary": "Revocar la sesion de consulta",
+        "description": "Requiere una sesion vigente. Tras revocarla, su token deja de autenticar solicitudes; repetir con el mismo token devuelve 401.",
+        "security": [
+          {
+            "sesionConsulta": []
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Operacion completada sin cuerpo.",
+            "headers": {
+              "Cache-Control": {
+                "$ref": "#/components/headers/NoStore"
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/401"
+          },
+          "403": {
+            "$ref": "#/components/responses/403"
+          },
+          "503": {
+            "$ref": "#/components/responses/503"
+          }
+        },
+        "x-java-handler": "pe.nivora.backend.acceso.presentacion.SesionesConsultaController#cerrar"
+      }
+    },
+    "/api/v1/acceso/administradores/sesiones": {
+      "post": {
+        "tags": [
+          "Acceso administrativo"
+        ],
+        "operationId": "iniciarSesionAdministrativa",
+        "summary": "Iniciar una sesion administrativa",
+        "description": "Credenciales de una cuenta administrativa activa. Duraciones predeterminadas configurables: 900 s de inactividad y 28800 s de duracion maxima. Una cuenta con cambio de clave requerido inicia con permisos vacios.",
+        "security": [],
+        "responses": {
+          "201": {
+            "description": "Sesion o cuenta creada.",
+            "headers": {
+              "Cache-Control": {
+                "$ref": "#/components/headers/NoStore"
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/InicioAdministrativo"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/400"
+          },
+          "401": {
+            "$ref": "#/components/responses/401"
+          },
+          "413": {
+            "$ref": "#/components/responses/413"
+          },
+          "415": {
+            "$ref": "#/components/responses/415"
+          },
+          "429": {
+            "$ref": "#/components/responses/429"
+          },
+          "503": {
+            "$ref": "#/components/responses/503"
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "description": "Objeto JSON UTF-8 de hasta 4096 bytes. Rechaza campos adicionales, duplicados y contenido despues del objeto. Los tipos no se convierten implicitamente.",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/IniciarAdministracionSolicitud"
+              }
+            }
+          }
+        },
+        "x-max-body-bytes": 4096,
+        "x-java-handler": "pe.nivora.backend.acceso.presentacion.SesionesAdministrativasController#iniciar"
+      }
+    },
+    "/api/v1/acceso/administradores/sesion": {
+      "get": {
+        "tags": [
+          "Acceso administrativo"
+        ],
+        "operationId": "consultarSesionAdministrativa",
+        "summary": "Consultar la sesion administrativa actual",
+        "description": "Consultar la sesion administrativa actual",
+        "security": [
+          {
+            "sesionAdministrativa": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Operacion completada.",
+            "headers": {
+              "Cache-Control": {
+                "$ref": "#/components/headers/NoStore"
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SesionAdministrativa"
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/401"
+          },
+          "403": {
+            "$ref": "#/components/responses/403"
+          },
+          "503": {
+            "$ref": "#/components/responses/503"
+          }
+        },
+        "x-permisos-requeridos": [
+          "ROLE_ADMIN"
+        ],
+        "x-java-handler": "pe.nivora.backend.acceso.presentacion.SesionesAdministrativasController#actual"
+      },
+      "delete": {
+        "tags": [
+          "Acceso administrativo"
+        ],
+        "operationId": "cerrarSesionAdministrativa",
+        "summary": "Revocar la sesion administrativa",
+        "description": "Requiere token administrativo vigente. Las siguientes solicitudes con ese token devuelven 401.",
+        "security": [
+          {
+            "sesionAdministrativa": []
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Operacion completada sin cuerpo.",
+            "headers": {
+              "Cache-Control": {
+                "$ref": "#/components/headers/NoStore"
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/401"
+          },
+          "403": {
+            "$ref": "#/components/responses/403"
+          },
+          "503": {
+            "$ref": "#/components/responses/503"
+          }
+        },
+        "x-permisos-requeridos": [
+          "ROLE_ADMIN"
+        ],
+        "x-java-handler": "pe.nivora.backend.acceso.presentacion.SesionesAdministrativasController#cerrar"
+      }
+    },
+    "/api/v1/acceso/administradores/sesion/clave": {
+      "put": {
+        "tags": [
+          "Acceso administrativo"
+        ],
+        "operationId": "cambiarClavePropia",
+        "summary": "Cambiar la clave de la cuenta actual",
+        "description": "Disponible aun con cambioClaveRequerido=true. Confirma claveActual, exige una claveNueva distinta y aplica la politica de 15 a 128 puntos de codigo. Si sesionActualRevocada=true, retirar el token y autenticar otra vez.",
+        "security": [
+          {
+            "sesionAdministrativa": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Operacion completada.",
+            "headers": {
+              "Cache-Control": {
+                "$ref": "#/components/headers/NoStore"
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ResultadoGestionCuenta"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/400"
+          },
+          "401": {
+            "$ref": "#/components/responses/401"
+          },
+          "403": {
+            "$ref": "#/components/responses/403"
+          },
+          "409": {
+            "$ref": "#/components/responses/409"
+          },
+          "413": {
+            "$ref": "#/components/responses/413"
+          },
+          "415": {
+            "$ref": "#/components/responses/415"
+          },
+          "429": {
+            "$ref": "#/components/responses/429"
+          },
+          "503": {
+            "$ref": "#/components/responses/503"
+          }
+        },
+        "x-permisos-requeridos": [
+          "ROLE_ADMIN"
+        ],
+        "requestBody": {
+          "required": true,
+          "description": "Objeto JSON UTF-8 de hasta 4096 bytes. Rechaza campos adicionales, duplicados y contenido despues del objeto. Los tipos no se convierten implicitamente.",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CambiarClaveSolicitud"
+              }
+            }
+          }
+        },
+        "x-max-body-bytes": 4096,
+        "x-java-handler": "pe.nivora.backend.acceso.presentacion.SesionesAdministrativasController#cambiarClave"
+      }
+    },
+    "/api/v1/administracion/administradores": {
+      "get": {
+        "tags": [
+          "Cuentas administrativas"
+        ],
+        "operationId": "listarAdministradores",
+        "summary": "Listar cuentas administrativas",
+        "description": "Listar cuentas administrativas",
+        "security": [
+          {
+            "sesionAdministrativa": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Operacion completada.",
+            "headers": {
+              "Cache-Control": {
+                "$ref": "#/components/headers/NoStore"
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PaginaAdministradores"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/400"
+          },
+          "401": {
+            "$ref": "#/components/responses/401"
+          },
+          "403": {
+            "$ref": "#/components/responses/403"
+          },
+          "503": {
+            "$ref": "#/components/responses/503"
+          }
+        },
+        "x-permisos-requeridos": [
+          "GESTIONAR_ADMINISTRADORES"
+        ],
+        "parameters": [
+          {
+            "name": "despuesDe",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "const": ""
+                },
+                {
+                  "$ref": "#/components/schemas/UsuarioAdministrador"
+                }
+              ],
+              "default": ""
+            },
+            "description": "Usuario exclusivo de la pagina anterior; vacio equivale a omitirlo."
+          },
+          {
+            "name": "limite",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "minimum": 1,
+              "maximum": 100,
+              "default": 20
+            }
+          }
+        ],
+        "x-java-handler": "pe.nivora.backend.acceso.presentacion.GestionAdministradoresController#listar"
+      },
+      "post": {
+        "tags": [
+          "Cuentas administrativas"
+        ],
+        "operationId": "crearAdministrador",
+        "summary": "Crear una cuenta administrativa",
+        "description": "Confirma la clave actual del actor. gestionarAdministradores es opcional y vale false si se omite. La cuenta nueva requiere cambiar su clave inicial. Un usuario existente puede producir conflicto.",
+        "security": [
+          {
+            "sesionAdministrativa": []
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "Sesion o cuenta creada.",
+            "headers": {
+              "Cache-Control": {
+                "$ref": "#/components/headers/NoStore"
+              },
+              "Location": {
+                "description": "Ruta de la cuenta creada.",
+                "schema": {
+                  "type": "string",
+                  "format": "uri-reference"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ResultadoGestionCuenta"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/400"
+          },
+          "401": {
+            "$ref": "#/components/responses/401"
+          },
+          "403": {
+            "$ref": "#/components/responses/403"
+          },
+          "409": {
+            "$ref": "#/components/responses/409"
+          },
+          "413": {
+            "$ref": "#/components/responses/413"
+          },
+          "415": {
+            "$ref": "#/components/responses/415"
+          },
+          "429": {
+            "$ref": "#/components/responses/429"
+          },
+          "503": {
+            "$ref": "#/components/responses/503"
+          }
+        },
+        "x-permisos-requeridos": [
+          "GESTIONAR_ADMINISTRADORES"
+        ],
+        "requestBody": {
+          "required": true,
+          "description": "Objeto JSON UTF-8 de hasta 4096 bytes. Rechaza campos adicionales, duplicados y contenido despues del objeto. Los tipos no se convierten implicitamente.",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CrearAdministradorSolicitud"
+              }
+            }
+          }
+        },
+        "x-max-body-bytes": 4096,
+        "x-java-handler": "pe.nivora.backend.acceso.presentacion.GestionAdministradoresController#crear"
+      }
+    },
+    "/api/v1/administracion/administradores/{usuario}": {
+      "get": {
+        "tags": [
+          "Cuentas administrativas"
+        ],
+        "operationId": "consultarAdministrador",
+        "summary": "Consultar una cuenta administrativa",
+        "description": "Consultar una cuenta administrativa",
+        "security": [
+          {
+            "sesionAdministrativa": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Operacion completada.",
+            "headers": {
+              "Cache-Control": {
+                "$ref": "#/components/headers/NoStore"
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CuentaAdministrativa"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/400"
+          },
+          "401": {
+            "$ref": "#/components/responses/401"
+          },
+          "403": {
+            "$ref": "#/components/responses/403"
+          },
+          "404": {
+            "$ref": "#/components/responses/404"
+          },
+          "503": {
+            "$ref": "#/components/responses/503"
+          }
+        },
+        "x-permisos-requeridos": [
+          "GESTIONAR_ADMINISTRADORES"
+        ],
+        "parameters": [
+          {
+            "name": "usuario",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/UsuarioAdministrador"
+            }
+          }
+        ],
+        "x-java-handler": "pe.nivora.backend.acceso.presentacion.GestionAdministradoresController#consultar"
+      }
+    },
+    "/api/v1/administracion/administradores/{usuario}/auditoria": {
+      "get": {
+        "tags": [
+          "Cuentas administrativas"
+        ],
+        "operationId": "consultarAuditoriaAdministrador",
+        "summary": "Consultar eventos de una cuenta",
+        "description": "Consultar eventos de una cuenta",
+        "security": [
+          {
+            "sesionAdministrativa": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Operacion completada.",
+            "headers": {
+              "Cache-Control": {
+                "$ref": "#/components/headers/NoStore"
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PaginaAuditoria"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/400"
+          },
+          "401": {
+            "$ref": "#/components/responses/401"
+          },
+          "403": {
+            "$ref": "#/components/responses/403"
+          },
+          "404": {
+            "$ref": "#/components/responses/404"
+          },
+          "503": {
+            "$ref": "#/components/responses/503"
+          }
+        },
+        "x-permisos-requeridos": [
+          "GESTIONAR_ADMINISTRADORES"
+        ],
+        "parameters": [
+          {
+            "name": "usuario",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/UsuarioAdministrador"
+            }
+          },
+          {
+            "name": "despuesDe",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "pattern": "^(0|[1-9][0-9]{0,18})$",
+              "default": "0"
+            },
+            "description": "ID exclusivo de evento; entero long representado como texto."
+          },
+          {
+            "name": "limite",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "minimum": 1,
+              "maximum": 100,
+              "default": 20
+            }
+          }
+        ],
+        "x-java-handler": "pe.nivora.backend.acceso.presentacion.GestionAdministradoresController#auditoria"
+      }
+    },
+    "/api/v1/administracion/administradores/{usuario}/estado": {
+      "put": {
+        "tags": [
+          "Cuentas administrativas"
+        ],
+        "operationId": "cambiarEstadoAdministrador",
+        "summary": "Activar o desactivar una cuenta",
+        "description": "Confirma claveActual del actor. Conserva al menos un gestor activo sin cambio de clave pendiente. Si la operacion revoca la sesion actual, la respuesta lo indica; los tokens afectados dejan de ser validos.",
+        "security": [
+          {
+            "sesionAdministrativa": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Operacion completada.",
+            "headers": {
+              "Cache-Control": {
+                "$ref": "#/components/headers/NoStore"
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ResultadoGestionCuenta"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/400"
+          },
+          "401": {
+            "$ref": "#/components/responses/401"
+          },
+          "403": {
+            "$ref": "#/components/responses/403"
+          },
+          "404": {
+            "$ref": "#/components/responses/404"
+          },
+          "409": {
+            "$ref": "#/components/responses/409"
+          },
+          "413": {
+            "$ref": "#/components/responses/413"
+          },
+          "415": {
+            "$ref": "#/components/responses/415"
+          },
+          "429": {
+            "$ref": "#/components/responses/429"
+          },
+          "503": {
+            "$ref": "#/components/responses/503"
+          }
+        },
+        "x-permisos-requeridos": [
+          "GESTIONAR_ADMINISTRADORES"
+        ],
+        "parameters": [
+          {
+            "name": "usuario",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/UsuarioAdministrador"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "description": "Objeto JSON UTF-8 de hasta 4096 bytes. Rechaza campos adicionales, duplicados y contenido despues del objeto. Los tipos no se convierten implicitamente.",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CambiarEstadoCuentaSolicitud"
+              }
+            }
+          }
+        },
+        "x-max-body-bytes": 4096,
+        "x-java-handler": "pe.nivora.backend.acceso.presentacion.GestionAdministradoresController#estado"
+      }
+    },
+    "/api/v1/administracion/administradores/{usuario}/permisos": {
+      "put": {
+        "tags": [
+          "Cuentas administrativas"
+        ],
+        "operationId": "cambiarPermisoAdministrador",
+        "summary": "Asignar o retirar gestion de administradores",
+        "description": "Confirma claveActual del actor. Conserva al menos un gestor activo sin cambio de clave pendiente. Si la operacion revoca la sesion actual, la respuesta lo indica; los tokens afectados dejan de ser validos.",
+        "security": [
+          {
+            "sesionAdministrativa": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Operacion completada.",
+            "headers": {
+              "Cache-Control": {
+                "$ref": "#/components/headers/NoStore"
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ResultadoGestionCuenta"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/400"
+          },
+          "401": {
+            "$ref": "#/components/responses/401"
+          },
+          "403": {
+            "$ref": "#/components/responses/403"
+          },
+          "404": {
+            "$ref": "#/components/responses/404"
+          },
+          "409": {
+            "$ref": "#/components/responses/409"
+          },
+          "413": {
+            "$ref": "#/components/responses/413"
+          },
+          "415": {
+            "$ref": "#/components/responses/415"
+          },
+          "429": {
+            "$ref": "#/components/responses/429"
+          },
+          "503": {
+            "$ref": "#/components/responses/503"
+          }
+        },
+        "x-permisos-requeridos": [
+          "GESTIONAR_ADMINISTRADORES"
+        ],
+        "parameters": [
+          {
+            "name": "usuario",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/UsuarioAdministrador"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "description": "Objeto JSON UTF-8 de hasta 4096 bytes. Rechaza campos adicionales, duplicados y contenido despues del objeto. Los tipos no se convierten implicitamente.",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CambiarPermisoCuentaSolicitud"
+              }
+            }
+          }
+        },
+        "x-max-body-bytes": 4096,
+        "x-java-handler": "pe.nivora.backend.acceso.presentacion.GestionAdministradoresController#permiso"
+      }
+    },
+    "/api/v1/administracion/administradores/{usuario}/clave": {
+      "put": {
+        "tags": [
+          "Cuentas administrativas"
+        ],
+        "operationId": "restablecerClaveAdministrador",
+        "summary": "Asignar una clave temporal",
+        "description": "Confirma claveActual del actor. Conserva al menos un gestor activo sin cambio de clave pendiente. Si la operacion revoca la sesion actual, la respuesta lo indica; los tokens afectados dejan de ser validos.",
+        "security": [
+          {
+            "sesionAdministrativa": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Operacion completada.",
+            "headers": {
+              "Cache-Control": {
+                "$ref": "#/components/headers/NoStore"
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ResultadoGestionCuenta"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/400"
+          },
+          "401": {
+            "$ref": "#/components/responses/401"
+          },
+          "403": {
+            "$ref": "#/components/responses/403"
+          },
+          "404": {
+            "$ref": "#/components/responses/404"
+          },
+          "409": {
+            "$ref": "#/components/responses/409"
+          },
+          "413": {
+            "$ref": "#/components/responses/413"
+          },
+          "415": {
+            "$ref": "#/components/responses/415"
+          },
+          "429": {
+            "$ref": "#/components/responses/429"
+          },
+          "503": {
+            "$ref": "#/components/responses/503"
+          }
+        },
+        "x-permisos-requeridos": [
+          "GESTIONAR_ADMINISTRADORES"
+        ],
+        "parameters": [
+          {
+            "name": "usuario",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/UsuarioAdministrador"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "description": "Objeto JSON UTF-8 de hasta 4096 bytes. Rechaza campos adicionales, duplicados y contenido despues del objeto. Los tipos no se convierten implicitamente.",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RestablecerClaveSolicitud"
+              }
+            }
+          }
+        },
+        "x-max-body-bytes": 4096,
+        "x-java-handler": "pe.nivora.backend.acceso.presentacion.GestionAdministradoresController#restablecer"
+      }
+    },
+    "/api/v1/acceso/consulta/consumo-actual": {
+      "get": {
+        "tags": [
+          "Consultas del suministro"
+        ],
+        "operationId": "consultarConsumoActual",
+        "summary": "Consultar consumo del periodo actual",
+        "description": "El suministro se obtiene de la sesion. Devuelve las lecturas almacenadas, su cobertura y el estado de actualizacion, incluso si la fuente externa esta caida. El periodo de analisis utiliza el calendario mensual configurado.",
+        "security": [
+          {
+            "sesionConsulta": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Operacion completada.",
+            "headers": {
+              "Cache-Control": {
+                "$ref": "#/components/headers/NoStore"
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ConsumoActual"
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/401"
+          },
+          "403": {
+            "$ref": "#/components/responses/403"
+          },
+          "404": {
+            "$ref": "#/components/responses/404"
+          },
+          "503": {
+            "$ref": "#/components/responses/503"
+          }
+        },
+        "x-java-handler": "pe.nivora.backend.lecturas.presentacion.ConsumoActualController#actual"
+      }
+    },
+    "/api/v1/acceso/consulta/historial": {
+      "get": {
+        "tags": [
+          "Consultas del suministro"
+        ],
+        "operationId": "consultarHistorialMensual",
+        "summary": "Consultar historial mensual",
+        "description": "Periodos anteriores, ordenados del mas reciente al mas antiguo. Cada periodo conserva su estado de cobertura y los extremos del calendario configurado.",
+        "security": [
+          {
+            "sesionConsulta": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Operacion completada.",
+            "headers": {
+              "Cache-Control": {
+                "$ref": "#/components/headers/NoStore"
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HistorialMensual"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/400"
+          },
+          "401": {
+            "$ref": "#/components/responses/401"
+          },
+          "403": {
+            "$ref": "#/components/responses/403"
+          },
+          "404": {
+            "$ref": "#/components/responses/404"
+          },
+          "503": {
+            "$ref": "#/components/responses/503"
+          }
+        },
+        "parameters": [
+          {
+            "name": "meses",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "minimum": 1,
+              "maximum": 12,
+              "default": 12
+            },
+            "description": "Cantidad de periodos anteriores."
+          },
+          {
+            "name": "hasta",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "$ref": "#/components/schemas/PeriodoMensual"
+            },
+            "description": "Ultimo periodo incluido, anterior al periodo actual; al omitirlo usa el anterior al actual."
+          }
+        ],
+        "x-java-handler": "pe.nivora.backend.lecturas.presentacion.ConsumoActualController#historial"
+      }
+    },
+    "/api/v1/acceso/consulta/estadisticas": {
+      "get": {
+        "tags": [
+          "Consultas del suministro"
+        ],
+        "operationId": "consultarEstadisticasConsumo",
+        "summary": "Consultar comparacion y resumen de consumo",
+        "description": "Incluye comparacion con el periodo anterior, serie mensual y resumen. La diferencia puede ser negativa o null. Los estados de cobertura no se reemplazan por ceros.",
+        "security": [
+          {
+            "sesionConsulta": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Operacion completada.",
+            "headers": {
+              "Cache-Control": {
+                "$ref": "#/components/headers/NoStore"
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EstadisticasConsumo"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/400"
+          },
+          "401": {
+            "$ref": "#/components/responses/401"
+          },
+          "403": {
+            "$ref": "#/components/responses/403"
+          },
+          "404": {
+            "$ref": "#/components/responses/404"
+          },
+          "503": {
+            "$ref": "#/components/responses/503"
+          }
+        },
+        "parameters": [
+          {
+            "name": "meses",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "minimum": 1,
+              "maximum": 12,
+              "default": 12
+            },
+            "description": "Cantidad de periodos anteriores."
+          }
+        ],
+        "x-java-handler": "pe.nivora.backend.lecturas.presentacion.ConsumoActualController#estadisticas"
+      }
+    },
+    "/api/v1/acceso/consulta/costos": {
+      "get": {
+        "tags": [
+          "Consultas del suministro"
+        ],
+        "operationId": "consultarCostosEstimados",
+        "summary": "Consultar costos estimados",
+        "description": "Estimaciones propias en PEN; no son recibos emitidos. Los importes de consulta son cadenas decimales. Conserva fuente y revision de la tarifa seleccionada. Datos incompletos generan estado y valores null.",
+        "security": [
+          {
+            "sesionConsulta": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Operacion completada.",
+            "headers": {
+              "Cache-Control": {
+                "$ref": "#/components/headers/NoStore"
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CostosConsumo"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/400"
+          },
+          "401": {
+            "$ref": "#/components/responses/401"
+          },
+          "403": {
+            "$ref": "#/components/responses/403"
+          },
+          "404": {
+            "$ref": "#/components/responses/404"
+          },
+          "503": {
+            "$ref": "#/components/responses/503"
+          }
+        },
+        "parameters": [
+          {
+            "name": "meses",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "minimum": 1,
+              "maximum": 12,
+              "default": 3
+            },
+            "description": "Cantidad de periodos anteriores."
+          }
+        ],
+        "x-java-handler": "pe.nivora.backend.tarifas.presentacion.CostosConsumoController#consultar"
+      }
+    },
+    "/api/v1/acceso/consulta/proyeccion": {
+      "get": {
+        "tags": [
+          "Consultas del suministro"
+        ],
+        "operationId": "consultarProyeccionMensual",
+        "summary": "Proyectar consumo y costo del periodo actual",
+        "description": "Supone ritmo promedio constante. Requiere cobertura compatible y al menos un dia observado. La proyeccion o su costo pueden ser null segun el estado; calculadoEn es la fecha del calculo.",
+        "security": [
+          {
+            "sesionConsulta": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Operacion completada.",
+            "headers": {
+              "Cache-Control": {
+                "$ref": "#/components/headers/NoStore"
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProyeccionMensual"
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/401"
+          },
+          "403": {
+            "$ref": "#/components/responses/403"
+          },
+          "404": {
+            "$ref": "#/components/responses/404"
+          },
+          "503": {
+            "$ref": "#/components/responses/503"
+          }
+        },
+        "x-java-handler": "pe.nivora.backend.tarifas.presentacion.CostosConsumoController#proyectar"
+      }
+    },
+    "/api/v1/acceso/consulta/recibos": {
+      "get": {
+        "tags": [
+          "Consultas del suministro"
+        ],
+        "operationId": "consultarRecibos",
+        "summary": "Listar recibos emitidos almacenados",
+        "description": "Orden descendente de periodo. El recibo conserva importe y fechas originales. periodoFacturado usa el mes civil; periodoAnalisis usa el calendario configurado. coincideConPeriodoAnalisis expresa si ambas ventanas coinciden.",
+        "security": [
+          {
+            "sesionConsulta": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Operacion completada.",
+            "headers": {
+              "Cache-Control": {
+                "$ref": "#/components/headers/NoStore"
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PaginaRecibos"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/400"
+          },
+          "401": {
+            "$ref": "#/components/responses/401"
+          },
+          "403": {
+            "$ref": "#/components/responses/403"
+          },
+          "503": {
+            "$ref": "#/components/responses/503"
+          }
+        },
+        "parameters": [
+          {
+            "name": "limite",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "minimum": 1,
+              "maximum": 60,
+              "default": 12
+            }
+          },
+          {
+            "name": "antesDe",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "$ref": "#/components/schemas/PeriodoMensual"
+            },
+            "description": "Periodo exclusivo; reutilizar siguienteAntesDe."
+          }
+        ],
+        "x-java-handler": "pe.nivora.backend.recibos.presentacion.RecibosConsultaController#consultar"
+      }
+    },
+    "/api/v1/acceso/consulta/notificaciones": {
+      "get": {
+        "tags": [
+          "Notificaciones"
+        ],
+        "operationId": "consultarNotificaciones",
+        "summary": "Consultar la bandeja del suministro",
+        "description": "Consultar la bandeja del suministro",
+        "security": [
+          {
+            "sesionConsulta": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Operacion completada.",
+            "headers": {
+              "Cache-Control": {
+                "$ref": "#/components/headers/NoStore"
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PaginaNotificaciones"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/400"
+          },
+          "401": {
+            "$ref": "#/components/responses/401"
+          },
+          "403": {
+            "$ref": "#/components/responses/403"
+          },
+          "503": {
+            "$ref": "#/components/responses/503"
+          }
+        },
+        "parameters": [
+          {
+            "name": "limite",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "minimum": 1,
+              "maximum": 60,
+              "default": 20
+            }
+          },
+          {
+            "name": "soloPendientes",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "boolean",
+              "default": false
+            }
+          },
+          {
+            "name": "antesDe",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Cursor exclusivo opaco devuelto por siguienteAntesDe: instante UTC con hasta seis decimales, ~ e ID de notificacion. Codificar como valor de query, no construirlo manualmente."
+          }
+        ],
+        "x-java-handler": "pe.nivora.backend.notificaciones.presentacion.NotificacionesConsultaController#consultar"
+      }
+    },
+    "/api/v1/acceso/consulta/notificaciones/{id}/leida": {
+      "put": {
+        "tags": [
+          "Notificaciones"
+        ],
+        "operationId": "marcarNotificacionLeida",
+        "summary": "Marcar una notificacion como leida",
+        "description": "No requiere cuerpo. Repetir la marca conserva la primera fecha de lectura. Un ID ausente o ajeno al suministro devuelve 404.",
+        "security": [
+          {
+            "sesionConsulta": []
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Operacion completada sin cuerpo.",
+            "headers": {
+              "Cache-Control": {
+                "$ref": "#/components/headers/NoStore"
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/400"
+          },
+          "401": {
+            "$ref": "#/components/responses/401"
+          },
+          "403": {
+            "$ref": "#/components/responses/403"
+          },
+          "404": {
+            "$ref": "#/components/responses/404"
+          },
+          "503": {
+            "$ref": "#/components/responses/503"
+          }
+        },
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/IdNotificacion"
+            }
+          }
+        ],
+        "x-java-handler": "pe.nivora.backend.notificaciones.presentacion.NotificacionesConsultaController#marcarLeida"
+      }
+    },
+    "/api/v1/acceso/consulta/notificaciones/dispositivos/{id}": {
+      "get": {
+        "tags": [
+          "Notificaciones"
+        ],
+        "operationId": "consultarPreferenciaDispositivo",
+        "summary": "Consultar la preferencia del dispositivo",
+        "description": "Consultar la preferencia del dispositivo",
+        "security": [
+          {
+            "sesionConsulta": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Operacion completada.",
+            "headers": {
+              "Cache-Control": {
+                "$ref": "#/components/headers/NoStore"
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PreferenciaDispositivo"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/400"
+          },
+          "401": {
+            "$ref": "#/components/responses/401"
+          },
+          "403": {
+            "$ref": "#/components/responses/403"
+          },
+          "404": {
+            "$ref": "#/components/responses/404"
+          },
+          "503": {
+            "$ref": "#/components/responses/503"
+          }
+        },
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/UuidCanonico"
+            }
+          }
+        ],
+        "x-java-handler": "pe.nivora.backend.notificaciones.presentacion.ConfiguracionNotificacionesController#consultarDispositivo"
+      },
+      "put": {
+        "tags": [
+          "Notificaciones"
+        ],
+        "operationId": "configurarPreferenciaDispositivo",
+        "summary": "Guardar la preferencia del dispositivo",
+        "description": "El UUID identifica al dispositivo dentro del suministro de la sesion. habilitadas=true requiere permiso CONCEDIDO. Esta operacion guarda la preferencia; el navegador solicita su permiso por separado.",
+        "security": [
+          {
+            "sesionConsulta": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Operacion completada.",
+            "headers": {
+              "Cache-Control": {
+                "$ref": "#/components/headers/NoStore"
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PreferenciaDispositivo"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/400"
+          },
+          "401": {
+            "$ref": "#/components/responses/401"
+          },
+          "403": {
+            "$ref": "#/components/responses/403"
+          },
+          "413": {
+            "$ref": "#/components/responses/413"
+          },
+          "415": {
+            "$ref": "#/components/responses/415"
+          },
+          "503": {
+            "$ref": "#/components/responses/503"
+          }
+        },
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/UuidCanonico"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "description": "Objeto JSON UTF-8 de hasta 4096 bytes. Rechaza campos adicionales, duplicados y contenido despues del objeto. Los tipos no se convierten implicitamente.",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ConfigurarDispositivoSolicitud"
+              }
+            }
+          }
+        },
+        "x-max-body-bytes": 4096,
+        "x-java-handler": "pe.nivora.backend.notificaciones.presentacion.ConfiguracionNotificacionesController#configurarDispositivo"
+      }
+    },
+    "/api/v1/acceso/consulta/notificaciones/web-push/clave-publica": {
+      "get": {
+        "tags": [
+          "Notificaciones"
+        ],
+        "operationId": "consultarClavePublicaWebPush",
+        "summary": "Obtener la clave publica VAPID",
+        "description": "Requiere sesion de consulta pese a que la clave sea publica. Devuelve 503 si el emisor Web Push no esta configurado o disponible.",
+        "security": [
+          {
+            "sesionConsulta": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Operacion completada.",
+            "headers": {
+              "Cache-Control": {
+                "$ref": "#/components/headers/NoStore"
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ClavePublicaVapid"
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/401"
+          },
+          "403": {
+            "$ref": "#/components/responses/403"
+          },
+          "503": {
+            "$ref": "#/components/responses/503"
+          }
+        },
+        "x-java-handler": "pe.nivora.backend.notificaciones.presentacion.WebPushController#consultarClave"
+      }
+    },
+    "/api/v1/acceso/consulta/notificaciones/dispositivos/{id}/suscripcion": {
+      "put": {
+        "tags": [
+          "Notificaciones"
+        ],
+        "operationId": "registrarSuscripcionWebPush",
+        "summary": "Registrar una suscripcion Web Push",
+        "description": "Requiere emisor disponible y preferencia habilitada con permiso CONCEDIDO. 409 indica preferencia inactiva o endpoint ya asociado. Usar la suscripcion y claves producidas por PushManager; el servidor valida proveedor, ruta y curva P-256.",
+        "security": [
+          {
+            "sesionConsulta": []
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Operacion completada sin cuerpo.",
+            "headers": {
+              "Cache-Control": {
+                "$ref": "#/components/headers/NoStore"
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/400"
+          },
+          "401": {
+            "$ref": "#/components/responses/401"
+          },
+          "403": {
+            "$ref": "#/components/responses/403"
+          },
+          "409": {
+            "$ref": "#/components/responses/409"
+          },
+          "413": {
+            "$ref": "#/components/responses/413"
+          },
+          "415": {
+            "$ref": "#/components/responses/415"
+          },
+          "503": {
+            "$ref": "#/components/responses/503"
+          }
+        },
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/UuidCanonico"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "description": "Objeto JSON UTF-8 de hasta 4096 bytes. Rechaza campos adicionales, duplicados y contenido despues del objeto. Los tipos no se convierten implicitamente.",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SuscripcionPushSolicitud"
+              }
+            }
+          }
+        },
+        "x-max-body-bytes": 4096,
+        "x-java-handler": "pe.nivora.backend.notificaciones.presentacion.WebPushController#suscribir"
+      },
+      "delete": {
+        "tags": [
+          "Notificaciones"
+        ],
+        "operationId": "retirarSuscripcionWebPush",
+        "summary": "Retirar la suscripcion del dispositivo",
+        "description": "Retira solo la asociacion del suministro y UUID indicados. No necesita cuerpo; devuelve 204 aunque esa asociacion ya este ausente.",
+        "security": [
+          {
+            "sesionConsulta": []
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Operacion completada sin cuerpo.",
+            "headers": {
+              "Cache-Control": {
+                "$ref": "#/components/headers/NoStore"
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/400"
+          },
+          "401": {
+            "$ref": "#/components/responses/401"
+          },
+          "403": {
+            "$ref": "#/components/responses/403"
+          },
+          "503": {
+            "$ref": "#/components/responses/503"
+          }
+        },
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/UuidCanonico"
+            }
+          }
+        ],
+        "x-java-handler": "pe.nivora.backend.notificaciones.presentacion.WebPushController#eliminar"
+      }
+    },
+    "/api/v1/administracion/suministros": {
+      "get": {
+        "tags": [
+          "Registros de acceso"
+        ],
+        "operationId": "listarSuministrosRegistrados",
+        "summary": "Listar suministros verificados guardados",
+        "description": "Consulta el almacenamiento propio de Nivora; no importa todo el padron de la empresa.",
+        "security": [
+          {
+            "sesionAdministrativa": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Operacion completada.",
+            "headers": {
+              "Cache-Control": {
+                "$ref": "#/components/headers/NoStore"
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PaginaSuministros"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/400"
+          },
+          "401": {
+            "$ref": "#/components/responses/401"
+          },
+          "403": {
+            "$ref": "#/components/responses/403"
+          },
+          "503": {
+            "$ref": "#/components/responses/503"
+          }
+        },
+        "x-permisos-requeridos": [
+          "CONSULTAR_ACCESOS"
+        ],
+        "parameters": [
+          {
+            "name": "despuesDe",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "$ref": "#/components/schemas/CodigoSuministro"
+            },
+            "description": "Codigo exclusivo de la pagina anterior; seguir siguienteDespuesDe."
+          },
+          {
+            "name": "limite",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "minimum": 1,
+              "maximum": 100,
+              "default": 20
+            }
+          }
+        ],
+        "x-java-handler": "pe.nivora.backend.acceso.presentacion.RegistrosAccesoController#suministros"
+      }
+    },
+    "/api/v1/administracion/suministros/{codigo}/accesos": {
+      "get": {
+        "tags": [
+          "Registros de acceso"
+        ],
+        "operationId": "consultarAccesosSuministro",
+        "summary": "Listar sesiones de consulta de un suministro",
+        "description": "Devuelve fechas y DNI enmascarado; no devuelve tokens ni el DNI completo.",
+        "security": [
+          {
+            "sesionAdministrativa": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Operacion completada.",
+            "headers": {
+              "Cache-Control": {
+                "$ref": "#/components/headers/NoStore"
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PaginaAccesos"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/400"
+          },
+          "401": {
+            "$ref": "#/components/responses/401"
+          },
+          "403": {
+            "$ref": "#/components/responses/403"
+          },
+          "404": {
+            "$ref": "#/components/responses/404"
+          },
+          "503": {
+            "$ref": "#/components/responses/503"
+          }
+        },
+        "x-permisos-requeridos": [
+          "CONSULTAR_ACCESOS"
+        ],
+        "parameters": [
+          {
+            "name": "codigo",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/CodigoSuministro"
+            }
+          },
+          {
+            "name": "antesDe",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Cursor exclusivo siguienteAntesDe: instante UTC con hasta seis decimales, ~ y UUID canonico de sesion."
+          },
+          {
+            "name": "limite",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "minimum": 1,
+              "maximum": 100,
+              "default": 20
+            }
+          }
+        ],
+        "x-java-handler": "pe.nivora.backend.acceso.presentacion.RegistrosAccesoController#accesos"
+      }
+    },
+    "/api/v1/administracion/suministros/{codigo}/tarifas": {
+      "get": {
+        "tags": [
+          "Tarifas"
+        ],
+        "operationId": "consultarTarifasSuministro",
+        "summary": "Consultar historial importado y publicacion administrativa",
+        "description": "revisionAdministrativa vale 0 cuando no hay publicacion administrativa; importada o publicada pueden ser null.",
+        "security": [
+          {
+            "sesionAdministrativa": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Operacion completada.",
+            "headers": {
+              "Cache-Control": {
+                "$ref": "#/components/headers/NoStore"
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/VistaTarifaria"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/400"
+          },
+          "401": {
+            "$ref": "#/components/responses/401"
+          },
+          "403": {
+            "$ref": "#/components/responses/403"
+          },
+          "404": {
+            "$ref": "#/components/responses/404"
+          },
+          "503": {
+            "$ref": "#/components/responses/503"
+          }
+        },
+        "x-permisos-requeridos": [
+          "GESTIONAR_TARIFAS"
+        ],
+        "parameters": [
+          {
+            "name": "codigo",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/CodigoSuministro"
+            }
+          }
+        ],
+        "x-java-handler": "pe.nivora.backend.tarifas.presentacion.GestionTarifasController#consultar"
+      },
+      "put": {
+        "tags": [
+          "Tarifas"
+        ],
+        "operationId": "publicarTarifaSuministro",
+        "summary": "Publicar una nueva asignacion tarifaria",
+        "description": "Consultar primero revisionAdministrativa y enviarla como revisionEsperada. Publica un historial versionado sin alterar recibos emitidos. Una revision obsoleta o vigencia en conflicto devuelve 409. Los importes de este contrato administrativo son numeros JSON, no las cadenas de los costos estimados.",
+        "security": [
+          {
+            "sesionAdministrativa": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Operacion completada.",
+            "headers": {
+              "Cache-Control": {
+                "$ref": "#/components/headers/NoStore"
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PublicacionTarifaria"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/400"
+          },
+          "401": {
+            "$ref": "#/components/responses/401"
+          },
+          "403": {
+            "$ref": "#/components/responses/403"
+          },
+          "404": {
+            "$ref": "#/components/responses/404"
+          },
+          "409": {
+            "$ref": "#/components/responses/409"
+          },
+          "413": {
+            "$ref": "#/components/responses/413"
+          },
+          "415": {
+            "$ref": "#/components/responses/415"
+          },
+          "503": {
+            "$ref": "#/components/responses/503"
+          }
+        },
+        "x-permisos-requeridos": [
+          "GESTIONAR_TARIFAS"
+        ],
+        "parameters": [
+          {
+            "name": "codigo",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/CodigoSuministro"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "description": "Objeto JSON UTF-8 de hasta 4096 bytes. Rechaza campos adicionales, duplicados y contenido despues del objeto. Los tipos no se convierten implicitamente.",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PublicarTarifaSolicitud"
+              }
+            }
+          }
+        },
+        "x-max-body-bytes": 4096,
+        "x-java-handler": "pe.nivora.backend.tarifas.presentacion.GestionTarifasController#publicar"
+      }
+    },
+    "/api/v1/administracion/suministros/{codigo}/tarifas/revisiones/{revision}": {
+      "get": {
+        "tags": [
+          "Tarifas"
+        ],
+        "operationId": "consultarRevisionTarifaria",
+        "summary": "Consultar una revision administrativa",
+        "description": "Consultar una revision administrativa",
+        "security": [
+          {
+            "sesionAdministrativa": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Operacion completada.",
+            "headers": {
+              "Cache-Control": {
+                "$ref": "#/components/headers/NoStore"
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PublicacionTarifaria"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/400"
+          },
+          "401": {
+            "$ref": "#/components/responses/401"
+          },
+          "403": {
+            "$ref": "#/components/responses/403"
+          },
+          "404": {
+            "$ref": "#/components/responses/404"
+          },
+          "503": {
+            "$ref": "#/components/responses/503"
+          }
+        },
+        "x-permisos-requeridos": [
+          "GESTIONAR_TARIFAS"
+        ],
+        "parameters": [
+          {
+            "name": "codigo",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/CodigoSuministro"
+            }
+          },
+          {
+            "name": "revision",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "pattern": "^(?!0+$)[0-9]{1,19}$"
+            },
+            "description": "Revision positiva dentro del rango long."
+          }
+        ],
+        "x-java-handler": "pe.nivora.backend.tarifas.presentacion.GestionTarifasController#consultar"
+      }
+    },
+    "/api/v1/administracion/periodos-mensuales": {
+      "get": {
+        "tags": [
+          "Periodos mensuales"
+        ],
+        "operationId": "consultarCalendarioMensual",
+        "summary": "Consultar calendario de analisis y revision",
+        "description": "Devuelve la revision actual, el periodo de analisis vigente y las reglas publicadas. Los recibos emitidos conservan su mes civil.",
+        "security": [
+          {
+            "sesionAdministrativa": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Operacion completada.",
+            "headers": {
+              "Cache-Control": {
+                "$ref": "#/components/headers/NoStore"
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CalendarioMensual"
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/401"
+          },
+          "403": {
+            "$ref": "#/components/responses/403"
+          },
+          "503": {
+            "$ref": "#/components/responses/503"
+          }
+        },
+        "x-permisos-requeridos": [
+          "GESTIONAR_PERIODOS"
+        ],
+        "x-java-handler": "pe.nivora.backend.periodos.presentacion.PeriodosMensualesController#consultar"
+      },
+      "put": {
+        "tags": [
+          "Periodos mensuales"
+        ],
+        "operationId": "publicarReglaMensual",
+        "summary": "Publicar una regla para periodos futuros",
+        "description": "Consultar primero revision y enviarla como revisionEsperada. La regla comienza en un mes civil futuro; los dias que no existen se ajustan al ultimo del mes. Una revision obsoleta devuelve 409.",
+        "security": [
+          {
+            "sesionAdministrativa": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Operacion completada.",
+            "headers": {
+              "Cache-Control": {
+                "$ref": "#/components/headers/NoStore"
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ReglaMensual"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/400"
+          },
+          "401": {
+            "$ref": "#/components/responses/401"
+          },
+          "403": {
+            "$ref": "#/components/responses/403"
+          },
+          "409": {
+            "$ref": "#/components/responses/409"
+          },
+          "413": {
+            "$ref": "#/components/responses/413"
+          },
+          "415": {
+            "$ref": "#/components/responses/415"
+          },
+          "503": {
+            "$ref": "#/components/responses/503"
+          }
+        },
+        "x-permisos-requeridos": [
+          "GESTIONAR_PERIODOS"
+        ],
+        "requestBody": {
+          "required": true,
+          "description": "Objeto JSON UTF-8 de hasta 4096 bytes. Rechaza campos adicionales, duplicados y contenido despues del objeto. Los tipos no se convierten implicitamente.",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PublicarPeriodoSolicitud"
+              }
+            }
+          }
+        },
+        "x-max-body-bytes": 4096,
+        "x-java-handler": "pe.nivora.backend.periodos.presentacion.PeriodosMensualesController#publicar"
+      }
+    },
+    "/api/v1/administracion/notificaciones/alertas-consumo": {
+      "get": {
+        "tags": [
+          "Control de alertas"
+        ],
+        "operationId": "consultarControlAlertas",
+        "summary": "Consultar la habilitacion de alertas de consumo",
+        "description": "efectiva combina habilitada guardada y la habilitacion del servidor. Antes de la primera escritura, actualizadaPor y actualizadaEn son null.",
+        "security": [
+          {
+            "sesionAdministrativa": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Operacion completada.",
+            "headers": {
+              "Cache-Control": {
+                "$ref": "#/components/headers/NoStore"
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ControlAlertas"
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/401"
+          },
+          "403": {
+            "$ref": "#/components/responses/403"
+          },
+          "503": {
+            "$ref": "#/components/responses/503"
+          }
+        },
+        "x-permisos-requeridos": [
+          "GESTIONAR_ALERTAS"
+        ],
+        "x-java-handler": "pe.nivora.backend.notificaciones.presentacion.ConfiguracionNotificacionesController#consultarAlertas"
+      },
+      "put": {
+        "tags": [
+          "Control de alertas"
+        ],
+        "operationId": "configurarControlAlertas",
+        "summary": "Pausar o reactivar evaluaciones de consumo",
+        "description": "El actor se obtiene de la sesion. Cambia la evaluacion futura; las alertas ya almacenadas no se borran.",
+        "security": [
+          {
+            "sesionAdministrativa": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Operacion completada.",
+            "headers": {
+              "Cache-Control": {
+                "$ref": "#/components/headers/NoStore"
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ControlAlertas"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/400"
+          },
+          "401": {
+            "$ref": "#/components/responses/401"
+          },
+          "403": {
+            "$ref": "#/components/responses/403"
+          },
+          "413": {
+            "$ref": "#/components/responses/413"
+          },
+          "415": {
+            "$ref": "#/components/responses/415"
+          },
+          "503": {
+            "$ref": "#/components/responses/503"
+          }
+        },
+        "x-permisos-requeridos": [
+          "GESTIONAR_ALERTAS"
+        ],
+        "requestBody": {
+          "required": true,
+          "description": "Objeto JSON UTF-8 de hasta 4096 bytes. Rechaza campos adicionales, duplicados y contenido despues del objeto. Los tipos no se convierten implicitamente.",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ConfigurarAlertasSolicitud"
+              }
+            }
+          }
+        },
+        "x-max-body-bytes": 4096,
+        "x-java-handler": "pe.nivora.backend.notificaciones.presentacion.ConfiguracionNotificacionesController#configurarAlertas"
+      }
+    },
+    "/api/v1/supervision/suministros/{codigo}/lecturas": {
+      "get": {
+        "tags": [
+          "Supervision"
+        ],
+        "operationId": "supervisarLecturas",
+        "summary": "Consultar estado de lecturas y programacion",
+        "description": "Instantanea del almacenamiento local. recuperacion y programacion pueden ser null si aun no se crearon. No inicia recuperaciones ni realiza llamadas a la fuente.",
+        "security": [
+          {
+            "sesionAdministrativa": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Operacion completada.",
+            "headers": {
+              "Cache-Control": {
+                "$ref": "#/components/headers/NoStore"
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SupervisionLecturas"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/400"
+          },
+          "401": {
+            "$ref": "#/components/responses/401"
+          },
+          "403": {
+            "$ref": "#/components/responses/403"
+          },
+          "404": {
+            "$ref": "#/components/responses/404"
+          },
+          "503": {
+            "$ref": "#/components/responses/503"
+          }
+        },
+        "x-permisos-requeridos": [
+          "SUPERVISAR_INTEGRACION"
+        ],
+        "parameters": [
+          {
+            "name": "codigo",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/CodigoSuministro"
+            }
+          }
+        ],
+        "x-java-handler": "pe.nivora.backend.lecturas.presentacion.SupervisionLecturasController#consultar"
+      }
+    },
+    "/api/v1/supervision/suministros/{codigo}/recibos": {
+      "get": {
+        "tags": [
+          "Supervision"
+        ],
+        "operationId": "supervisarRecibos",
+        "summary": "Consultar estado de recibos y programacion",
+        "description": "Consultar estado de recibos y programacion",
+        "security": [
+          {
+            "sesionAdministrativa": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Operacion completada.",
+            "headers": {
+              "Cache-Control": {
+                "$ref": "#/components/headers/NoStore"
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SupervisionRecibos"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/400"
+          },
+          "401": {
+            "$ref": "#/components/responses/401"
+          },
+          "403": {
+            "$ref": "#/components/responses/403"
+          },
+          "404": {
+            "$ref": "#/components/responses/404"
+          },
+          "503": {
+            "$ref": "#/components/responses/503"
+          }
+        },
+        "x-permisos-requeridos": [
+          "SUPERVISAR_INTEGRACION"
+        ],
+        "parameters": [
+          {
+            "name": "codigo",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/CodigoSuministro"
+            }
+          }
+        ],
+        "x-java-handler": "pe.nivora.backend.recibos.presentacion.SupervisionRecibosController#consultar"
+      }
+    },
+    "/api/v1/supervision/suministros/{codigo}/incidencias": {
+      "get": {
+        "tags": [
+          "Supervision"
+        ],
+        "operationId": "consultarIncidenciasIntegracion",
+        "summary": "Listar incidencias de un suministro",
+        "description": "Listar incidencias de un suministro",
+        "security": [
+          {
+            "sesionAdministrativa": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Operacion completada.",
+            "headers": {
+              "Cache-Control": {
+                "$ref": "#/components/headers/NoStore"
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PaginaIncidencias"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/400"
+          },
+          "401": {
+            "$ref": "#/components/responses/401"
+          },
+          "403": {
+            "$ref": "#/components/responses/403"
+          },
+          "404": {
+            "$ref": "#/components/responses/404"
+          },
+          "503": {
+            "$ref": "#/components/responses/503"
+          }
+        },
+        "x-permisos-requeridos": [
+          "SUPERVISAR_INTEGRACION"
+        ],
+        "parameters": [
+          {
+            "name": "codigo",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/CodigoSuministro"
+            }
+          },
+          {
+            "name": "antesDe",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Cursor exclusivo siguienteAntesDe: instante UTC, origen, referencia y fuente separados por ~; reutilizarlo y codificarlo como query."
+          },
+          {
+            "name": "limite",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "minimum": 1,
+              "maximum": 100,
+              "default": 20
+            }
+          }
+        ],
+        "x-java-handler": "pe.nivora.backend.integracion.presentacion.IncidenciasIntegracionController#incidencias"
+      }
+    },
+    "/api/v1/supervision/suministros/{codigo}/{recurso}/reintentos": {
+      "post": {
+        "tags": [
+          "Supervision"
+        ],
+        "operationId": "programarReintentoIntegracion",
+        "summary": "Programar un reintento de lecturas o recibos",
+        "description": "No requiere cuerpo. 202 confirma que se programo el intento, no que la sincronizacion termino. Una reserva vigente o un recorrido de lecturas bloqueado devuelve 409. No resuelve incidencias ni reinicia recorridos bloqueados.",
+        "security": [
+          {
+            "sesionAdministrativa": []
+          }
+        ],
+        "responses": {
+          "202": {
+            "description": "Reintento programado; la sincronizacion se ejecutara posteriormente.",
+            "headers": {
+              "Cache-Control": {
+                "$ref": "#/components/headers/NoStore"
+              },
+              "Location": {
+                "description": "Ruta GET de supervision del proceso correspondiente.",
+                "schema": {
+                  "type": "string",
+                  "format": "uri-reference"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ReintentoProgramado"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/400"
+          },
+          "401": {
+            "$ref": "#/components/responses/401"
+          },
+          "403": {
+            "$ref": "#/components/responses/403"
+          },
+          "404": {
+            "$ref": "#/components/responses/404"
+          },
+          "409": {
+            "$ref": "#/components/responses/409"
+          },
+          "503": {
+            "$ref": "#/components/responses/503"
+          }
+        },
+        "x-permisos-requeridos": [
+          "REINTENTAR_INTEGRACION"
+        ],
+        "parameters": [
+          {
+            "name": "codigo",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/CodigoSuministro"
+            }
+          },
+          {
+            "name": "recurso",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "enum": [
+                "lecturas",
+                "recibos"
+              ]
+            }
+          }
+        ],
+        "x-java-handler": "pe.nivora.backend.integracion.presentacion.ReintentosIntegracionController#reintentar"
+      }
+    },
+    "/actuator/health": {
+      "get": {
+        "tags": [
+          "Salud"
+        ],
+        "operationId": "consultarSalud",
+        "summary": "Consultar salud de la aplicacion",
+        "description": "Endpoint de Actuator publico. No forma parte de las 40 operaciones de negocio. Sus componentes dependen de la configuracion y no contiene credenciales.",
+        "security": [],
+        "responses": {
+          "200": {
+            "description": "Salud disponible.",
+            "content": {
+              "application/vnd.spring-boot.actuator.v3+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Salud"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Salud"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Componente no disponible o fuera de servicio.",
+            "content": {
+              "application/vnd.spring-boot.actuator.v3+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Salud"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Salud"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "securitySchemes": {
+      "sesionConsulta": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "Token opaco nc_ + 43 caracteres base64url",
+        "description": "Obtener mediante POST /api/v1/acceso/consulta/sesiones. No admite el token administrativo."
+      },
+      "sesionAdministrativa": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "Token opaco de 43 caracteres base64url",
+        "description": "Obtener mediante POST /api/v1/acceso/administradores/sesiones. La sesion debe conservar el permiso indicado. No admite el token de consulta."
+      }
+    },
+    "headers": {
+      "NoStore": {
+        "description": "Evita almacenar respuestas de esta API.",
+        "schema": {
+          "type": "string",
+          "const": "no-store"
+        }
+      }
+    },
+    "responses": {
+      "400": {
+        "description": "Parametros, campos, tipos o reglas de negocio invalidos.",
+        "headers": {
+          "Cache-Control": {
+            "$ref": "#/components/headers/NoStore"
+          }
+        },
+        "content": {
+          "application/problem+json": {
+            "schema": {
+              "$ref": "#/components/schemas/Problema"
+            }
+          }
+        }
+      },
+      "401": {
+        "description": "Sesion ausente, invalida, vencida o revocada; en el acceso, credenciales no validas.",
+        "headers": {
+          "Cache-Control": {
+            "$ref": "#/components/headers/NoStore"
+          },
+          "WWW-Authenticate": {
+            "schema": {
+              "type": "string",
+              "const": "Bearer"
+            }
+          }
+        },
+        "content": {
+          "application/problem+json": {
+            "schema": {
+              "$ref": "#/components/schemas/Problema"
+            }
+          }
+        }
+      },
+      "403": {
+        "description": "La sesion carece de los permisos requeridos.",
+        "headers": {
+          "Cache-Control": {
+            "$ref": "#/components/headers/NoStore"
+          }
+        },
+        "content": {
+          "application/problem+json": {
+            "schema": {
+              "$ref": "#/components/schemas/Problema"
+            }
+          }
+        }
+      },
+      "404": {
+        "description": "Recurso o suministro no encontrado dentro del alcance de esta operacion.",
+        "headers": {
+          "Cache-Control": {
+            "$ref": "#/components/headers/NoStore"
+          }
+        },
+        "content": {
+          "application/problem+json": {
+            "schema": {
+              "$ref": "#/components/schemas/Problema"
+            }
+          }
+        }
+      },
+      "409": {
+        "description": "Conflicto de revision, vigencia, ultima cuenta gestora, reserva o asociacion existente.",
+        "headers": {
+          "Cache-Control": {
+            "$ref": "#/components/headers/NoStore"
+          }
+        },
+        "content": {
+          "application/problem+json": {
+            "schema": {
+              "$ref": "#/components/schemas/Problema"
+            }
+          }
+        }
+      },
+      "413": {
+        "description": "El objeto JSON completo supera los 4096 bytes.",
+        "headers": {
+          "Cache-Control": {
+            "$ref": "#/components/headers/NoStore"
+          }
+        },
+        "content": {
+          "application/problem+json": {
+            "schema": {
+              "$ref": "#/components/schemas/Problema"
+            }
+          }
+        }
+      },
+      "415": {
+        "description": "Se requiere application/json y, si se declara charset, UTF-8.",
+        "headers": {
+          "Cache-Control": {
+            "$ref": "#/components/headers/NoStore"
+          }
+        },
+        "content": {
+          "application/problem+json": {
+            "schema": {
+              "$ref": "#/components/schemas/Problema"
+            }
+          }
+        }
+      },
+      "429": {
+        "description": "Limite de intentos alcanzado; esperar Retry-After segundos.",
+        "headers": {
+          "Cache-Control": {
+            "$ref": "#/components/headers/NoStore"
+          },
+          "Retry-After": {
+            "description": "Segundos que se deben esperar antes de reintentar.",
+            "schema": {
+              "type": "string",
+              "pattern": "^[1-9][0-9]*$"
+            }
+          }
+        },
+        "content": {
+          "application/problem+json": {
+            "schema": {
+              "$ref": "#/components/schemas/Problema"
+            }
+          }
+        }
+      },
+      "503": {
+        "description": "Almacenamiento, calendario, proveedor o servicio necesario no disponible.",
+        "headers": {
+          "Cache-Control": {
+            "$ref": "#/components/headers/NoStore"
+          }
+        },
+        "content": {
+          "application/problem+json": {
+            "schema": {
+              "$ref": "#/components/schemas/Problema"
+            }
+          }
+        }
+      }
+    },
+    "schemas": {
+      "CodigoSuministro": {
+        "type": "string",
+        "pattern": "^[0-9]{1,20}$",
+        "description": "Conservar como texto, incluidos los ceros iniciales.",
+        "examples": [
+          "90000001"
+        ]
+      },
+      "Dni": {
+        "type": "string",
+        "pattern": "^[0-9]{8}$",
+        "writeOnly": true,
+        "description": "DNI de ocho digitos. El valor de ejemplo es ficticio.",
+        "examples": [
+          "00000001"
+        ]
+      },
+      "PeriodoMensual": {
+        "type": "string",
+        "pattern": "^[1-9][0-9]{3}-(0[1-9]|1[0-2])$",
+        "examples": [
+          "2026-10"
+        ]
+      },
+      "DecimalTexto": {
+        "type": "string",
+        "pattern": "^-?[0-9]+(?:\\.[0-9]+)?$",
+        "description": "Decimal exacto serializado como texto; conservar su precision.",
+        "examples": [
+          "13.46"
+        ]
+      },
+      "RevisionTexto": {
+        "type": "string",
+        "pattern": "^[0-9]{1,19}$",
+        "description": "Revision no negativa dentro del rango long; se envia como cadena. El servidor rechaza valores mayores que 9223372036854775807.",
+        "examples": [
+          "0"
+        ]
+      },
+      "UsuarioAdministrador": {
+        "type": "string",
+        "pattern": "^[A-Za-z][A-Za-z0-9._-]{2,49}$",
+        "description": "Se normaliza a minusculas.",
+        "examples": [
+          "admin.ejemplo"
+        ]
+      },
+      "UuidCanonico": {
+        "type": "string",
+        "format": "uuid",
+        "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$",
+        "examples": [
+          "00000000-0000-4000-8000-000000000001"
+        ]
+      },
+      "EstadoConsumo": {
+        "type": "string",
+        "enum": [
+          "SIN_DATOS",
+          "PARCIAL",
+          "COMPLETO",
+          "INCOMPATIBLE"
+        ],
+        "x-java-enum": "pe.nivora.backend.lecturas.dominio.ConsumoPeriodo$Estado"
+      },
+      "MotivoConsumo": {
+        "type": "string",
+        "enum": [
+          "LECTURAS_INSUFICIENTES",
+          "FALTA_LECTURA_INICIAL",
+          "FALTA_LECTURA_FINAL",
+          "CAMBIO_DE_MEDIDOR",
+          "RETROCESO_DEL_CONTADOR"
+        ],
+        "x-java-enum": "pe.nivora.backend.lecturas.dominio.ConsumoPeriodo$Motivo"
+      },
+      "EstadoActualizacion": {
+        "type": "string",
+        "enum": [
+          "SIN_LECTURAS",
+          "PENDIENTE",
+          "CORTE_CONFIRMADO",
+          "CON_INCIDENCIAS"
+        ],
+        "x-java-enum": "pe.nivora.backend.lecturas.aplicacion.ConsultarConsumoActual$EstadoActualizacion"
+      },
+      "EstadoCosto": {
+        "type": "string",
+        "enum": [
+          "SIN_CONSUMO_CALCULABLE",
+          "SIN_TARIFA_COMPATIBLE",
+          "CONCEPTOS_INCOMPLETOS",
+          "ESTIMADO"
+        ],
+        "x-java-enum": "pe.nivora.backend.tarifas.aplicacion.ConsultarCostosConsumo$Estado"
+      },
+      "EstadoProyeccion": {
+        "type": "string",
+        "enum": [
+          "PROYECTADO",
+          "SIN_CONSUMO_CALCULABLE",
+          "COBERTURA_INCOMPLETA",
+          "TIEMPO_INSUFICIENTE",
+          "PERIODO_CERRADO"
+        ],
+        "x-java-enum": "pe.nivora.backend.tarifas.dominio.ProyeccionMensual$Estado"
+      },
+      "TipoNotificacion": {
+        "type": "string",
+        "enum": [
+          "ALERTA_CONSUMO",
+          "RECIBO_DISPONIBLE"
+        ],
+        "x-java-enum": "pe.nivora.backend.notificaciones.dominio.Notificacion$Tipo"
+      },
+      "PermisoNavegador": {
+        "type": "string",
+        "enum": [
+          "CONCEDIDO",
+          "DENEGADO",
+          "PENDIENTE"
+        ],
+        "x-java-enum": "pe.nivora.backend.notificaciones.dominio.RepositorioConfiguracionNotificaciones$Permiso"
+      },
+      "PermisoAdministrativo": {
+        "type": "string",
+        "enum": [
+          "SUPERVISAR_INTEGRACION",
+          "GESTIONAR_ADMINISTRADORES",
+          "GESTIONAR_TARIFAS",
+          "GESTIONAR_ALERTAS",
+          "CONSULTAR_ACCESOS",
+          "REINTENTAR_INTEGRACION",
+          "GESTIONAR_PERIODOS"
+        ]
+      },
+      "EstadoRecuperacion": {
+        "type": "string",
+        "enum": [
+          "PENDIENTE",
+          "EN_CURSO",
+          "RECORRIDO_COMPLETO",
+          "ERROR_FUENTE",
+          "SUMINISTRO_NO_ENCONTRADO",
+          "BLOQUEADO"
+        ],
+        "x-java-enum": "pe.nivora.backend.lecturas.dominio.EstadoRecuperacion"
+      },
+      "EstadoSincronizacionLecturas": {
+        "type": "string",
+        "enum": [
+          "RECORRIDO_COMPLETO",
+          "EN_CURSO",
+          "ERROR_FUENTE",
+          "SUMINISTRO_NO_ENCONTRADO",
+          "BLOQUEADO",
+          "CONFLICTO",
+          "ERROR_ALMACENAMIENTO",
+          "ERROR_INTERNO"
+        ],
+        "x-java-enum": "pe.nivora.backend.lecturas.dominio.EstadoSincronizacion"
+      },
+      "EstadoSincronizacionRecibos": {
+        "type": "string",
+        "enum": [
+          "ACTUALIZADO",
+          "ERROR_FUENTE",
+          "SUMINISTRO_NO_ENCONTRADO",
+          "CONFLICTO",
+          "ERROR_ALMACENAMIENTO",
+          "ERROR_INTERNO"
+        ],
+        "x-java-enum": "pe.nivora.backend.recibos.dominio.RepositorioSincronizacionRecibos$Estado"
+      },
+      "OrigenIncidencia": {
+        "type": "string",
+        "enum": [
+          "RECHAZO_LECTURA",
+          "RECUPERACION_LECTURAS",
+          "SINCRONIZACION_RECIBOS"
+        ],
+        "x-java-enum": "pe.nivora.backend.integracion.dominio.IncidenciaIntegracion$Origen"
+      },
+      "EstadoIncidencia": {
+        "type": "string",
+        "enum": [
+          "POR_REVISAR",
+          "ABIERTA",
+          "RESUELTA"
+        ],
+        "x-java-enum": "pe.nivora.backend.integracion.dominio.IncidenciaIntegracion$Estado"
+      },
+      "ProcesoIntegracion": {
+        "type": "string",
+        "enum": [
+          "LECTURAS",
+          "RECIBOS"
+        ],
+        "x-java-enum": "pe.nivora.backend.integracion.dominio.RepositorioReintentosIntegracion$Proceso"
+      },
+      "EstadoReintento": {
+        "type": "string",
+        "enum": [
+          "PROGRAMADO",
+          "EN_CURSO",
+          "BLOQUEADO",
+          "SUMINISTRO_NO_REGISTRADO"
+        ],
+        "x-java-enum": "pe.nivora.backend.integracion.dominio.RepositorioReintentosIntegracion$Estado"
+      },
+      "SesionConsulta": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "idSesion",
+          "codigoSuministro",
+          "nombre",
+          "rol",
+          "creadaEn",
+          "expiraEn"
+        ],
+        "properties": {
+          "idSesion": {
+            "type": "string"
+          },
+          "codigoSuministro": {
+            "$ref": "#/components/schemas/CodigoSuministro"
+          },
+          "nombre": {
+            "type": "string"
+          },
+          "rol": {
+            "type": "string",
+            "const": "CONSULTA"
+          },
+          "creadaEn": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Instante UTC, serializado con sufijo Z."
+          },
+          "expiraEn": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Instante UTC, serializado con sufijo Z."
+          }
+        },
+        "x-java-types": [
+          "pe.nivora.backend.acceso.presentacion.SesionesConsultaController$DatosSesion"
+        ]
+      },
+      "InicioConsulta": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "tipoToken",
+          "token",
+          "sesion"
+        ],
+        "properties": {
+          "tipoToken": {
+            "type": "string",
+            "const": "Bearer"
+          },
+          "token": {
+            "type": "string",
+            "pattern": "^nc_[A-Za-z0-9_-]{43}$",
+            "readOnly": true,
+            "description": "Token opaco de consulta, no JWT. Conservar solo durante la sesion."
+          },
+          "sesion": {
+            "$ref": "#/components/schemas/SesionConsulta"
+          }
+        },
+        "x-java-types": [
+          "pe.nivora.backend.acceso.presentacion.SesionesConsultaController$InicioRespuesta"
+        ]
+      },
+      "SesionAdministrativa": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "idSesion",
+          "usuario",
+          "nombre",
+          "rol",
+          "permisos",
+          "cambioClaveRequerido",
+          "creadaEn",
+          "ultimaActividad",
+          "expiraEn",
+          "inactivaHasta"
+        ],
+        "properties": {
+          "idSesion": {
+            "type": "string"
+          },
+          "usuario": {
+            "$ref": "#/components/schemas/UsuarioAdministrador"
+          },
+          "nombre": {
+            "type": "string"
+          },
+          "rol": {
+            "type": "string",
+            "const": "ADMIN"
+          },
+          "permisos": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/PermisoAdministrativo"
+            },
+            "uniqueItems": true
+          },
+          "cambioClaveRequerido": {
+            "type": "boolean"
+          },
+          "creadaEn": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Instante UTC, serializado con sufijo Z."
+          },
+          "ultimaActividad": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Instante UTC, serializado con sufijo Z."
+          },
+          "expiraEn": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Instante UTC, serializado con sufijo Z."
+          },
+          "inactivaHasta": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Instante UTC, serializado con sufijo Z."
+          }
+        },
+        "x-java-types": [
+          "pe.nivora.backend.acceso.presentacion.SesionesAdministrativasController$DatosSesion"
+        ]
+      },
+      "InicioAdministrativo": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "tipoToken",
+          "token",
+          "sesion"
+        ],
+        "properties": {
+          "tipoToken": {
+            "type": "string",
+            "const": "Bearer"
+          },
+          "token": {
+            "type": "string",
+            "pattern": "^[A-Za-z0-9_-]{43}$",
+            "readOnly": true,
+            "description": "Token opaco administrativo de 43 caracteres, sin prefijo nc_; no JWT."
+          },
+          "sesion": {
+            "$ref": "#/components/schemas/SesionAdministrativa"
+          }
+        },
+        "x-java-types": [
+          "pe.nivora.backend.acceso.presentacion.SesionesAdministrativasController$InicioRespuesta"
+        ]
+      },
+      "CuentaAdministrativa": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "usuario",
+          "nombre",
+          "activa",
+          "gestionarAdministradores",
+          "cambioClaveRequerido",
+          "versionCredenciales",
+          "creadoEn",
+          "actualizadoEn"
+        ],
+        "properties": {
+          "usuario": {
+            "$ref": "#/components/schemas/UsuarioAdministrador"
+          },
+          "nombre": {
+            "type": "string"
+          },
+          "activa": {
+            "type": "boolean"
+          },
+          "gestionarAdministradores": {
+            "type": "boolean"
+          },
+          "cambioClaveRequerido": {
+            "type": "boolean"
+          },
+          "versionCredenciales": {
+            "$ref": "#/components/schemas/RevisionTexto"
+          },
+          "creadoEn": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Instante UTC, serializado con sufijo Z."
+          },
+          "actualizadoEn": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Instante UTC, serializado con sufijo Z."
+          }
+        },
+        "x-java-types": [
+          "pe.nivora.backend.acceso.presentacion.GestionAdministradoresController$CuentaRespuesta"
+        ]
+      },
+      "ResultadoGestionCuenta": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "cuenta",
+          "modificada",
+          "sesionActualRevocada"
+        ],
+        "properties": {
+          "cuenta": {
+            "$ref": "#/components/schemas/CuentaAdministrativa"
+          },
+          "modificada": {
+            "type": "boolean"
+          },
+          "sesionActualRevocada": {
+            "type": "boolean"
+          }
+        },
+        "x-java-types": [
+          "pe.nivora.backend.acceso.presentacion.GestionAdministradoresController$ResultadoRespuesta"
+        ]
+      },
+      "PaginaAdministradores": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "administradores",
+          "siguienteDespuesDe",
+          "hayMas"
+        ],
+        "properties": {
+          "administradores": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/CuentaAdministrativa"
+            }
+          },
+          "siguienteDespuesDe": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/UsuarioAdministrador"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "hayMas": {
+            "type": "boolean"
+          }
+        },
+        "x-java-types": [
+          "pe.nivora.backend.acceso.presentacion.GestionAdministradoresController$PaginaRespuesta"
+        ]
+      },
+      "EventoAuditoria": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "idEvento",
+          "actorUsuario",
+          "afectadoUsuario",
+          "operacion",
+          "registradoEn"
+        ],
+        "properties": {
+          "idEvento": {
+            "$ref": "#/components/schemas/RevisionTexto"
+          },
+          "actorUsuario": {
+            "type": "string"
+          },
+          "afectadoUsuario": {
+            "type": "string"
+          },
+          "operacion": {
+            "type": "string"
+          },
+          "registradoEn": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Instante UTC, serializado con sufijo Z."
+          }
+        },
+        "x-java-types": [
+          "pe.nivora.backend.acceso.dominio.administradores.PaginaAuditoriaAdministrativa$Evento"
+        ]
+      },
+      "PaginaAuditoria": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "eventos",
+          "siguienteDespuesDe",
+          "hayMas"
+        ],
+        "properties": {
+          "eventos": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/EventoAuditoria"
+            }
+          },
+          "siguienteDespuesDe": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/RevisionTexto"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "hayMas": {
+            "type": "boolean"
+          }
+        },
+        "x-java-types": [
+          "pe.nivora.backend.acceso.dominio.administradores.PaginaAuditoriaAdministrativa"
+        ]
+      },
+      "SuministroListado": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "codigoSuministro",
+          "titular",
+          "verificadoEn"
+        ],
+        "properties": {
+          "codigoSuministro": {
+            "$ref": "#/components/schemas/CodigoSuministro"
+          },
+          "titular": {
+            "type": "string"
+          },
+          "verificadoEn": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Instante UTC, serializado con sufijo Z."
+          }
+        },
+        "x-java-types": [
+          "pe.nivora.backend.acceso.presentacion.RegistrosAccesoController$SuministroListado"
+        ]
+      },
+      "PaginaSuministros": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "suministros",
+          "hayMas",
+          "siguienteDespuesDe"
+        ],
+        "properties": {
+          "suministros": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/SuministroListado"
+            }
+          },
+          "hayMas": {
+            "type": "boolean"
+          },
+          "siguienteDespuesDe": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/CodigoSuministro"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          }
+        },
+        "x-java-types": [
+          "pe.nivora.backend.acceso.presentacion.RegistrosAccesoController$ListadoSuministros"
+        ]
+      },
+      "RegistroAcceso": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "dniEnmascarado",
+          "creadaEn",
+          "expiraEn",
+          "revocadaEn"
+        ],
+        "properties": {
+          "dniEnmascarado": {
+            "type": "string"
+          },
+          "creadaEn": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Instante UTC, serializado con sufijo Z."
+          },
+          "expiraEn": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Instante UTC, serializado con sufijo Z."
+          },
+          "revocadaEn": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time",
+                "description": "Instante UTC, serializado con sufijo Z."
+              },
+              {
+                "type": "null"
+              }
+            ]
+          }
+        },
+        "x-java-types": [
+          "pe.nivora.backend.acceso.presentacion.RegistrosAccesoController$AccesoListado"
+        ]
+      },
+      "PaginaAccesos": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "codigoSuministro",
+          "accesos",
+          "hayMas",
+          "siguienteAntesDe"
+        ],
+        "properties": {
+          "codigoSuministro": {
+            "$ref": "#/components/schemas/CodigoSuministro"
+          },
+          "accesos": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/RegistroAcceso"
+            }
+          },
+          "hayMas": {
+            "type": "boolean"
+          },
+          "siguienteAntesDe": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          }
+        },
+        "x-java-types": [
+          "pe.nivora.backend.acceso.presentacion.RegistrosAccesoController$ListadoAccesos"
+        ]
+      },
+      "DetalleConsumo": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "estado",
+          "motivo",
+          "litros",
+          "metrosCubicos",
+          "desde",
+          "hasta",
+          "idMedidor",
+          "idLecturaInicial",
+          "idLecturaFinal"
+        ],
+        "properties": {
+          "estado": {
+            "$ref": "#/components/schemas/EstadoConsumo"
+          },
+          "motivo": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/MotivoConsumo"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "litros": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/DecimalTexto"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "metrosCubicos": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/DecimalTexto"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "desde": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time",
+                "description": "Instante UTC, serializado con sufijo Z."
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "hasta": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time",
+                "description": "Instante UTC, serializado con sufijo Z."
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "idMedidor": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "idLecturaInicial": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "idLecturaFinal": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          }
+        },
+        "x-java-types": [
+          "pe.nivora.backend.lecturas.presentacion.ConsumoActualController$Detalle",
+          "pe.nivora.backend.tarifas.presentacion.CostosConsumoController$Consumo"
+        ],
+        "description": "Un importe null comunica falta de calculo compatible; no equivale a cero. Un estado PARCIAL conserva su motivo."
+      },
+      "ActualizacionConsumo": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "estado",
+          "ultimaLectura",
+          "confirmadoHasta"
+        ],
+        "properties": {
+          "estado": {
+            "$ref": "#/components/schemas/EstadoActualizacion"
+          },
+          "ultimaLectura": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time",
+                "description": "Instante UTC, serializado con sufijo Z."
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "confirmadoHasta": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time",
+                "description": "Instante UTC, serializado con sufijo Z."
+              },
+              {
+                "type": "null"
+              }
+            ]
+          }
+        },
+        "x-java-types": [
+          "pe.nivora.backend.lecturas.aplicacion.ConsultarConsumoActual$Actualizacion"
+        ]
+      },
+      "ConsumoActual": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "fuente",
+          "codigoSuministro",
+          "periodo",
+          "zonaHoraria",
+          "inicioMes",
+          "finMesExclusivo",
+          "consultadoEn",
+          "consumo",
+          "actualizacion"
+        ],
+        "properties": {
+          "fuente": {
+            "type": "string",
+            "const": "empresa-agua"
+          },
+          "codigoSuministro": {
+            "$ref": "#/components/schemas/CodigoSuministro"
+          },
+          "periodo": {
+            "$ref": "#/components/schemas/PeriodoMensual"
+          },
+          "zonaHoraria": {
+            "type": "string",
+            "const": "America/Lima"
+          },
+          "inicioMes": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Instante UTC, serializado con sufijo Z."
+          },
+          "finMesExclusivo": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Instante UTC, serializado con sufijo Z."
+          },
+          "consultadoEn": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Instante UTC, serializado con sufijo Z."
+          },
+          "consumo": {
+            "$ref": "#/components/schemas/DetalleConsumo"
+          },
+          "actualizacion": {
+            "$ref": "#/components/schemas/ActualizacionConsumo"
+          }
+        },
+        "x-java-types": [
+          "pe.nivora.backend.lecturas.presentacion.ConsumoActualController$Respuesta"
+        ],
+        "examples": [
+          {
+            "fuente": "empresa-agua",
+            "codigoSuministro": "90000001",
+            "periodo": "2026-11",
+            "zonaHoraria": "America/Lima",
+            "inicioMes": "2026-11-01T05:00:00Z",
+            "finMesExclusivo": "2026-12-01T05:00:00Z",
+            "consultadoEn": "2026-11-18T17:00:00Z",
+            "consumo": {
+              "estado": "SIN_DATOS",
+              "motivo": "LECTURAS_INSUFICIENTES",
+              "litros": null,
+              "metrosCubicos": null,
+              "desde": null,
+              "hasta": null,
+              "idMedidor": null,
+              "idLecturaInicial": null,
+              "idLecturaFinal": null
+            },
+            "actualizacion": {
+              "estado": "SIN_LECTURAS",
+              "ultimaLectura": null,
+              "confirmadoHasta": null
+            }
+          }
+        ]
+      },
+      "PeriodoHistorial": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "periodo",
+          "inicioMes",
+          "finMesExclusivo",
+          "consumo"
+        ],
+        "properties": {
+          "periodo": {
+            "$ref": "#/components/schemas/PeriodoMensual"
+          },
+          "inicioMes": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Instante UTC, serializado con sufijo Z."
+          },
+          "finMesExclusivo": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Instante UTC, serializado con sufijo Z."
+          },
+          "consumo": {
+            "$ref": "#/components/schemas/DetalleConsumo"
+          }
+        },
+        "x-java-types": [
+          "pe.nivora.backend.lecturas.presentacion.ConsumoActualController$PeriodoHistorial"
+        ]
+      },
+      "HistorialMensual": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "fuente",
+          "codigoSuministro",
+          "zonaHoraria",
+          "consultadoEn",
+          "periodos"
+        ],
+        "properties": {
+          "fuente": {
+            "type": "string",
+            "const": "empresa-agua"
+          },
+          "codigoSuministro": {
+            "$ref": "#/components/schemas/CodigoSuministro"
+          },
+          "zonaHoraria": {
+            "type": "string",
+            "const": "America/Lima"
+          },
+          "consultadoEn": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Instante UTC, serializado con sufijo Z."
+          },
+          "periodos": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/PeriodoHistorial"
+            }
+          }
+        },
+        "x-java-types": [
+          "pe.nivora.backend.lecturas.presentacion.ConsumoActualController$RespuestaHistorial"
+        ]
+      },
+      "CantidadConsumo": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "litros",
+          "metrosCubicos"
+        ],
+        "properties": {
+          "litros": {
+            "$ref": "#/components/schemas/DecimalTexto"
+          },
+          "metrosCubicos": {
+            "$ref": "#/components/schemas/DecimalTexto"
+          }
+        },
+        "x-java-types": [
+          "pe.nivora.backend.lecturas.presentacion.ConsumoActualController$Cantidad"
+        ]
+      },
+      "TramoComparado": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "periodo",
+          "consumo",
+          "duracionSegundos"
+        ],
+        "properties": {
+          "periodo": {
+            "$ref": "#/components/schemas/PeriodoMensual"
+          },
+          "consumo": {
+            "$ref": "#/components/schemas/DetalleConsumo"
+          },
+          "duracionSegundos": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/DecimalTexto"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          }
+        },
+        "x-java-types": [
+          "pe.nivora.backend.lecturas.presentacion.ConsumoActualController$TramoComparado"
+        ]
+      },
+      "ComparacionConsumo": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "actual",
+          "anterior",
+          "diferencia"
+        ],
+        "properties": {
+          "actual": {
+            "$ref": "#/components/schemas/TramoComparado"
+          },
+          "anterior": {
+            "$ref": "#/components/schemas/TramoComparado"
+          },
+          "diferencia": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/CantidadConsumo"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          }
+        },
+        "x-java-types": [
+          "pe.nivora.backend.lecturas.presentacion.ConsumoActualController$Comparacion"
+        ]
+      },
+      "ResumenConsumo": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "mesesCompletos",
+          "mesesParciales",
+          "mesesSinDatos",
+          "mesesIncompatibles",
+          "total",
+          "promedio",
+          "minimo",
+          "maximo"
+        ],
+        "properties": {
+          "mesesCompletos": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "mesesParciales": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "mesesSinDatos": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "mesesIncompatibles": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "total": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/CantidadConsumo"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "promedio": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/CantidadConsumo"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "minimo": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/CantidadConsumo"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "maximo": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/CantidadConsumo"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          }
+        },
+        "x-java-types": [
+          "pe.nivora.backend.lecturas.presentacion.ConsumoActualController$Resumen"
+        ]
+      },
+      "EstadisticasConsumo": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "fuente",
+          "codigoSuministro",
+          "zonaHoraria",
+          "consultadoEn",
+          "comparacion",
+          "serieMensual",
+          "resumen"
+        ],
+        "properties": {
+          "fuente": {
+            "type": "string",
+            "const": "empresa-agua"
+          },
+          "codigoSuministro": {
+            "$ref": "#/components/schemas/CodigoSuministro"
+          },
+          "zonaHoraria": {
+            "type": "string",
+            "const": "America/Lima"
+          },
+          "consultadoEn": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Instante UTC, serializado con sufijo Z."
+          },
+          "comparacion": {
+            "$ref": "#/components/schemas/ComparacionConsumo"
+          },
+          "serieMensual": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/PeriodoHistorial"
+            }
+          },
+          "resumen": {
+            "$ref": "#/components/schemas/ResumenConsumo"
+          }
+        },
+        "x-java-types": [
+          "pe.nivora.backend.lecturas.presentacion.ConsumoActualController$RespuestaEstadisticas"
+        ]
+      },
+      "TarifaEstimada": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "codigoTarifa",
+          "versionTarifa",
+          "nombreTarifa",
+          "aplicableDesde",
+          "aplicableHasta",
+          "igvPorcentaje",
+          "fuenteTarifaria",
+          "revisionTarifaria"
+        ],
+        "properties": {
+          "codigoTarifa": {
+            "type": "string"
+          },
+          "versionTarifa": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "nombreTarifa": {
+            "type": "string"
+          },
+          "aplicableDesde": {
+            "type": "string",
+            "format": "date"
+          },
+          "aplicableHasta": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "igvPorcentaje": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/DecimalTexto"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "fuenteTarifaria": {
+            "type": "string"
+          },
+          "revisionTarifaria": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/RevisionTexto"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          }
+        },
+        "x-java-types": [
+          "pe.nivora.backend.tarifas.presentacion.CostosConsumoController$Tarifa"
+        ]
+      },
+      "TramoCosto": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "desdeM3",
+          "hastaM3",
+          "volumenM3",
+          "precioAguaPorM3",
+          "precioAlcantarilladoPorM3",
+          "importeAgua",
+          "importeAlcantarillado"
+        ],
+        "properties": {
+          "desdeM3": {
+            "$ref": "#/components/schemas/DecimalTexto"
+          },
+          "hastaM3": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/DecimalTexto"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "volumenM3": {
+            "$ref": "#/components/schemas/DecimalTexto"
+          },
+          "precioAguaPorM3": {
+            "$ref": "#/components/schemas/DecimalTexto"
+          },
+          "precioAlcantarilladoPorM3": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/DecimalTexto"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "importeAgua": {
+            "$ref": "#/components/schemas/DecimalTexto"
+          },
+          "importeAlcantarillado": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/DecimalTexto"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          }
+        },
+        "x-java-types": [
+          "pe.nivora.backend.tarifas.presentacion.CostosConsumoController$Tramo"
+        ]
+      },
+      "DesgloseCosto": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "agua",
+          "alcantarillado",
+          "cargoFijo",
+          "subtotalConocido",
+          "igv",
+          "totalEstimado",
+          "tramos"
+        ],
+        "properties": {
+          "agua": {
+            "$ref": "#/components/schemas/DecimalTexto"
+          },
+          "alcantarillado": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/DecimalTexto"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "cargoFijo": {
+            "$ref": "#/components/schemas/DecimalTexto"
+          },
+          "subtotalConocido": {
+            "$ref": "#/components/schemas/DecimalTexto"
+          },
+          "igv": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/DecimalTexto"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "totalEstimado": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/DecimalTexto"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "tramos": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/TramoCosto"
+            }
+          }
+        },
+        "x-java-types": [
+          "pe.nivora.backend.tarifas.presentacion.CostosConsumoController$Desglose"
+        ]
+      },
+      "PeriodoCosto": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "periodo",
+          "inicioMes",
+          "finMesExclusivo",
+          "estado",
+          "consumo",
+          "tarifa",
+          "desglose"
+        ],
+        "properties": {
+          "periodo": {
+            "$ref": "#/components/schemas/PeriodoMensual"
+          },
+          "inicioMes": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Instante UTC, serializado con sufijo Z."
+          },
+          "finMesExclusivo": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Instante UTC, serializado con sufijo Z."
+          },
+          "estado": {
+            "$ref": "#/components/schemas/EstadoCosto"
+          },
+          "consumo": {
+            "$ref": "#/components/schemas/DetalleConsumo"
+          },
+          "tarifa": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/TarifaEstimada"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "desglose": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/DesgloseCosto"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          }
+        },
+        "x-java-types": [
+          "pe.nivora.backend.tarifas.presentacion.CostosConsumoController$PeriodoCosto"
+        ]
+      },
+      "CostosConsumo": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "fuente",
+          "codigoSuministro",
+          "moneda",
+          "zonaHoraria",
+          "consultadoEn",
+          "revisionTarifaria",
+          "revisionTarifariaAdministrativa",
+          "actual",
+          "anteriores"
+        ],
+        "properties": {
+          "fuente": {
+            "type": "string",
+            "const": "empresa-agua"
+          },
+          "codigoSuministro": {
+            "$ref": "#/components/schemas/CodigoSuministro"
+          },
+          "moneda": {
+            "type": "string",
+            "const": "PEN"
+          },
+          "zonaHoraria": {
+            "type": "string",
+            "const": "America/Lima"
+          },
+          "consultadoEn": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Instante UTC, serializado con sufijo Z."
+          },
+          "revisionTarifaria": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/RevisionTexto"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "revisionTarifariaAdministrativa": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/RevisionTexto"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "actual": {
+            "$ref": "#/components/schemas/PeriodoCosto"
+          },
+          "anteriores": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/PeriodoCosto"
+            }
+          }
+        },
+        "x-java-types": [
+          "pe.nivora.backend.tarifas.presentacion.CostosConsumoController$Respuesta"
+        ]
+      },
+      "SupuestosProyeccion": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "metodo",
+          "minimoObservadoSegundos"
+        ],
+        "properties": {
+          "metodo": {
+            "type": "string",
+            "const": "RITMO_PROMEDIO_CONSTANTE"
+          },
+          "minimoObservadoSegundos": {
+            "type": "integer",
+            "format": "int64",
+            "const": 86400
+          }
+        },
+        "x-java-types": [
+          "pe.nivora.backend.tarifas.presentacion.CostosConsumoController$Supuestos"
+        ]
+      },
+      "VolumenProyectado": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "litros",
+          "metrosCubicos",
+          "promedioLitrosPorDia",
+          "segundosObservados",
+          "segundosDelMes"
+        ],
+        "properties": {
+          "litros": {
+            "$ref": "#/components/schemas/DecimalTexto"
+          },
+          "metrosCubicos": {
+            "$ref": "#/components/schemas/DecimalTexto"
+          },
+          "promedioLitrosPorDia": {
+            "$ref": "#/components/schemas/DecimalTexto"
+          },
+          "segundosObservados": {
+            "$ref": "#/components/schemas/DecimalTexto"
+          },
+          "segundosDelMes": {
+            "$ref": "#/components/schemas/DecimalTexto"
+          }
+        },
+        "x-java-types": [
+          "pe.nivora.backend.tarifas.presentacion.CostosConsumoController$VolumenProyectado"
+        ]
+      },
+      "CostoProyectado": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "estado",
+          "fuenteTarifaria",
+          "revisionTarifaria",
+          "tarifa",
+          "desglose"
+        ],
+        "properties": {
+          "estado": {
+            "$ref": "#/components/schemas/EstadoCosto"
+          },
+          "fuenteTarifaria": {
+            "type": "string"
+          },
+          "revisionTarifaria": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/RevisionTexto"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "tarifa": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/TarifaEstimada"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "desglose": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/DesgloseCosto"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          }
+        },
+        "x-java-types": [
+          "pe.nivora.backend.tarifas.presentacion.CostosConsumoController$CostoProyectado"
+        ]
+      },
+      "ProyeccionMensual": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "fuente",
+          "codigoSuministro",
+          "moneda",
+          "periodo",
+          "zonaHoraria",
+          "inicioMes",
+          "finMesExclusivo",
+          "calculadoEn",
+          "supuestos",
+          "estado",
+          "observado",
+          "actualizacion",
+          "proyeccion",
+          "costoProyectado"
+        ],
+        "properties": {
+          "fuente": {
+            "type": "string",
+            "const": "empresa-agua"
+          },
+          "codigoSuministro": {
+            "$ref": "#/components/schemas/CodigoSuministro"
+          },
+          "moneda": {
+            "type": "string",
+            "const": "PEN"
+          },
+          "periodo": {
+            "$ref": "#/components/schemas/PeriodoMensual"
+          },
+          "zonaHoraria": {
+            "type": "string",
+            "const": "America/Lima"
+          },
+          "inicioMes": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Instante UTC, serializado con sufijo Z."
+          },
+          "finMesExclusivo": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Instante UTC, serializado con sufijo Z."
+          },
+          "calculadoEn": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Instante UTC, serializado con sufijo Z."
+          },
+          "supuestos": {
+            "$ref": "#/components/schemas/SupuestosProyeccion"
+          },
+          "estado": {
+            "$ref": "#/components/schemas/EstadoProyeccion"
+          },
+          "observado": {
+            "$ref": "#/components/schemas/DetalleConsumo"
+          },
+          "actualizacion": {
+            "$ref": "#/components/schemas/ActualizacionConsumo"
+          },
+          "proyeccion": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/VolumenProyectado"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "costoProyectado": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/CostoProyectado"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          }
+        },
+        "x-java-types": [
+          "pe.nivora.backend.tarifas.presentacion.CostosConsumoController$RespuestaProyeccion"
+        ]
+      },
+      "VentanaRecibo": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "inicio",
+          "finExclusivo"
+        ],
+        "properties": {
+          "inicio": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Instante UTC, serializado con sufijo Z."
+          },
+          "finExclusivo": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Instante UTC, serializado con sufijo Z."
+          }
+        },
+        "x-java-types": [
+          "pe.nivora.backend.recibos.presentacion.RecibosConsultaController$Ventana"
+        ]
+      },
+      "Recibo": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "numeroRecibo",
+          "periodo",
+          "consumoLitros",
+          "cargoFijo",
+          "importeConsumo",
+          "importeTotal",
+          "fechaDisponibilidad",
+          "fechaVencimiento",
+          "codigoTarifa",
+          "versionTarifa",
+          "recibidoEn",
+          "periodoFacturado",
+          "periodoAnalisis",
+          "coincideConPeriodoAnalisis"
+        ],
+        "properties": {
+          "numeroRecibo": {
+            "type": "string"
+          },
+          "periodo": {
+            "$ref": "#/components/schemas/PeriodoMensual"
+          },
+          "consumoLitros": {
+            "$ref": "#/components/schemas/DecimalTexto"
+          },
+          "cargoFijo": {
+            "$ref": "#/components/schemas/DecimalTexto"
+          },
+          "importeConsumo": {
+            "$ref": "#/components/schemas/DecimalTexto"
+          },
+          "importeTotal": {
+            "$ref": "#/components/schemas/DecimalTexto"
+          },
+          "fechaDisponibilidad": {
+            "type": "string",
+            "format": "date"
+          },
+          "fechaVencimiento": {
+            "type": "string",
+            "format": "date"
+          },
+          "codigoTarifa": {
+            "type": "string"
+          },
+          "versionTarifa": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "recibidoEn": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Instante UTC, serializado con sufijo Z."
+          },
+          "periodoFacturado": {
+            "$ref": "#/components/schemas/VentanaRecibo"
+          },
+          "periodoAnalisis": {
+            "$ref": "#/components/schemas/VentanaRecibo"
+          },
+          "coincideConPeriodoAnalisis": {
+            "type": "boolean"
+          }
+        },
+        "x-java-types": [
+          "pe.nivora.backend.recibos.presentacion.RecibosConsultaController$Recibo"
+        ]
+      },
+      "PaginaRecibos": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "codigoSuministro",
+          "moneda",
+          "zonaFechas",
+          "recibos",
+          "hayMas",
+          "siguienteAntesDe"
+        ],
+        "properties": {
+          "codigoSuministro": {
+            "$ref": "#/components/schemas/CodigoSuministro"
+          },
+          "moneda": {
+            "type": "string",
+            "const": "PEN"
+          },
+          "zonaFechas": {
+            "type": "string",
+            "const": "America/Lima"
+          },
+          "recibos": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Recibo"
+            }
+          },
+          "hayMas": {
+            "type": "boolean"
+          },
+          "siguienteAntesDe": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/PeriodoMensual"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          }
+        },
+        "x-java-types": [
+          "pe.nivora.backend.recibos.presentacion.RecibosConsultaController$Respuesta"
+        ],
+        "examples": [
+          {
+            "codigoSuministro": "90000001",
+            "moneda": "PEN",
+            "zonaFechas": "America/Lima",
+            "recibos": [],
+            "hayMas": false,
+            "siguienteAntesDe": null
+          }
+        ]
+      },
+      "IdNotificacion": {
+        "type": "string",
+        "pattern": "^(ALERTA_CONSUMO|RECIBO_DISPONIBLE)-[1-9][0-9]{3}-(0[1-9]|1[0-2])$",
+        "examples": [
+          "RECIBO_DISPONIBLE-2026-10"
+        ]
+      },
+      "ConsumoNotificado": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "actualLitros",
+          "anteriorLitros"
+        ],
+        "properties": {
+          "actualLitros": {
+            "$ref": "#/components/schemas/DecimalTexto"
+          },
+          "anteriorLitros": {
+            "$ref": "#/components/schemas/DecimalTexto"
+          }
+        },
+        "x-java-types": [
+          "pe.nivora.backend.notificaciones.presentacion.NotificacionesConsultaController$Consumo"
+        ]
+      },
+      "ReciboNotificado": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "numeroRecibo",
+          "fechaDisponibilidad",
+          "fechaVencimiento"
+        ],
+        "properties": {
+          "numeroRecibo": {
+            "type": "string"
+          },
+          "fechaDisponibilidad": {
+            "type": "string",
+            "format": "date"
+          },
+          "fechaVencimiento": {
+            "type": "string",
+            "format": "date"
+          }
+        },
+        "x-java-types": [
+          "pe.nivora.backend.notificaciones.dominio.Notificacion$Recibo"
+        ]
+      },
+      "Notificacion": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "id",
+          "tipo",
+          "periodo",
+          "titulo",
+          "registradaEn",
+          "leida",
+          "leidaEn",
+          "consumo",
+          "recibo"
+        ],
+        "properties": {
+          "id": {
+            "$ref": "#/components/schemas/IdNotificacion"
+          },
+          "tipo": {
+            "$ref": "#/components/schemas/TipoNotificacion"
+          },
+          "periodo": {
+            "$ref": "#/components/schemas/PeriodoMensual"
+          },
+          "titulo": {
+            "type": "string"
+          },
+          "registradaEn": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Instante UTC, serializado con sufijo Z."
+          },
+          "leida": {
+            "type": "boolean"
+          },
+          "leidaEn": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time",
+                "description": "Instante UTC, serializado con sufijo Z."
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "consumo": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/ConsumoNotificado"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "recibo": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/ReciboNotificado"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          }
+        },
+        "x-java-types": [
+          "pe.nivora.backend.notificaciones.presentacion.NotificacionesConsultaController$Aviso"
+        ]
+      },
+      "PaginaNotificaciones": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "codigoSuministro",
+          "notificaciones",
+          "hayMas",
+          "siguienteAntesDe"
+        ],
+        "properties": {
+          "codigoSuministro": {
+            "$ref": "#/components/schemas/CodigoSuministro"
+          },
+          "notificaciones": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Notificacion"
+            }
+          },
+          "hayMas": {
+            "type": "boolean"
+          },
+          "siguienteAntesDe": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          }
+        },
+        "x-java-types": [
+          "pe.nivora.backend.notificaciones.presentacion.NotificacionesConsultaController$Respuesta"
+        ]
+      },
+      "PreferenciaDispositivo": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "idDispositivo",
+          "permiso",
+          "habilitadas",
+          "actualizadaEn"
+        ],
+        "properties": {
+          "idDispositivo": {
+            "$ref": "#/components/schemas/UuidCanonico"
+          },
+          "permiso": {
+            "$ref": "#/components/schemas/PermisoNavegador"
+          },
+          "habilitadas": {
+            "type": "boolean"
+          },
+          "actualizadaEn": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Instante UTC, serializado con sufijo Z."
+          }
+        },
+        "x-java-types": [
+          "pe.nivora.backend.notificaciones.dominio.RepositorioConfiguracionNotificaciones$Preferencia"
+        ]
+      },
+      "ControlAlertas": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "habilitada",
+          "efectiva",
+          "actualizadaPor",
+          "actualizadaEn"
+        ],
+        "properties": {
+          "habilitada": {
+            "type": "boolean"
+          },
+          "efectiva": {
+            "type": "boolean"
+          },
+          "actualizadaPor": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "actualizadaEn": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time",
+                "description": "Instante UTC, serializado con sufijo Z."
+              },
+              {
+                "type": "null"
+              }
+            ]
+          }
+        },
+        "x-java-types": [
+          "pe.nivora.backend.notificaciones.aplicacion.ConfigurarNotificaciones$EstadoAlertas"
+        ],
+        "description": "efectiva combina la preferencia guardada y la habilitacion del servidor."
+      },
+      "ClavePublicaVapid": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "clavePublica"
+        ],
+        "properties": {
+          "clavePublica": {
+            "type": "string",
+            "pattern": "^[A-Za-z0-9_-]{87}$",
+            "description": "Clave publica P-256, base64url sin relleno. Nunca se devuelve la clave privada."
+          }
+        },
+        "x-java-types": [
+          "pe.nivora.backend.notificaciones.presentacion.WebPushController$ClavePublica"
+        ]
+      },
+      "AlmacenamientoLecturas": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "lecturasGuardadas",
+          "primeraMedicion",
+          "ultimaMedicion",
+          "ultimaRecepcion",
+          "incidenciasLecturas",
+          "incidenciasRecuperacionAbiertas"
+        ],
+        "properties": {
+          "lecturasGuardadas": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "primeraMedicion": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time",
+                "description": "Instante UTC, serializado con sufijo Z."
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "ultimaMedicion": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time",
+                "description": "Instante UTC, serializado con sufijo Z."
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "ultimaRecepcion": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time",
+                "description": "Instante UTC, serializado con sufijo Z."
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "incidenciasLecturas": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "incidenciasRecuperacionAbiertas": {
+            "type": "integer",
+            "format": "int64"
+          }
+        },
+        "x-java-types": [
+          "pe.nivora.backend.lecturas.dominio.SupervisionLecturas$Almacenamiento"
+        ]
+      },
+      "CorteLecturas": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "hastaIdLectura",
+          "confirmadoHasta",
+          "capturadoEn"
+        ],
+        "properties": {
+          "hastaIdLectura": {
+            "type": "string"
+          },
+          "confirmadoHasta": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Instante UTC, serializado con sufijo Z."
+          },
+          "capturadoEn": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Instante UTC, serializado con sufijo Z."
+          }
+        },
+        "x-java-types": [
+          "pe.nivora.backend.lecturas.dominio.SupervisionLecturas$Corte"
+        ]
+      },
+      "RecuperacionLecturas": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "estado",
+          "cursorConfirmado",
+          "revision",
+          "ultimaConfirmacion",
+          "actualizadoEn",
+          "corte"
+        ],
+        "properties": {
+          "estado": {
+            "$ref": "#/components/schemas/EstadoRecuperacion"
+          },
+          "cursorConfirmado": {
+            "type": "string"
+          },
+          "revision": {
+            "$ref": "#/components/schemas/RevisionTexto"
+          },
+          "ultimaConfirmacion": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time",
+                "description": "Instante UTC, serializado con sufijo Z."
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "actualizadoEn": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Instante UTC, serializado con sufijo Z."
+          },
+          "corte": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/CorteLecturas"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          }
+        },
+        "x-java-types": [
+          "pe.nivora.backend.lecturas.dominio.SupervisionLecturas$Recuperacion"
+        ]
+      },
+      "ProgramacionLecturas": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "ultimoResultado",
+          "fallosConsecutivos",
+          "ultimoIntento",
+          "ultimoExito",
+          "proximoIntento",
+          "reservaHasta",
+          "reservaVigente",
+          "reservaVencida"
+        ],
+        "properties": {
+          "ultimoResultado": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/EstadoSincronizacionLecturas"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "fallosConsecutivos": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "ultimoIntento": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time",
+                "description": "Instante UTC, serializado con sufijo Z."
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "ultimoExito": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time",
+                "description": "Instante UTC, serializado con sufijo Z."
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "proximoIntento": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Instante UTC, serializado con sufijo Z."
+          },
+          "reservaHasta": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time",
+                "description": "Instante UTC, serializado con sufijo Z."
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "reservaVigente": {
+            "type": "boolean"
+          },
+          "reservaVencida": {
+            "type": "boolean"
+          }
+        },
+        "x-java-types": [
+          "pe.nivora.backend.lecturas.dominio.SupervisionLecturas$Programacion"
+        ]
+      },
+      "SupervisionLecturas": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "fuente",
+          "codigoSuministro",
+          "consultadoEn",
+          "sincronizacionAutomaticaHabilitada",
+          "almacenamiento",
+          "recuperacion",
+          "programacion"
+        ],
+        "properties": {
+          "fuente": {
+            "type": "string",
+            "const": "empresa-agua"
+          },
+          "codigoSuministro": {
+            "$ref": "#/components/schemas/CodigoSuministro"
+          },
+          "consultadoEn": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Instante UTC, serializado con sufijo Z."
+          },
+          "sincronizacionAutomaticaHabilitada": {
+            "type": "boolean"
+          },
+          "almacenamiento": {
+            "$ref": "#/components/schemas/AlmacenamientoLecturas"
+          },
+          "recuperacion": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/RecuperacionLecturas"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "programacion": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/ProgramacionLecturas"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          }
+        },
+        "x-java-types": [
+          "pe.nivora.backend.lecturas.presentacion.SupervisionLecturasController$Respuesta"
+        ]
+      },
+      "AlmacenamientoRecibos": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "recibosGuardados",
+          "ultimoPeriodo",
+          "ultimaRecepcion"
+        ],
+        "properties": {
+          "recibosGuardados": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "ultimoPeriodo": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/PeriodoMensual"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "ultimaRecepcion": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time",
+                "description": "Instante UTC, serializado con sufijo Z."
+              },
+              {
+                "type": "null"
+              }
+            ]
+          }
+        },
+        "x-java-types": [
+          "pe.nivora.backend.recibos.presentacion.SupervisionRecibosController$RecibosGuardados"
+        ]
+      },
+      "ProgramacionRecibos": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "ultimoResultado",
+          "fallosConsecutivos",
+          "ultimoIntento",
+          "ultimoExito",
+          "proximoIntento",
+          "reservaHasta",
+          "reservaVigente",
+          "reservaVencida"
+        ],
+        "properties": {
+          "ultimoResultado": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/EstadoSincronizacionRecibos"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "fallosConsecutivos": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "ultimoIntento": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time",
+                "description": "Instante UTC, serializado con sufijo Z."
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "ultimoExito": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time",
+                "description": "Instante UTC, serializado con sufijo Z."
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "proximoIntento": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Instante UTC, serializado con sufijo Z."
+          },
+          "reservaHasta": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time",
+                "description": "Instante UTC, serializado con sufijo Z."
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "reservaVigente": {
+            "type": "boolean"
+          },
+          "reservaVencida": {
+            "type": "boolean"
+          }
+        },
+        "x-java-types": [
+          "pe.nivora.backend.recibos.dominio.SupervisionRecibos$Programacion"
+        ]
+      },
+      "SupervisionRecibos": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "fuente",
+          "codigoSuministro",
+          "consultadoEn",
+          "sincronizacionAutomaticaHabilitada",
+          "almacenamiento",
+          "programacion"
+        ],
+        "properties": {
+          "fuente": {
+            "type": "string",
+            "const": "empresa-agua"
+          },
+          "codigoSuministro": {
+            "$ref": "#/components/schemas/CodigoSuministro"
+          },
+          "consultadoEn": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Instante UTC, serializado con sufijo Z."
+          },
+          "sincronizacionAutomaticaHabilitada": {
+            "type": "boolean"
+          },
+          "almacenamiento": {
+            "$ref": "#/components/schemas/AlmacenamientoRecibos"
+          },
+          "programacion": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/ProgramacionRecibos"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          }
+        },
+        "x-java-types": [
+          "pe.nivora.backend.recibos.presentacion.SupervisionRecibosController$Respuesta"
+        ]
+      },
+      "IncidenciaIntegracion": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "origen",
+          "fuente",
+          "referencia",
+          "idLectura",
+          "motivo",
+          "estado",
+          "primeraRecepcion",
+          "ultimaRecepcion",
+          "repeticiones",
+          "ultimaResolucion"
+        ],
+        "properties": {
+          "origen": {
+            "$ref": "#/components/schemas/OrigenIncidencia"
+          },
+          "fuente": {
+            "type": "string"
+          },
+          "referencia": {
+            "type": "string"
+          },
+          "idLectura": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "motivo": {
+            "type": "string"
+          },
+          "estado": {
+            "$ref": "#/components/schemas/EstadoIncidencia"
+          },
+          "primeraRecepcion": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Instante UTC, serializado con sufijo Z."
+          },
+          "ultimaRecepcion": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Instante UTC, serializado con sufijo Z."
+          },
+          "repeticiones": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "ultimaResolucion": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time",
+                "description": "Instante UTC, serializado con sufijo Z."
+              },
+              {
+                "type": "null"
+              }
+            ]
+          }
+        },
+        "x-java-types": [
+          "pe.nivora.backend.integracion.dominio.IncidenciaIntegracion"
+        ]
+      },
+      "PaginaIncidencias": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "codigoSuministro",
+          "incidencias",
+          "hayMas",
+          "siguienteAntesDe"
+        ],
+        "properties": {
+          "codigoSuministro": {
+            "$ref": "#/components/schemas/CodigoSuministro"
+          },
+          "incidencias": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/IncidenciaIntegracion"
+            }
+          },
+          "hayMas": {
+            "type": "boolean"
+          },
+          "siguienteAntesDe": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          }
+        },
+        "x-java-types": [
+          "pe.nivora.backend.integracion.presentacion.IncidenciasIntegracionController$Respuesta"
+        ]
+      },
+      "ReintentoProgramado": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "codigoSuministro",
+          "proceso",
+          "estado",
+          "proximoIntento"
+        ],
+        "properties": {
+          "codigoSuministro": {
+            "$ref": "#/components/schemas/CodigoSuministro"
+          },
+          "proceso": {
+            "$ref": "#/components/schemas/ProcesoIntegracion"
+          },
+          "estado": {
+            "$ref": "#/components/schemas/EstadoReintento",
+            "const": "PROGRAMADO"
+          },
+          "proximoIntento": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Instante UTC, serializado con sufijo Z."
+          }
+        },
+        "x-java-types": [
+          "pe.nivora.backend.integracion.presentacion.ReintentosIntegracionController$Respuesta"
+        ]
+      },
+      "TramoTarifa": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "desdeM3",
+          "hastaM3",
+          "precioAguaPorM3",
+          "precioAlcantarilladoPorM3"
+        ],
+        "properties": {
+          "desdeM3": {
+            "type": "number"
+          },
+          "hastaM3": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "precioAguaPorM3": {
+            "type": "number"
+          },
+          "precioAlcantarilladoPorM3": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          }
+        },
+        "x-java-types": [
+          "pe.nivora.backend.tarifas.dominio.VersionTarifaria$Tramo"
+        ]
+      },
+      "VigenciaTarifa": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "codigoTarifa",
+          "versionTarifa",
+          "nombreTarifa",
+          "vigenteDesde",
+          "vigenteHasta",
+          "asignadaDesde",
+          "asignadaHasta",
+          "aplicableDesde",
+          "aplicableHasta",
+          "cargoFijo",
+          "igvPorcentaje",
+          "tramos"
+        ],
+        "properties": {
+          "codigoTarifa": {
+            "type": "string"
+          },
+          "versionTarifa": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "nombreTarifa": {
+            "type": "string"
+          },
+          "vigenteDesde": {
+            "type": "string",
+            "format": "date"
+          },
+          "vigenteHasta": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "asignadaDesde": {
+            "type": "string",
+            "format": "date"
+          },
+          "asignadaHasta": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "aplicableDesde": {
+            "type": "string",
+            "format": "date"
+          },
+          "aplicableHasta": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "cargoFijo": {
+            "type": "number"
+          },
+          "igvPorcentaje": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "tramos": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/TramoTarifa"
+            }
+          }
+        },
+        "x-java-types": [
+          "pe.nivora.backend.tarifas.presentacion.GestionTarifasController$Vigencia"
+        ]
+      },
+      "HistorialTarifario": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "fuente",
+          "codigoSuministro",
+          "revision",
+          "registradoEn",
+          "asignaciones"
+        ],
+        "properties": {
+          "fuente": {
+            "type": "string"
+          },
+          "codigoSuministro": {
+            "$ref": "#/components/schemas/CodigoSuministro"
+          },
+          "revision": {
+            "$ref": "#/components/schemas/RevisionTexto"
+          },
+          "registradoEn": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Instante UTC, serializado con sufijo Z."
+          },
+          "asignaciones": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/VigenciaTarifa"
+            }
+          }
+        },
+        "x-java-types": [
+          "pe.nivora.backend.tarifas.presentacion.GestionTarifasController$Historial"
+        ]
+      },
+      "PublicacionTarifaria": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "historial",
+          "publicadoPor"
+        ],
+        "properties": {
+          "historial": {
+            "$ref": "#/components/schemas/HistorialTarifario"
+          },
+          "publicadoPor": {
+            "type": "string"
+          }
+        },
+        "x-java-types": [
+          "pe.nivora.backend.tarifas.presentacion.GestionTarifasController$Publicacion"
+        ]
+      },
+      "VistaTarifaria": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "codigoSuministro",
+          "moneda",
+          "zonaFechas",
+          "revisionAdministrativa",
+          "importada",
+          "publicada"
+        ],
+        "properties": {
+          "codigoSuministro": {
+            "$ref": "#/components/schemas/CodigoSuministro"
+          },
+          "moneda": {
+            "type": "string",
+            "const": "PEN"
+          },
+          "zonaFechas": {
+            "type": "string",
+            "const": "America/Lima"
+          },
+          "revisionAdministrativa": {
+            "$ref": "#/components/schemas/RevisionTexto"
+          },
+          "importada": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/HistorialTarifario"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "publicada": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/PublicacionTarifaria"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          }
+        },
+        "x-java-types": [
+          "pe.nivora.backend.tarifas.presentacion.GestionTarifasController$Vista"
+        ]
+      },
+      "VentanaMensual": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "periodo",
+          "inicioMes",
+          "finMesExclusivo"
+        ],
+        "properties": {
+          "periodo": {
+            "$ref": "#/components/schemas/PeriodoMensual"
+          },
+          "inicioMes": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Instante UTC, serializado con sufijo Z."
+          },
+          "finMesExclusivo": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Instante UTC, serializado con sufijo Z."
+          }
+        },
+        "x-java-types": [
+          "pe.nivora.backend.periodos.presentacion.PeriodosMensualesController$Periodo"
+        ]
+      },
+      "ReglaMensual": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "revision",
+          "desde",
+          "diaInicio",
+          "publicadaEn",
+          "publicadaPor"
+        ],
+        "properties": {
+          "revision": {
+            "$ref": "#/components/schemas/RevisionTexto"
+          },
+          "desde": {
+            "$ref": "#/components/schemas/PeriodoMensual"
+          },
+          "diaInicio": {
+            "type": "integer",
+            "format": "int32",
+            "minimum": 1,
+            "maximum": 31
+          },
+          "publicadaEn": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Instante UTC, serializado con sufijo Z."
+          },
+          "publicadaPor": {
+            "type": "string"
+          }
+        },
+        "x-java-types": [
+          "pe.nivora.backend.periodos.presentacion.PeriodosMensualesController$Regla"
+        ]
+      },
+      "CalendarioMensual": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "revision",
+          "zonaHoraria",
+          "diaInicioPredeterminado",
+          "actual",
+          "reglas"
+        ],
+        "properties": {
+          "revision": {
+            "$ref": "#/components/schemas/RevisionTexto"
+          },
+          "zonaHoraria": {
+            "type": "string",
+            "const": "America/Lima"
+          },
+          "diaInicioPredeterminado": {
+            "type": "integer",
+            "format": "int32",
+            "const": 1
+          },
+          "actual": {
+            "$ref": "#/components/schemas/VentanaMensual"
+          },
+          "reglas": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ReglaMensual"
+            }
+          }
+        },
+        "x-java-types": [
+          "pe.nivora.backend.periodos.presentacion.PeriodosMensualesController$Vista"
+        ]
+      },
+      "IniciarConsultaSolicitud": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "codigoSuministro",
+          "dni"
+        ],
+        "properties": {
+          "codigoSuministro": {
+            "$ref": "#/components/schemas/CodigoSuministro"
+          },
+          "dni": {
+            "$ref": "#/components/schemas/Dni"
+          }
+        },
+        "examples": [
+          {
+            "codigoSuministro": "90000001",
+            "dni": "00000001"
+          }
+        ]
+      },
+      "IniciarAdministracionSolicitud": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "usuario",
+          "clave"
+        ],
+        "properties": {
+          "usuario": {
+            "$ref": "#/components/schemas/UsuarioAdministrador"
+          },
+          "clave": {
+            "type": "string",
+            "format": "password",
+            "writeOnly": true,
+            "minLength": 1,
+            "maxLength": 128,
+            "description": "Clave existente; no se registra en ejemplos ni URLs."
+          }
+        }
+      },
+      "CambiarClaveSolicitud": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "claveActual",
+          "claveNueva"
+        ],
+        "properties": {
+          "claveActual": {
+            "type": "string",
+            "format": "password",
+            "writeOnly": true,
+            "minLength": 1,
+            "maxLength": 128,
+            "description": "Clave existente; no se registra en ejemplos ni URLs."
+          },
+          "claveNueva": {
+            "type": "string",
+            "format": "password",
+            "writeOnly": true,
+            "minLength": 15,
+            "maxLength": 128,
+            "description": "Clave nueva de 15 a 128 puntos de codigo, sin controles ni sustitutos Unicode invalidos. Debe ser distinta de la actual."
+          }
+        }
+      },
+      "CrearAdministradorSolicitud": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "usuario",
+          "nombre",
+          "claveInicial",
+          "claveActual"
+        ],
+        "properties": {
+          "usuario": {
+            "$ref": "#/components/schemas/UsuarioAdministrador"
+          },
+          "nombre": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 120
+          },
+          "claveInicial": {
+            "type": "string",
+            "format": "password",
+            "writeOnly": true,
+            "minLength": 15,
+            "maxLength": 128,
+            "description": "Clave nueva de 15 a 128 puntos de codigo, sin controles ni sustitutos Unicode invalidos. Debe ser distinta de la actual."
+          },
+          "claveActual": {
+            "type": "string",
+            "format": "password",
+            "writeOnly": true,
+            "minLength": 1,
+            "maxLength": 128,
+            "description": "Clave existente; no se registra en ejemplos ni URLs."
+          },
+          "gestionarAdministradores": {
+            "type": "boolean",
+            "default": false
+          }
+        }
+      },
+      "CambiarEstadoCuentaSolicitud": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "activa",
+          "claveActual"
+        ],
+        "properties": {
+          "activa": {
+            "type": "boolean"
+          },
+          "claveActual": {
+            "type": "string",
+            "format": "password",
+            "writeOnly": true,
+            "minLength": 1,
+            "maxLength": 128,
+            "description": "Clave existente; no se registra en ejemplos ni URLs."
+          }
+        }
+      },
+      "CambiarPermisoCuentaSolicitud": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "gestionarAdministradores",
+          "claveActual"
+        ],
+        "properties": {
+          "gestionarAdministradores": {
+            "type": "boolean"
+          },
+          "claveActual": {
+            "type": "string",
+            "format": "password",
+            "writeOnly": true,
+            "minLength": 1,
+            "maxLength": 128,
+            "description": "Clave existente; no se registra en ejemplos ni URLs."
+          }
+        }
+      },
+      "RestablecerClaveSolicitud": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "claveTemporal",
+          "claveActual"
+        ],
+        "properties": {
+          "claveTemporal": {
+            "type": "string",
+            "format": "password",
+            "writeOnly": true,
+            "minLength": 15,
+            "maxLength": 128,
+            "description": "Clave nueva de 15 a 128 puntos de codigo, sin controles ni sustitutos Unicode invalidos. Debe ser distinta de la actual."
+          },
+          "claveActual": {
+            "type": "string",
+            "format": "password",
+            "writeOnly": true,
+            "minLength": 1,
+            "maxLength": 128,
+            "description": "Clave existente; no se registra en ejemplos ni URLs."
+          }
+        }
+      },
+      "ConfigurarDispositivoSolicitud": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "permiso",
+          "habilitadas"
+        ],
+        "properties": {
+          "permiso": {
+            "$ref": "#/components/schemas/PermisoNavegador"
+          },
+          "habilitadas": {
+            "type": "boolean"
+          }
+        },
+        "description": "habilitadas=true requiere permiso=CONCEDIDO. Registrar este estado no solicita por si mismo el permiso al navegador.",
+        "allOf": [
+          {
+            "if": {
+              "properties": {
+                "habilitadas": {
+                  "const": true
+                }
+              },
+              "required": [
+                "habilitadas"
+              ]
+            },
+            "then": {
+              "properties": {
+                "permiso": {
+                  "const": "CONCEDIDO"
+                }
+              }
+            }
+          }
+        ],
+        "examples": [
+          {
+            "permiso": "CONCEDIDO",
+            "habilitadas": true
+          }
+        ]
+      },
+      "ConfigurarAlertasSolicitud": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "habilitada"
+        ],
+        "properties": {
+          "habilitada": {
+            "type": "boolean"
+          }
+        },
+        "examples": [
+          {
+            "habilitada": false
+          }
+        ]
+      },
+      "ClavesPushSolicitud": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "p256dh",
+          "auth"
+        ],
+        "properties": {
+          "p256dh": {
+            "type": "string",
+            "pattern": "^[A-Za-z0-9_-]{87}$",
+            "description": "Punto P-256 no comprimido valido, 65 bytes en base64url canonico sin relleno."
+          },
+          "auth": {
+            "type": "string",
+            "pattern": "^[A-Za-z0-9_-]{22}$",
+            "writeOnly": true,
+            "description": "Secreto de 16 bytes en base64url canonico sin relleno."
+          }
+        }
+      },
+      "SuscripcionPushSolicitud": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "endpoint",
+          "keys"
+        ],
+        "properties": {
+          "endpoint": {
+            "type": "string",
+            "format": "uri",
+            "maxLength": 2048,
+            "pattern": "^https://(?!.*\\.\\.)(?:fcm\\.googleapis\\.com/(?:fcm/send|wp)/[A-Za-z0-9_:+.-]+|(?:updates\\.)?push\\.services\\.mozilla\\.com/wpush/v[12]/[A-Za-z0-9_.-]+|web\\.push\\.apple\\.com/[A-Za-z0-9_.-]+)$",
+            "description": "Endpoint emitido por un proveedor admitido; HTTPS, sin puerto explicito, usuario, consulta, fragmento, porcentajes ni segmentos ..; no construirlo manualmente."
+          },
+          "keys": {
+            "$ref": "#/components/schemas/ClavesPushSolicitud"
+          }
+        }
+      },
+      "TramoTarifaSolicitud": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "desdeM3",
+          "precioAguaPorM3"
+        ],
+        "properties": {
+          "desdeM3": {
+            "type": "number",
+            "minimum": 0,
+            "maximum": 999999999999.999,
+            "multipleOf": 0.001
+          },
+          "hastaM3": {
+            "anyOf": [
+              {
+                "type": "number",
+                "minimum": 0,
+                "maximum": 999999999999.999,
+                "multipleOf": 0.001
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "precioAguaPorM3": {
+            "type": "number",
+            "minimum": 0,
+            "maximum": 99999999.9999,
+            "multipleOf": 0.0001
+          },
+          "precioAlcantarilladoPorM3": {
+            "anyOf": [
+              {
+                "type": "number",
+                "minimum": 0,
+                "maximum": 99999999.9999,
+                "multipleOf": 0.0001
+              },
+              {
+                "type": "null"
+              }
+            ]
+          }
+        },
+        "description": "Los tramos son continuos desde cero; el ultimo carece de tope. Cada tope presente debe ser mayor que desdeM3."
+      },
+      "PublicarTarifaSolicitud": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "revisionEsperada",
+          "codigoTarifa",
+          "versionTarifa",
+          "nombreTarifa",
+          "vigenteDesde",
+          "asignadaDesde",
+          "cargoFijo",
+          "tramos"
+        ],
+        "properties": {
+          "revisionEsperada": {
+            "$ref": "#/components/schemas/RevisionTexto"
+          },
+          "codigoTarifa": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 30
+          },
+          "versionTarifa": {
+            "type": "integer",
+            "format": "int32",
+            "minimum": 1
+          },
+          "nombreTarifa": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 120
+          },
+          "vigenteDesde": {
+            "type": "string",
+            "format": "date"
+          },
+          "asignadaDesde": {
+            "type": "string",
+            "format": "date"
+          },
+          "asignadaHasta": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "cargoFijo": {
+            "type": "number",
+            "minimum": 0,
+            "maximum": 9999999999.99,
+            "multipleOf": 0.01
+          },
+          "igvPorcentaje": {
+            "anyOf": [
+              {
+                "type": "number",
+                "minimum": 0,
+                "maximum": 100,
+                "multipleOf": 0.0001
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "tramos": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/TramoTarifaSolicitud"
+            },
+            "minItems": 1
+          }
+        },
+        "description": "Fechas entre 1000 y 9999 y vigencias compatibles; importes numericos JSON. revisionEsperada es texto. versionTarifa debe enviarse como token entero JSON, sin fraccion ni exponente. Los textos no admiten blancos al inicio o final.",
+        "examples": [
+          {
+            "revisionEsperada": "0",
+            "codigoTarifa": "EJEMPLO",
+            "versionTarifa": 1,
+            "nombreTarifa": "Tarifa ficticia",
+            "vigenteDesde": "2027-01-01",
+            "asignadaDesde": "2027-01-01",
+            "cargoFijo": 5,
+            "igvPorcentaje": 0,
+            "tramos": [
+              {
+                "desdeM3": 0,
+                "precioAguaPorM3": 1.5,
+                "precioAlcantarilladoPorM3": 0.5
+              }
+            ]
+          }
+        ]
+      },
+      "PublicarPeriodoSolicitud": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "revisionEsperada",
+          "desde",
+          "diaInicio"
+        ],
+        "properties": {
+          "revisionEsperada": {
+            "$ref": "#/components/schemas/RevisionTexto"
+          },
+          "desde": {
+            "$ref": "#/components/schemas/PeriodoMensual"
+          },
+          "diaInicio": {
+            "type": "integer",
+            "format": "int32",
+            "minimum": 1,
+            "maximum": 31
+          }
+        },
+        "description": "desde debe ser un mes civil futuro; revisionEsperada debe coincidir con la revision actual. En meses cortos, diaInicio se ajusta al ultimo dia disponible. diaInicio se envia como token entero JSON.",
+        "examples": [
+          {
+            "revisionEsperada": "0",
+            "desde": "2027-01",
+            "diaInicio": 5
+          }
+        ]
+      },
+      "Problema": {
+        "type": "object",
+        "required": [
+          "status",
+          "title",
+          "detail"
+        ],
+        "properties": {
+          "type": {
+            "type": "string",
+            "format": "uri-reference"
+          },
+          "title": {
+            "type": "string"
+          },
+          "status": {
+            "type": "integer",
+            "minimum": 400,
+            "maximum": 599
+          },
+          "detail": {
+            "type": "string"
+          },
+          "instance": {
+            "type": "string",
+            "format": "uri-reference"
+          }
+        },
+        "additionalProperties": true,
+        "description": "Los controladores usan ProblemDetail; el filtro de seguridad emite status/title/detail/instance y puede omitir type.",
+        "examples": [
+          {
+            "status": 401,
+            "title": "Sesion requerida",
+            "detail": "Inicia una sesion de consulta.",
+            "instance": "/api/v1/acceso/consulta/consumo-actual"
+          }
+        ]
+      },
+      "Salud": {
+        "type": "object",
+        "required": [
+          "status"
+        ],
+        "properties": {
+          "status": {
+            "type": "string"
+          },
+          "components": {
+            "type": "object",
+            "additionalProperties": true
+          },
+          "groups": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        },
+        "additionalProperties": true,
+        "description": "Respuesta de Actuator; sus componentes y grupos dependen de la configuracion."
+      }
+    }
+  },
+  "externalDocs": {
+    "description": "Guia de autenticacion, permisos, paginacion y ejemplos.",
+    "url": "https://github.com/SebastianCH27/Nivora/blob/main/tecnologia/nivora-backend/documentacion/api.md"
+  }
+}

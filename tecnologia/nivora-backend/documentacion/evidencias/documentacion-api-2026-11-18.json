@@ -1,0 +1,96 @@
+{
+  "versionFormato": 1,
+  "fechaLocalPreparacion": "2026-11-18",
+  "zonaHoraria": "America/Lima",
+  "baseImplementacionReportada": "4fd156a",
+  "alcance": "Bloque 9, parte 4: documentacion de contratos y controles de deriva; no es una nueva prueba de carga.",
+  "contrato": {
+    "archivo": "documentacion/openapi.json",
+    "openapi": "3.1.0",
+    "operacionesNegocio": 40,
+    "operacionesSalud": 1,
+    "plantillasDeRuta": 33,
+    "esquemas": 100,
+    "registrosJavaEnlazados": 62,
+    "enumsJavaEnlazados": 14,
+    "esquemasDeSesion": [
+      "sesionConsulta",
+      "sesionAdministrativa"
+    ]
+  },
+  "validacionEstructural": {
+    "estructuraOpenAPI": "Aceptada por fastapi.openapi.models.OpenAPI",
+    "fastapi": "0.141.1",
+    "dialectoEsquemas": "JSON Schema 2020-12",
+    "jsonschema": "4.26.0",
+    "esquemasComprobados": 100,
+    "referenciasInternasResueltas": 496,
+    "ejemplosValidados": 16,
+    "formatosDeEjemplosValidados": true,
+    "syntaxPowerShellEjemplo": "OK; ParseFile sin ejecutar solicitudes"
+  },
+  "pruebasDocumentacion": {
+    "clase": "pe.nivora.backend.documentacion.DocumentacionApiTests",
+    "pruebas": 3,
+    "fallos": 0,
+    "errores": 0,
+    "omitidas": 0,
+    "metodos": [
+      "documentaTodasLasOperacionesRegistradasSinInventarRutas",
+      "documentaParametrosRealesConObligatoriedadYValoresPredeterminados",
+      "conservaLosCamposYTiposDeLosRegistrosYEnumsPublicados"
+    ]
+  },
+  "regresion": {
+    "comando": "clean verify",
+    "tests": 562,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0,
+    "buildSuccess": true,
+    "java": "21.0.13",
+    "compilador": "Eclipse ECJ 3.38.0 para Java 21",
+    "pomVersionadoModificado": false,
+    "resultado": "BUILD SUCCESS"
+  },
+  "revisionManual": {
+    "fuentes": [
+      "16 controladores REST",
+      "SeguridadConfiguracion",
+      "filtros de sesion y RespuestaSeguridad",
+      "LectorSolicitudAdministrativa",
+      "DTO, enums y reglas de aplicacion/dominio",
+      "pruebas de contratos e integraciones existentes"
+    ],
+    "temas": [
+      "permisos administrativos",
+      "estados HTTP tratados",
+      "cabeceras Cache-Control, WWW-Authenticate, Retry-After y Location",
+      "tipos y nulabilidad",
+      "paginacion y cursores",
+      "JSON de hasta 4096 bytes y campos estrictos",
+      "restricciones de Web Push y reglas de publicaciones"
+    ]
+  },
+  "huellasSha256": {
+    "tecnologia/nivora-backend/README.md": "5504d30ba5ae5128b1a2ae799edd3e92b632362ab27d961dc354da2f7111b909",
+    "tecnologia/nivora-backend/documentacion/api.md": "9ba41fb3d99047a3fb25aab93952709bc940915a76017cf3399d3bae591581bc",
+    "tecnologia/nivora-backend/documentacion/openapi.json": "967cf077395240ed22d09cf2da2411c5ec7056ea172d45acbee456aab5a6d6eb",
+    "tecnologia/nivora-backend/documentacion/verificacion-documentacion-api.md": "cd4218b20ee8fffaff4513b28869f7927db1845c457b334b1e6f2ddba7168c5c",
+    "tecnologia/nivora-backend/src/test/java/pe/nivora/backend/documentacion/DocumentacionApiTests.java": "075db36ba1608b3758ca1f6de08e8b08b951801f1766e678c021c4c1322b7597"
+  },
+  "limites": [
+    "Los controles automaticos de forma y trazabilidad no sustituyen pruebas funcionales de reglas, permisos efectivos, datos o transiciones.",
+    "La guia y los ejemplos se prepararon con datos ficticios. El ejemplo PowerShell se analizo sintacticamente y no se ejecuto contra las credenciales ni servicios del usuario.",
+    "El contrato es un archivo versionado; no agrega un endpoint HTTP de documentacion ni cambia las rutas de negocio.",
+    "La revision final de requisitos del bloque 9, incluida la reserva de EQ-02, corresponde a la parte 5."
+  ],
+  "archivosEntrega": [
+    "tecnologia/nivora-backend/README.md",
+    "tecnologia/nivora-backend/documentacion/api.md",
+    "tecnologia/nivora-backend/documentacion/openapi.json",
+    "tecnologia/nivora-backend/documentacion/verificacion-documentacion-api.md",
+    "tecnologia/nivora-backend/documentacion/evidencias/documentacion-api-2026-11-18.json",
+    "tecnologia/nivora-backend/src/test/java/pe/nivora/backend/documentacion/DocumentacionApiTests.java"
+  ]
+}
