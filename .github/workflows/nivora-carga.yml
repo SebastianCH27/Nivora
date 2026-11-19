@@ -1,0 +1,76 @@
+name: Nivora - pruebas de carga
+run-name: Carga Nivora - ${{ inputs.perfil }} - pool ${{ inputs.pool_conexiones }}
+
+on:
+  workflow_dispatch:
+    inputs:
+      perfil:
+        description: Perfil de la prueba
+        type: choice
+        options: [breve, diagnostico-2500, completa]
+        default: breve
+        required: true
+      pool_conexiones:
+        description: Conexiones de la instancia temporal
+        type: choice
+        options: ['10', '20']
+        default: '10'
+        required: true
+
+permissions:
+  contents: read
+
+concurrency:
+  group: nivora-carga-${{ github.repository }}
+  cancel-in-progress: false
+
+jobs:
+  carga:
+    # El computo estandar de repositorios publicos esta cubierto gratuitamente.
+    # En un repositorio privado este trabajo se omite, sin arrancar una VM.
+    if: ${{ github.event.repository.private == false }}
+    runs-on: ubuntu-24.04
+    timeout-minutes: 75
+    env:
+      POWERSHELL_TELEMETRY_OPTOUT: '1'
+      POWERSHELL_UPDATECHECK: 'Off'
+      MAVEN_OPTS: '-Xmx512m'
+    defaults:
+      run:
+        working-directory: tecnologia/nivora-backend
+    steps:
+      - name: Obtener el codigo
+        uses: actions/checkout@v6.1.0
+        with:
+          persist-credentials: false
+
+      - name: Preparar Java 21
+        uses: actions/setup-java@v6.3.0
+        with:
+          distribution: temurin
+          java-version: '21'
+
+      - name: Construir y verificar el backend
+        shell: bash
+        run: bash ./mvnw -B -ntp clean verify
+
+      - name: Iniciar MySQL de la maquina temporal
+        shell: bash
+        env:
+          # Credencial publica de la imagen de GitHub; no pertenece a la laptop.
+          MYSQL_PWD: root
+        run: |
+          sudo systemctl start mysql.service
+          mysql --protocol=TCP --host=127.0.0.1 --user=root --execute='SELECT VERSION();'
+
+      - name: Ejecutar carga y publicar resumen
+        shell: pwsh
+        env:
+          PERFIL_CARGA: ${{ inputs.perfil }}
+          POOL_CARGA: ${{ inputs.pool_conexiones }}
+          NIVORA_CARGA_DB_ADMIN_CLAVE: root
+        run: |
+          ./herramientas/EjecutarCargaGitHub.ps1 -Perfil $env:PERFIL_CARGA -PoolConexiones ([int]$env:POOL_CARGA)
+
+      # Los JSON permitidos se imprimen en los logs. No se suben artefactos,
+      # caches, JAR, CSV de sesiones ni volcados de la base de datos.

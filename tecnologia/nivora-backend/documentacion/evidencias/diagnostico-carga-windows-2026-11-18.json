@@ -1,0 +1,200 @@
+{
+  "origen": {
+    "descripcion": "Resumen diagnostico y salida de CMD compartidos por el usuario el 18 de noviembre de 2026.",
+    "archivoCompartido": "Texto pegado.txt",
+    "sha256ArchivoCompartido": "a83e5f356fe8a1e56fee5fbdbe9db417fa59c2f1d45b73b70c5c459e492def55",
+    "idEjecucion": "b6d6dd64786c",
+    "archivosOriginalesDisponiblesEnEquipoUsuario": "target/carga/b6d6dd64786c",
+    "alcanceDelPaquete": "Se conserva el resumen transcrito. No se recibieron los CSV, los logs de GC ni las capturas de hilos originales."
+  },
+  "parametros": {
+    "etapas": [
+      2500
+    ],
+    "suministrosDatos": 5000,
+    "duracionSegundos": 120,
+    "rampaSegundos": 60,
+    "calentamientoSegundos": 15,
+    "poolConexiones": 10,
+    "diagnostico": true
+  },
+  "salidaConsola": {
+    "codigoSalidaGenerador": 0,
+    "sincronizacionDuranteMedicion": true,
+    "baseYCuentaTemporalesRetiradas": true
+  },
+  "resumenDiagnostico": {
+    "inicioMedicionUTC": "2026-11-18T20:48:19.208355800Z",
+    "finMedicionUTC": "2026-11-18T20:50:19.208355800Z",
+    "usuarios": 2500,
+    "usuariosMinimosEnMedicion": 2500,
+    "fallosGenerador": 0,
+    "cumpleUmbralesDeEstaEtapa": false,
+    "operaciones": [
+      {
+        "nombre": "consumo",
+        "solicitudes": 11609,
+        "p95MsHasta": 4513,
+        "internosOTransporte": 0,
+        "otrosErrores": 0
+      },
+      {
+        "nombre": "historial",
+        "solicitudes": 11588,
+        "p95MsHasta": 4482,
+        "internosOTransporte": 0,
+        "otrosErrores": 0
+      },
+      {
+        "nombre": "estadisticas",
+        "solicitudes": 11575,
+        "p95MsHasta": 4479,
+        "internosOTransporte": 0,
+        "otrosErrores": 0
+      },
+      {
+        "nombre": "costos",
+        "solicitudes": 11587,
+        "p95MsHasta": 4531,
+        "internosOTransporte": 0,
+        "otrosErrores": 0
+      },
+      {
+        "nombre": "proyeccion",
+        "solicitudes": 11573,
+        "p95MsHasta": 4480,
+        "internosOTransporte": 0,
+        "otrosErrores": 0
+      },
+      {
+        "nombre": "recibos",
+        "solicitudes": 11586,
+        "p95MsHasta": 4470,
+        "internosOTransporte": 0,
+        "otrosErrores": 0
+      },
+      {
+        "nombre": "notificaciones",
+        "solicitudes": 11607,
+        "p95MsHasta": 4440,
+        "internosOTransporte": 0,
+        "otrosErrores": 0
+      }
+    ],
+    "alcance": "Diagnostico instrumentado; requiere interpretar muestras, logs GC y capturas de hilos.",
+    "backend": {
+      "muestras": 19,
+      "cpuProcesoPorcentajeDeUnNucleo": 142.413,
+      "cpuSistemaPorcentaje": {
+        "muestras": 19,
+        "promedio": 99.686,
+        "minimo": 97.476,
+        "maximo": 100
+      },
+      "memoriaFisicaLibreBytes": {
+        "muestras": 19,
+        "promedio": 389161391.158,
+        "minimo": 240848896,
+        "maximo": 567558144
+      },
+      "heapUsadoBytes": {
+        "muestras": 19,
+        "promedio": 127059799.579,
+        "minimo": 102374904,
+        "maximo": 159478496
+      },
+      "conexionesActivas": {
+        "muestras": 19,
+        "promedio": 2.474,
+        "minimo": 0,
+        "maximo": 10
+      },
+      "conexionesInactivas": {
+        "muestras": 19,
+        "promedio": 7.579,
+        "minimo": 0,
+        "maximo": 10
+      },
+      "conexionesTotales": {
+        "muestras": 19,
+        "promedio": 10,
+        "minimo": 10,
+        "maximo": 10
+      },
+      "hilosEsperandoConexion": {
+        "muestras": 19,
+        "promedio": 12.368,
+        "minimo": 0,
+        "maximo": 184
+      },
+      "hilosHttpOcupados": {
+        "muestras": 19,
+        "promedio": 42.474,
+        "minimo": 0,
+        "maximo": 200
+      },
+      "hilosHttpMaximos": {
+        "muestras": 19,
+        "promedio": 200,
+        "minimo": 200,
+        "maximo": 200
+      },
+      "gcTiempoMsEntrePrimeraYUltimaMuestra": 1297,
+      "gcCantidadEntrePrimeraYUltimaMuestra": 372
+    },
+    "generador": {
+      "muestras": 18,
+      "cpuProcesoPorcentajeDeUnNucleo": 32.992,
+      "cpuSistemaPorcentaje": {
+        "muestras": 18,
+        "promedio": 99.643,
+        "minimo": 97.094,
+        "maximo": 100
+      },
+      "memoriaFisicaLibreBytes": {
+        "muestras": 18,
+        "promedio": 385904184.889,
+        "minimo": 243118080,
+        "maximo": 555974656
+      },
+      "heapUsadoBytes": {
+        "muestras": 18,
+        "promedio": 305902241.778,
+        "minimo": 235405312,
+        "maximo": 395313152
+      },
+      "conexionesActivas": null,
+      "conexionesInactivas": null,
+      "conexionesTotales": null,
+      "hilosEsperandoConexion": null,
+      "hilosHttpOcupados": null,
+      "hilosHttpMaximos": null,
+      "gcTiempoMsEntrePrimeraYUltimaMuestra": 651,
+      "gcCantidadEntrePrimeraYUltimaMuestra": 27
+    },
+    "mysql": {
+      "muestras": 18,
+      "cpuPorcentajeDeUnNucleo": {
+        "muestras": 18,
+        "promedio": 155.392,
+        "minimo": 125.51,
+        "maximo": 202.07
+      },
+      "memoriaProcesoBytes": {
+        "muestras": 18,
+        "promedio": 139882723.556,
+        "minimo": 125931520,
+        "maximo": 155619328
+      }
+    }
+  },
+  "interpretacion": {
+    "solicitudesTotales": 81125,
+    "saturacionCpuDelSistemaObservada": true,
+    "cpuComoCausaUnicaDemostrada": false,
+    "paginacionMedida": false,
+    "ocupacionPermanenteDelPoolDemostrada": false,
+    "cubre5000Durante30Minutos": false,
+    "limitacionComparacion": "Ejecucion focalizada con instrumentacion y nuevo arranque de JVM. No equivale al perfil completo de las ejecuciones anteriores."
+  }
+}

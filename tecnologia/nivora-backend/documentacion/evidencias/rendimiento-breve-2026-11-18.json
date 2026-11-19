@@ -1,0 +1,910 @@
+{
+  "alcance": "Prueba breve local de la herramienta; EQ-01 de 5000 usuarios por 30 minutos y EQ-02 siguen pendientes.",
+  "baseGit": "ce72c35",
+  "validacionHerramientas": {
+    "powershell": "7.4.6, Linux, telemetria desactivada antes del arranque",
+    "compilador": "Eclipse ECJ 3.38.0, nivel Java 21",
+    "regresionBackend": "559 pruebas, 0 fallos, 0 errores"
+  },
+  "herramientasSHA256": {
+    "EjecutarPruebaCarga.ps1": "230dbf83d675ff6d45bf4ef686a4951e970c817e536684b0704c5a7ae644a09e",
+    "PrepararDatosCarga.java": "beb476423ba32e643b27859fbde9209ee8f6401c176f0db1423c140e38e936fa",
+    "PruebaCargaConsultas.java": "a814099efaedee75a5a1942c187c99d24320ed1ee6abcecf813da764243a50a4"
+  },
+  "entorno": {
+    "creadoUTC": "2026-11-18T18:38:33.8031434Z",
+    "equipo": "13a25673548a",
+    "sistema": "Unix 6.18.57.0",
+    "procesadores": 9,
+    "ramFisicaBytes": null,
+    "mysql": {
+      "version": "8.0.46",
+      "maxConnections": 151,
+      "innodbBufferPoolBytes": 134217728
+    },
+    "java": "openjdk 21.0.13 2026-10-20 LTS\nOpenJDK Runtime Environment Temurin-21.0.13+9 (build 21.0.13+9-LTS)\nOpenJDK 64-Bit Server VM Temurin-21.0.13+9 (build 21.0.13+9-LTS, mixed mode, sharing)",
+    "jarSHA256": "6AB95CF3ABC95B6CEE9BF65DB2E4A7EEE1BCE10BE05475C3B0A484EC0632439C",
+    "baseTemporal": "nivora_carga_315a6ff90571",
+    "usuariosFicticios": 100,
+    "lecturasPorSuministro": 4,
+    "recibosPorSuministro": 1,
+    "periodosConConsumo": 3,
+    "sesionesIndependientes": 100,
+    "memoriaBackendMb": 512,
+    "memoriaGeneradorMb": 512,
+    "poolConexiones": 10,
+    "hilosHttp": 200,
+    "pausaMs": 1000,
+    "etapas": [
+      20,
+      100
+    ],
+    "completa": false,
+    "generadorYServidorEnMismoEquipo": true,
+    "sincronizacionLecturasIntervaloMs": 1000,
+    "intentosPorCiclo": 1,
+    "intervaloCompletoSegundos": 30
+  },
+  "etapas": [
+    {
+      "informe": {
+        "inicioUTC": "2026-11-18T18:38:34.610023818Z",
+        "finUTC": "2026-11-18T18:39:30.788903410Z",
+        "inicioMedicionUTC": "2026-11-18T18:38:44.809112291Z",
+        "finMedicionUTC": "2026-11-18T18:39:29.809112291Z",
+        "usuarios": 20,
+        "usuariosMinimosEnMedicion": 20,
+        "rampaSegundos": 5,
+        "calentamientoSegundos": 5,
+        "medicionSegundos": 45,
+        "pausaMs": 1000,
+        "fallosGenerador": 0,
+        "cumpleUmbralesDeEstaEtapa": true,
+        "cubre5000Durante30Minutos": false,
+        "generador": {
+          "procesadores": 9,
+          "heapMaximoBytes": 536870912,
+          "heapObservadoMaximoBytes": 33199512,
+          "cpuMediaPorcentajeDeUnNucleo": 7.18
+        },
+        "operaciones": [
+          {
+            "nombre": "consumo",
+            "solicitudes": 127,
+            "internosOTransporte": 0,
+            "otrosErrores": 0,
+            "erroresPorcentaje": 0.0,
+            "solicitudesPorSegundo": 2.822,
+            "mediaMs": 5.539,
+            "p50MsHasta": 6,
+            "p95MsHasta": 9,
+            "p99MsHasta": 15,
+            "maximoMs": 17.276,
+            "cumple": true
+          },
+          {
+            "nombre": "historial",
+            "solicitudes": 127,
+            "internosOTransporte": 0,
+            "otrosErrores": 0,
+            "erroresPorcentaje": 0.0,
+            "solicitudesPorSegundo": 2.822,
+            "mediaMs": 5.519,
+            "p50MsHasta": 6,
+            "p95MsHasta": 9,
+            "p99MsHasta": 12,
+            "maximoMs": 13.708,
+            "cumple": true
+          },
+          {
+            "nombre": "estadisticas",
+            "solicitudes": 128,
+            "internosOTransporte": 0,
+            "otrosErrores": 0,
+            "erroresPorcentaje": 0.0,
+            "solicitudesPorSegundo": 2.844,
+            "mediaMs": 5.835,
+            "p50MsHasta": 6,
+            "p95MsHasta": 10,
+            "p99MsHasta": 12,
+            "maximoMs": 13.995,
+            "cumple": true
+          },
+          {
+            "nombre": "costos",
+            "solicitudes": 128,
+            "internosOTransporte": 0,
+            "otrosErrores": 0,
+            "erroresPorcentaje": 0.0,
+            "solicitudesPorSegundo": 2.844,
+            "mediaMs": 8.602,
+            "p50MsHasta": 9,
+            "p95MsHasta": 15,
+            "p99MsHasta": 19,
+            "maximoMs": 22.443,
+            "cumple": true
+          },
+          {
+            "nombre": "proyeccion",
+            "solicitudes": 128,
+            "internosOTransporte": 0,
+            "otrosErrores": 0,
+            "erroresPorcentaje": 0.0,
+            "solicitudesPorSegundo": 2.844,
+            "mediaMs": 7.765,
+            "p50MsHasta": 8,
+            "p95MsHasta": 13,
+            "p99MsHasta": 24,
+            "maximoMs": 27.664,
+            "cumple": true
+          },
+          {
+            "nombre": "recibos",
+            "solicitudes": 129,
+            "internosOTransporte": 0,
+            "otrosErrores": 0,
+            "erroresPorcentaje": 0.0,
+            "solicitudesPorSegundo": 2.867,
+            "mediaMs": 4.467,
+            "p50MsHasta": 5,
+            "p95MsHasta": 9,
+            "p99MsHasta": 11,
+            "maximoMs": 10.389,
+            "cumple": true
+          },
+          {
+            "nombre": "notificaciones",
+            "solicitudes": 128,
+            "internosOTransporte": 0,
+            "otrosErrores": 0,
+            "erroresPorcentaje": 0.0,
+            "solicitudesPorSegundo": 2.844,
+            "mediaMs": 4.701,
+            "p50MsHasta": 5,
+            "p95MsHasta": 8,
+            "p99MsHasta": 10,
+            "maximoMs": 10.347,
+            "cumple": true
+          }
+        ]
+      },
+      "antes": {
+        "suministrosActualizados": 0,
+        "ultimoExitoUTC": null,
+        "alertasRegistradas": 0,
+        "lecturasGuardadas": 400,
+        "suministrosConExitoDuranteMedicion": null,
+        "alertasDuranteMedicion": null,
+        "lecturasDuranteMedicion": null,
+        "ultimaAlertaUTC": null
+      },
+      "despues": {
+        "suministrosActualizados": 49,
+        "ultimoExitoUTC": "2026-11-18 18:39:31.644282",
+        "alertasRegistradas": 49,
+        "lecturasGuardadas": 449,
+        "suministrosConExitoDuranteMedicion": 40,
+        "alertasDuranteMedicion": 40,
+        "lecturasDuranteMedicion": 40,
+        "ultimaAlertaUTC": "2026-11-18 18:39:31.647045"
+      },
+      "recursosBackend": [
+        {
+          "utc": "2026-11-18T18:38:35.5728108Z",
+          "memoriaProcesoBytes": 346132480,
+          "cpuPorcentajeDeUnNucleo": 26.65
+        },
+        {
+          "utc": "2026-11-18T18:38:36.5914645Z",
+          "memoriaProcesoBytes": 348958720,
+          "cpuPorcentajeDeUnNucleo": 41.22
+        },
+        {
+          "utc": "2026-11-18T18:38:37.5928226Z",
+          "memoriaProcesoBytes": 355581952,
+          "cpuPorcentajeDeUnNucleo": 38.92
+        },
+        {
+          "utc": "2026-11-18T18:38:38.5941522Z",
+          "memoriaProcesoBytes": 355332096,
+          "cpuPorcentajeDeUnNucleo": 43.96
+        },
+        {
+          "utc": "2026-11-18T18:38:39.5954756Z",
+          "memoriaProcesoBytes": 362491904,
+          "cpuPorcentajeDeUnNucleo": 89.91
+        },
+        {
+          "utc": "2026-11-18T18:38:40.5983363Z",
+          "memoriaProcesoBytes": 365375488,
+          "cpuPorcentajeDeUnNucleo": 73.78
+        },
+        {
+          "utc": "2026-11-18T18:38:41.5998694Z",
+          "memoriaProcesoBytes": 365543424,
+          "cpuPorcentajeDeUnNucleo": 25.95
+        },
+        {
+          "utc": "2026-11-18T18:38:42.6011825Z",
+          "memoriaProcesoBytes": 366051328,
+          "cpuPorcentajeDeUnNucleo": 41.96
+        },
+        {
+          "utc": "2026-11-18T18:38:43.6025498Z",
+          "memoriaProcesoBytes": 358682624,
+          "cpuPorcentajeDeUnNucleo": 48.95
+        },
+        {
+          "utc": "2026-11-18T18:38:44.6041223Z",
+          "memoriaProcesoBytes": 359100416,
+          "cpuPorcentajeDeUnNucleo": 20.96
+        },
+        {
+          "utc": "2026-11-18T18:38:45.6086853Z",
+          "memoriaProcesoBytes": 359493632,
+          "cpuPorcentajeDeUnNucleo": 23.9
+        },
+        {
+          "utc": "2026-11-18T18:38:46.6107285Z",
+          "memoriaProcesoBytes": 359968768,
+          "cpuPorcentajeDeUnNucleo": 22.95
+        },
+        {
+          "utc": "2026-11-18T18:38:47.6131033Z",
+          "memoriaProcesoBytes": 360353792,
+          "cpuPorcentajeDeUnNucleo": 17.96
+        },
+        {
+          "utc": "2026-11-18T18:38:48.6148266Z",
+          "memoriaProcesoBytes": 360927232,
+          "cpuPorcentajeDeUnNucleo": 20.96
+        },
+        {
+          "utc": "2026-11-18T18:38:49.6197774Z",
+          "memoriaProcesoBytes": 361426944,
+          "cpuPorcentajeDeUnNucleo": 16.93
+        },
+        {
+          "utc": "2026-11-18T18:38:50.6229255Z",
+          "memoriaProcesoBytes": 362049536,
+          "cpuPorcentajeDeUnNucleo": 20.92
+        },
+        {
+          "utc": "2026-11-18T18:38:51.6242122Z",
+          "memoriaProcesoBytes": 362303488,
+          "cpuPorcentajeDeUnNucleo": 28.97
+        },
+        {
+          "utc": "2026-11-18T18:38:52.6255131Z",
+          "memoriaProcesoBytes": 365228032,
+          "cpuPorcentajeDeUnNucleo": 25.97
+        },
+        {
+          "utc": "2026-11-18T18:38:53.6267470Z",
+          "memoriaProcesoBytes": 365457408,
+          "cpuPorcentajeDeUnNucleo": 20.98
+        },
+        {
+          "utc": "2026-11-18T18:38:54.6278233Z",
+          "memoriaProcesoBytes": 365621248,
+          "cpuPorcentajeDeUnNucleo": 16.98
+        },
+        {
+          "utc": "2026-11-18T18:38:55.6289953Z",
+          "memoriaProcesoBytes": 365907968,
+          "cpuPorcentajeDeUnNucleo": 20.98
+        },
+        {
+          "utc": "2026-11-18T18:38:56.6301732Z",
+          "memoriaProcesoBytes": 367050752,
+          "cpuPorcentajeDeUnNucleo": 19.98
+        },
+        {
+          "utc": "2026-11-18T18:38:57.6313166Z",
+          "memoriaProcesoBytes": 367529984,
+          "cpuPorcentajeDeUnNucleo": 22.98
+        },
+        {
+          "utc": "2026-11-18T18:38:58.6324932Z",
+          "memoriaProcesoBytes": 367976448,
+          "cpuPorcentajeDeUnNucleo": 18.98
+        },
+        {
+          "utc": "2026-11-18T18:38:59.6335423Z",
+          "memoriaProcesoBytes": 368205824,
+          "cpuPorcentajeDeUnNucleo": 11.99
+        },
+        {
+          "utc": "2026-11-18T18:39:00.6350607Z",
+          "memoriaProcesoBytes": 368361472,
+          "cpuPorcentajeDeUnNucleo": 13.97
+        },
+        {
+          "utc": "2026-11-18T18:39:01.6360269Z",
+          "memoriaProcesoBytes": 368545792,
+          "cpuPorcentajeDeUnNucleo": 23.98
+        },
+        {
+          "utc": "2026-11-18T18:39:02.6369788Z",
+          "memoriaProcesoBytes": 369168384,
+          "cpuPorcentajeDeUnNucleo": 16.98
+        },
+        {
+          "utc": "2026-11-18T18:39:03.6382261Z",
+          "memoriaProcesoBytes": 369729536,
+          "cpuPorcentajeDeUnNucleo": 16.98
+        },
+        {
+          "utc": "2026-11-18T18:39:04.6395823Z",
+          "memoriaProcesoBytes": 369901568,
+          "cpuPorcentajeDeUnNucleo": 16.98
+        },
+        {
+          "utc": "2026-11-18T18:39:05.6408892Z",
+          "memoriaProcesoBytes": 370085888,
+          "cpuPorcentajeDeUnNucleo": 12.99
+        },
+        {
+          "utc": "2026-11-18T18:39:06.6420135Z",
+          "memoriaProcesoBytes": 370221056,
+          "cpuPorcentajeDeUnNucleo": 11.99
+        },
+        {
+          "utc": "2026-11-18T18:39:07.6431961Z",
+          "memoriaProcesoBytes": 370335744,
+          "cpuPorcentajeDeUnNucleo": 16.98
+        },
+        {
+          "utc": "2026-11-18T18:39:08.6442381Z",
+          "memoriaProcesoBytes": 370475008,
+          "cpuPorcentajeDeUnNucleo": 23.98
+        },
+        {
+          "utc": "2026-11-18T18:39:09.6452909Z",
+          "memoriaProcesoBytes": 371781632,
+          "cpuPorcentajeDeUnNucleo": 17.98
+        },
+        {
+          "utc": "2026-11-18T18:39:10.6467368Z",
+          "memoriaProcesoBytes": 372076544,
+          "cpuPorcentajeDeUnNucleo": 14.99
+        },
+        {
+          "utc": "2026-11-18T18:39:11.6482260Z",
+          "memoriaProcesoBytes": 372207616,
+          "cpuPorcentajeDeUnNucleo": 19.98
+        },
+        {
+          "utc": "2026-11-18T18:39:12.6492367Z",
+          "memoriaProcesoBytes": 373497856,
+          "cpuPorcentajeDeUnNucleo": 24.98
+        },
+        {
+          "utc": "2026-11-18T18:39:13.6501956Z",
+          "memoriaProcesoBytes": 373616640,
+          "cpuPorcentajeDeUnNucleo": 20.98
+        },
+        {
+          "utc": "2026-11-18T18:39:14.6511618Z",
+          "memoriaProcesoBytes": 373702656,
+          "cpuPorcentajeDeUnNucleo": 14.99
+        },
+        {
+          "utc": "2026-11-18T18:39:15.6523654Z",
+          "memoriaProcesoBytes": 373899264,
+          "cpuPorcentajeDeUnNucleo": 12.99
+        },
+        {
+          "utc": "2026-11-18T18:39:16.6532425Z",
+          "memoriaProcesoBytes": 374038528,
+          "cpuPorcentajeDeUnNucleo": 8.99
+        },
+        {
+          "utc": "2026-11-18T18:39:17.6541342Z",
+          "memoriaProcesoBytes": 374149120,
+          "cpuPorcentajeDeUnNucleo": 9.99
+        },
+        {
+          "utc": "2026-11-18T18:39:18.6552153Z",
+          "memoriaProcesoBytes": 374427648,
+          "cpuPorcentajeDeUnNucleo": 27.97
+        },
+        {
+          "utc": "2026-11-18T18:39:19.6561784Z",
+          "memoriaProcesoBytes": 374501376,
+          "cpuPorcentajeDeUnNucleo": 6.99
+        },
+        {
+          "utc": "2026-11-18T18:39:20.6572939Z",
+          "memoriaProcesoBytes": 374611968,
+          "cpuPorcentajeDeUnNucleo": 16.98
+        },
+        {
+          "utc": "2026-11-18T18:39:21.6583447Z",
+          "memoriaProcesoBytes": 375173120,
+          "cpuPorcentajeDeUnNucleo": 15.98
+        },
+        {
+          "utc": "2026-11-18T18:39:22.6595144Z",
+          "memoriaProcesoBytes": 375341056,
+          "cpuPorcentajeDeUnNucleo": 5.99
+        },
+        {
+          "utc": "2026-11-18T18:39:23.6611412Z",
+          "memoriaProcesoBytes": 375369728,
+          "cpuPorcentajeDeUnNucleo": 6.99
+        },
+        {
+          "utc": "2026-11-18T18:39:24.6621261Z",
+          "memoriaProcesoBytes": 375402496,
+          "cpuPorcentajeDeUnNucleo": 12.99
+        },
+        {
+          "utc": "2026-11-18T18:39:25.6635296Z",
+          "memoriaProcesoBytes": 375508992,
+          "cpuPorcentajeDeUnNucleo": 7.99
+        },
+        {
+          "utc": "2026-11-18T18:39:26.6645022Z",
+          "memoriaProcesoBytes": 375566336,
+          "cpuPorcentajeDeUnNucleo": 9.99
+        },
+        {
+          "utc": "2026-11-18T18:39:27.6655101Z",
+          "memoriaProcesoBytes": 375574528,
+          "cpuPorcentajeDeUnNucleo": 6.99
+        },
+        {
+          "utc": "2026-11-18T18:39:28.6665472Z",
+          "memoriaProcesoBytes": 375627776,
+          "cpuPorcentajeDeUnNucleo": 8.99
+        },
+        {
+          "utc": "2026-11-18T18:39:29.6678276Z",
+          "memoriaProcesoBytes": 375697408,
+          "cpuPorcentajeDeUnNucleo": 10.99
+        },
+        {
+          "utc": "2026-11-18T18:39:30.6696866Z",
+          "memoriaProcesoBytes": 375717888,
+          "cpuPorcentajeDeUnNucleo": 3.99
+        },
+        {
+          "utc": "2026-11-18T18:39:31.6712164Z",
+          "memoriaProcesoBytes": 375750656,
+          "cpuPorcentajeDeUnNucleo": 5.99
+        }
+      ]
+    },
+    {
+      "informe": {
+        "inicioUTC": "2026-11-18T18:39:32.800555988Z",
+        "finUTC": "2026-11-18T18:40:29.089350822Z",
+        "inicioMedicionUTC": "2026-11-18T18:39:43.068134622Z",
+        "finMedicionUTC": "2026-11-18T18:40:28.068134622Z",
+        "usuarios": 100,
+        "usuariosMinimosEnMedicion": 100,
+        "rampaSegundos": 5,
+        "calentamientoSegundos": 5,
+        "medicionSegundos": 45,
+        "pausaMs": 1000,
+        "fallosGenerador": 0,
+        "cumpleUmbralesDeEstaEtapa": true,
+        "cubre5000Durante30Minutos": false,
+        "generador": {
+          "procesadores": 9,
+          "heapMaximoBytes": 536870912,
+          "heapObservadoMaximoBytes": 99074640,
+          "cpuMediaPorcentajeDeUnNucleo": 16.2
+        },
+        "operaciones": [
+          {
+            "nombre": "consumo",
+            "solicitudes": 641,
+            "internosOTransporte": 0,
+            "otrosErrores": 0,
+            "erroresPorcentaje": 0.0,
+            "solicitudesPorSegundo": 14.244,
+            "mediaMs": 3.311,
+            "p50MsHasta": 4,
+            "p95MsHasta": 6,
+            "p99MsHasta": 9,
+            "maximoMs": 26.254,
+            "cumple": true
+          },
+          {
+            "nombre": "historial",
+            "solicitudes": 640,
+            "internosOTransporte": 0,
+            "otrosErrores": 0,
+            "erroresPorcentaje": 0.0,
+            "solicitudesPorSegundo": 14.222,
+            "mediaMs": 3.37,
+            "p50MsHasta": 4,
+            "p95MsHasta": 6,
+            "p99MsHasta": 9,
+            "maximoMs": 13.739,
+            "cumple": true
+          },
+          {
+            "nombre": "estadisticas",
+            "solicitudes": 639,
+            "internosOTransporte": 0,
+            "otrosErrores": 0,
+            "erroresPorcentaje": 0.0,
+            "solicitudesPorSegundo": 14.2,
+            "mediaMs": 3.589,
+            "p50MsHasta": 4,
+            "p95MsHasta": 7,
+            "p99MsHasta": 9,
+            "maximoMs": 23.233,
+            "cumple": true
+          },
+          {
+            "nombre": "costos",
+            "solicitudes": 640,
+            "internosOTransporte": 0,
+            "otrosErrores": 0,
+            "erroresPorcentaje": 0.0,
+            "solicitudesPorSegundo": 14.222,
+            "mediaMs": 5.319,
+            "p50MsHasta": 5,
+            "p95MsHasta": 9,
+            "p99MsHasta": 13,
+            "maximoMs": 21.242,
+            "cumple": true
+          },
+          {
+            "nombre": "proyeccion",
+            "solicitudes": 641,
+            "internosOTransporte": 0,
+            "otrosErrores": 0,
+            "erroresPorcentaje": 0.0,
+            "solicitudesPorSegundo": 14.244,
+            "mediaMs": 4.781,
+            "p50MsHasta": 5,
+            "p95MsHasta": 8,
+            "p99MsHasta": 11,
+            "maximoMs": 14.472,
+            "cumple": true
+          },
+          {
+            "nombre": "recibos",
+            "solicitudes": 642,
+            "internosOTransporte": 0,
+            "otrosErrores": 0,
+            "erroresPorcentaje": 0.0,
+            "solicitudesPorSegundo": 14.267,
+            "mediaMs": 2.692,
+            "p50MsHasta": 3,
+            "p95MsHasta": 5,
+            "p99MsHasta": 8,
+            "maximoMs": 26.171,
+            "cumple": true
+          },
+          {
+            "nombre": "notificaciones",
+            "solicitudes": 642,
+            "internosOTransporte": 0,
+            "otrosErrores": 0,
+            "erroresPorcentaje": 0.0,
+            "solicitudesPorSegundo": 14.267,
+            "mediaMs": 2.798,
+            "p50MsHasta": 3,
+            "p95MsHasta": 6,
+            "p99MsHasta": 8,
+            "maximoMs": 12.485,
+            "cumple": true
+          }
+        ]
+      },
+      "antes": {
+        "suministrosActualizados": 49,
+        "ultimoExitoUTC": "2026-11-18 18:39:31.644282",
+        "alertasRegistradas": 49,
+        "lecturasGuardadas": 449,
+        "suministrosConExitoDuranteMedicion": null,
+        "alertasDuranteMedicion": null,
+        "lecturasDuranteMedicion": null,
+        "ultimaAlertaUTC": "2026-11-18 18:39:31.647045"
+      },
+      "despues": {
+        "suministrosActualizados": 100,
+        "ultimoExitoUTC": "2026-11-18 18:40:29.706717",
+        "alertasRegistradas": 100,
+        "lecturasGuardadas": 500,
+        "suministrosConExitoDuranteMedicion": 40,
+        "alertasDuranteMedicion": 40,
+        "lecturasDuranteMedicion": 40,
+        "ultimaAlertaUTC": "2026-11-18 18:40:28.575941"
+      },
+      "recursosBackend": [
+        {
+          "utc": "2026-11-18T18:39:33.7613404Z",
+          "memoriaProcesoBytes": 375848960,
+          "cpuPorcentajeDeUnNucleo": 11.95
+        },
+        {
+          "utc": "2026-11-18T18:39:34.7628581Z",
+          "memoriaProcesoBytes": 376029184,
+          "cpuPorcentajeDeUnNucleo": 34.93
+        },
+        {
+          "utc": "2026-11-18T18:39:35.7640906Z",
+          "memoriaProcesoBytes": 376459264,
+          "cpuPorcentajeDeUnNucleo": 35.96
+        },
+        {
+          "utc": "2026-11-18T18:39:36.7652939Z",
+          "memoriaProcesoBytes": 377409536,
+          "cpuPorcentajeDeUnNucleo": 46.95
+        },
+        {
+          "utc": "2026-11-18T18:39:37.7663241Z",
+          "memoriaProcesoBytes": 377585664,
+          "cpuPorcentajeDeUnNucleo": 45.95
+        },
+        {
+          "utc": "2026-11-18T18:39:38.7704532Z",
+          "memoriaProcesoBytes": 392757248,
+          "cpuPorcentajeDeUnNucleo": 98.61
+        },
+        {
+          "utc": "2026-11-18T18:39:39.7720274Z",
+          "memoriaProcesoBytes": 393199616,
+          "cpuPorcentajeDeUnNucleo": 44.91
+        },
+        {
+          "utc": "2026-11-18T18:39:40.7731846Z",
+          "memoriaProcesoBytes": 393474048,
+          "cpuPorcentajeDeUnNucleo": 48.95
+        },
+        {
+          "utc": "2026-11-18T18:39:41.7743449Z",
+          "memoriaProcesoBytes": 393515008,
+          "cpuPorcentajeDeUnNucleo": 44.96
+        },
+        {
+          "utc": "2026-11-18T18:39:42.7759379Z",
+          "memoriaProcesoBytes": 393592832,
+          "cpuPorcentajeDeUnNucleo": 39.92
+        },
+        {
+          "utc": "2026-11-18T18:39:43.8037701Z",
+          "memoriaProcesoBytes": 388849664,
+          "cpuPorcentajeDeUnNucleo": 38.91
+        },
+        {
+          "utc": "2026-11-18T18:39:44.8046739Z",
+          "memoriaProcesoBytes": 388857856,
+          "cpuPorcentajeDeUnNucleo": 17.98
+        },
+        {
+          "utc": "2026-11-18T18:39:45.8056286Z",
+          "memoriaProcesoBytes": 388886528,
+          "cpuPorcentajeDeUnNucleo": 24.98
+        },
+        {
+          "utc": "2026-11-18T18:39:46.8064720Z",
+          "memoriaProcesoBytes": 388898816,
+          "cpuPorcentajeDeUnNucleo": 17.98
+        },
+        {
+          "utc": "2026-11-18T18:39:47.8075055Z",
+          "memoriaProcesoBytes": 388898816,
+          "cpuPorcentajeDeUnNucleo": 29.97
+        },
+        {
+          "utc": "2026-11-18T18:39:48.8087785Z",
+          "memoriaProcesoBytes": 388923392,
+          "cpuPorcentajeDeUnNucleo": 20.98
+        },
+        {
+          "utc": "2026-11-18T18:39:49.8096315Z",
+          "memoriaProcesoBytes": 390406144,
+          "cpuPorcentajeDeUnNucleo": 39.96
+        },
+        {
+          "utc": "2026-11-18T18:39:50.8105381Z",
+          "memoriaProcesoBytes": 390418432,
+          "cpuPorcentajeDeUnNucleo": 26.97
+        },
+        {
+          "utc": "2026-11-18T18:39:51.8115229Z",
+          "memoriaProcesoBytes": 390475776,
+          "cpuPorcentajeDeUnNucleo": 32.97
+        },
+        {
+          "utc": "2026-11-18T18:39:52.8124508Z",
+          "memoriaProcesoBytes": 390475776,
+          "cpuPorcentajeDeUnNucleo": 25.97
+        },
+        {
+          "utc": "2026-11-18T18:39:53.8136367Z",
+          "memoriaProcesoBytes": 384868352,
+          "cpuPorcentajeDeUnNucleo": 37.96
+        },
+        {
+          "utc": "2026-11-18T18:39:54.8144967Z",
+          "memoriaProcesoBytes": 384868352,
+          "cpuPorcentajeDeUnNucleo": 21.98
+        },
+        {
+          "utc": "2026-11-18T18:39:55.8161092Z",
+          "memoriaProcesoBytes": 381747200,
+          "cpuPorcentajeDeUnNucleo": 40.96
+        },
+        {
+          "utc": "2026-11-18T18:39:56.8174963Z",
+          "memoriaProcesoBytes": 381747200,
+          "cpuPorcentajeDeUnNucleo": 22.95
+        },
+        {
+          "utc": "2026-11-18T18:39:57.8182932Z",
+          "memoriaProcesoBytes": 381751296,
+          "cpuPorcentajeDeUnNucleo": 23.98
+        },
+        {
+          "utc": "2026-11-18T18:39:58.8196354Z",
+          "memoriaProcesoBytes": 381751296,
+          "cpuPorcentajeDeUnNucleo": 21.98
+        },
+        {
+          "utc": "2026-11-18T18:39:59.8205589Z",
+          "memoriaProcesoBytes": 382877696,
+          "cpuPorcentajeDeUnNucleo": 33.97
+        },
+        {
+          "utc": "2026-11-18T18:40:00.8216431Z",
+          "memoriaProcesoBytes": 382922752,
+          "cpuPorcentajeDeUnNucleo": 18.98
+        },
+        {
+          "utc": "2026-11-18T18:40:01.8224948Z",
+          "memoriaProcesoBytes": 382926848,
+          "cpuPorcentajeDeUnNucleo": 20.98
+        },
+        {
+          "utc": "2026-11-18T18:40:02.8235236Z",
+          "memoriaProcesoBytes": 382935040,
+          "cpuPorcentajeDeUnNucleo": 15.98
+        },
+        {
+          "utc": "2026-11-18T18:40:03.8249946Z",
+          "memoriaProcesoBytes": 382951424,
+          "cpuPorcentajeDeUnNucleo": 20.98
+        },
+        {
+          "utc": "2026-11-18T18:40:04.8259323Z",
+          "memoriaProcesoBytes": 382955520,
+          "cpuPorcentajeDeUnNucleo": 15.98
+        },
+        {
+          "utc": "2026-11-18T18:40:05.8268404Z",
+          "memoriaProcesoBytes": 383578112,
+          "cpuPorcentajeDeUnNucleo": 13.99
+        },
+        {
+          "utc": "2026-11-18T18:40:06.8277716Z",
+          "memoriaProcesoBytes": 383606784,
+          "cpuPorcentajeDeUnNucleo": 21.98
+        },
+        {
+          "utc": "2026-11-18T18:40:07.8285999Z",
+          "memoriaProcesoBytes": 383606784,
+          "cpuPorcentajeDeUnNucleo": 14.99
+        },
+        {
+          "utc": "2026-11-18T18:40:08.8297373Z",
+          "memoriaProcesoBytes": 383606784,
+          "cpuPorcentajeDeUnNucleo": 12.99
+        },
+        {
+          "utc": "2026-11-18T18:40:09.8305978Z",
+          "memoriaProcesoBytes": 380461056,
+          "cpuPorcentajeDeUnNucleo": 30.97
+        },
+        {
+          "utc": "2026-11-18T18:40:10.8316032Z",
+          "memoriaProcesoBytes": 380461056,
+          "cpuPorcentajeDeUnNucleo": 14.99
+        },
+        {
+          "utc": "2026-11-18T18:40:11.8328525Z",
+          "memoriaProcesoBytes": 380469248,
+          "cpuPorcentajeDeUnNucleo": 21.98
+        },
+        {
+          "utc": "2026-11-18T18:40:12.8339304Z",
+          "memoriaProcesoBytes": 380469248,
+          "cpuPorcentajeDeUnNucleo": 21.98
+        },
+        {
+          "utc": "2026-11-18T18:40:13.8353625Z",
+          "memoriaProcesoBytes": 380493824,
+          "cpuPorcentajeDeUnNucleo": 21.98
+        },
+        {
+          "utc": "2026-11-18T18:40:14.8362580Z",
+          "memoriaProcesoBytes": 380518400,
+          "cpuPorcentajeDeUnNucleo": 17.98
+        },
+        {
+          "utc": "2026-11-18T18:40:15.8370770Z",
+          "memoriaProcesoBytes": 380530688,
+          "cpuPorcentajeDeUnNucleo": 16.98
+        },
+        {
+          "utc": "2026-11-18T18:40:16.8379924Z",
+          "memoriaProcesoBytes": 380764160,
+          "cpuPorcentajeDeUnNucleo": 29.97
+        },
+        {
+          "utc": "2026-11-18T18:40:17.8398146Z",
+          "memoriaProcesoBytes": 380919808,
+          "cpuPorcentajeDeUnNucleo": 34.93
+        },
+        {
+          "utc": "2026-11-18T18:40:18.8408327Z",
+          "memoriaProcesoBytes": 381034496,
+          "cpuPorcentajeDeUnNucleo": 29.97
+        },
+        {
+          "utc": "2026-11-18T18:40:19.8416803Z",
+          "memoriaProcesoBytes": 382410752,
+          "cpuPorcentajeDeUnNucleo": 59.94
+        },
+        {
+          "utc": "2026-11-18T18:40:20.8433607Z",
+          "memoriaProcesoBytes": 383541248,
+          "cpuPorcentajeDeUnNucleo": 45.95
+        },
+        {
+          "utc": "2026-11-18T18:40:21.8451922Z",
+          "memoriaProcesoBytes": 383750144,
+          "cpuPorcentajeDeUnNucleo": 64.87
+        },
+        {
+          "utc": "2026-11-18T18:40:22.8469062Z",
+          "memoriaProcesoBytes": 380502016,
+          "cpuPorcentajeDeUnNucleo": 42.91
+        },
+        {
+          "utc": "2026-11-18T18:40:23.8487226Z",
+          "memoriaProcesoBytes": 380608512,
+          "cpuPorcentajeDeUnNucleo": 29.94
+        },
+        {
+          "utc": "2026-11-18T18:40:24.8496429Z",
+          "memoriaProcesoBytes": 380616704,
+          "cpuPorcentajeDeUnNucleo": 13.99
+        },
+        {
+          "utc": "2026-11-18T18:40:25.8505643Z",
+          "memoriaProcesoBytes": 380661760,
+          "cpuPorcentajeDeUnNucleo": 22.98
+        },
+        {
+          "utc": "2026-11-18T18:40:26.8515464Z",
+          "memoriaProcesoBytes": 380669952,
+          "cpuPorcentajeDeUnNucleo": 14.99
+        },
+        {
+          "utc": "2026-11-18T18:40:27.8524572Z",
+          "memoriaProcesoBytes": 382164992,
+          "cpuPorcentajeDeUnNucleo": 38.96
+        },
+        {
+          "utc": "2026-11-18T18:40:28.8538708Z",
+          "memoriaProcesoBytes": 382164992,
+          "cpuPorcentajeDeUnNucleo": 5.99
+        },
+        {
+          "utc": "2026-11-18T18:40:29.8547414Z",
+          "memoriaProcesoBytes": 383778816,
+          "cpuPorcentajeDeUnNucleo": 13.99
+        }
+      ]
+    }
+  ]
+}

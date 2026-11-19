@@ -1,0 +1,122 @@
+{
+  "alcance": "Validacion local de la automatizacion. No constituye una ejecucion en GitHub ni una prueba de 5000 usuarios.",
+  "fechaLocalLima": "2026-11-18",
+  "ejecuciones": [
+    {
+      "idEjecucionLocal": "6c05f06c4b67",
+      "entorno": {
+        "sistema": "Unix 6.18.57.0",
+        "procesadores": 9,
+        "java": "openjdk 21.0.13 2026-10-20 LTS\nOpenJDK Runtime Environment Temurin-21.0.13+9 (build 21.0.13+9-LTS)\nOpenJDK 64-Bit Server VM Temurin-21.0.13+9 (build 21.0.13+9-LTS, mixed mode, sharing)",
+        "powershell": "7.4.6",
+        "mysql": {
+          "version": "8.0.46",
+          "maxConnections": 151,
+          "innodbBufferPoolBytes": 134217728
+        },
+        "jarSHA256": "6AB95CF3ABC95B6CEE9BF65DB2E4A7EEE1BCE10BE05475C3B0A484EC0632439C",
+        "usuariosFicticios": 5000,
+        "poolConexiones": 10,
+        "memoriaBackendMb": 512,
+        "memoriaGeneradorMb": 512
+      },
+      "etapas": [
+        {
+          "etapa": "etapa-1-20",
+          "usuarios": 20,
+          "usuariosMinimosEnMedicion": 20,
+          "medicionSegundos": 45,
+          "inicioMedicionUTC": "2026-11-19T01:34:39.140673103Z",
+          "finMedicionUTC": "2026-11-19T01:35:24.140673103Z",
+          "solicitudes": 895,
+          "p95MaximoMs": 11,
+          "errores": 0,
+          "cumple": true,
+          "sincronizacionDuranteMedicion": true,
+          "alertasDuranteMedicion": true,
+          "muestrasBackend": 9,
+          "muestrasGenerador": 9,
+          "csvGeneradorSHA256": "101007d388c4ed94e05ec16d5a37f515a9f268ab472e7a3bd10ae94bdad18515"
+        }
+      ]
+    },
+    {
+      "idEjecucionLocal": "90cbcfbb58bd",
+      "entorno": {
+        "sistema": "Unix 6.18.57.0",
+        "procesadores": 9,
+        "java": "openjdk 21.0.13 2026-10-20 LTS\nOpenJDK Runtime Environment Temurin-21.0.13+9 (build 21.0.13+9-LTS)\nOpenJDK 64-Bit Server VM Temurin-21.0.13+9 (build 21.0.13+9-LTS, mixed mode, sharing)",
+        "powershell": "7.4.6",
+        "mysql": {
+          "version": "8.0.46",
+          "maxConnections": 151,
+          "innodbBufferPoolBytes": 134217728
+        },
+        "jarSHA256": "6AB95CF3ABC95B6CEE9BF65DB2E4A7EEE1BCE10BE05475C3B0A484EC0632439C",
+        "usuariosFicticios": 5000,
+        "poolConexiones": 10,
+        "memoriaBackendMb": 512,
+        "memoriaGeneradorMb": 512
+      },
+      "etapas": [
+        {
+          "etapa": "etapa-1-20",
+          "usuarios": 20,
+          "usuariosMinimosEnMedicion": 20,
+          "medicionSegundos": 45,
+          "inicioMedicionUTC": "2026-11-19T01:35:46.984761354Z",
+          "finMedicionUTC": "2026-11-19T01:36:31.984761354Z",
+          "solicitudes": 895,
+          "p95MaximoMs": 11,
+          "errores": 0,
+          "cumple": true,
+          "sincronizacionDuranteMedicion": true,
+          "alertasDuranteMedicion": true,
+          "muestrasBackend": 9,
+          "muestrasGenerador": 9,
+          "csvGeneradorSHA256": "ff50d7b817a471805026ce445ec5cd274b960a52972956a7255d63d67e90a271"
+        },
+        {
+          "etapa": "etapa-2-20",
+          "usuarios": 20,
+          "usuariosMinimosEnMedicion": 20,
+          "medicionSegundos": 45,
+          "inicioMedicionUTC": "2026-11-19T01:36:45.266544758Z",
+          "finMedicionUTC": "2026-11-19T01:37:30.266544758Z",
+          "solicitudes": 895,
+          "p95MaximoMs": 10,
+          "errores": 0,
+          "cumple": true,
+          "sincronizacionDuranteMedicion": true,
+          "alertasDuranteMedicion": true,
+          "muestrasBackend": 9,
+          "muestrasGenerador": 9,
+          "csvGeneradorSHA256": "815f65c82495d9dabd07902f44ce0a767847545b9ffe32f91acb1aae32e2f198"
+        }
+      ]
+    }
+  ],
+  "controles": {
+    "escenariosDelResumenValidados": 10,
+    "escenarios": [
+      "breve correcta",
+      "fallo de latencia",
+      "fallo de sincronizacion",
+      "fallo de alertas",
+      "recursos ausentes",
+      "fallo de montaje",
+      "sin evaluaciones",
+      "completa correcta simulada",
+      "completa incompleta",
+      "completa sin cobertura"
+    ],
+    "publicacionDeTokensCsvYLogsNoPermitidos": false,
+    "yamlManualConCondicionPublica": true,
+    "sintaxisPowerShellValida": true
+  },
+  "fuentesSHA256": {
+    ".github/workflows/nivora-carga.yml": "78ffbc03f993cb4e3e21407ff0991fcee8a8117a87833fc7e3ddd3c2407cb1ea",
+    "tecnologia/nivora-backend/herramientas/EjecutarCargaGitHub.ps1": "5ce72dc716457f4199b1759cda7b6221095314fef1838c2aba42165ab68bb05a",
+    "tecnologia/nivora-backend/herramientas/EjecutarPruebaCarga.ps1": "37ab53276f7f8ba59daa6f3577b3b1d4b6fe7435878f09439c20b59a9e49be54"
+  }
+}

@@ -1,0 +1,219 @@
+{
+  "origen": "Informes y resumen de recursos compartidos desde CMD de Windows el 18 de noviembre de 2026.",
+  "alcance": "Comparacion descriptiva de dos ejecuciones en un equipo compartido. El cuello de botella sigue pendiente de diagnosticar.",
+  "entorno": {
+    "procesadoresLogicos": 4,
+    "ramFisicaBytes": 4066164736,
+    "java": "Temurin 21.0.11",
+    "mysql": "8.0.46",
+    "mysqlInnodbBufferPoolBytes": 134217728,
+    "memoriaBackendMb": 512,
+    "memoriaGeneradorMb": 512,
+    "hilosHttp": 200,
+    "suministrosDatos": 5000,
+    "generadorYServidorEnMismoEquipo": true
+  },
+  "resultados": [
+    {
+      "idEjecucion": "26f5797371bf",
+      "poolConexiones": 10,
+      "usuarios": 2500,
+      "usuariosMinimosEnMedicion": 2500,
+      "rampaSegundos": 60,
+      "calentamientoSegundos": 15,
+      "medicionSegundos": 120,
+      "pausaMs": 1000,
+      "fallosGenerador": 0,
+      "cumpleUmbralesDeEstaEtapa": false,
+      "cubre5000Durante30Minutos": false,
+      "solicitudesTotales": 89552,
+      "generador": {
+        "cpuMediaPorcentajeDeUnNucleo": 46.14,
+        "heapObservadoMaximoBytes": 460565120
+      },
+      "operaciones": [
+        {
+          "nombre": "consumo",
+          "solicitudes": 12813,
+          "mediaMs": 1647.335,
+          "p95MsHasta": 4093,
+          "p99MsHasta": 5075,
+          "maximoMs": 7593.509,
+          "internosOTransporte": 0,
+          "otrosErrores": 0,
+          "cumple": false
+        },
+        {
+          "nombre": "historial",
+          "solicitudes": 12836,
+          "mediaMs": 1659.162,
+          "p95MsHasta": 4070,
+          "p99MsHasta": 5080,
+          "maximoMs": 7593.412,
+          "internosOTransporte": 0,
+          "otrosErrores": 0,
+          "cumple": false
+        },
+        {
+          "nombre": "estadisticas",
+          "solicitudes": 12790,
+          "mediaMs": 1646.206,
+          "p95MsHasta": 4068,
+          "p99MsHasta": 5160,
+          "maximoMs": 7593.561,
+          "internosOTransporte": 0,
+          "otrosErrores": 0,
+          "cumple": false
+        },
+        {
+          "nombre": "costos",
+          "solicitudes": 12792,
+          "mediaMs": 1649.479,
+          "p95MsHasta": 4039,
+          "p99MsHasta": 5068,
+          "maximoMs": 8168.113,
+          "internosOTransporte": 0,
+          "otrosErrores": 0,
+          "cumple": false
+        },
+        {
+          "nombre": "proyeccion",
+          "solicitudes": 12786,
+          "mediaMs": 1646.916,
+          "p95MsHasta": 4059,
+          "p99MsHasta": 5043,
+          "maximoMs": 7593.396,
+          "internosOTransporte": 0,
+          "otrosErrores": 0,
+          "cumple": false
+        },
+        {
+          "nombre": "recibos",
+          "solicitudes": 12784,
+          "mediaMs": 1667.326,
+          "p95MsHasta": 4070,
+          "p99MsHasta": 5182,
+          "maximoMs": 8158.32,
+          "internosOTransporte": 0,
+          "otrosErrores": 0,
+          "cumple": false
+        },
+        {
+          "nombre": "notificaciones",
+          "solicitudes": 12751,
+          "mediaMs": 1625.065,
+          "p95MsHasta": 4038,
+          "p99MsHasta": 5031,
+          "maximoMs": 7593.447,
+          "internosOTransporte": 0,
+          "otrosErrores": 0,
+          "cumple": false
+        }
+      ],
+      "recursosBackendDuranteMedicion": {
+        "muestras": 50,
+        "cpuMediaPorcentajeDeUnNucleo": 138.0806,
+        "cpuMaximaPorcentajeDeUnNucleo": 175.7,
+        "memoriaResidenteMediaBytes": 310655385.6,
+        "memoriaResidenteMaximaBytes": 343453696
+      }
+    },
+    {
+      "idEjecucion": "30d5dc753694",
+      "poolConexiones": 20,
+      "usuarios": 2500,
+      "usuariosMinimosEnMedicion": 2500,
+      "rampaSegundos": 60,
+      "calentamientoSegundos": 15,
+      "medicionSegundos": 120,
+      "pausaMs": 1000,
+      "fallosGenerador": 0,
+      "cumpleUmbralesDeEstaEtapa": false,
+      "cubre5000Durante30Minutos": false,
+      "solicitudesTotales": 89616,
+      "generador": {
+        "cpuMediaPorcentajeDeUnNucleo": 43.47,
+        "heapObservadoMaximoBytes": 438620216
+      },
+      "operaciones": [
+        {
+          "nombre": "consumo",
+          "solicitudes": 12775,
+          "mediaMs": 1852.859,
+          "p95MsHasta": 4139,
+          "p99MsHasta": 5203,
+          "maximoMs": 7913.306,
+          "internosOTransporte": 0,
+          "otrosErrores": 0,
+          "cumple": false
+        },
+        {
+          "nombre": "historial",
+          "solicitudes": 12786,
+          "mediaMs": 1822.098,
+          "p95MsHasta": 4112,
+          "p99MsHasta": 5138,
+          "maximoMs": 8606.401,
+          "internosOTransporte": 0,
+          "otrosErrores": 0,
+          "cumple": false
+        },
+        {
+          "nombre": "estadisticas",
+          "solicitudes": 12791,
+          "mediaMs": 1824.227,
+          "p95MsHasta": 4121,
+          "p99MsHasta": 5138,
+          "maximoMs": 8610.662,
+          "internosOTransporte": 0,
+          "otrosErrores": 0,
+          "cumple": false
+        },
+        {
+          "nombre": "costos",
+          "solicitudes": 12800,
+          "mediaMs": 1848.524,
+          "p95MsHasta": 4132,
+          "p99MsHasta": 5138,
+          "maximoMs": 10513.972,
+          "internosOTransporte": 1,
+          "otrosErrores": 0,
+          "cumple": false
+        },
+        {
+          "nombre": "proyeccion",
+          "solicitudes": 12806,
+          "mediaMs": 1867.891,
+          "p95MsHasta": 4135,
+          "p99MsHasta": 5249,
+          "maximoMs": 8606.455,
+          "internosOTransporte": 0,
+          "otrosErrores": 0,
+          "cumple": false
+        },
+        {
+          "nombre": "recibos",
+          "solicitudes": 12835,
+          "mediaMs": 1818.61,
+          "p95MsHasta": 4110,
+          "p99MsHasta": 5140,
+          "maximoMs": 7920.816,
+          "internosOTransporte": 0,
+          "otrosErrores": 0,
+          "cumple": false
+        },
+        {
+          "nombre": "notificaciones",
+          "solicitudes": 12823,
+          "mediaMs": 1843.084,
+          "p95MsHasta": 4111,
+          "p99MsHasta": 5137,
+          "maximoMs": 7913.361,
+          "internosOTransporte": 0,
+          "otrosErrores": 0,
+          "cumple": false
+        }
+      ]
+    }
+  ]
+}

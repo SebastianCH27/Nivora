@@ -19,7 +19,7 @@ se ejecutan por separado, conforme a ADR-003.
 | **Respuesta esperada** | Nivora atiende las consultas y devuelve la información almacenada correspondiente al suministro, mientras continúan las actualizaciones y la evaluación de alertas. |
 | **Medida** | Mantener 5000 usuarios activos simultáneamente durante 30 minutos. Al menos el 95 % de las solicitudes válidas de cada operación principal debe responder en un máximo de 2 segundos. Menos del 1 % de las solicitudes válidas de cada operación debe fallar por errores internos o tiempos de espera agotados. |
 | **Verificación** | Ejecutar la prueba de carga y registrar usuarios activos, duración, solicitudes, tiempos por operación, errores y uso de recursos. Comprobar que continúen las actualizaciones y la evaluación de alertas. Separar los rechazos esperados por datos inválidos de los errores internos. |
-| **Estado** | Pendiente de ejecutar y documentar la prueba completa. |
+| **Estado** | [Pruebas y diagnostico documentados](../../tecnologia/nivora-backend/documentacion/verificacion-rendimiento.md). Las etapas de 500 y 1000 usuarios cumplieron los umbrales segun las salidas compartidas. Con 2500 usuarios se supero el p95 permitido y el diagnostico registro saturacion de CPU del equipo compartido. Pendiente medir 5000 usuarios durante 30 minutos y conservar su evidencia completa. |
 | **Trazabilidad** | AC01 y DA01. |
 
 Los 5000 usuarios simultáneos constituyen un requisito del proyecto.
@@ -39,7 +39,7 @@ Su cumplimiento deberá comprobarse mediante pruebas.
 | **Respuesta esperada** | La ampliación de recursos permite atender una carga sostenible mayor, manteniendo los límites establecidos de respuesta y errores. |
 | **Medida** | Como propuesta de evaluación, aumentar la carga por etapas de 500, 1000, 2500 y 5000 usuarios activos. La configuración ampliada debe sostener una carga mayor que la inicial. La etapa de 5000 usuarios debe mantenerse durante 30 minutos, con al menos el 95 % de las solicitudes válidas de cada operación principal respondidas en un máximo de 2 segundos y menos del 1 % de errores internos o tiempos de espera agotados. |
 | **Verificación** | Registrar la carga sostenible, los tiempos por operación, los errores y el uso de recursos en cada configuración. Comparar los resultados manteniendo la misma mezcla de operaciones y condiciones de datos. Comprobar que continúen las actualizaciones y la evaluación de alertas. |
-| **Estado** | Pendiente de definir las configuraciones de recursos y ejecutar la comparación de capacidad. |
+| **Estado** | [Comparacion y diagnostico documentados](../../tecnologia/nivora-backend/documentacion/verificacion-rendimiento.md). Ampliar el pool de 10 a 20 conexiones no mostro mejora apreciable con 2500 usuarios; ambas configuraciones incumplieron el p95. Pendiente demostrar una carga sostenible mayor mediante ampliacion de recursos y ejecutar la etapa de 5000 usuarios durante 30 minutos. |
 | **Trazabilidad** | AC02 y DA01. |
 
 Los escalones de carga constituyen una propuesta para organizar la prueba.
