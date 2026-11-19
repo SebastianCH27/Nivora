@@ -437,3 +437,11 @@ curl.exe -i "http://127.0.0.1:8081/api/v1/suministros/13100390/tarifa-actual"
 
 Las pruebas de carga para evaluar el objetivo de 5000 usuarios
 concurrentes quedan pendientes.
+
+
+## Perfil HTTPS de pruebas
+
+El perfil optativo `https` utiliza PKCS12, TLS 1.2/1.3 y el puerto 8444.
+Su prueba forma parte de la regresión de **75 casos aprobados** del cierre
+del 19 de noviembre de 2026. Configuración y procedimiento en
+[verificación de HTTPS](../nivora-backend/documentacion/verificacion-https.md).

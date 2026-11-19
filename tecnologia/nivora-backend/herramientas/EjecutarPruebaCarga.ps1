@@ -4,6 +4,7 @@ param(
     [switch]$Diagnostico,
     [switch]$MedirRecursos,
     [switch]$SinInteraccion,
+    [switch]$DatosMixtos,
     [ValidateRange(0,100000)][int]$SuministrosDatos = 0,
     [ValidateRange(1,10000)][int[]]$Etapas = @(20),
     [ValidateRange(5,3600)][int]$DuracionSegundos = 45,
@@ -81,7 +82,7 @@ $classpath = $clases + [IO.Path]::PathSeparator + $controlador
 $urlMysql = "jdbc:mysql://127.0.0.1:$PuertoMysql/?connectionTimeZone=UTC&allowPublicKeyRetrieval=true&rewriteBatchedStatements=true"
 $urlBackend = "http://127.0.0.1:$PuertoBackend"
 $nombres = @('NIVORA_CARGA_DB_USUARIO','NIVORA_CARGA_DB_CLAVE','NIVORA_CARGA_DB_ADMIN',
-    'NIVORA_CARGA_DB_ADMIN_CLAVE','NIVORA_DB_CLAVE','NIVORA_WEB_PUSH_HABILITADO')
+    'NIVORA_CARGA_DB_ADMIN_CLAVE','NIVORA_DB_CLAVE','NIVORA_WEB_PUSH_HABILITADO','NIVORA_CARGA_INTERVALOS')
 $anteriores = @{}
 foreach ($nombre in $nombres) { $anteriores[$nombre] = [Environment]::GetEnvironmentVariable($nombre, 'Process') }
 $procesos = New-Object System.Collections.Generic.List[System.Diagnostics.Process]
@@ -129,6 +130,7 @@ try {
     $env:NIVORA_CARGA_DB_ADMIN = $AdministradorMysql
     $env:NIVORA_CARGA_DB_USUARIO = $cuenta
     $env:NIVORA_CARGA_DB_CLAVE = [Guid]::NewGuid().ToString('N') + 'Carga9!'
+    $env:NIVORA_CARGA_INTERVALOS = $DatosMixtos.IsPresent.ToString().ToLowerInvariant()
     $preparacionIntentada = $true
     Invocar-Datos 'preparar' | Write-Host
     # Los hijos reciben solo la cuenta de carga; la clave administrativa se conserva en esta sesion.
@@ -144,7 +146,9 @@ try {
         "--server.tomcat.threads.max=$HilosHttp","--nivora.empresa-agua.url-base=http://127.0.0.1:$PuertoFuente",
         '--nivora.sincronizacion.intervalo-ms=1000','--nivora.sincronizacion.maximo-intentos-por-ciclo=1',
         '--nivora.sincronizacion.intervalo-completo-segundos=30','--nivora.web-push.habilitado=false',
-        '--nivora.tarifas.sincronizacion.habilitada=false')
+        '--nivora.tarifas.sincronizacion.habilitada=true',
+        '--nivora.tarifas.sincronizacion.intervalo-ms=1000','--nivora.tarifas.sincronizacion.maximo-intentos-por-ciclo=1',
+        '--nivora.tarifas.sincronizacion.intervalo-completo-segundos=30')
     if ($instrumentada) {
         $argumentos += @('--spring.datasource.hikari.register-mbeans=true',
             '--spring.datasource.hikari.pool-name=NivoraCarga','--server.tomcat.mbeanregistry.enabled=true')
@@ -184,7 +188,7 @@ try {
         sinInteraccion = [bool]$SinInteraccion; powershell = $PSVersionTable.PSVersion.ToString()
         etapas = $Etapas; completa = [bool]$Completa; generadorYServidorEnMismoEquipo = $true
         sincronizacionLecturasIntervaloMs = 1000; intentosPorCiclo = 1; intervaloCompletoSegundos = 30
-        sincronizacionTarifasHabilitada = $false
+        sincronizacionTarifasHabilitada = $true; datosMixtos = $DatosMixtos.IsPresent
     }) (Join-Path $salida 'entorno.json')
     $numero = 0
     foreach ($cantidad in $Etapas) {
@@ -249,8 +253,13 @@ try {
         Guardar-Json $despues ($prefijo + '-despues.json')
         $progreso = $despues.suministrosConExitoDuranteMedicion -gt 0
         $alertaDuranteCarga = $despues.alertasDuranteMedicion -gt 0
+        $tarifasDuranteCarga = $despues.tarifasConExitoDuranteMedicion -gt 0
+        $continuidad = $progreso -and $alertaDuranteCarga -and $tarifasDuranteCarga -and ($despues.lecturasDuranteMedicion -gt 0)
         Guardar-Json ([ordered]@{
             sincronizacionDuranteMedicion = $progreso; alertasGeneradasDuranteMedicion = $alertaDuranteCarga
+            tarifasActualizadasDuranteMedicion = $despues.tarifasConExitoDuranteMedicion
+            cumpleContinuidad = $continuidad
+            cumpleEtapaCompleta = $informe.cumpleUmbralesDeEstaEtapa -and $continuidad
             alertasAlFinal = $despues.alertasRegistradas
             lecturasIncorporadasDuranteMedicion = $despues.lecturasDuranteMedicion
             cumpleUmbralesDeEstaEtapa = $informe.cumpleUmbralesDeEstaEtapa
@@ -258,7 +267,7 @@ try {
             requiereComparacionDeRecursos = $true
         }) ($prefijo + '-evaluacion.json')
         Write-Host "p95 y errores dentro de los limites: $($informe.cumpleUmbralesDeEstaEtapa). Sincronizacion durante medicion: $progreso."
-        if (-not $informe.cumpleUmbralesDeEstaEtapa) {
+        if (-not ($informe.cumpleUmbralesDeEstaEtapa -and $continuidad)) {
             Write-Host 'La etapa no satisface los umbrales. Conserva los informes y revisa el cuello de botella antes de ampliar la carga.'
             break
         }

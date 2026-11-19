@@ -22,11 +22,14 @@ a 602 pruebas aprobadas. La [comparación de costos entre periodos](documentacio
 completa RF20/P02 con una regresión de 632 pruebas aprobadas.
 La corrección de [sincronización de tarifas](documentacion/sincronizacion-tarifas.md)
 conecta la incorporación inicial y el refresco periódico para los suministros
-registrados, con programación persistida y reintentos. La regresión actual
+registrados, con programación persistida y reintentos. La regresión de aquella entrega
 tiene 656 pruebas aprobadas; requiere aplicar la migración 22 antes del nuevo arranque.
 La [matriz RF/EQ](documentacion/matriz-requisitos-backend.md) identifica
-la cobertura del backend y los pendientes de interfaces y evaluaciones
-de calidad restantes.
+la cobertura del backend y las comprobaciones de interfaz pendientes.
+El [cierre sobre 890db94](documentacion/cierre-validacion-backend.md) completa
+HTTPS, contratos, sustitución de adaptadores y ampliación controlada de CPU.
+La regresión vigente tiene **760 pruebas aprobadas**; la Empresa de Agua, 75.
+Las tareas P03/P08 pertenecen a la implementación y validación del frontend.
 
 ## Servicios del entorno local
 
@@ -538,7 +541,7 @@ respuestas de error y los permisos antes de las operaciones administrativas.
 Los casos y comandos están en
 [Contratos y aislamiento de la API](documentacion/verificacion-contratos-api.md).
 
-La herramienta de carga prepara datos ficticios y mide las siete consultas
+La herramienta de carga prepara datos ficticios y mide las ocho consultas
 con sesiones independientes, sincronizacion y alertas en segundo plano.
 La ejecucion breve y el perfil de 5000 usuarios estan descritos en
 [Rendimiento y carga](documentacion/verificacion-rendimiento.md).

@@ -20,9 +20,9 @@ import java.util.regex.Pattern;
 /** Carga cerrada: cada usuario tiene una sesion y espera entre consultas. Requiere JDK 21. */
 public class PruebaCargaConsultas {
     private static final String[] RUTAS = {"consumo-actual", "historial?meses=2", "estadisticas?meses=2",
-        "costos?meses=2", "proyeccion", "recibos?limite=12", "notificaciones?limite=20"};
+        "costos?meses=2", "proyeccion", "recibos?limite=12", "notificaciones?limite=20", "comparacion"};
     private static final String[] NOMBRES = {"consumo", "historial", "estadisticas", "costos",
-        "proyeccion", "recibos", "notificaciones"};
+        "proyeccion", "recibos", "notificaciones", "comparacion"};
 
     public static void main(String[] args) throws Exception {
         if (args.length != 8) {

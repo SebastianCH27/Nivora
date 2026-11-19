@@ -41,4 +41,5 @@ administrativa se describen en [Sesiones administrativas](sesiones-administrativ
 El conjunto de integración también comprueba los permisos, la paginación
 y el enmascarado de DNI en las rutas de
 [suministros y registros de acceso](registros-acceso.md).
-Para EQ-06 queda pendiente la prueba de un despliegue con HTTPS.
+La comprobación posterior de EQ-06 está en
+[despliegue de pruebas con HTTPS](verificacion-https.md).

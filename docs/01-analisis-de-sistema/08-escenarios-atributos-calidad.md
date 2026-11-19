@@ -23,14 +23,13 @@ consolidan la cobertura y las reservas al 19 de noviembre de 2026.
 | **Respuesta esperada** | Nivora atiende las consultas y devuelve la información almacenada correspondiente al suministro, mientras continúan las actualizaciones y la evaluación de alertas. |
 | **Medida** | Mantener 5000 usuarios activos simultáneamente durante 30 minutos. Al menos el 95 % de las solicitudes válidas de cada operación principal debe responder en un máximo de 2 segundos. Menos del 1 % de las solicitudes válidas de cada operación debe fallar por errores internos o tiempos de espera agotados. |
 | **Verificación** | Ejecutar la prueba de carga y registrar usuarios activos, duración, solicitudes, tiempos por operación, errores y uso de recursos. Comprobar que continúen las actualizaciones y la evaluación de alertas. Separar los rechazos esperados por datos inválidos de los errores internos. |
-| **Estado** | Verificado en el entorno documentado: [GitHub Actions, pool 20, 18 de noviembre de 2026](../../tecnologia/nivora-backend/documentacion/resultados-carga-github-actions.md). Se mantuvieron 5000 usuarios durante 1800 segundos; 3 375 041 consultas sin errores; p95 por operacion entre 1793 y 1867 ms; sincronizacion y alertas durante la medicion. Alcance: montaje ficticio compartido y carga cerrada descritos en la evidencia. |
+| **Estado** | Verificado en el [cierre actual del backend](../../tecnologia/nivora-backend/documentacion/escalabilidad-controlada.md): 5000 usuarios durante 1800 s, ocho operaciones, 3,437,894 solicitudes, p95 1953–1998 ms, 0 errores y continuidad de lecturas, alertas y tarifas. Los resultados anteriores de GitHub se conservan como antecedentes. |
 | **Trazabilidad** | AC01 y DA01. |
 
 Los 5000 usuarios simultáneos constituyen un requisito del proyecto.
 La duración, los tiempos de respuesta y el porcentaje de errores
 son las metas iniciales documentadas en los atributos de calidad.
 Su cumplimiento deberá comprobarse mediante pruebas.
-
 ## EQ-02. Escalabilidad: crecimiento de usuarios
 
 | Elemento | Descripción |
@@ -43,13 +42,12 @@ Su cumplimiento deberá comprobarse mediante pruebas.
 | **Respuesta esperada** | La ampliación de recursos permite atender una carga sostenible mayor, manteniendo los límites establecidos de respuesta y errores. |
 | **Medida** | Como propuesta de evaluación, aumentar la carga por etapas de 500, 1000, 2500 y 5000 usuarios activos. La configuración ampliada debe sostener una carga mayor que la inicial. La etapa de 5000 usuarios debe mantenerse durante 30 minutos, con al menos el 95 % de las solicitudes válidas de cada operación principal respondidas en un máximo de 2 segundos y menos del 1 % de errores internos o tiempos de espera agotados. |
 | **Verificación** | Registrar la carga sostenible, los tiempos por operación, los errores y el uso de recursos en cada configuración. Comparar los resultados manteniendo la misma mezcla de operaciones y condiciones de datos. Comprobar que continúen las actualizaciones y la evaluación de alertas. |
-| **Estado** | Evidencia parcial: [comparacion observacional de pools 10 y 20 en GitHub Actions](../../tecnologia/nivora-backend/documentacion/resultados-carga-github-actions.md). Con el mismo JAR, pool 10 cumple con 2500 usuarios y falla con 5000; pool 20 cumple con 5000 durante 30 minutos. Las VMs son distintas y no se aislo el efecto del pool. Permanece pendiente una comparacion controlada de ampliacion de recursos para acreditar escalabilidad de infraestructura. |
+| **Estado** | Verificada la [ampliación controlada de CPU](../../tecnologia/nivora-backend/documentacion/escalabilidad-controlada.md) con el mismo JAR, datos, mezcla y generador separado: un núcleo incumple desde 500 usuarios; cuatro núcleos cumplen las etapas y 5000 usuarios durante 30 minutos. Se conserva el consumo de recursos y la afinidad por proceso. |
 | **Trazabilidad** | AC02 y DA01. |
 
 Los escalones de carga constituyen una propuesta para organizar la prueba.
 La capacidad de 5000 usuarios simultáneos conserva su condición
 de requisito del proyecto.
-
 ## EQ-03. Exactitud e integridad: procesamiento de lecturas
 
 | Elemento | Descripción |
@@ -119,15 +117,16 @@ representan momentos distintos.
 | **Respuesta esperada** | Nivora comprueba la sesión y los permisos antes de ejecutar la operación. Rechaza los intentos no autorizados, conserva los datos sin modificaciones indebidas y protege la información del DNI y los registros de acceso. Las operaciones autorizadas funcionan según el perfil correspondiente. |
 | **Medida** | Rechazar el 100 % de los intentos no autorizados definidos en la prueba, con cero modificaciones indebidas y cero exposiciones no autorizadas de datos del DNI o registros de acceso. Permitir el 100 % de los casos autorizados definidos. Todas las comunicaciones protegidas del despliegue evaluado deben utilizar HTTPS. |
 | **Verificación** | Probar los distintos estados de sesión y ambos perfiles. Intentar operaciones administrativas desde una sesión de consulta y revisar sus respuestas y efectos. Comprobar el cierre y la caducidad de sesiones, la protección de los registros y el uso de HTTPS en el despliegue evaluado. |
-| **Estado** | [Pruebas locales de sesiones y permisos](../../tecnologia/nivora-backend/documentacion/verificacion-acceso.md), [verificación de registros de acceso y reintentos administrativos](../../tecnologia/nivora-backend/documentacion/verificacion-administracion.md) y [matriz HTTP de contratos y aislamiento entre suministros](../../tecnologia/nivora-backend/documentacion/verificacion-contratos-api.md). La comprobación HTTPS corresponde al despliegue de pruebas. |
+| **Estado** | [Pruebas locales de sesiones y permisos](../../tecnologia/nivora-backend/documentacion/verificacion-acceso.md), [verificación de registros de acceso y reintentos administrativos](../../tecnologia/nivora-backend/documentacion/verificacion-administracion.md) y [matriz HTTP de contratos y aislamiento entre suministros](../../tecnologia/nivora-backend/documentacion/verificacion-contratos-api.md). La [comprobación de HTTPS](../../tecnologia/nivora-backend/documentacion/verificacion-https.md) pasó con TLS 1.2/1.3, certificados verificados, permisos y revocación en el despliegue local de pruebas. |
 | **Trazabilidad** | AC06; DA03; RF01–RF04, RF30 y RF31; RC05 y RC06. |
 
 El acceso de consulta requiere un suministro existente y un DNI válido,
 sin exigir titularidad. Las operaciones administrativas utilizan
 un acceso diferenciado y sus propios permisos.
 
-La demostración local utiliza HTTP. La comprobación de HTTPS
-corresponde al despliegue de pruebas configurado para ese propósito.
+La configuración local habitual utiliza HTTP en loopback. El perfil optativo
+`https` y su despliegue de pruebas están comprobados; ver la
+[verificación de transporte](../../tecnologia/nivora-backend/documentacion/verificacion-https.md).
 
 ## EQ-07. Interoperabilidad: intercambio con servicios externos
 
@@ -141,7 +140,7 @@ corresponde al despliegue de pruebas configurado para ese propósito.
 | **Respuesta esperada** | Los adaptadores generan las solicitudes correspondientes a cada servicio y transforman sus respuestas al modelo utilizado por Nivora. Distinguen los datos inexistentes de los errores de formato y comunicación, sin incorporar respuestas incompatibles como información válida. |
 | **Medida** | El 100 % de los casos válidos definidos debe respetar los campos, tipos y unidades de sus contratos, cuando corresponda. El 100 % de los resultados negativos y errores simulados debe clasificarse correctamente. Debe haber cero respuestas incompatibles incorporadas como datos válidos. |
 | **Verificación** | Ejecutar pruebas de contrato para agua, identidad y notificaciones. Comparar solicitudes, respuestas y transformaciones con los formatos documentados. Probar datos inexistentes, campos obligatorios ausentes, tipos incorrectos y tiempos de espera agotados. Revisar los resultados e incidencias generados. |
-| **Estado** | Parcial: existen pruebas de los adaptadores HTTP de agua e identidad y del emisor Web Push; sus referencias están en la [matriz RF/EQ](../../tecnologia/nivora-backend/documentacion/matriz-requisitos-backend.md). Falta consolidar la matriz completa de contratos externos y contrastar cada integración con la especificación de su proveedor al conectarlo. |
+| **Estado** | Verificado para los proveedores y escenarios definidos en la [matriz consolidada de contratos externos](../../tecnologia/nivora-backend/documentacion/contratos-externos.md): formatos válidos, ausencia, errores, tiempos de espera y cifrado/firma Push. Se contrastan las referencias oficiales; una conexión a un proveedor nuevo requiere validar su contrato y autenticación concretos. |
 | **Trazabilidad** | AC07; DA04 y DA07; RC04, RC05 y RC07; RF02, RF05, RF23–RF27 y RF38. |
 
 RENIEC se contempla como integración de identidad del sistema futuro.
@@ -202,7 +201,7 @@ entre pantallas se evaluarán mediante el escenario de usabilidad.
 | **Respuesta esperada** | El cambio se concentra en el adaptador y su configuración. Las reglas del dominio y los casos de uso conservan su independencia respecto del formato y la tecnología del proveedor. Las consultas, actualizaciones y alertas mantienen el comportamiento esperado. |
 | **Medida** | Aprobar el 100 % de las pruebas de contrato y regresión definidas para el cambio. Registrar cero violaciones de las reglas de dependencias y cero modificaciones del dominio o de los casos de uso motivadas únicamente por el formato o protocolo del proveedor, mientras se conserve el contrato. |
 | **Verificación** | Realizar una sustitución controlada, revisar los archivos modificados y las importaciones, ejecutar las pruebas del nuevo adaptador y la regresión, y comprobar las reglas de capas. Comparar los resultados con la versión de referencia. |
-| **Estado** | Pendiente de realizar la sustitución controlada y documentar los cambios y pruebas. |
+| **Estado** | Verificada la [sustitución controlada de cuatro adaptadores HTTP por archivo](../../tecnologia/nivora-backend/documentacion/sustitucion-adaptadores.md): ocho consultas equivalentes, idempotencia, 135 fuentes de dominio/aplicación sin violaciones de los límites revisados y cero cambios de negocio por el transporte. |
 | **Trazabilidad** | AC10; DA09 y DA04; ADR-002 y ADR-004. |
 
 ## Resumen de escenarios

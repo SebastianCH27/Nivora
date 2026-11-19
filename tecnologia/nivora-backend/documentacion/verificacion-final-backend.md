@@ -58,11 +58,12 @@ memoria o instancias. Las reservas, recursos y límites se conservan en
 
 ## Requisitos revisados
 
-La [matriz](matriz-requisitos-backend.md) contiene una fila para cada uno de
+La [matriz](matriz-requisitos-backend.md) conserva el estado vigente.
+En el corte histórico descrito aquí contenía una fila para cada uno de
 los 39 RF y los 10 escenarios EQ, con evidencia y reservas. Entre las
 brechas están el procesamiento de lecturas de intervalo (RF10), la
 diferencia de costos entre periodos (RF20) y los gráficos del frontend
-(RF21). También faltan evaluaciones de HTTPS, escalabilidad controlada,
+(RF21). En ese corte también faltaban evaluaciones de HTTPS, escalabilidad controlada,
 contratos externos completos, sustitución de adaptador y uso desde los
 dispositivos finales.
 
@@ -92,3 +93,8 @@ en `cf2f699` y [P02: comparación de costos](comparacion-costos.md) en la
 entrega siguiente. Este documento conserva el corte del bloque 9; la
 [matriz actual](matriz-requisitos-backend.md) identifica las reservas
 restantes de interfaces, despliegue y evaluaciones de calidad.
+
+
+La [validación posterior sobre 890db94](cierre-validacion-backend.md)
+actualiza HTTPS, contratos, sustitución y escalabilidad. Este documento
+conserva los resultados históricos de su corte original.

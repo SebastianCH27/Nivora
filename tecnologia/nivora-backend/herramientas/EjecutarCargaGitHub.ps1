@@ -12,7 +12,7 @@ $carpeta = Join-Path $raiz 'target/carga'
 $previas = @()
 if (Test-Path $carpeta) { $previas = @(Get-ChildItem $carpeta -Directory | Select-Object -ExpandProperty Name) }
 $parametros = @{
-    SinInteraccion = $true; SuministrosDatos = 5000; PoolConexiones = $PoolConexiones
+    SinInteraccion = $true; DatosMixtos = $true; SuministrosDatos = 5000; PoolConexiones = $PoolConexiones
     PuertoMysql = $PuertoMysql; AdministradorMysql = $AdministradorMysql
 }
 switch ($Perfil) {
@@ -73,7 +73,7 @@ if ($evaluaciones.Count -eq 0) { $recursosValidos = $false }
 $cumple = $null -eq $fallo -and $evaluaciones.Count -gt 0 -and $recursosValidos
 foreach ($e in $evaluaciones) {
     $cumple = $cumple -and $e.cumpleUmbralesDeEstaEtapa -and
-        $e.sincronizacionDuranteMedicion -and $e.alertasGeneradasDuranteMedicion
+        $e.sincronizacionDuranteMedicion -and $e.alertasGeneradasDuranteMedicion -and $e.cumpleContinuidad
 }
 if ($Perfil -eq 'completa') {
     $cumple = $cumple -and $evaluaciones.Count -eq 4 -and $evaluaciones[-1].cubre5000Durante30Minutos

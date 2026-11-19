@@ -1,0 +1,282 @@
+[
+  {
+    "perfil": "inicial",
+    "usuarios": 500,
+    "muestras_en_medicion": 12,
+    "procesos": {
+      "backend": {
+        "cpu_media_porcentaje_de_un_nucleo": 70.15,
+        "rss_maximo_durante_medicion_bytes": 395169792,
+        "afinidades_observadas": [
+          "0"
+        ]
+      },
+      "mysql": {
+        "cpu_media_porcentaje_de_un_nucleo": 29.74,
+        "rss_maximo_durante_medicion_bytes": 556412928,
+        "afinidades_observadas": [
+          "0"
+        ]
+      },
+      "generador": {
+        "cpu_media_porcentaje_de_un_nucleo": 22.16,
+        "rss_maximo_durante_medicion_bytes": 254078976,
+        "afinidades_observadas": [
+          "4-5"
+        ]
+      },
+      "fuente": {
+        "cpu_media_porcentaje_de_un_nucleo": 0.45,
+        "rss_maximo_durante_medicion_bytes": 55685120,
+        "afinidades_observadas": [
+          "6"
+        ]
+      }
+    }
+  },
+  {
+    "perfil": "inicial",
+    "usuarios": 1000,
+    "muestras_en_medicion": 12,
+    "procesos": {
+      "backend": {
+        "cpu_media_porcentaje_de_un_nucleo": 60.0,
+        "rss_maximo_durante_medicion_bytes": 465141760,
+        "afinidades_observadas": [
+          "0"
+        ]
+      },
+      "mysql": {
+        "cpu_media_porcentaje_de_un_nucleo": 39.97,
+        "rss_maximo_durante_medicion_bytes": 559837184,
+        "afinidades_observadas": [
+          "0"
+        ]
+      },
+      "generador": {
+        "cpu_media_porcentaje_de_un_nucleo": 21.48,
+        "rss_maximo_durante_medicion_bytes": 273022976,
+        "afinidades_observadas": [
+          "4-5"
+        ]
+      },
+      "fuente": {
+        "cpu_media_porcentaje_de_un_nucleo": 0.27,
+        "rss_maximo_durante_medicion_bytes": 58028032,
+        "afinidades_observadas": [
+          "6"
+        ]
+      }
+    }
+  },
+  {
+    "perfil": "inicial",
+    "usuarios": 2500,
+    "muestras_en_medicion": 12,
+    "procesos": {
+      "backend": {
+        "cpu_media_porcentaje_de_un_nucleo": 55.57,
+        "rss_maximo_durante_medicion_bytes": 522526720,
+        "afinidades_observadas": [
+          "0"
+        ]
+      },
+      "mysql": {
+        "cpu_media_porcentaje_de_un_nucleo": 44.44,
+        "rss_maximo_durante_medicion_bytes": 561909760,
+        "afinidades_observadas": [
+          "0"
+        ]
+      },
+      "generador": {
+        "cpu_media_porcentaje_de_un_nucleo": 28.16,
+        "rss_maximo_durante_medicion_bytes": 450527232,
+        "afinidades_observadas": [
+          "4-5"
+        ]
+      },
+      "fuente": {
+        "cpu_media_porcentaje_de_un_nucleo": 0.22,
+        "rss_maximo_durante_medicion_bytes": 59916288,
+        "afinidades_observadas": [
+          "6"
+        ]
+      }
+    }
+  },
+  {
+    "perfil": "inicial",
+    "usuarios": 5000,
+    "muestras_en_medicion": 24,
+    "procesos": {
+      "backend": {
+        "cpu_media_porcentaje_de_un_nucleo": 47.11,
+        "rss_maximo_durante_medicion_bytes": 789553152,
+        "afinidades_observadas": [
+          "0"
+        ]
+      },
+      "mysql": {
+        "cpu_media_porcentaje_de_un_nucleo": 52.86,
+        "rss_maximo_durante_medicion_bytes": 564363264,
+        "afinidades_observadas": [
+          "0"
+        ]
+      },
+      "generador": {
+        "cpu_media_porcentaje_de_un_nucleo": 29.18,
+        "rss_maximo_durante_medicion_bytes": 923136000,
+        "afinidades_observadas": [
+          "4-5"
+        ]
+      },
+      "fuente": {
+        "cpu_media_porcentaje_de_un_nucleo": 0.32,
+        "rss_maximo_durante_medicion_bytes": 74973184,
+        "afinidades_observadas": [
+          "6"
+        ]
+      }
+    }
+  },
+  {
+    "perfil": "ampliado",
+    "usuarios": 500,
+    "muestras_en_medicion": 12,
+    "procesos": {
+      "backend": {
+        "cpu_media_porcentaje_de_un_nucleo": 55.44,
+        "rss_maximo_durante_medicion_bytes": 368996352,
+        "afinidades_observadas": [
+          "0-3"
+        ]
+      },
+      "mysql": {
+        "cpu_media_porcentaje_de_un_nucleo": 58.26,
+        "rss_maximo_durante_medicion_bytes": 521891840,
+        "afinidades_observadas": [
+          "0-3"
+        ]
+      },
+      "generador": {
+        "cpu_media_porcentaje_de_un_nucleo": 22.39,
+        "rss_maximo_durante_medicion_bytes": 217776128,
+        "afinidades_observadas": [
+          "4-5"
+        ]
+      },
+      "fuente": {
+        "cpu_media_porcentaje_de_un_nucleo": 0.78,
+        "rss_maximo_durante_medicion_bytes": 57868288,
+        "afinidades_observadas": [
+          "6"
+        ]
+      }
+    }
+  },
+  {
+    "perfil": "ampliado",
+    "usuarios": 1000,
+    "muestras_en_medicion": 12,
+    "procesos": {
+      "backend": {
+        "cpu_media_porcentaje_de_un_nucleo": 96.09,
+        "rss_maximo_durante_medicion_bytes": 378695680,
+        "afinidades_observadas": [
+          "0-3"
+        ]
+      },
+      "mysql": {
+        "cpu_media_porcentaje_de_un_nucleo": 111.36,
+        "rss_maximo_durante_medicion_bytes": 525967360,
+        "afinidades_observadas": [
+          "0-3"
+        ]
+      },
+      "generador": {
+        "cpu_media_porcentaje_de_un_nucleo": 41.5,
+        "rss_maximo_durante_medicion_bytes": 242900992,
+        "afinidades_observadas": [
+          "4-5"
+        ]
+      },
+      "fuente": {
+        "cpu_media_porcentaje_de_un_nucleo": 1.16,
+        "rss_maximo_durante_medicion_bytes": 75083776,
+        "afinidades_observadas": [
+          "6"
+        ]
+      }
+    }
+  },
+  {
+    "perfil": "ampliado",
+    "usuarios": 2500,
+    "muestras_en_medicion": 12,
+    "procesos": {
+      "backend": {
+        "cpu_media_porcentaje_de_un_nucleo": 179.58,
+        "rss_maximo_durante_medicion_bytes": 483295232,
+        "afinidades_observadas": [
+          "0-3"
+        ]
+      },
+      "mysql": {
+        "cpu_media_porcentaje_de_un_nucleo": 213.53,
+        "rss_maximo_durante_medicion_bytes": 529059840,
+        "afinidades_observadas": [
+          "0-3"
+        ]
+      },
+      "generador": {
+        "cpu_media_porcentaje_de_un_nucleo": 92.4,
+        "rss_maximo_durante_medicion_bytes": 377794560,
+        "afinidades_observadas": [
+          "4-5"
+        ]
+      },
+      "fuente": {
+        "cpu_media_porcentaje_de_un_nucleo": 0.38,
+        "rss_maximo_durante_medicion_bytes": 79331328,
+        "afinidades_observadas": [
+          "6"
+        ]
+      }
+    }
+  },
+  {
+    "perfil": "ampliado",
+    "usuarios": 5000,
+    "muestras_en_medicion": 360,
+    "procesos": {
+      "backend": {
+        "cpu_media_porcentaje_de_un_nucleo": 172.42,
+        "rss_maximo_durante_medicion_bytes": 715153408,
+        "afinidades_observadas": [
+          "0-3"
+        ]
+      },
+      "mysql": {
+        "cpu_media_porcentaje_de_un_nucleo": 219.61,
+        "rss_maximo_durante_medicion_bytes": 534675456,
+        "afinidades_observadas": [
+          "0-3"
+        ]
+      },
+      "generador": {
+        "cpu_media_porcentaje_de_un_nucleo": 89.24,
+        "rss_maximo_durante_medicion_bytes": 811208704,
+        "afinidades_observadas": [
+          "4-5"
+        ]
+      },
+      "fuente": {
+        "cpu_media_porcentaje_de_un_nucleo": 0.34,
+        "rss_maximo_durante_medicion_bytes": 128176128,
+        "afinidades_observadas": [
+          "6"
+        ]
+      }
+    }
+  }
+]

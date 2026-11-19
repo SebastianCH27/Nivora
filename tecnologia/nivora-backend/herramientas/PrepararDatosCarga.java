@@ -42,6 +42,7 @@ public class PrepararDatosCarga {
             case "preparar" -> preparar(url, base, usuarios, salida);
             case "fuente" -> servir(usuarios, salida, puerto);
             case "estado" -> estado(url, base, salida);
+            case "restablecer" -> restablecer(url, base, salida);
             case "limpiar" -> limpiar(url, base, salida);
             default -> throw new IllegalArgumentException("Modo de carga invalido.");
         }
@@ -115,8 +116,8 @@ public class PrepararDatosCarga {
         filas.add("codigoSuministro,token");
         try (PreparedStatement suministro = db.prepareStatement("INSERT INTO suministros VALUES (?, 'Titular ficticio de carga', ?)");
                 PreparedStatement lectura = db.prepareStatement("INSERT INTO lecturas "
-                    + "(fuente,id_lectura,codigo_suministro,id_medidor,fecha_medicion_utc,valor_litros,recibida_en_utc) "
-                    + "VALUES ('empresa-agua',?,?,'1',?,?,?)");
+                    + "(fuente,id_lectura,codigo_suministro,id_medidor,fecha_medicion_utc,valor_litros,recibida_en_utc,tipo_medicion,inicio_intervalo_utc) "
+                    + "VALUES ('empresa-agua',?,?,'1',?,?,?,?,?)");
                 PreparedStatement historial = db.prepareStatement("INSERT INTO tarifas_historiales VALUES ('empresa-agua',?,1,?)");
                 PreparedStatement asignacion = db.prepareStatement("INSERT INTO tarifas_asignaciones VALUES "
                     + "('empresa-agua',?,1,?,NULL,?,NULL,'CARGA',1)");
@@ -134,8 +135,10 @@ public class PrepararDatosCarga {
                     lectura.setString(1, Long.toString((i - 1L) * 5 + j + 1));
                     lectura.setString(2, codigo);
                     lectura.setObject(3, utc(fechas.get(j)));
-                    lectura.setLong(4, j == 3 ? 6300 : 100 + j * 2000L);
+                    lectura.setLong(4, esIntervalo(i) ? (j == 3 ? 2200 : 2000) : (j == 3 ? 6300 : 100 + j * 2000L));
                     lectura.setObject(5, utc(ahora));
+                    lectura.setString(6, esIntervalo(i) ? "INTERVALO" : "ACUMULADA");
+                    lectura.setObject(7, esIntervalo(i) ? utc(j == 0 ? inicio(mes.minusMonths(3)) : fechas.get(j - 1)) : null);
                     lectura.addBatch();
                 }
                 historial.setString(1, codigo);
@@ -192,7 +195,7 @@ public class PrepararDatosCarga {
             if (ruta.equals("/api/v1/lecturas/corte")) {
                 cuerpo = "{\"fuente\":\"empresa-agua\",\"hastaIdLectura\":\"" + usuarios * 5L
                     + "\",\"confirmadoHasta\":\"" + Instant.now().truncatedTo(ChronoUnit.MICROS) + "\"}";
-            } else if (ruta.matches("/api/v1/suministros/[0-9]+/(medidores|lecturas|recibos)")) {
+            } else if (ruta.matches("/api/v1/suministros/[0-9]+/(medidores|lecturas|recibos|tarifas)")) {
                 String codigo = ruta.split("/")[4];
                 int indice = Integer.parseInt(codigo) - 90000000;
                 if (indice < 1 || indice > usuarios) {
@@ -201,8 +204,10 @@ public class PrepararDatosCarga {
                 } else if (ruta.endsWith("/medidores")) {
                     cuerpo = "{\"fuente\":\"empresa-agua\",\"codigoSuministro\":\"" + codigo
                         + "\",\"zonaFechas\":\"America/Lima\",\"medidores\":[{\"idMedidor\":\"1\","
-                        + "\"fechaInstalacion\":\"" + fechas.getFirst().atZone(LIMA).toLocalDate()
+                        + "\"fechaInstalacion\":\"" + YearMonth.from(fechas.getFirst().atZone(LIMA)).minusMonths(1).atDay(1)
                         + "\",\"fechaRetiro\":null}]}";
+                } else if (ruta.endsWith("/tarifas")) {
+                    cuerpo = tarifaFicticia(codigo, fechas.getFirst().atZone(LIMA).toLocalDate().toString());
                 } else if (ruta.endsWith("/recibos")) {
                     cuerpo = "{\"codigoSuministro\":\"" + codigo + "\",\"moneda\":\"PEN\",\"recibos\":[]}";
                 } else {
@@ -215,14 +220,18 @@ public class PrepararDatosCarga {
                     for (int j = 0; j < 5; j++) {
                         long id = (indice - 1L) * 5 + j + 1;
                         if (id > cursor) {
+                            Instant fin = j == 4 ? fechas.getLast().plusSeconds(1) : fechas.get(j);
+                            Instant inicio = j == 0 ? inicio(YearMonth.from(fechas.getFirst().atZone(LIMA)).minusMonths(1)) : fechas.get(j - 1);
+                            long litros = esIntervalo(indice) ? (j == 4 ? 1 : j == 3 ? 2200 : 2000)
+                                : j >= 3 ? 6300 + j - 3 : 100 + j * 2000L;
                             lecturas.add("{\"idLectura\":\"" + id + "\",\"idMedidor\":\"1\",\"fechaMedicion\":\""
-                                + (j == 4 ? fechas.getLast().plusSeconds(1) : fechas.get(j))
-                                + "\",\"valorLitros\":" + (j >= 3 ? 6300 + j - 3 : 100 + j * 2000L) + "}");
+                                + fin + "\",\"valorLitros\":" + litros
+                                + (esIntervalo(indice) ? ",\"inicioIntervalo\":\"" + inicio + "\"" : "") + "}");
                             ultimo = id;
                         }
                     }
                     cuerpo = "{\"fuente\":\"empresa-agua\",\"codigoSuministro\":\"" + codigo
-                        + "\",\"tipoMedicion\":\"ACUMULADA\",\"unidad\":\"L\",\"lecturas\":["
+                        + "\",\"tipoMedicion\":\"" + (esIntervalo(indice) ? "INTERVALO" : "ACUMULADA") + "\",\"unidad\":\"L\",\"lecturas\":["
                         + String.join(",", lecturas) + "],\"hayMas\":false,\"siguienteDespuesDe\":\"" + ultimo + "\"}";
                 }
             } else {
@@ -257,10 +266,13 @@ public class PrepararDatosCarga {
                             AND recibida_en_utc < ?) AS lecturas_durante,
                         (SELECT COUNT(*) FROM alertas_consumo) AS alertas,
                         (SELECT COUNT(*) FROM lecturas) AS lecturas,
-                        (SELECT MAX(detectada_en_utc) FROM alertas_consumo) AS ultima_alerta
+                        (SELECT MAX(detectada_en_utc) FROM alertas_consumo) AS ultima_alerta,
+                        (SELECT COUNT(*) FROM programacion_sincronizacion_tarifas WHERE ultimo_exito_utc IS NOT NULL) AS tarifas_actualizadas,
+                        (SELECT COUNT(*) FROM programacion_sincronizacion_tarifas
+                            WHERE ultimo_exito_utc >= ? AND ultimo_exito_utc < ?) AS tarifas_durante
                     FROM programacion_sincronizacion_lecturas WHERE ultimo_exito_utc IS NOT NULL
                     """)) {
-                for (int i = 1; i <= 6; i++) sql.setObject(i, utc(limites.get((i - 1) % 2)));
+                for (int i = 1; i <= 8; i++) sql.setObject(i, utc(limites.get((i - 1) % 2)));
                 try (var fila = sql.executeQuery()) {
                     fila.next();
                     String ultimo = fila.getString("ultimo_exito");
@@ -272,10 +284,53 @@ public class PrepararDatosCarga {
                         + ",\"suministrosConExitoDuranteMedicion\":" + (medida ? fila.getLong("exitos_durante") : "null")
                         + ",\"alertasDuranteMedicion\":" + (medida ? fila.getLong("alertas_durante") : "null")
                         + ",\"lecturasDuranteMedicion\":" + (medida ? fila.getLong("lecturas_durante") : "null")
+                        + ",\"tarifasActualizadas\":" + fila.getLong("tarifas_actualizadas")
+                        + ",\"tarifasConExitoDuranteMedicion\":" + (medida ? fila.getLong("tarifas_durante") : "null")
                         + ",\"ultimaAlertaUTC\":" + (alerta == null ? "null" : "\"" + alerta + "\"") + "}");
                 }
             }
         }
+    }
+
+
+    private static boolean esIntervalo(int indice) {
+        return "true".equalsIgnoreCase(System.getenv("NIVORA_CARGA_INTERVALOS")) && indice % 2 == 0;
+    }
+
+    private static String tarifaFicticia(String codigo, String desde) {
+        return """
+            {"fuente":"empresa-agua","codigoSuministro":"%s","moneda":"PEN","zonaFechas":"America/Lima",
+             "asignaciones":[{"codigoTarifa":"CARGA","versionTarifa":1,"nombreTarifa":"Tarifa ficticia",
+              "cargoFijo":5.00,"igvPorcentaje":0,"vigenteDesde":"%s","vigenteHasta":null,
+              "asignadaDesde":"%s","asignadaHasta":null,"aplicableDesde":"%s","aplicableHasta":null,
+              "tramos":[{"desdeM3":0,"hastaM3":null,"precioPorM3":1.50,"precioAlcantarilladoPorM3":0.50}]}]}
+            """.formatted(codigo, desde, desde, desde);
+    }
+
+    /** Restablece el mismo conjunto ficticio entre perfiles; los servicios deben estar detenidos. */
+    private static void restablecer(String url, String base, Path salida) throws Exception {
+        try (Connection db = DriverManager.getConnection(url, variable("NIVORA_CARGA_DB_USUARIO"),
+                variable("NIVORA_CARGA_DB_CLAVE"))) {
+            db.setCatalog(base);
+            db.setAutoCommit(false);
+            try (Statement sql = db.createStatement()) {
+                for (String tabla : List.of("entregas_web_push", "suscripciones_web_push", "notificaciones_leidas",
+                        "alertas_consumo", "incidencias_lecturas", "incidencias_recuperacion_lecturas",
+                        "contexto_recuperacion_lecturas", "progreso_recuperacion_lecturas", "control_incorporacion_lecturas",
+                        "programacion_sincronizacion_lecturas", "programacion_sincronizacion_recibos",
+                        "programacion_sincronizacion_tarifas", "incidencias_sincronizacion_recibos")) {
+                    sql.executeUpdate("DELETE FROM " + tabla);
+                }
+                sql.executeUpdate("DELETE FROM lecturas WHERE MOD(CAST(id_lectura AS UNSIGNED),5) = 0");
+            }
+            Instant inicial = Instant.parse(Files.readAllLines(salida.resolve("fechas.txt")).getLast()).plusSeconds(1);
+            try (PreparedStatement sql = db.prepareStatement("UPDATE tarifas_historiales SET consultado_en_utc = ?")) {
+                sql.setObject(1, utc(inicial));
+                sql.executeUpdate();
+            }
+            db.commit();
+        }
+        System.out.println("Conjunto ficticio restablecido sin cambiar lecturas iniciales, tarifas ni sesiones.");
     }
 
     private static void limpiar(String url, String base, Path salida) throws Exception {

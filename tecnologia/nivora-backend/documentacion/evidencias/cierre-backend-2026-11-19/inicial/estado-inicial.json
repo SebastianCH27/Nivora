@@ -1,0 +1,12 @@
+{
+  "suministrosActualizados": 0,
+  "ultimoExitoUTC": null,
+  "alertasRegistradas": 0,
+  "lecturasGuardadas": 20000,
+  "suministrosConExitoDuranteMedicion": null,
+  "alertasDuranteMedicion": null,
+  "lecturasDuranteMedicion": null,
+  "tarifasActualizadas": 0,
+  "tarifasConExitoDuranteMedicion": null,
+  "ultimaAlertaUTC": null
+}

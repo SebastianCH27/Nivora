@@ -4,8 +4,10 @@ Bloque 9, parte 3. Procedimiento reproducible para EQ-01 y EQ-02.
 EQ-01 se verifico en GitHub Actions con pool 20 el 18 de noviembre de 2026:
 5000 usuarios mantenidos durante 1800 segundos, siete operaciones dentro del
 limite de p95 y cero errores. La [evidencia completa y sus limites](resultados-carga-github-actions.md)
-incluyen la comparacion con pool 10. EQ-02 conserva evidencia parcial;
-queda pendiente una ampliacion de recursos comparada de forma controlada.
+incluyen la comparacion con pool 10. Aquella comparación de pools es evidencia parcial de EQ-02.
+El montaje actual amplía la mezcla a ocho operaciones e incluye datos mixtos
+y actualización automática de tarifas. La comparación controlada del cierre
+se documenta en [escalabilidad controlada](escalabilidad-controlada.md).
 
 Para ejecutar el montaje fuera de la laptop, seguir
 [Carga en GitHub Actions](carga-github-actions.md). El flujo manual prepara
@@ -21,16 +23,19 @@ Requiere MySQL 8 y una cuenta administradora para crear y retirar una base
 La clave se solicita de forma oculta. La cuenta administrativa se utiliza
 solo durante la preparacion y la limpieza.
 
-El montaje usa los scripts 02 a 20 sobre esa base nueva. Inicia una fuente
+El montaje usa los scripts 02 a 20 y 22 sobre esa base nueva. Inicia una fuente
 ficticia en `127.0.0.1:28081` y una instancia del JAR en `127.0.0.1:28082`.
 Al finalizar detiene sus procesos y retira su base y cuenta temporales.
 Conserva los informes en `target/carga/<identificador>/`.
 
 Por cada usuario se crean un suministro ficticio, una sesion independiente,
-cuatro lecturas acumuladas que cubren tres periodos, una tarifa completa,
+cuatro lecturas que cubren tres periodos, una tarifa completa,
 un recibo y un aviso de disponibilidad. La fuente ofrece una quinta lectura
 por suministro; el sincronizador habitual la incorpora mientras se consulta.
 El incremento del consumo permite generar una alerta por suministro.
+Con `-DatosMixtos`, la mitad de los suministros utiliza mediciones de
+intervalo y la otra mitad acumuladas. La sincronización automática de
+tarifas permanece habilitada durante la carga.
 
 Las sesiones se preparan directamente para medir las consultas autenticadas.
 Duran cuatro horas en este montaje. La capacidad de validar nuevos accesos
@@ -91,7 +96,7 @@ la carga; una evaluacion de despliegue debe incluir su topologia real.
 ## Mezcla y medicion
 
 Cada usuario virtual reutiliza su sesion y realiza una consulta a la vez.
-Rota entre las siete operaciones, espera 1000 ms despues de cada respuesta
+Rota entre las ocho operaciones, espera 1000 ms despues de cada respuesta
 y repite hasta terminar. Los usuarios comienzan en momentos distribuidos
 durante la rampa; sus primeras operaciones tambien estan distribuidas.
 La carga es cerrada: si crece la latencia, disminuye el ritmo de solicitudes.
@@ -106,6 +111,7 @@ Los 5000 usuarios activos incluyen el tiempo de espera entre consultas.
 | Proyeccion | `/proyeccion` |
 | Recibos | `/recibos?limite=12` |
 | Notificaciones | `/notificaciones?limite=20` |
+| Comparación | `/comparacion` |
 
 Las solicitudes iniciadas durante la medicion estable se incluyen hasta
 recibir su respuesta o agotar el plazo. La rampa y el calentamiento se excluyen.
@@ -132,8 +138,9 @@ la verificacion detallada del cuerpo y del aislamiento.
   El 100 % de CPU representa un nucleo ocupado; puede superar 100 %.
 - `etapa-*-antes.json` y `etapa-*-despues.json`: almacenamiento,
   sincronizaciones y alertas. Las fechas se contrastan con el intervalo exacto
-  de medicion; se cuentan las lecturas y alertas registradas dentro de el.
-- `etapa-*-evaluacion.json`: limites de la etapa y continuidad observada.
+  de medicion; se cuentan las lecturas, alertas y sincronizaciones tarifarias dentro de él.
+- `etapa-*-evaluacion.json`: límites, continuidad de lecturas/alertas/tarifas
+  y resultado conjunto `cumpleEtapaCompleta`.
 - Logs del backend, fuente y generador para explicar errores.
 
 `cubre5000Durante30Minutos` describe el perfil ejecutado. Para acreditar EQ-01
@@ -162,7 +169,7 @@ DROP DATABASE IF EXISTS nivora_carga_IDENTIFICADOR;
 DROP USER IF EXISTS 'ncarga_IDENTIFICADOR'@'127.0.0.1';
 ```
 
-## Estado de esta entrega
+## Antecedentes del bloque 9
 
 La regresion del backend conserva 559 pruebas, sin fallos ni errores.
 Las herramientas de carga se verifican por separado mediante compilacion
@@ -171,7 +178,7 @@ Las comprobaciones anteriores en Windows se conservan como antecedentes.
 Las dos ejecuciones completas de GitHub construyeron y verificaron el mismo
 commit y el mismo JAR. La ejecucion con pool 20 aprobo EQ-01 en el montaje
 documentado; la comparacion con pool 10 es evidencia parcial para EQ-02.
-Los resultados vigentes estan en [Resultados de carga en GitHub Actions](resultados-carga-github-actions.md).
+Los resultados de aquel corte están en [Resultados de carga en GitHub Actions](resultados-carga-github-actions.md).
 
 
 ## Comprobacion breve del 18 de noviembre de 2026

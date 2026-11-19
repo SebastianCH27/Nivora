@@ -69,7 +69,10 @@ la regresión de esa entrega tiene 632 pruebas aprobadas. La corrección de
 [sincronización de tarifas](tecnologia/nivora-backend/documentacion/sincronizacion-tarifas.md)
 incorpora y refresca automáticamente las tarifas de los suministros registrados,
 conserva los historiales ante fallos y eleva la regresión a 656 pruebas aprobadas.
-El frontend está previsto con Flutter.
+El [cierre de validación previo al frontend](tecnologia/nivora-backend/documentacion/cierre-validacion-backend.md)
+comprueba HTTPS, contratos externos, sustitución de adaptadores y escalabilidad
+controlada con ocho consultas. La regresión vigente tiene 760 pruebas del
+backend y 75 de la Empresa de Agua aprobadas. El frontend está previsto con Flutter.
 
 La base de Node.js y el boilerplate se conservan como material
 de los laboratorios iniciales.

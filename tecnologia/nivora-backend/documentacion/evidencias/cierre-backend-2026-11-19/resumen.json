@@ -1,0 +1,284 @@
+{
+  "rapida": false,
+  "jar_sha256": "789f65e1d37c1c10a9430eb380c5ddc239a4c212bf56a07287049636121cc3dc",
+  "generador_cpu": [
+    4,
+    5
+  ],
+  "fuente_cpu": [
+    6
+  ],
+  "pool": 20,
+  "backend_heap_mb": 512,
+  "generador_heap_mb": 768,
+  "mysql_buffer_mb": 128,
+  "datos": {
+    "suministros": 5000,
+    "acumuladas": 2500,
+    "intervalos": 2500,
+    "lecturas_iniciales_por_suministro": 4,
+    "consultas": 8,
+    "tarifas_automaticas": true
+  },
+  "perfiles": [
+    {
+      "nombre": "inicial",
+      "cpu_servidor": [
+        0
+      ],
+      "resultados": [
+        {
+          "usuarios": 500,
+          "antes": {
+            "suministrosActualizados": 0,
+            "ultimoExitoUTC": null,
+            "alertasRegistradas": 0,
+            "lecturasGuardadas": 20000,
+            "suministrosConExitoDuranteMedicion": null,
+            "alertasDuranteMedicion": null,
+            "lecturasDuranteMedicion": null,
+            "tarifasActualizadas": 0,
+            "tarifasConExitoDuranteMedicion": null,
+            "ultimaAlertaUTC": null
+          },
+          "despues": {
+            "suministrosActualizados": 14,
+            "ultimoExitoUTC": "2026-11-19 21:09:32.537024",
+            "alertasRegistradas": 14,
+            "lecturasGuardadas": 20014,
+            "suministrosConExitoDuranteMedicion": 9,
+            "alertasDuranteMedicion": 9,
+            "lecturasDuranteMedicion": 9,
+            "tarifasActualizadas": 20,
+            "tarifasConExitoDuranteMedicion": 14,
+            "ultimaAlertaUTC": "2026-11-19 21:09:32.538290"
+          },
+          "continuidad": true,
+          "cumple": false
+        },
+        {
+          "usuarios": 1000,
+          "antes": {
+            "suministrosActualizados": 15,
+            "ultimoExitoUTC": "2026-11-19 21:09:33.690525",
+            "alertasRegistradas": 15,
+            "lecturasGuardadas": 20015,
+            "suministrosConExitoDuranteMedicion": null,
+            "alertasDuranteMedicion": null,
+            "lecturasDuranteMedicion": null,
+            "tarifasActualizadas": 20,
+            "tarifasConExitoDuranteMedicion": null,
+            "ultimaAlertaUTC": "2026-11-19 21:09:33.691844"
+          },
+          "despues": {
+            "suministrosActualizados": 30,
+            "ultimoExitoUTC": "2026-11-19 21:10:54.302836",
+            "alertasRegistradas": 30,
+            "lecturasGuardadas": 20030,
+            "suministrosConExitoDuranteMedicion": 9,
+            "alertasDuranteMedicion": 9,
+            "lecturasDuranteMedicion": 8,
+            "tarifasActualizadas": 43,
+            "tarifasConExitoDuranteMedicion": 13,
+            "ultimaAlertaUTC": "2026-11-19 21:10:54.304153"
+          },
+          "continuidad": true,
+          "cumple": false
+        },
+        {
+          "usuarios": 2500,
+          "antes": {
+            "suministrosActualizados": 30,
+            "ultimoExitoUTC": "2026-11-19 21:10:54.302836",
+            "alertasRegistradas": 30,
+            "lecturasGuardadas": 20030,
+            "suministrosConExitoDuranteMedicion": null,
+            "alertasDuranteMedicion": null,
+            "lecturasDuranteMedicion": null,
+            "tarifasActualizadas": 44,
+            "tarifasConExitoDuranteMedicion": null,
+            "ultimaAlertaUTC": "2026-11-19 21:10:54.304153"
+          },
+          "despues": {
+            "suministrosActualizados": 49,
+            "ultimoExitoUTC": "2026-11-19 21:12:19.875378",
+            "alertasRegistradas": 49,
+            "lecturasGuardadas": 20049,
+            "suministrosConExitoDuranteMedicion": 10,
+            "alertasDuranteMedicion": 10,
+            "lecturasDuranteMedicion": 10,
+            "tarifasActualizadas": 68,
+            "tarifasConExitoDuranteMedicion": 15,
+            "ultimaAlertaUTC": "2026-11-19 21:12:19.876372"
+          },
+          "continuidad": true,
+          "cumple": false
+        },
+        {
+          "usuarios": 5000,
+          "antes": {
+            "suministrosActualizados": 50,
+            "ultimoExitoUTC": "2026-11-19 21:12:21.020130",
+            "alertasRegistradas": 50,
+            "lecturasGuardadas": 20050,
+            "suministrosConExitoDuranteMedicion": null,
+            "alertasDuranteMedicion": null,
+            "lecturasDuranteMedicion": null,
+            "tarifasActualizadas": 68,
+            "tarifasConExitoDuranteMedicion": null,
+            "ultimaAlertaUTC": "2026-11-19 21:12:21.021067"
+          },
+          "despues": {
+            "suministrosActualizados": 95,
+            "ultimoExitoUTC": "2026-11-19 21:15:51.441447",
+            "alertasRegistradas": 95,
+            "lecturasGuardadas": 20095,
+            "suministrosConExitoDuranteMedicion": 24,
+            "alertasDuranteMedicion": 24,
+            "lecturasDuranteMedicion": 23,
+            "tarifasActualizadas": 128,
+            "tarifasConExitoDuranteMedicion": 29,
+            "ultimaAlertaUTC": "2026-11-19 21:15:51.442645"
+          },
+          "continuidad": true,
+          "cumple": false
+        }
+      ]
+    },
+    {
+      "nombre": "ampliado",
+      "cpu_servidor": [
+        0,
+        1,
+        2,
+        3
+      ],
+      "resultados": [
+        {
+          "usuarios": 500,
+          "antes": {
+            "suministrosActualizados": 0,
+            "ultimoExitoUTC": null,
+            "alertasRegistradas": 0,
+            "lecturasGuardadas": 20000,
+            "suministrosConExitoDuranteMedicion": null,
+            "alertasDuranteMedicion": null,
+            "lecturasDuranteMedicion": null,
+            "tarifasActualizadas": 0,
+            "tarifasConExitoDuranteMedicion": null,
+            "ultimaAlertaUTC": null
+          },
+          "despues": {
+            "suministrosActualizados": 68,
+            "ultimoExitoUTC": "2026-11-19 21:17:22.020235",
+            "alertasRegistradas": 68,
+            "lecturasGuardadas": 20068,
+            "suministrosConExitoDuranteMedicion": 53,
+            "alertasDuranteMedicion": 53,
+            "lecturasDuranteMedicion": 53,
+            "tarifasActualizadas": 75,
+            "tarifasConExitoDuranteMedicion": 59,
+            "ultimaAlertaUTC": "2026-11-19 21:17:22.021263"
+          },
+          "continuidad": true,
+          "cumple": true
+        },
+        {
+          "usuarios": 1000,
+          "antes": {
+            "suministrosActualizados": 68,
+            "ultimoExitoUTC": "2026-11-19 21:17:22.020235",
+            "alertasRegistradas": 68,
+            "lecturasGuardadas": 20068,
+            "suministrosConExitoDuranteMedicion": null,
+            "alertasDuranteMedicion": null,
+            "lecturasDuranteMedicion": null,
+            "tarifasActualizadas": 75,
+            "tarifasConExitoDuranteMedicion": null,
+            "ultimaAlertaUTC": "2026-11-19 21:17:22.021263"
+          },
+          "despues": {
+            "suministrosActualizados": 139,
+            "ultimoExitoUTC": "2026-11-19 21:18:43.367366",
+            "alertasRegistradas": 139,
+            "lecturasGuardadas": 20139,
+            "suministrosConExitoDuranteMedicion": 52,
+            "alertasDuranteMedicion": 52,
+            "lecturasDuranteMedicion": 52,
+            "tarifasActualizadas": 153,
+            "tarifasConExitoDuranteMedicion": 58,
+            "ultimaAlertaUTC": "2026-11-19 21:18:43.368301"
+          },
+          "continuidad": true,
+          "cumple": true
+        },
+        {
+          "usuarios": 2500,
+          "antes": {
+            "suministrosActualizados": 139,
+            "ultimoExitoUTC": "2026-11-19 21:18:43.367366",
+            "alertasRegistradas": 139,
+            "lecturasGuardadas": 20139,
+            "suministrosConExitoDuranteMedicion": null,
+            "alertasDuranteMedicion": null,
+            "lecturasDuranteMedicion": null,
+            "tarifasActualizadas": 154,
+            "tarifasConExitoDuranteMedicion": null,
+            "ultimaAlertaUTC": "2026-11-19 21:18:43.368301"
+          },
+          "despues": {
+            "suministrosActualizados": 187,
+            "ultimoExitoUTC": "2026-11-19 21:20:04.160543",
+            "alertasRegistradas": 187,
+            "lecturasGuardadas": 20187,
+            "suministrosConExitoDuranteMedicion": 33,
+            "alertasDuranteMedicion": 33,
+            "lecturasDuranteMedicion": 33,
+            "tarifasActualizadas": 216,
+            "tarifasConExitoDuranteMedicion": 44,
+            "ultimaAlertaUTC": "2026-11-19 21:20:04.161672"
+          },
+          "continuidad": true,
+          "cumple": true
+        },
+        {
+          "usuarios": 5000,
+          "antes": {
+            "suministrosActualizados": 187,
+            "ultimoExitoUTC": "2026-11-19 21:20:04.160543",
+            "alertasRegistradas": 187,
+            "lecturasGuardadas": 20187,
+            "suministrosConExitoDuranteMedicion": null,
+            "alertasDuranteMedicion": null,
+            "lecturasDuranteMedicion": null,
+            "tarifasActualizadas": 217,
+            "tarifasConExitoDuranteMedicion": null,
+            "ultimaAlertaUTC": "2026-11-19 21:20:04.161672"
+          },
+          "despues": {
+            "suministrosActualizados": 1364,
+            "ultimoExitoUTC": "2026-11-19 21:51:26.039821",
+            "alertasRegistradas": 1364,
+            "lecturasGuardadas": 21364,
+            "suministrosConExitoDuranteMedicion": 1123,
+            "alertasDuranteMedicion": 1123,
+            "lecturasDuranteMedicion": 1123,
+            "tarifasActualizadas": 1694,
+            "tarifasConExitoDuranteMedicion": 1411,
+            "ultimaAlertaUTC": "2026-11-19 21:51:26.040878"
+          },
+          "continuidad": true,
+          "cumple": true
+        }
+      ]
+    }
+  ],
+  "fechas_iniciales": [
+    "2026-09-01T05:00:00Z",
+    "2026-10-01T05:00:00Z",
+    "2026-11-01T05:00:00Z",
+    "2026-11-19T21:07:54.377756Z"
+  ],
+  "sesiones_sha256": "a0294981688398bcea3eef21f6850f79a0b02699f3ace3c7a2421b40f8294bb0",
+  "limpieza_completada": true
+}

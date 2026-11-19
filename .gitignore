@@ -1,2 +1,10 @@
 node_modules/
 .env
+
+# Almacenes y claves privadas de TLS
+*.p12
+*.jks
+*.key
+
+# Cache local de herramientas Python
+__pycache__/

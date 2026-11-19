@@ -58,8 +58,9 @@ visibilidad del repositorio. El flujo no cambia esa visibilidad.
 | `diagnostico-2500` | 2500 | 60 s y 15 s | 120 s |
 | `completa` | 500, 1000, 2500 y 5000 | 60 s y 15 s por etapa | 120 s en las primeras tres; 1800 s en la ultima |
 
-Todos preparan 5000 suministros ficticios y sesiones independientes. Se mantiene
-la mezcla de siete consultas, la pausa de 1000 ms y los criterios definidos en
+Todos preparan 5000 suministros ficticios y sesiones independientes, con
+mediciones acumuladas y de intervalo y sincronización automática de tarifas. Se mantiene
+la mezcla de ocho consultas, la pausa de 1000 ms y los criterios definidos en
 [Rendimiento y carga](verificacion-rendimiento.md). El perfil completo se detiene
 si una etapa incumple los umbrales. Seleccionar `completa` no acredita que las
 cuatro etapas hayan sido ejecutadas.

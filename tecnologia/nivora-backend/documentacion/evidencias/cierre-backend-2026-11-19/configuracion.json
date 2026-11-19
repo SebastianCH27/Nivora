@@ -1,0 +1,24 @@
+{
+  "rapida": false,
+  "jar_sha256": "789f65e1d37c1c10a9430eb380c5ddc239a4c212bf56a07287049636121cc3dc",
+  "generador_cpu": [
+    4,
+    5
+  ],
+  "fuente_cpu": [
+    6
+  ],
+  "pool": 20,
+  "backend_heap_mb": 512,
+  "generador_heap_mb": 768,
+  "mysql_buffer_mb": 128,
+  "datos": {
+    "suministros": 5000,
+    "acumuladas": 2500,
+    "intervalos": 2500,
+    "lecturas_iniciales_por_suministro": 4,
+    "consultas": 8,
+    "tarifas_automaticas": true
+  },
+  "perfiles": []
+}

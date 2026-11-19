@@ -1,0 +1,29 @@
+{
+  "usuarios": 5000,
+  "antes": {
+    "suministrosActualizados": 187,
+    "ultimoExitoUTC": "2026-11-19 21:20:04.160543",
+    "alertasRegistradas": 187,
+    "lecturasGuardadas": 20187,
+    "suministrosConExitoDuranteMedicion": null,
+    "alertasDuranteMedicion": null,
+    "lecturasDuranteMedicion": null,
+    "tarifasActualizadas": 217,
+    "tarifasConExitoDuranteMedicion": null,
+    "ultimaAlertaUTC": "2026-11-19 21:20:04.161672"
+  },
+  "despues": {
+    "suministrosActualizados": 1364,
+    "ultimoExitoUTC": "2026-11-19 21:51:26.039821",
+    "alertasRegistradas": 1364,
+    "lecturasGuardadas": 21364,
+    "suministrosConExitoDuranteMedicion": 1123,
+    "alertasDuranteMedicion": 1123,
+    "lecturasDuranteMedicion": 1123,
+    "tarifasActualizadas": 1694,
+    "tarifasConExitoDuranteMedicion": 1411,
+    "ultimaAlertaUTC": "2026-11-19 21:51:26.040878"
+  },
+  "continuidad": true,
+  "cumple": true
+}

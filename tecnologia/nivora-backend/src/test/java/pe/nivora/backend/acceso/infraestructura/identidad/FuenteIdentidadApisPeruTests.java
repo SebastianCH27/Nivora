@@ -43,6 +43,7 @@ class FuenteIdentidadApisPeruTests {
     private final AtomicReference<Peticion> peticion = new AtomicReference<>();
     private final AtomicInteger peticiones = new AtomicInteger();
 
+    private final java.util.concurrent.atomic.AtomicLong demoraMs = new java.util.concurrent.atomic.AtomicLong();
     private HttpServer servidor;
     private FuenteIdentidadApisPeru fuente;
 
@@ -99,6 +100,8 @@ class FuenteIdentidadApisPeruTests {
 
     static Stream<Arguments> respuestasFallidas() {
         return Stream.of(
+            Arguments.of(403, "application/json", PERSONA, Motivo.CREDENCIAL_RECHAZADA),
+            Arguments.of(500, "application/json", "{}", Motivo.FUENTE_NO_DISPONIBLE),
             Arguments.of(401, "application/json", PERSONA, Motivo.CREDENCIAL_RECHAZADA),
             Arguments.of(429, "application/json", "{}", Motivo.LIMITE_CONSULTAS),
             Arguments.of(404, "text/html", "<h1>Not Found</h1>", Motivo.RESULTADO_NO_CONCLUYENTE),
@@ -139,8 +142,28 @@ class FuenteIdentidadApisPeruTests {
         assertEquals(0, peticiones.get());
     }
 
+    @Test
+    void unaConexionInterrumpidaSeClasificaSinExponerDatos() throws Exception {
+        servidor.stop(0);
+        var error = assertThrows(FuenteIdentidadNoDisponibleException.class, () -> fuente.consultar(DNI));
+        assertEquals(Motivo.FUENTE_NO_DISPONIBLE, error.motivo());
+        assertFalse(error.getMessage().contains(TOKEN));
+    }
+
+    @Test
+    void limitaLaEsperaDeUnaFuenteQueNoResponde() {
+        demoraMs.set(11000);
+        var inicio = System.nanoTime();
+        var error = assertThrows(FuenteIdentidadNoDisponibleException.class, () -> fuente.consultar(DNI));
+        assertEquals(Motivo.FUENTE_NO_DISPONIBLE, error.motivo());
+        org.junit.jupiter.api.Assertions.assertTrue(java.time.Duration.ofNanos(System.nanoTime() - inicio).toSeconds() < 20);
+        assertFalse(error.getMessage().contains(TOKEN));
+    }
+
     private void responder(HttpExchange intercambio) throws IOException {
         try (intercambio) {
+            if (demoraMs.get() > 0) try { Thread.sleep(demoraMs.get()); }
+            catch (InterruptedException ex) { Thread.currentThread().interrupt(); return; }
             peticiones.incrementAndGet();
             peticion.set(new Peticion(intercambio.getRequestMethod(),
                 intercambio.getRequestURI().getPath(), intercambio.getRequestURI().getRawQuery(),

@@ -1,0 +1,1501 @@
+{
+  "fecha": "2026-11-19",
+  "zona": "America/Lima",
+  "base_git": "890db948a7e3a93891c9cc598acca1f4ec123825",
+  "regresion": [
+    {
+      "modulo": "nivora-backend",
+      "totales": {
+        "tests": 760,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      "clases": [
+        {
+          "name": "pe.nivora.backend.acceso.administradores.InicializadorAdministrativoConfiguracionTests",
+          "tests": "6",
+          "failures": "0",
+          "errors": "0",
+          "skipped": "0",
+          "time": "0.115"
+        },
+        {
+          "name": "pe.nivora.backend.lecturas.sincronizacion.PoliticaSincronizacionTests",
+          "tests": "6",
+          "failures": "0",
+          "errors": "0",
+          "skipped": "0",
+          "time": "0.007"
+        },
+        {
+          "name": "pe.nivora.backend.integracion.contratos.ContratosEmpresaAguaTests",
+          "tests": "78",
+          "failures": "0",
+          "errors": "0",
+          "skipped": "0",
+          "time": "4.959"
+        },
+        {
+          "name": "pe.nivora.backend.acceso.sesiones.SesionesConsultaApiTests",
+          "tests": "21",
+          "failures": "0",
+          "errors": "0",
+          "skipped": "0",
+          "time": "0.973"
+        },
+        {
+          "name": "pe.nivora.backend.acceso.infraestructura.persistencia.RepositorioSuministrosJdbcTests",
+          "tests": "15",
+          "failures": "0",
+          "errors": "0",
+          "skipped": "0",
+          "time": "0.035"
+        },
+        {
+          "name": "pe.nivora.backend.acceso.infraestructura.identidad.AccesoConsultaIntegradoTests",
+          "tests": "128",
+          "failures": "0",
+          "errors": "0",
+          "skipped": "0",
+          "time": "20.225"
+        },
+        {
+          "name": "pe.nivora.backend.recibos.infraestructura.AlmacenamientoRecibosTests",
+          "tests": "13",
+          "failures": "0",
+          "errors": "0",
+          "skipped": "0",
+          "time": "1.051"
+        },
+        {
+          "name": "pe.nivora.backend.lecturas.dominio.ConsumoIntervalosTests",
+          "tests": "13",
+          "failures": "0",
+          "errors": "0",
+          "skipped": "0",
+          "time": "0.019"
+        },
+        {
+          "name": "pe.nivora.backend.tarifas.TarifasAutomaticasTests",
+          "tests": "1",
+          "failures": "0",
+          "errors": "0",
+          "skipped": "0",
+          "time": "2.114"
+        },
+        {
+          "name": "pe.nivora.backend.documentacion.DocumentacionApiTests",
+          "tests": "3",
+          "failures": "0",
+          "errors": "0",
+          "skipped": "0",
+          "time": "0.697"
+        },
+        {
+          "name": "pe.nivora.backend.acceso.infraestructura.identidad.SustitucionAdaptadoresTests",
+          "tests": "1",
+          "failures": "0",
+          "errors": "0",
+          "skipped": "0",
+          "time": "1.597"
+        },
+        {
+          "name": "pe.nivora.backend.lecturas.infraestructura.persistencia.LecturasIntervaloJdbcTests",
+          "tests": "9",
+          "failures": "0",
+          "errors": "0",
+          "skipped": "0",
+          "time": "0.119"
+        },
+        {
+          "name": "pe.nivora.backend.lecturas.infraestructura.persistencia.RepositorioRecuperacionLecturasJdbcTests",
+          "tests": "8",
+          "failures": "0",
+          "errors": "0",
+          "skipped": "0",
+          "time": "0.089"
+        },
+        {
+          "name": "pe.nivora.backend.lecturas.aplicacion.RecuperacionConCorteTests",
+          "tests": "36",
+          "failures": "0",
+          "errors": "0",
+          "skipped": "0",
+          "time": "4.179"
+        },
+        {
+          "name": "pe.nivora.backend.notificaciones.infraestructura.EmisorWebPushHttpTests",
+          "tests": "17",
+          "failures": "0",
+          "errors": "0",
+          "skipped": "0",
+          "time": "0.571"
+        },
+        {
+          "name": "pe.nivora.backend.periodos.dominio.CalendarioMensualTests",
+          "tests": "1",
+          "failures": "0",
+          "errors": "0",
+          "skipped": "0",
+          "time": "0.012"
+        },
+        {
+          "name": "pe.nivora.backend.tarifas.TarifasIntegracionTests",
+          "tests": "9",
+          "failures": "0",
+          "errors": "0",
+          "skipped": "0",
+          "time": "4.362"
+        },
+        {
+          "name": "pe.nivora.backend.recibos.infraestructura.FuenteRecibosHttpTests",
+          "tests": "18",
+          "failures": "0",
+          "errors": "0",
+          "skipped": "0",
+          "time": "0.273"
+        },
+        {
+          "name": "pe.nivora.backend.lecturas.dominio.ConsumoPeriodoTests",
+          "tests": "4",
+          "failures": "0",
+          "errors": "0",
+          "skipped": "0",
+          "time": "0.004"
+        },
+        {
+          "name": "pe.nivora.backend.tarifas.ProyeccionMensualTests",
+          "tests": "4",
+          "failures": "0",
+          "errors": "0",
+          "skipped": "0",
+          "time": "0.022"
+        },
+        {
+          "name": "pe.nivora.backend.tarifas.SincronizacionTarifasTests",
+          "tests": "17",
+          "failures": "0",
+          "errors": "0",
+          "skipped": "0",
+          "time": "0.407"
+        },
+        {
+          "name": "pe.nivora.backend.lecturas.sincronizacion.ProgramacionSincronizacionTests",
+          "tests": "11",
+          "failures": "0",
+          "errors": "0",
+          "skipped": "0",
+          "time": "0.077"
+        },
+        {
+          "name": "pe.nivora.backend.lecturas.sincronizacion.SincronizarLecturasTests",
+          "tests": "14",
+          "failures": "0",
+          "errors": "0",
+          "skipped": "0",
+          "time": "0.168"
+        },
+        {
+          "name": "pe.nivora.backend.lecturas.aplicacion.ImportarPaginaLecturasTests",
+          "tests": "5",
+          "failures": "0",
+          "errors": "0",
+          "skipped": "0",
+          "time": "0.009"
+        },
+        {
+          "name": "pe.nivora.backend.acceso.sesiones.SesionesAdministrativasApiTests",
+          "tests": "31",
+          "failures": "0",
+          "errors": "0",
+          "skipped": "0",
+          "time": "4.638"
+        },
+        {
+          "name": "pe.nivora.backend.acceso.administradores.InicializacionAdministrativaTests",
+          "tests": "10",
+          "failures": "0",
+          "errors": "0",
+          "skipped": "0",
+          "time": "0.11"
+        },
+        {
+          "name": "pe.nivora.backend.NivoraBackendApplicationTests",
+          "tests": "2",
+          "failures": "0",
+          "errors": "0",
+          "skipped": "0",
+          "time": "0.531"
+        },
+        {
+          "name": "pe.nivora.backend.lecturas.aplicacion.RecuperarLecturasTests",
+          "tests": "10",
+          "failures": "0",
+          "errors": "0",
+          "skipped": "0",
+          "time": "0.135"
+        },
+        {
+          "name": "pe.nivora.backend.acceso.infraestructura.empresaagua.FuenteSuministrosHttpTests",
+          "tests": "29",
+          "failures": "0",
+          "errors": "0",
+          "skipped": "0",
+          "time": "4.141"
+        },
+        {
+          "name": "pe.nivora.backend.tarifas.CostoEstimadoTests",
+          "tests": "6",
+          "failures": "0",
+          "errors": "0",
+          "skipped": "0",
+          "time": "0.028"
+        },
+        {
+          "name": "pe.nivora.backend.lecturas.infraestructura.empresaagua.FuenteLecturasHttpTests",
+          "tests": "74",
+          "failures": "0",
+          "errors": "0",
+          "skipped": "0",
+          "time": "0.82"
+        },
+        {
+          "name": "pe.nivora.backend.acceso.infraestructura.identidad.TransporteHttpsTests",
+          "tests": "6",
+          "failures": "0",
+          "errors": "0",
+          "skipped": "0",
+          "time": "2.698"
+        },
+        {
+          "name": "pe.nivora.backend.acceso.aplicacion.ActualizarSuministroTests",
+          "tests": "5",
+          "failures": "0",
+          "errors": "0",
+          "skipped": "0",
+          "time": "0.013"
+        },
+        {
+          "name": "pe.nivora.backend.lecturas.infraestructura.persistencia.RepositorioLecturasJdbcTests",
+          "tests": "28",
+          "failures": "0",
+          "errors": "0",
+          "skipped": "0",
+          "time": "0.271"
+        },
+        {
+          "name": "pe.nivora.backend.acceso.infraestructura.identidad.FuenteIdentidadApisPeruTests",
+          "tests": "27",
+          "failures": "0",
+          "errors": "0",
+          "skipped": "0",
+          "time": "11.126"
+        },
+        {
+          "name": "pe.nivora.backend.acceso.administradores.ClavesAdministrativasTests",
+          "tests": "17",
+          "failures": "0",
+          "errors": "0",
+          "skipped": "0",
+          "time": "0.529"
+        },
+        {
+          "name": "pe.nivora.backend.notificaciones.infraestructura.ColaWebPushTests",
+          "tests": "5",
+          "failures": "0",
+          "errors": "0",
+          "skipped": "0",
+          "time": "0.085"
+        },
+        {
+          "name": "pe.nivora.backend.lecturas.supervision.SupervisionLecturasApiTests",
+          "tests": "20",
+          "failures": "0",
+          "errors": "0",
+          "skipped": "0",
+          "time": "2.706"
+        },
+        {
+          "name": "pe.nivora.backend.integracion.contratos.DependenciasArquitecturaTests",
+          "tests": "1",
+          "failures": "0",
+          "errors": "0",
+          "skipped": "0",
+          "time": "0.049"
+        },
+        {
+          "name": "pe.nivora.backend.tarifas.ComparacionCostosTests",
+          "tests": "8",
+          "failures": "0",
+          "errors": "0",
+          "skipped": "0",
+          "time": "0.278"
+        },
+        {
+          "name": "pe.nivora.backend.acceso.administradores.GestionAdministradoresApiTests",
+          "tests": "43",
+          "failures": "0",
+          "errors": "0",
+          "skipped": "0",
+          "time": "10.428"
+        }
+      ]
+    },
+    {
+      "modulo": "empresa-agua",
+      "totales": {
+        "tests": 75,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      "clases": [
+        {
+          "name": "pe.nivora.empresaagua.TransporteHttpsTests",
+          "tests": "1",
+          "failures": "0",
+          "errors": "0",
+          "skipped": "0",
+          "time": "5.27"
+        },
+        {
+          "name": "pe.nivora.empresaagua.simulacion.LecturasContinuasTests",
+          "tests": "14",
+          "failures": "0",
+          "errors": "0",
+          "skipped": "0",
+          "time": "2.3"
+        },
+        {
+          "name": "pe.nivora.empresaagua.api.TarifasApiTests",
+          "tests": "6",
+          "failures": "0",
+          "errors": "0",
+          "skipped": "0",
+          "time": "0.688"
+        },
+        {
+          "name": "pe.nivora.empresaagua.EmpresaAguaApplicationTests",
+          "tests": "1",
+          "failures": "0",
+          "errors": "0",
+          "skipped": "0",
+          "time": "0.608"
+        },
+        {
+          "name": "pe.nivora.empresaagua.api.CorteLecturasApiTests",
+          "tests": "25",
+          "failures": "0",
+          "errors": "0",
+          "skipped": "0",
+          "time": "1.13"
+        },
+        {
+          "name": "pe.nivora.empresaagua.api.SuministrosApiTests",
+          "tests": "6",
+          "failures": "0",
+          "errors": "0",
+          "skipped": "0",
+          "time": "0.609"
+        },
+        {
+          "name": "pe.nivora.empresaagua.api.LecturasApiTests",
+          "tests": "22",
+          "failures": "0",
+          "errors": "0",
+          "skipped": "0",
+          "time": "1.03"
+        }
+      ]
+    }
+  ],
+  "mysql_8_0_46": [
+    {
+      "name": "pe.nivora.backend.acceso.infraestructura.identidad.AccesoConsultaIntegradoTests",
+      "tests": "128",
+      "failures": "0",
+      "errors": "0",
+      "skipped": "0"
+    },
+    {
+      "name": "pe.nivora.backend.tarifas.TarifasAutomaticasTests",
+      "tests": "1",
+      "failures": "0",
+      "errors": "0",
+      "skipped": "0"
+    },
+    {
+      "name": "pe.nivora.backend.tarifas.MigracionTarifasMySqlTests",
+      "tests": "1",
+      "failures": "0",
+      "errors": "0",
+      "skipped": "0"
+    }
+  ],
+  "nucleo": {
+    "archivos": 135,
+    "sha256_agregado": "6daff6bf5996199a007222f38d25ae88541fa115dd8a7eb8abe8de9d308cae2c",
+    "fuentes_modificadas": []
+  },
+  "jar": {
+    "jar_medido_sha256": "789f65e1d37c1c10a9430eb380c5ddc239a4c212bf56a07287049636121cc3dc",
+    "entradas_produccion": 420,
+    "produccion_identica": true,
+    "clases_y_recursos_sha256": {
+      "BOOT-INF/classes/application-https.properties": "a012ca57766b547d7baafaab4ded52965f96481b4136f164ec2d7054ce93c254",
+      "BOOT-INF/classes/application.properties": "0073c0f0976aa8466a94922d29ac74f32906e1cce817a23e899ef59f9f306e86",
+      "BOOT-INF/classes/pe/nivora/backend/NivoraBackendApplication.class": "89dd1387fcb14d9a7afdc3082f17d824b302ed6e39d76edf4b8cc5d0ff260cca",
+      "BOOT-INF/classes/pe/nivora/backend/acceso/aplicacion/ActualizarSuministro.class": "40ab986e59943c309f5b3a28aecdfa6cd0a51437c472e3d4b5e3564fb3ed4c30",
+      "BOOT-INF/classes/pe/nivora/backend/acceso/aplicacion/ConsultarRegistrosAcceso$Pagina.class": "dc9c9d2c67b2a0d635a401bdf05639ed3cc6244b10e4c012175ade7ccba76334",
+      "BOOT-INF/classes/pe/nivora/backend/acceso/aplicacion/ConsultarRegistrosAcceso.class": "f876cf89fa6703421eb120eec27ce3a8a5a7842c0d024e78f692aa6e5323416f",
+      "BOOT-INF/classes/pe/nivora/backend/acceso/aplicacion/GestionarAdministradores.class": "723ffe65a0c271f06fd37d84b5bbb9b156c616aff7c8f86175d379445dd48bef",
+      "BOOT-INF/classes/pe/nivora/backend/acceso/aplicacion/InicializarAdministracion.class": "e2d7a7c4a3d3fb2f9829dff467c9aab84c8c6e01588c103864ac1bfd05ab1edc",
+      "BOOT-INF/classes/pe/nivora/backend/acceso/aplicacion/SesionesAdministrativas$Inicio.class": "ac2a151e4ae860bd7443a61064477ad738eb4c8da184e235449a165f5b9d8e8c",
+      "BOOT-INF/classes/pe/nivora/backend/acceso/aplicacion/SesionesAdministrativas.class": "dcf19c2d38485b7b62f473ee0a72389d6c496e53d9a1cc48069a016e739eb8fc",
+      "BOOT-INF/classes/pe/nivora/backend/acceso/aplicacion/SesionesConsulta$Inicio.class": "7ba1d137c8442e24436a8536f747dbd7a84471fbaf378a5a00686c82137177b8",
+      "BOOT-INF/classes/pe/nivora/backend/acceso/aplicacion/SesionesConsulta.class": "6759a34968dd60398ac3dda2b74b5ea0109467fc7c4093713b0e67cc2c7471e9",
+      "BOOT-INF/classes/pe/nivora/backend/acceso/dominio/CodigoSuministro.class": "44145ba7a80eb21814e83a8b9347b4b55a7344503e2c6eb8e0442b9404f7dfbd",
+      "BOOT-INF/classes/pe/nivora/backend/acceso/dominio/Dni.class": "f587811d1d1abcc6c42706d54903679a6ae3469d7406a837a96878510badfa7d",
+      "BOOT-INF/classes/pe/nivora/backend/acceso/dominio/IdentidadConsultada.class": "9194258c23480d33a22911e8463e75f6213beeec7a08e167d5999399bc055608",
+      "BOOT-INF/classes/pe/nivora/backend/acceso/dominio/Suministro.class": "6ac284130456db9f0d9e2d5063cdc8dc16f31f9bc1a31331542e2a85ee96079b",
+      "BOOT-INF/classes/pe/nivora/backend/acceso/dominio/SuministroVerificado.class": "a2491871bb7ff603f863c403982e98e1de6d35019e838d917fbb7fa8f34fa6ca",
+      "BOOT-INF/classes/pe/nivora/backend/acceso/dominio/TokenOpaco.class": "094f7a83f7689ecd151b03cff20eb8a26e6947394a848d1c6ef440c7287f63df",
+      "BOOT-INF/classes/pe/nivora/backend/acceso/dominio/administradores/ActorAdministrativo.class": "92bea26e1615839e30e64677eee0e24f567d6f819565c770f7da4596fc594e2e",
+      "BOOT-INF/classes/pe/nivora/backend/acceso/dominio/administradores/Administrador.class": "658ea0b49ab688d2810ada156369091fcf78118a76cec485e58506da991d064a",
+      "BOOT-INF/classes/pe/nivora/backend/acceso/dominio/administradores/ConfirmacionAdministrativa.class": "316b000999bf08fa094a8c04907a814689b2ab0a2792ddaba36ff04b6c0a0f3f",
+      "BOOT-INF/classes/pe/nivora/backend/acceso/dominio/administradores/CredencialAdministrativa.class": "9aab47930ffdd4a5d3ed4c70bcba5bdbe509ce8115d95af1d5c957393c7e101b",
+      "BOOT-INF/classes/pe/nivora/backend/acceso/dominio/administradores/PaginaAdministradores.class": "3810586f3822b30743aa4cfebc239d3ca3ed46ce8727fa0f420acc222013dfe0",
+      "BOOT-INF/classes/pe/nivora/backend/acceso/dominio/administradores/PaginaAuditoriaAdministrativa$Evento.class": "f87434287ef3d42df84ff537b23d19c052e3285e1384754f7f383f155c1c4e6e",
+      "BOOT-INF/classes/pe/nivora/backend/acceso/dominio/administradores/PaginaAuditoriaAdministrativa.class": "9e5339201962a6294c6f250e50f289e5a7a7cfec3d118a83c46b13a7cfccc0b1",
+      "BOOT-INF/classes/pe/nivora/backend/acceso/dominio/administradores/PoliticaSesionAdministrativa.class": "629b2664ca9fb3be0920edd38b9f88d3dc4f38c137b3eb6a449bc2de98ef24af",
+      "BOOT-INF/classes/pe/nivora/backend/acceso/dominio/administradores/ResultadoGestionAdministrativa.class": "5056e674b06e62b5832647db041e4b5a3c967601759fd9334ad3d5049c30a63a",
+      "BOOT-INF/classes/pe/nivora/backend/acceso/dominio/administradores/SesionAdministrativa.class": "61b1d50ee75e497fe4e9543595b7efb3773855dd4287716918eba4d356f24a44",
+      "BOOT-INF/classes/pe/nivora/backend/acceso/dominio/administradores/TokenAdministrativo.class": "88b6a41239548249bce3f09920ccec917c9ce390595d855d287ac276ec14509a",
+      "BOOT-INF/classes/pe/nivora/backend/acceso/dominio/administradores/UsuarioAdministrador.class": "cc400429005f7e6fe82d8ae1c35a5e2938dc094b95b4402605dfc4e6867ca8a0",
+      "BOOT-INF/classes/pe/nivora/backend/acceso/dominio/consulta/SesionConsulta.class": "16064e3d983c1b3d4a29b83a39d8d3e70d1a383c64d672670d480ec73f48a66c",
+      "BOOT-INF/classes/pe/nivora/backend/acceso/dominio/consulta/TokenConsulta.class": "35d0f9cce5e71a87ed7e0730bf62ac0021a6f1c996c8c90732d80ea8ed52a949",
+      "BOOT-INF/classes/pe/nivora/backend/acceso/dominio/contratos/AccesoAdministrativoLimitadoException.class": "b759084df2fb7a6b2b4ccc50ab2a9a4ed8b0a5d566bfb040240a8034e1e3b69a",
+      "BOOT-INF/classes/pe/nivora/backend/acceso/dominio/contratos/AccesoConsultaLimitadoException.class": "97eaf925c67feaa866b8589306ea0be6ef3eafb47651143e55ee2c9184d1fca1",
+      "BOOT-INF/classes/pe/nivora/backend/acceso/dominio/contratos/AdministracionYaInicializadaException.class": "4747e3983e74a68c9b802cb6d003363e7361b9229a0b38f645105798c03a22d6",
+      "BOOT-INF/classes/pe/nivora/backend/acceso/dominio/contratos/AdministradorNoEncontradoException.class": "f3e1bc45cb247034c00c16111bda92fb50272089d31091543a510f293eabdf07",
+      "BOOT-INF/classes/pe/nivora/backend/acceso/dominio/contratos/ConflictoGestionAdministrativaException.class": "7742fb5cffcf1a2aca8f01e4036fb738feb921f1d151cc709229690ec8564990",
+      "BOOT-INF/classes/pe/nivora/backend/acceso/dominio/contratos/ConsultaRegistrosAcceso$Acceso.class": "4e5629393b4b34a329a26e0c90ca4b191fbd968c8c2a88a2b2d258d0c5c3aa58",
+      "BOOT-INF/classes/pe/nivora/backend/acceso/dominio/contratos/ConsultaRegistrosAcceso$Cursor.class": "0aebde8a5a6085141174dfed1b23d8485417b2ff23598965f19cd4d6529bcc83",
+      "BOOT-INF/classes/pe/nivora/backend/acceso/dominio/contratos/ConsultaRegistrosAcceso$NoDisponible.class": "ffdeb7c5788af7187c2ab8e94949dbcdc8bd134141c5beb4e2f4bb0cf978e996",
+      "BOOT-INF/classes/pe/nivora/backend/acceso/dominio/contratos/ConsultaRegistrosAcceso.class": "3818761d8bae54ba765b5315efb5b7d2e4c0009a8382e01e46ae97d7cc652362",
+      "BOOT-INF/classes/pe/nivora/backend/acceso/dominio/contratos/CredencialesAdministrativasInvalidasException.class": "f3ab20c0b95a8931543bda93241647d3c3ad7a3e6e85af6f29f308e95844efdd",
+      "BOOT-INF/classes/pe/nivora/backend/acceso/dominio/contratos/FuenteIdentidad.class": "c914d8249d4c1956f901842fb09b9d236f62732846a100227075f1f7fff74ad5",
+      "BOOT-INF/classes/pe/nivora/backend/acceso/dominio/contratos/FuenteIdentidadNoDisponibleException$Motivo.class": "b6fa3ebdf70d4c0f5d8778f4c3efcb2d8b6b880b2130ffe42af58cb153bb1450",
+      "BOOT-INF/classes/pe/nivora/backend/acceso/dominio/contratos/FuenteIdentidadNoDisponibleException.class": "c671ccceefbcf3256c979c4c09e6425607046209076cdde3d82362764babc780",
+      "BOOT-INF/classes/pe/nivora/backend/acceso/dominio/contratos/FuenteSuministros.class": "de32d0aa0a386cbf9ca556d76f7f22bfe8701944d653399db4364170c3ad5150",
+      "BOOT-INF/classes/pe/nivora/backend/acceso/dominio/contratos/FuenteSuministrosNoDisponibleException.class": "93389e6385ccc32c0607588185e79e0e1e0f0360b9f189a1531762731380ff74",
+      "BOOT-INF/classes/pe/nivora/backend/acceso/dominio/contratos/PermisoGestionAdministrativaException.class": "2dca6b9150689d654861c516182f6ee056a8b08523e51d194f1756c3d4c145c8",
+      "BOOT-INF/classes/pe/nivora/backend/acceso/dominio/contratos/ProtectorClavesAdministrativas.class": "a90c956228b56311935b176ad36474c7875db3cbb5d3e69630b5e8a25076262a",
+      "BOOT-INF/classes/pe/nivora/backend/acceso/dominio/contratos/RepositorioAdministradores.class": "7244ac479a08d127cfcc47101a5c841971df4fefa0e2a0ccbd3e60acb1be7014",
+      "BOOT-INF/classes/pe/nivora/backend/acceso/dominio/contratos/RepositorioAdministradoresNoDisponibleException.class": "4edd84f978d3296e13bcb897dea57e37c825d422c6e2c19d560a8e1515adccff",
+      "BOOT-INF/classes/pe/nivora/backend/acceso/dominio/contratos/RepositorioGestionAdministradores.class": "e305fc70aa1fd10d395e3e7eb6580561208f07b7075b7975e5466410db3fe216",
+      "BOOT-INF/classes/pe/nivora/backend/acceso/dominio/contratos/RepositorioSesionesAdministrativas.class": "7999973a38ea8aa4a445ac98af22a98fbe794e9e7575f8243dfb99a27aa4a0d3",
+      "BOOT-INF/classes/pe/nivora/backend/acceso/dominio/contratos/RepositorioSesionesConsulta.class": "c2d14a3d69dec010e1662002ed8cf703e1384b251b21fb7a1183bd949cadf3ab",
+      "BOOT-INF/classes/pe/nivora/backend/acceso/dominio/contratos/RepositorioSuministros.class": "c6350b53a81e61be25d9bbc56815f76ed6715be3dfd8e79657cfdc54ccc2ec6b",
+      "BOOT-INF/classes/pe/nivora/backend/acceso/dominio/contratos/RepositorioSuministrosNoDisponibleException.class": "033e4374e5a86467c184709fb0f4e73b0b1aeebbd7bfaa078034175c31ffe8f6",
+      "BOOT-INF/classes/pe/nivora/backend/acceso/dominio/contratos/SesionesAdministrativasNoDisponiblesException.class": "90c8c15070a1115ed3c2f7903e97bc0b262ef38261701a081d9b89f990ce0140",
+      "BOOT-INF/classes/pe/nivora/backend/acceso/dominio/contratos/SesionesConsultaNoDisponiblesException.class": "2139407d641107011e2972ac8d922fb77be4f16ceb99493cda70845bcb54e8ca",
+      "BOOT-INF/classes/pe/nivora/backend/acceso/infraestructura/administradores/AdministradoresConfiguracion.class": "3e4ee4ad6a7aaebf67d74ea0f761f52fffacb5e31e99527cb7ad1de6bfe66d89",
+      "BOOT-INF/classes/pe/nivora/backend/acceso/infraestructura/administradores/GestionAdministradoresConfiguracion.class": "92d75b3eef253665c80e3d55820c10f9ec37ede8480caba0d64d8f3dcea4423c",
+      "BOOT-INF/classes/pe/nivora/backend/acceso/infraestructura/administradores/InicializarAdministracionAlIniciar.class": "5e61166f540d7864d3799ba15c21fbfcf1eb1fc266984a4f635bbb91a161201f",
+      "BOOT-INF/classes/pe/nivora/backend/acceso/infraestructura/administradores/ProtectorClavesArgon2.class": "d7922d0f3b22d06f5de5a233da4f92358b50ca1279eff230c6bd4a4863e15be4",
+      "BOOT-INF/classes/pe/nivora/backend/acceso/infraestructura/administradores/RepositorioAdministradoresJdbc.class": "a8cd89637244ea170982a7c57518857098663f4b2fa2e44b1a7d840051a744ca",
+      "BOOT-INF/classes/pe/nivora/backend/acceso/infraestructura/administradores/RepositorioGestionAdministradoresJdbc$Vigencia.class": "2e02c208d192f7e924e92e1adb8ac7ca22bd1f8610e7a785e637f1796844e60b",
+      "BOOT-INF/classes/pe/nivora/backend/acceso/infraestructura/administradores/RepositorioGestionAdministradoresJdbc.class": "7ace3f9d4cc9459776fd5ff9e62c6bd2d09e21c802662645923226f1b6762ca5",
+      "BOOT-INF/classes/pe/nivora/backend/acceso/infraestructura/administradores/RepositorioSesionesAdministrativasJdbc$Guardada.class": "a928c6661b9c38e0539c958055ba55d6c0d1dfeb8b2a97429f40b47122d11659",
+      "BOOT-INF/classes/pe/nivora/backend/acceso/infraestructura/administradores/RepositorioSesionesAdministrativasJdbc$Ventana.class": "aea9e3419b4b9be35471e53838fa7e0460d2343701e5e31d1a267ed6b303f3ab",
+      "BOOT-INF/classes/pe/nivora/backend/acceso/infraestructura/administradores/RepositorioSesionesAdministrativasJdbc.class": "a587ec7d923a9170c0d06dd772307f91787627a17847264e632d72231ad51d33",
+      "BOOT-INF/classes/pe/nivora/backend/acceso/infraestructura/administradores/SesionesAdministrativasConfiguracion.class": "587cda630e3181b9a559543a907c2e2e6978cc34091352acb21e11cc8b4588c6",
+      "BOOT-INF/classes/pe/nivora/backend/acceso/infraestructura/consulta/RepositorioSesionesConsultaJdbc$Ventana.class": "eb445077f74858aad58e42db3d9f68eba038230fc0d424a92868296c51844655",
+      "BOOT-INF/classes/pe/nivora/backend/acceso/infraestructura/consulta/RepositorioSesionesConsultaJdbc.class": "a7a5aa89e95ec6fb30f6a20bdc3d563abcdbb838577e61fe4c7e9136d5f18583",
+      "BOOT-INF/classes/pe/nivora/backend/acceso/infraestructura/consulta/SesionesConsultaConfiguracion.class": "faadadeb68692c499b561b2b9bd2055966adb7b9215be6ca93cfef73916b81ea",
+      "BOOT-INF/classes/pe/nivora/backend/acceso/infraestructura/empresaagua/ComprobarFuenteSuministros.class": "befd4223330d1f3e2001a88359f4a56f2843a8755c252ec41b6698e5655a1c5a",
+      "BOOT-INF/classes/pe/nivora/backend/acceso/infraestructura/empresaagua/EmpresaAguaConfiguracion.class": "d7a60a40232949810aa602e3ded20b6fe114e5bd18063fa15a97d4db2a6905bc",
+      "BOOT-INF/classes/pe/nivora/backend/acceso/infraestructura/empresaagua/FuenteSuministrosHttp.class": "d4a31718375a2ee89bf5c317c5e52558e74a2548179d07d5b1c607b3776fef0a",
+      "BOOT-INF/classes/pe/nivora/backend/acceso/infraestructura/identidad/ComprobarFuenteIdentidad.class": "9329a60e6ef56adb1124001a38175221dbc6a0e875660b6113ba28a3d4f45592",
+      "BOOT-INF/classes/pe/nivora/backend/acceso/infraestructura/identidad/FuenteIdentidadApisPeru.class": "64b05d3542d7633e4c88f25595b6666ec51ea451e29bd17929de02c3fe73d075",
+      "BOOT-INF/classes/pe/nivora/backend/acceso/infraestructura/identidad/IdentidadConfiguracion.class": "3e235774a2f314b92748127f14ae1472bb9963e6d2df6a777f237dd2d63b1a54",
+      "BOOT-INF/classes/pe/nivora/backend/acceso/infraestructura/persistencia/ComprobarAlmacenamientoSuministros.class": "7d0edbfada16f8b848e9a2484c8ddf07c0ef19d712983405cd98d570947aa305",
+      "BOOT-INF/classes/pe/nivora/backend/acceso/infraestructura/persistencia/ConsultaRegistrosAccesoJdbc.class": "86c4fa9ee0438abd040e8700d9616329aceb5d5674623ea92f2d26a87fe8778c",
+      "BOOT-INF/classes/pe/nivora/backend/acceso/infraestructura/persistencia/RegistrosAccesoConfiguracion.class": "ccdb93d01a506380c33da99a37bf9efdc4c32bd9be2f9600f7ab3b5d029981d8",
+      "BOOT-INF/classes/pe/nivora/backend/acceso/infraestructura/persistencia/RepositorioSuministrosJdbc.class": "500d5cad6d9186ff224c2f48348f8948a9484f15ea3939edae5330a97aec30d7",
+      "BOOT-INF/classes/pe/nivora/backend/acceso/infraestructura/persistencia/SuministrosConfiguracion.class": "a4a8e4c600198c4e7b44123ec4f45eae2928aee23c9846fb2e220c7364e29b84",
+      "BOOT-INF/classes/pe/nivora/backend/acceso/infraestructura/seguridad/FiltroSesionAdministrativa.class": "eddc7db89b4f27c492b94ca661144f87db08d9868c29e0854d74d1a0e81335c9",
+      "BOOT-INF/classes/pe/nivora/backend/acceso/infraestructura/seguridad/FiltroSesionConsulta.class": "e9892b5c63b4cee10b4c1c0345f9c9f2189576ac00eb296aeac91b138e7fbd39",
+      "BOOT-INF/classes/pe/nivora/backend/acceso/infraestructura/seguridad/PrincipalAdministrativo.class": "a169bd47b15f407eef72d6af30851fcb1771a65705c982e2b5e41a0d9827aaa9",
+      "BOOT-INF/classes/pe/nivora/backend/acceso/infraestructura/seguridad/PrincipalConsulta.class": "bcd8df76e82991a6136662486b9b954141d1c6625fd0a89a8e2ec73dcc4f8a61",
+      "BOOT-INF/classes/pe/nivora/backend/acceso/infraestructura/seguridad/RespuestaSeguridad.class": "3d4aa91e99cde4700538cd55597712c01d42a4065d5acd6276c26d6f0a1391e6",
+      "BOOT-INF/classes/pe/nivora/backend/acceso/infraestructura/seguridad/SeguridadConfiguracion.class": "b49286be1072c91e1686686c5bff197f2307df687232e63181e7ca45d85c944e",
+      "BOOT-INF/classes/pe/nivora/backend/acceso/presentacion/ErroresSesionesAdministrativas.class": "9efaf817d5a69643d5dfd065807f2f29fc1f7f75f44e83ba0f0fa24195b932d1",
+      "BOOT-INF/classes/pe/nivora/backend/acceso/presentacion/ErroresSesionesConsulta.class": "deec456733ae99c02a0e4941166d936c6db5e5df6081c1a2812918fcd3c2e5ad",
+      "BOOT-INF/classes/pe/nivora/backend/acceso/presentacion/GestionAdministradoresController$CuentaRespuesta.class": "594b060b9bcaa9b0aa42d03ea177d69a6de7ed945a6a1b2250ed92a3084bcc30",
+      "BOOT-INF/classes/pe/nivora/backend/acceso/presentacion/GestionAdministradoresController$PaginaRespuesta.class": "52d10068169c59d0e3749ea996cd5270c50573056769fe97de9463b0bd0a667b",
+      "BOOT-INF/classes/pe/nivora/backend/acceso/presentacion/GestionAdministradoresController$ResultadoRespuesta.class": "2e6b069b9d07c42292142a51215eeebdd26afab3d5f5683f25613322cfdaf5fc",
+      "BOOT-INF/classes/pe/nivora/backend/acceso/presentacion/GestionAdministradoresController.class": "8b1e63f56cab0624e50a01e0122f556f5b305823987f73b7e6d50ef315d3b9e8",
+      "BOOT-INF/classes/pe/nivora/backend/acceso/presentacion/LectorSolicitudAdministrativa$FormatoSolicitudException.class": "c4fbab424aa56db56b86047fdd00ad293d10b51257abcafdb09db9528e8d130c",
+      "BOOT-INF/classes/pe/nivora/backend/acceso/presentacion/LectorSolicitudAdministrativa.class": "030bd83580ccddcd70f419d52a15f7917687f55577e9ad572e97e11561693c40",
+      "BOOT-INF/classes/pe/nivora/backend/acceso/presentacion/RegistrosAccesoController$AccesoListado.class": "efad7fa64e6e9d9b6ca1a57648384d854e5072ef137b56d69a3f88155b4846d9",
+      "BOOT-INF/classes/pe/nivora/backend/acceso/presentacion/RegistrosAccesoController$ListadoAccesos.class": "b0025bf1b385998ba41bedd8b672be868d42c2c8ddb84a21c576048161f63ed0",
+      "BOOT-INF/classes/pe/nivora/backend/acceso/presentacion/RegistrosAccesoController$ListadoSuministros.class": "d2fd618c0bd2f75d03c06ed80f6fc85df0f887dd0569b935f07161d6172f595e",
+      "BOOT-INF/classes/pe/nivora/backend/acceso/presentacion/RegistrosAccesoController$SuministroListado.class": "f487414892a41eab868920e170a24fb7b55c98ef33fe617cd7752321ada38599",
+      "BOOT-INF/classes/pe/nivora/backend/acceso/presentacion/RegistrosAccesoController.class": "ae5661cc87d529a9146e01b44ec4488909288d461106d92b1359f628582901ca",
+      "BOOT-INF/classes/pe/nivora/backend/acceso/presentacion/SesionesAdministrativasController$DatosSesion.class": "4aea8aef879c0b07fde2705a33da3b4fcbda4604a73eb41c57a01ba327532955",
+      "BOOT-INF/classes/pe/nivora/backend/acceso/presentacion/SesionesAdministrativasController$InicioRespuesta.class": "a8584b3179bb687a641aeea3e395fc8dbc0b4de3582eb99e4962855466c4017e",
+      "BOOT-INF/classes/pe/nivora/backend/acceso/presentacion/SesionesAdministrativasController.class": "dd0c01fff74141114180418352bc3e8ef6bf54933e9d36f0d265ef524781de95",
+      "BOOT-INF/classes/pe/nivora/backend/acceso/presentacion/SesionesConsultaController$AccesoNoValido.class": "12d6d5eb3e0157ffcafedfde5c8c790f36d762f8ff1cf44d69f69eb6e88f65d1",
+      "BOOT-INF/classes/pe/nivora/backend/acceso/presentacion/SesionesConsultaController$DatosSesion.class": "4bc54fd20fb2f2e5ca04ec0805c6c271615135760a3b7cec984db467d77653c5",
+      "BOOT-INF/classes/pe/nivora/backend/acceso/presentacion/SesionesConsultaController$InicioRespuesta.class": "72b0ce2c5fcd47134d1cae3fae4ec7442f7e5e8504b987b9f21f3ba118d48adf",
+      "BOOT-INF/classes/pe/nivora/backend/acceso/presentacion/SesionesConsultaController.class": "38ae0e87a942132e3b42dd7dfb6e5dcb6a2691d065bbd19eb8497e3af424e85a",
+      "BOOT-INF/classes/pe/nivora/backend/compartido/dominio/ReintentoExponencial.class": "1026c8d242f8573633c8e23a557de256b0f9307e05a432d825f1498ff304d4ca",
+      "BOOT-INF/classes/pe/nivora/backend/compartido/infraestructura/empresaagua/ClienteEmpresaAgua$1.class": "2359c42ea8e0d7d1d54f597e4ec8c4938be8c6dee383f16dcc11e9e42621a3db",
+      "BOOT-INF/classes/pe/nivora/backend/compartido/infraestructura/empresaagua/ClienteEmpresaAgua$ConsultaFallidaException.class": "335f189b2d7c8b1499a8464420524c6c2dd8d8731910f690187471f1cf31e14e",
+      "BOOT-INF/classes/pe/nivora/backend/compartido/infraestructura/empresaagua/ClienteEmpresaAgua$Respuesta.class": "1dec70284f892fc6198f606c71d96d7f561400cf863e05953e8d7c68976ca878",
+      "BOOT-INF/classes/pe/nivora/backend/compartido/infraestructura/empresaagua/ClienteEmpresaAgua.class": "ff2933dd53cda929d5447ac0c0eb7a840a7d0805c9534a65dc67028634b2b5c5",
+      "BOOT-INF/classes/pe/nivora/backend/compartido/infraestructura/seguridad/TransporteSeguroConfiguracion.class": "1094d706e18c3f94ef09e78e969db5fa561e66643969ce467ab8193beb21ff1f",
+      "BOOT-INF/classes/pe/nivora/backend/compartido/infraestructura/sincronizacion/ProgramacionSincronizacionJdbc$Pendiente.class": "00fdecead406f55a349f4ef44fa9ee9de73e6d25661f1608482369b7dbc2dc20",
+      "BOOT-INF/classes/pe/nivora/backend/compartido/infraestructura/sincronizacion/ProgramacionSincronizacionJdbc$Reserva.class": "bc6606f9667e0c64c550eeb6802e9eadbcbd7d6ec9a376645fe78f41705b9b49",
+      "BOOT-INF/classes/pe/nivora/backend/compartido/infraestructura/sincronizacion/ProgramacionSincronizacionJdbc$Tabla.class": "f60f3c68a06b3a2b857b63dd5fa4905d3391254d81c66eb45593a016f7471a3d",
+      "BOOT-INF/classes/pe/nivora/backend/compartido/infraestructura/sincronizacion/ProgramacionSincronizacionJdbc.class": "fcc39e55170ef1c2d90f78ff1f55273656b5eeae0235bdc99ad33e8dfe0dc032",
+      "BOOT-INF/classes/pe/nivora/backend/integracion/aplicacion/ConsultarIncidenciasIntegracion$Pagina.class": "a51a0e66ff3c2862827cb5a5974012a80376a977905038e8922d53673ac77b74",
+      "BOOT-INF/classes/pe/nivora/backend/integracion/aplicacion/ConsultarIncidenciasIntegracion.class": "5184d36df1561db924aea35b992c28d791dbb8235f6bc0ba4541f0dda4649848",
+      "BOOT-INF/classes/pe/nivora/backend/integracion/aplicacion/SolicitarReintentoIntegracion.class": "47ec4f0f6b0a9116489cee2398013c614453273d33443f83cc38584d139cc544",
+      "BOOT-INF/classes/pe/nivora/backend/integracion/dominio/ConsultaIncidenciasIntegracion$NoDisponible.class": "4d301ff4e6d365539f99e13a1d155a6a1d3319d5d008e585d9c497aeebd53336",
+      "BOOT-INF/classes/pe/nivora/backend/integracion/dominio/ConsultaIncidenciasIntegracion.class": "99dbc0c497fd428f16d998af0560036af13055bd0cde4d2992a6cd726520b5e2",
+      "BOOT-INF/classes/pe/nivora/backend/integracion/dominio/IncidenciaIntegracion$Cursor.class": "f2a3d262f6cc1ec4e1d2c755012f6004104546fd4d00c9e72e046871cf050873",
+      "BOOT-INF/classes/pe/nivora/backend/integracion/dominio/IncidenciaIntegracion$Estado.class": "d8d9a45ac3b6a0ce959fc399a4238aaae1235880044f90701035f7259ee59988",
+      "BOOT-INF/classes/pe/nivora/backend/integracion/dominio/IncidenciaIntegracion$Origen.class": "dab7e6ace1b11097aae205fc4d892903b2348be854c8ffd69ac80a0dff1adae5",
+      "BOOT-INF/classes/pe/nivora/backend/integracion/dominio/IncidenciaIntegracion.class": "94c54bd8b5af35a5c376f354160265eb5062ba94c1c42aff364a21465c7d4858",
+      "BOOT-INF/classes/pe/nivora/backend/integracion/dominio/RepositorioReintentosIntegracion$Estado.class": "c50eff45464424203bf05ad17e687ed0a16d69d21909309a90bcc36752bcabb6",
+      "BOOT-INF/classes/pe/nivora/backend/integracion/dominio/RepositorioReintentosIntegracion$NoDisponible.class": "cc47f83d986d3ed5fc45264f71877011690f49edd9c2edd62afc50e97fe9e3f0",
+      "BOOT-INF/classes/pe/nivora/backend/integracion/dominio/RepositorioReintentosIntegracion$Proceso.class": "849edd6160e57109952334dd54da76a4dbd7a210f5e4e46d6d9ce6dc1b425bfc",
+      "BOOT-INF/classes/pe/nivora/backend/integracion/dominio/RepositorioReintentosIntegracion$Solicitud.class": "7c42828fad5f3aed2a83445fd92298e902f23c975958e0825d0fe4bb504aed77",
+      "BOOT-INF/classes/pe/nivora/backend/integracion/dominio/RepositorioReintentosIntegracion.class": "b46e77c8ea25997b4c8ce0b3c7f18796450e2b782d77535dbbed34426568028d",
+      "BOOT-INF/classes/pe/nivora/backend/integracion/infraestructura/ConsultaIncidenciasIntegracionJdbc.class": "b5e438fa23e2fc6868349511aef24c958c1120558402e51444c5e297dc5cd94b",
+      "BOOT-INF/classes/pe/nivora/backend/integracion/infraestructura/IncidenciasIntegracionConfiguracion.class": "7e0eda5ac7c81b79f5a4716c06e7c3d408d4a522de97f08d3815ff10eb542a13",
+      "BOOT-INF/classes/pe/nivora/backend/integracion/infraestructura/ReintentosIntegracionConfiguracion.class": "600c0a95d5ffee223d738a61a6ac8bb4a38085b9d9febf984bd03cff2110e21f",
+      "BOOT-INF/classes/pe/nivora/backend/integracion/infraestructura/RepositorioReintentosIntegracionJdbc$Calendario.class": "6e2194189686f21eb121879b4f3a95a9d6ec45253efdfac92cfffc661320a7fd",
+      "BOOT-INF/classes/pe/nivora/backend/integracion/infraestructura/RepositorioReintentosIntegracionJdbc.class": "b72bb829cbe8d68c4fcc38569e2d24b364802c3e1e3d1ef4fb363a9558ecc34f",
+      "BOOT-INF/classes/pe/nivora/backend/integracion/presentacion/IncidenciasIntegracionController$Respuesta.class": "0936b064bd2f519ed6d421cdfdf2052c1d1574993b7990e889bbfbc434a9d18d",
+      "BOOT-INF/classes/pe/nivora/backend/integracion/presentacion/IncidenciasIntegracionController.class": "2ceca48184d1666a2f4d2384ad4cc896f71f8c453a61c4c268010aaaef7a8833",
+      "BOOT-INF/classes/pe/nivora/backend/integracion/presentacion/ReintentosIntegracionController$Respuesta.class": "1542259daa29a5a71df4f62ef1528dd3cd993e0076c47a17fbe33b1fbf07a260",
+      "BOOT-INF/classes/pe/nivora/backend/integracion/presentacion/ReintentosIntegracionController.class": "1bbfb1cb1b9e30f77099fcdd7ea560e020c5ae7d72f63640113c6f3995e9bdcf",
+      "BOOT-INF/classes/pe/nivora/backend/lecturas/aplicacion/ConsultarConsumoActual$Actualizacion.class": "5c20542765072bf8590b563144d8ace0060a074ac26727f5723ec112a1d908ff",
+      "BOOT-INF/classes/pe/nivora/backend/lecturas/aplicacion/ConsultarConsumoActual$EstadoActualizacion.class": "f8e8722e8daddaf94689f83699ff9a7d432d37af03671c16919c966f5e2d4cf7",
+      "BOOT-INF/classes/pe/nivora/backend/lecturas/aplicacion/ConsultarConsumoActual$Resultado.class": "3e8065fe5a93957a22f9bff644dd555f6ea6600fa913b4c27e5efd8e43c6c25e",
+      "BOOT-INF/classes/pe/nivora/backend/lecturas/aplicacion/ConsultarConsumoActual.class": "b9902508b16243a04bc2f14f579deeb31c938e2f823d754ffc141f732d5af129",
+      "BOOT-INF/classes/pe/nivora/backend/lecturas/aplicacion/ConsultarEstadisticasConsumo$Comparacion.class": "69386c07d6eed8d22e6e1a336543256bfdf6c9b24083e0b964a218d7c8b6e513",
+      "BOOT-INF/classes/pe/nivora/backend/lecturas/aplicacion/ConsultarEstadisticasConsumo$Resultado.class": "89dcecbb72e0ae1f621cddfc1fed5ab8a72c725ebc32a601813d410bbc3a5f1e",
+      "BOOT-INF/classes/pe/nivora/backend/lecturas/aplicacion/ConsultarEstadisticasConsumo$Resumen.class": "16e659e12649079beed247dc1651eaade8770571e437aa2effa639058eb88a58",
+      "BOOT-INF/classes/pe/nivora/backend/lecturas/aplicacion/ConsultarEstadisticasConsumo.class": "d9a987782ee78c1cef3a9e9b52820a78bff09f58dd5b5cab60b7291088c589ca",
+      "BOOT-INF/classes/pe/nivora/backend/lecturas/aplicacion/ConsultarHistorialMensual$Periodo.class": "762e50a67bc7c588eae3999ce9433e273bb55ad8acf7d5b970897c6a1ce67d8c",
+      "BOOT-INF/classes/pe/nivora/backend/lecturas/aplicacion/ConsultarHistorialMensual$Resultado.class": "cc52d9be4cded84c8a1db45e17908dabfc5ebb633c3f4565b2f2b6875752892b",
+      "BOOT-INF/classes/pe/nivora/backend/lecturas/aplicacion/ConsultarHistorialMensual.class": "c6f7e5d8358c37e5cc815fd2196d4c99021fc8abd0909fac16540057e4fdeb0a",
+      "BOOT-INF/classes/pe/nivora/backend/lecturas/aplicacion/ConsultarSupervisionLecturas.class": "d7de1569b3209bd8ebc9854bbb987a36a45de5d983e7119b9a288d14345d14e9",
+      "BOOT-INF/classes/pe/nivora/backend/lecturas/aplicacion/ImportarPaginaLecturas$Resultado.class": "e7fda3e3a2341cd7968b172c8b94fc85045c461266fabe3c9dcabfce746bb6ec",
+      "BOOT-INF/classes/pe/nivora/backend/lecturas/aplicacion/ImportarPaginaLecturas.class": "f8f2acfb6527d46d3ccd75e05e16aef331d6d4ff17be6a143a3140f04f62c698",
+      "BOOT-INF/classes/pe/nivora/backend/lecturas/aplicacion/PoliticaSincronizacion$Siguiente.class": "a8725a21fe837e1621b2ddeb115e681a353cfec85a5723136ee7aca26aed9425",
+      "BOOT-INF/classes/pe/nivora/backend/lecturas/aplicacion/PoliticaSincronizacion.class": "679f288a8af38a7d90b22f81d148675d531958fa9e13510287423c160f7b3c7b",
+      "BOOT-INF/classes/pe/nivora/backend/lecturas/aplicacion/RecuperarLecturas$Resultado.class": "4b98065066eaf75fb769d6f2d7a0c9cef3666afad6eb0cfb551c4ba3bcaa72c2",
+      "BOOT-INF/classes/pe/nivora/backend/lecturas/aplicacion/RecuperarLecturas.class": "87a97b05da012574555b51a2f235808abd8f6a40d4e7822054cfb8e168ac5539",
+      "BOOT-INF/classes/pe/nivora/backend/lecturas/aplicacion/RecuperarLecturasConCorte.class": "9ad7cae29a86709fe483064cbac99e7dc9e604bd1839f535467425779e43f1f0",
+      "BOOT-INF/classes/pe/nivora/backend/lecturas/aplicacion/SincronizarLecturas$Intento.class": "fd788bec508804c8e287ed7478e82f476e61c67a0e9e4a8a34f75fca21768486",
+      "BOOT-INF/classes/pe/nivora/backend/lecturas/aplicacion/SincronizarLecturas.class": "5a3d80aab5c7c962926d2f144f958f32028e2e0d31fceeae0ca6c172b3124699",
+      "BOOT-INF/classes/pe/nivora/backend/lecturas/dominio/ConsumoPeriodo$Estado.class": "20afc597adcee022e4866840a35228547d30f1e83da75a9cb1eb8dfd7b69eda6",
+      "BOOT-INF/classes/pe/nivora/backend/lecturas/dominio/ConsumoPeriodo$Motivo.class": "e7d584920801f57a76fcc2ec37cbd0094049f06ff9c4d779f03532e501b2d366",
+      "BOOT-INF/classes/pe/nivora/backend/lecturas/dominio/ConsumoPeriodo.class": "01002c3c15cb96fec5db66c2e93b44555b427c09eb79cca11999e3cfb8dd8515",
+      "BOOT-INF/classes/pe/nivora/backend/lecturas/dominio/ContextoLecturas$Medidor.class": "5bde72378b1d758b5d89f7c82e23b91ce57312165c2d429821cc4b4c9f7e7fb8",
+      "BOOT-INF/classes/pe/nivora/backend/lecturas/dominio/ContextoLecturas.class": "a422cbb5d325173a64070c3f17beb58ad6299fa98d3b001e656b34fe4c3cfb54",
+      "BOOT-INF/classes/pe/nivora/backend/lecturas/dominio/EstadoRecuperacion.class": "a967597520e22e23fca5130583e95e30bf398049819f776f7a8c9f51c92d6c34",
+      "BOOT-INF/classes/pe/nivora/backend/lecturas/dominio/EstadoSincronizacion.class": "1656c81f88e31bf6127dcae53026fbeb4f8b40bd57516132fce8631aef07cc89",
+      "BOOT-INF/classes/pe/nivora/backend/lecturas/dominio/Lectura$Tipo.class": "b8e1f01851ebfe95a1928a7ec4688d3f02a78582acb8633c2d8e467716a05ab9",
+      "BOOT-INF/classes/pe/nivora/backend/lecturas/dominio/Lectura.class": "8a46b1c3bfb974ac8b1286ab3954729aafc12cec8d7953e635c1381cc775c347",
+      "BOOT-INF/classes/pe/nivora/backend/lecturas/dominio/LecturaAcumulada.class": "f3e01d271e2c899cac12a54b8b418f1e5eb564ec69618c0e64726503a393a911",
+      "BOOT-INF/classes/pe/nivora/backend/lecturas/dominio/LecturaIntervalo.class": "95d594e85a1830c9ffe94ebea91077fe4152f113b37e30524e146b7af53f1d7d",
+      "BOOT-INF/classes/pe/nivora/backend/lecturas/dominio/LoteLecturas.class": "04492d2bc7f787e5011f7d21aa6b514775a513091b9035b614ea8ef286f172d7",
+      "BOOT-INF/classes/pe/nivora/backend/lecturas/dominio/MesConsumo.class": "38dabfa4f4d54a6f036c0883590027fca2cc8d860aabdbf6788626eb91795139",
+      "BOOT-INF/classes/pe/nivora/backend/lecturas/dominio/MotivoRechazoLectura.class": "3df94d96d84b4f20849bc49aa5f9cba442115079787515b27a3774476cf23512",
+      "BOOT-INF/classes/pe/nivora/backend/lecturas/dominio/PoliticaIncorporacionLecturas.class": "321657645b9439ef15b47de60409de5f9bc117d1f03572b88a2608983d73f279",
+      "BOOT-INF/classes/pe/nivora/backend/lecturas/dominio/ProgresoRecuperacion.class": "3fdb956f387a8fc878aa0ae99d6d1577fbd897da089deb6d8454d5e983c20f8b",
+      "BOOT-INF/classes/pe/nivora/backend/lecturas/dominio/ReservaSincronizacion.class": "76cfe4d09848e36b70ab6641e29d8a0b4d3d20e3b2ce744371caa6a28de54a18",
+      "BOOT-INF/classes/pe/nivora/backend/lecturas/dominio/ResultadoIncorporacion.class": "40ac84a0eb4a31f7a31ae3cb0fa5d8fa5c2ebb4818442d4a9d3f9fda67bbe183",
+      "BOOT-INF/classes/pe/nivora/backend/lecturas/dominio/SupervisionLecturas$Almacenamiento.class": "a1f8090b7c729658b9bb0ea1469c0d0ab87eae2e727e4c3229b112b0446c5bab",
+      "BOOT-INF/classes/pe/nivora/backend/lecturas/dominio/SupervisionLecturas$Corte.class": "be310947b66a8b4a3c48a48b943605e56b7bedcb722ecd2052ee602f949f06a0",
+      "BOOT-INF/classes/pe/nivora/backend/lecturas/dominio/SupervisionLecturas$Programacion.class": "3e2ce9374eec85c8e8401b54e432c6f6f1e139e3e0679592db53fa89c6deff66",
+      "BOOT-INF/classes/pe/nivora/backend/lecturas/dominio/SupervisionLecturas$Recuperacion.class": "dfadfad358865519e8e7b3e9935bf2316dfdf45d8851502770c3f69f36a89d83",
+      "BOOT-INF/classes/pe/nivora/backend/lecturas/dominio/SupervisionLecturas.class": "c1d7dac54416ce4cee8e5a6f67dd9f93291b3e7028d9252f87ee7953e8617fdb",
+      "BOOT-INF/classes/pe/nivora/backend/lecturas/dominio/contratos/ConsultaLecturasPeriodo$Datos.class": "7ac58845e258396bf6a2f8ddc85d0a0bbd3a4a71bd9a5fbf8b01b8447abbec5e",
+      "BOOT-INF/classes/pe/nivora/backend/lecturas/dominio/contratos/ConsultaLecturasPeriodo.class": "92cca3ee2c3eb1cdbbeef6128eaa9e9dd979698df6641d603b98f4764a8786ff",
+      "BOOT-INF/classes/pe/nivora/backend/lecturas/dominio/contratos/ConsultaSupervisionLecturas.class": "b652d778f0c5283ff8a6dc9891e7b112b3c697956ecd63ca9c56199f54462de4",
+      "BOOT-INF/classes/pe/nivora/backend/lecturas/dominio/contratos/FuenteLecturas.class": "1b90bcad81d5e83aa71467e175e4656e24c8ab6ef1cd8fc27bf5eb605d5d5900",
+      "BOOT-INF/classes/pe/nivora/backend/lecturas/dominio/contratos/FuenteLecturasConCorte.class": "62544e65091d0790e45cae2a9033965a677ff71c9ca5a3b8992ce238f2078831",
+      "BOOT-INF/classes/pe/nivora/backend/lecturas/dominio/contratos/FuenteLecturasNoDisponibleException.class": "fa730cce641d28e4cf355572beeb559519a038e496d7a018df3a44e48bd3ef2f",
+      "BOOT-INF/classes/pe/nivora/backend/lecturas/dominio/contratos/ProgresoRecuperacionModificadoException.class": "cec9397736f24a420f561f15e724473705c0eb4855372f652c247ad01e373b92",
+      "BOOT-INF/classes/pe/nivora/backend/lecturas/dominio/contratos/RepositorioLecturas.class": "5f8412cd2170011de7bc76ffb6eb5d7cb15fa73767d7cd2918bac59097d86f6c",
+      "BOOT-INF/classes/pe/nivora/backend/lecturas/dominio/contratos/RepositorioLecturasNoDisponibleException.class": "19baf7b4c8d7bfecb62764a3107530bb8e659a8f5f9402589dd297dbc23851a4",
+      "BOOT-INF/classes/pe/nivora/backend/lecturas/dominio/contratos/RepositorioRecuperacionLecturas$Paso.class": "ac1708215eb4d8a0aea0e1244a227b34c69840fbfad7577cd7ba3c50fac06fa9",
+      "BOOT-INF/classes/pe/nivora/backend/lecturas/dominio/contratos/RepositorioRecuperacionLecturas.class": "b179e2b9d2cd52a15761653a692c625a7d03cea16091a064b5d59d1712088bcd",
+      "BOOT-INF/classes/pe/nivora/backend/lecturas/dominio/contratos/RepositorioSincronizacion.class": "59eed0c4e1ab2498830f3bfcb2885c2ed5f70bbe26ba75d7a605ad637f4d76d7",
+      "BOOT-INF/classes/pe/nivora/backend/lecturas/dominio/contratos/RepositorioSincronizacionNoDisponibleException.class": "03c627b5001618809b273b5cd1b4323ee6b95ce830a76e83e675a85e6f88eb6d",
+      "BOOT-INF/classes/pe/nivora/backend/lecturas/dominio/contratos/SuministroNoRegistradoException.class": "ccdcd2982398693be6df30f34dd4569e0465de16b376ae0daddcf69a1ce83fb2",
+      "BOOT-INF/classes/pe/nivora/backend/lecturas/dominio/contratos/SupervisionLecturasNoDisponibleException.class": "d102a18c6cf60f315af93347426405cc15ccbb5721319e55a77d76eed25c49f4",
+      "BOOT-INF/classes/pe/nivora/backend/lecturas/infraestructura/ConsumoActualConfiguracion.class": "f6ac37fed0f6fa7d029f5594eeb0eead48f25cca2560fc5edaf44a3aee68137f",
+      "BOOT-INF/classes/pe/nivora/backend/lecturas/infraestructura/ContextoLecturasJson.class": "c063dc5bc6fa661cbf41a5eb9353f9ba4698e11e96368a89fd1c81dda4cde4fc",
+      "BOOT-INF/classes/pe/nivora/backend/lecturas/infraestructura/SupervisionLecturasConfiguracion.class": "b9e92b2aeacac6d7d00d5b92ec18366b5d4b3d83dc731287af1fa9d5b5cda2c3",
+      "BOOT-INF/classes/pe/nivora/backend/lecturas/infraestructura/empresaagua/ComprobarFuenteLecturas.class": "fdb779af33ef1880ccd5cec800fb76233f410d4adcf8c368030a2e91fe448d74",
+      "BOOT-INF/classes/pe/nivora/backend/lecturas/infraestructura/empresaagua/FuenteLecturasConCorteHttp.class": "11ca9006b4132753af614b4cf9af0af45c59f5fb3937c3247eeabdd017300de8",
+      "BOOT-INF/classes/pe/nivora/backend/lecturas/infraestructura/empresaagua/FuenteLecturasHttp.class": "03ec0fc1487cb5434c0f72c0eeb00c08853d71a07c0130dd704d9cc18495db41",
+      "BOOT-INF/classes/pe/nivora/backend/lecturas/infraestructura/empresaagua/LecturasEmpresaConfiguracion.class": "dde549327f0b6d8df0c984c807ebe6d07ebdeb793e542fe3601d4ff55b615a53",
+      "BOOT-INF/classes/pe/nivora/backend/lecturas/infraestructura/persistencia/ComprobarAlmacenamientoLecturas.class": "9e80e01e5e7297834675311fe0fec705be668bffae200edb136eea1e497f0ad6",
+      "BOOT-INF/classes/pe/nivora/backend/lecturas/infraestructura/persistencia/ComprobarRecuperacionLecturas.class": "c88559f152c1153c4bf9c2d25c2a589b7f61cc9c701f61134411bbec4c583cc6",
+      "BOOT-INF/classes/pe/nivora/backend/lecturas/infraestructura/persistencia/ConsultaLecturasPeriodoJdbc.class": "7082482194a34ac71e37fa800b9548ed2d7ae2bffe9dad3a6010c499b2778fd7",
+      "BOOT-INF/classes/pe/nivora/backend/lecturas/infraestructura/persistencia/ConsultaSupervisionLecturasJdbc.class": "4f0ce8d272b3c6206de452c00d8c8ae3660e7a92c2cca36ad29fbee408c58eeb",
+      "BOOT-INF/classes/pe/nivora/backend/lecturas/infraestructura/persistencia/LecturasPersistenciaConfiguracion.class": "933c7bac2127f2d0a66cb864d0c62cc290c7dee92882ded3f0e21ef38fca1bc0",
+      "BOOT-INF/classes/pe/nivora/backend/lecturas/infraestructura/persistencia/RecuperacionLecturasConfiguracion.class": "e3ec8430a4f82e5a6942182e402fee3b35947211eac7d2226afba826466ffd3d",
+      "BOOT-INF/classes/pe/nivora/backend/lecturas/infraestructura/persistencia/RepositorioLecturasJdbc$Detalle.class": "c4e406b5ed6311554b4f9395bd2dd61ef58c7a636eee1ce831c85d58b580871d",
+      "BOOT-INF/classes/pe/nivora/backend/lecturas/infraestructura/persistencia/RepositorioLecturasJdbc$DetalleIntervalo.class": "579600eae7f5666cfeb5116efa6db76e87ec97347f9c5511edd0d6e33aa43e87",
+      "BOOT-INF/classes/pe/nivora/backend/lecturas/infraestructura/persistencia/RepositorioLecturasJdbc.class": "74aef908199e561d53e66ceff6268b5bd2803f0c45697eec83146162e22e4683",
+      "BOOT-INF/classes/pe/nivora/backend/lecturas/infraestructura/persistencia/RepositorioRecuperacionLecturasJdbc.class": "dfd23cb2f8fa0d83efeb42a2ff8016ee2c392eff5d377a7c27ffc3c7fb91aa5b",
+      "BOOT-INF/classes/pe/nivora/backend/lecturas/infraestructura/persistencia/RepositorioSincronizacionJdbc.class": "b67e79f7e3dfac1b2006aa75797f707e9eb873c47adedefc8b023f340c9885f7",
+      "BOOT-INF/classes/pe/nivora/backend/lecturas/infraestructura/sincronizacion/SincronizacionAutomatica.class": "9ff7d2df1ab69b550cf036b8a9bcb57cd9a18040d90f5e2adca975590e2658dc",
+      "BOOT-INF/classes/pe/nivora/backend/lecturas/infraestructura/sincronizacion/SincronizacionConfiguracion.class": "415590a80f0498abcdfc4acd82cc9af75cfe46a2519b6ebe5478baeca312cd06",
+      "BOOT-INF/classes/pe/nivora/backend/lecturas/presentacion/ConsumoActualController$Cantidad.class": "1dfcaeb0196dca54d3972230ec64e9e007028571e58b7428c517d69ffad0b14f",
+      "BOOT-INF/classes/pe/nivora/backend/lecturas/presentacion/ConsumoActualController$Comparacion.class": "cfc112df6ef598dea1f2d3e6d6d605bdd3a045d0e4f9093d9f81e951d2c90654",
+      "BOOT-INF/classes/pe/nivora/backend/lecturas/presentacion/ConsumoActualController$Detalle.class": "afe2d12b803738422ab4e2b5e041e12db0acdfcb0bde26b41b1d1454191cffea",
+      "BOOT-INF/classes/pe/nivora/backend/lecturas/presentacion/ConsumoActualController$PeriodoHistorial.class": "b0a652c69c9016e9a13b15ddb1961d423135bde9a656a6fbec247d17775ae2f5",
+      "BOOT-INF/classes/pe/nivora/backend/lecturas/presentacion/ConsumoActualController$Respuesta.class": "052f534da267ac760d4acf884bc142edb57f4abc8dde39b7b441dddf5083f94a",
+      "BOOT-INF/classes/pe/nivora/backend/lecturas/presentacion/ConsumoActualController$RespuestaEstadisticas.class": "1bd783f5eb7e154cc6fbbb2a8dbb29bebcb3674d72a0baa10fddac0cb1a667d9",
+      "BOOT-INF/classes/pe/nivora/backend/lecturas/presentacion/ConsumoActualController$RespuestaHistorial.class": "9147470b7d970b93d1745cd72973be6ad5604732c3bcbaceede2e99e676e0f2b",
+      "BOOT-INF/classes/pe/nivora/backend/lecturas/presentacion/ConsumoActualController$Resumen.class": "dc07b00d98338ae25ac088d495f5a5b7a97a6a950cba24fee69c6daa60a68eda",
+      "BOOT-INF/classes/pe/nivora/backend/lecturas/presentacion/ConsumoActualController$TramoComparado.class": "bf4684319668bb26187bfbded9f7d73fef47844b14b5498a85ca753890003de7",
+      "BOOT-INF/classes/pe/nivora/backend/lecturas/presentacion/ConsumoActualController.class": "34968362f6dafad03890b30d040a3106b87c6eadb4bb0709c3a40ca83596f148",
+      "BOOT-INF/classes/pe/nivora/backend/lecturas/presentacion/ErroresSupervisionLecturas.class": "077220c3e6ea59483c4afc4d565fa0a4a306cf626fff417d03c7afb65f853941",
+      "BOOT-INF/classes/pe/nivora/backend/lecturas/presentacion/SupervisionLecturasController$Respuesta.class": "efe6fa85fc0f2301a9ea131af6168538d7af4fe2f7acfca469bd6f35f5592855",
+      "BOOT-INF/classes/pe/nivora/backend/lecturas/presentacion/SupervisionLecturasController.class": "1002ea51052814e61189830b748d290f107836bb0c8d9c77799192c330e4fb3d",
+      "BOOT-INF/classes/pe/nivora/backend/notificaciones/aplicacion/BandejaNotificaciones$Pagina.class": "354d74dc098cb1480b1a5ee00b93b31101e2fb53d73fced93d0c14f6c5013027",
+      "BOOT-INF/classes/pe/nivora/backend/notificaciones/aplicacion/BandejaNotificaciones.class": "4536f15b9982f4df8eba08c4e9b1d625eb582b6a0841c0c0af41329aaee1805f",
+      "BOOT-INF/classes/pe/nivora/backend/notificaciones/aplicacion/ConfigurarNotificaciones$EstadoAlertas.class": "ea5291b6db5f1f981b84a749a0364757f13e758db987a50e1ffb5d8b7165e67c",
+      "BOOT-INF/classes/pe/nivora/backend/notificaciones/aplicacion/ConfigurarNotificaciones.class": "4e657e87e5455019786ebe68910ba12ed0fec6399741d4418cd0fd600e71b5f0",
+      "BOOT-INF/classes/pe/nivora/backend/notificaciones/aplicacion/DespacharWebPush.class": "ad8370951d532e76e7f813e13cccee4575b50a4d66284a58ff171aa6ef2e4595",
+      "BOOT-INF/classes/pe/nivora/backend/notificaciones/aplicacion/EvaluarAlertaConsumo$Estado.class": "3c6d4f69549e93607ed6e853c079d834540353bc16b70c95848147907df91cbf",
+      "BOOT-INF/classes/pe/nivora/backend/notificaciones/aplicacion/EvaluarAlertaConsumo$Resultado.class": "988667c415ebfe5d482cc0ccc0e84607660986aa6c3c1f3c143c84f687071386",
+      "BOOT-INF/classes/pe/nivora/backend/notificaciones/aplicacion/EvaluarAlertaConsumo.class": "e37a445239fea38008a1ddf9afb72ab0135e8ac537a365f903797a11d1e16df1",
+      "BOOT-INF/classes/pe/nivora/backend/notificaciones/aplicacion/GenerarAvisosRecibo.class": "de0977e3b78e0c10c9fc7966a6b5053cfb34cc0f55d11c250f159fb9654ddd80",
+      "BOOT-INF/classes/pe/nivora/backend/notificaciones/dominio/AlertaConsumo.class": "66761927c40f6c7358381351e19fb40f7f9281da923191894065130ff039b29b",
+      "BOOT-INF/classes/pe/nivora/backend/notificaciones/dominio/EmisorWebPush$Respuesta.class": "b3bb657636078d6635d4c9e1a60bdd3a0b2072045e7ba8c84fd6ae6682876f76",
+      "BOOT-INF/classes/pe/nivora/backend/notificaciones/dominio/EmisorWebPush$Resultado.class": "64927d50d9bfdee9336be49373446eb75436d2396e10a31637bb8d34220a38e1",
+      "BOOT-INF/classes/pe/nivora/backend/notificaciones/dominio/EmisorWebPush.class": "70641dfcae1c7f05b88f2fa2d176a9367a5cff20c787aa83684f649b4bfd3aa7",
+      "BOOT-INF/classes/pe/nivora/backend/notificaciones/dominio/Notificacion$Clave.class": "366242a5a31449d81a58daa5482e3f0b63cb1b88d3b83cef368dde440611b679",
+      "BOOT-INF/classes/pe/nivora/backend/notificaciones/dominio/Notificacion$Consumo.class": "8ae1cfad86f0e9792f79600f9b6194cbed26ddf392a259849ac0743b1862e6d0",
+      "BOOT-INF/classes/pe/nivora/backend/notificaciones/dominio/Notificacion$Cursor.class": "62a9377e866cffc696be2033791b8a07b5a0905c63c54c3b692cb68249704272",
+      "BOOT-INF/classes/pe/nivora/backend/notificaciones/dominio/Notificacion$Recibo.class": "e3d32dc5712b1e1d4f1d3e3daa1559f82435476e2c498b00c1b1c8903e177a79",
+      "BOOT-INF/classes/pe/nivora/backend/notificaciones/dominio/Notificacion$Tipo.class": "f62b592fa05ad5bbbe9779b6d99c2871273ccd33fc3606a16febc7f445320b32",
+      "BOOT-INF/classes/pe/nivora/backend/notificaciones/dominio/Notificacion.class": "5ccdfe9ee9187d124a3ca2c0ec89628d85fb9ba54dfb0c4956beff3ad773dd9a",
+      "BOOT-INF/classes/pe/nivora/backend/notificaciones/dominio/RepositorioAlertasConsumo.class": "de6e910196b8b327c44839a80a7b3ead0729259540f2fa3f3aed73f1e2d2265a",
+      "BOOT-INF/classes/pe/nivora/backend/notificaciones/dominio/RepositorioAvisosRecibo.class": "5bebcea3c7dbb6efda42ffba0ace2150edad0caea02fabfe666a01b75b24deb1",
+      "BOOT-INF/classes/pe/nivora/backend/notificaciones/dominio/RepositorioBandejaNotificaciones$NoDisponible.class": "d8ca392e200c76e5bd70b7302f60fb40774bab9edd859ee2e4c30d814768cc64",
+      "BOOT-INF/classes/pe/nivora/backend/notificaciones/dominio/RepositorioBandejaNotificaciones.class": "c9c4739221b80dcf8396936cf7b3cac2315e37a6ea38434888f7f1b3a6b2ec3c",
+      "BOOT-INF/classes/pe/nivora/backend/notificaciones/dominio/RepositorioConfiguracionNotificaciones$ControlAlertas.class": "96bed625d64a33857830237a518b640a36bcd539bb12735702bab5d6a5cc25fc",
+      "BOOT-INF/classes/pe/nivora/backend/notificaciones/dominio/RepositorioConfiguracionNotificaciones$NoDisponible.class": "b7010f20b8f517355dfa4caab13b65c7bbe8edc47f4f655fd243bcaba1c21098",
+      "BOOT-INF/classes/pe/nivora/backend/notificaciones/dominio/RepositorioConfiguracionNotificaciones$Permiso.class": "e453e833881dd4eba193d856f9a8b7c8ebb480776fc0d4b03243bf17a9e08344",
+      "BOOT-INF/classes/pe/nivora/backend/notificaciones/dominio/RepositorioConfiguracionNotificaciones$Preferencia.class": "d14cf5c7a4050290e264c1b499ab29ecaf9a772e6e6ee9ea7257dfec613229ef",
+      "BOOT-INF/classes/pe/nivora/backend/notificaciones/dominio/RepositorioConfiguracionNotificaciones.class": "76dbbeca3f7baf269d629d9e1a35641c91b63ff1b9697c7a8c97672f2eab3e8d",
+      "BOOT-INF/classes/pe/nivora/backend/notificaciones/dominio/RepositorioWebPush$Estado.class": "3e64cb66021da7b8bdfbc4491fd79ed06988d04b47107cb4f997f2b5fe05e2d2",
+      "BOOT-INF/classes/pe/nivora/backend/notificaciones/dominio/RepositorioWebPush$NoDisponible.class": "772c47ec3a8a3f6aa66aef61ffbd897bfa9ac6bac9dab7c1514bbd7341db78fb",
+      "BOOT-INF/classes/pe/nivora/backend/notificaciones/dominio/RepositorioWebPush$Registro.class": "816110338a2debfcd901c77f3402f9c7ef288fb0167bf25998c535176e732c7d",
+      "BOOT-INF/classes/pe/nivora/backend/notificaciones/dominio/RepositorioWebPush$Reserva.class": "639d6d219f99e5cb9991d93f22d8111cfbdc0fff96b22e2e303ad0358b878cc7",
+      "BOOT-INF/classes/pe/nivora/backend/notificaciones/dominio/RepositorioWebPush.class": "9244f7f655b2e9461576e6d03547cda4862c8f8357f9a590e1e7514870eea848",
+      "BOOT-INF/classes/pe/nivora/backend/notificaciones/dominio/SuscripcionWebPush.class": "fbb950b7d4d5590ab429cebd7d39370676e1092411c30608ff84c4f6fc687124",
+      "BOOT-INF/classes/pe/nivora/backend/notificaciones/infraestructura/AlertasConsumoConfiguracion.class": "1c0b8331117e03b2b09efff6d2623cc9999c7548f32a65916fce145c7b41c9d9",
+      "BOOT-INF/classes/pe/nivora/backend/notificaciones/infraestructura/AvisosReciboAutomaticos.class": "7170dea08fcbae7a1c0f853f09cc9d8cb3bfbd15c579adaf8792a6b7b2b3e260",
+      "BOOT-INF/classes/pe/nivora/backend/notificaciones/infraestructura/AvisosReciboConfiguracion.class": "b2b019ada466c68433d4f51fa4637351b1551fca9d8298f111ed97a2f3b2988f",
+      "BOOT-INF/classes/pe/nivora/backend/notificaciones/infraestructura/BandejaNotificacionesConfiguracion.class": "65b45378e7b46bc0dd9bb0d99682e3adef8582b05b83cd8b1b76a9cff4550e0e",
+      "BOOT-INF/classes/pe/nivora/backend/notificaciones/infraestructura/ComprobarAlertaConsumo.class": "839c512334d34824b35c6f94ccba2d71c3b554aedeadc94f2fe660957e38a552",
+      "BOOT-INF/classes/pe/nivora/backend/notificaciones/infraestructura/EmisorWebPushHttp$Cifrado.class": "c962e8bc83ed91c517be9eead325d822c376356dcacede279a6d8d0bc0b435e4",
+      "BOOT-INF/classes/pe/nivora/backend/notificaciones/infraestructura/EmisorWebPushHttp.class": "22e1fad94964e40fc6f28e3bd09e2f465bbd1ee81d40bc7cbfee11375ef2049a",
+      "BOOT-INF/classes/pe/nivora/backend/notificaciones/infraestructura/RepositorioAlertasConsumoJdbc.class": "383503ad748bdc1551c9a3be59bc2f5ca93239e04ef88f8c79bc5de6455f266c",
+      "BOOT-INF/classes/pe/nivora/backend/notificaciones/infraestructura/RepositorioAvisosReciboJdbc$ReciboPendiente.class": "474d7310454b0b4805d6ff45774438852e4b61d66e97729ff29d8ff2628dd62c",
+      "BOOT-INF/classes/pe/nivora/backend/notificaciones/infraestructura/RepositorioAvisosReciboJdbc.class": "d39faa9fe5520ba5b2654282db204b78bf829e69f3f5520de009ae469d8383fd",
+      "BOOT-INF/classes/pe/nivora/backend/notificaciones/infraestructura/RepositorioBandejaNotificacionesJdbc.class": "95547501bee4cf103222eaabc6b4ad87790cf840063641aa543f42cc5d1e014e",
+      "BOOT-INF/classes/pe/nivora/backend/notificaciones/infraestructura/RepositorioConfiguracionNotificacionesJdbc.class": "1cf8ebff035bb56a090774313d2b7287b3ae087dad16509d288f3a978a52ad51",
+      "BOOT-INF/classes/pe/nivora/backend/notificaciones/infraestructura/RepositorioWebPushJdbc.class": "0d479a753b0d6051486de82a3e1ca975af63d480a650ad882600495041c26d56",
+      "BOOT-INF/classes/pe/nivora/backend/notificaciones/infraestructura/WebPushConfiguracion.class": "fd7ec97a2f323396e02d5a4b457d2398a2a8d69760a376effaae832d224da0fe",
+      "BOOT-INF/classes/pe/nivora/backend/notificaciones/presentacion/ConfiguracionNotificacionesController.class": "a2f45b583fec226041eb389dd798b65403da4effe68d4dae6074d5cd86cd614b",
+      "BOOT-INF/classes/pe/nivora/backend/notificaciones/presentacion/NotificacionesConsultaController$Aviso.class": "77e54529d339b73bb17f41f9301e06a149bfb6a63f1a7ac4b73b6abc50ff91d8",
+      "BOOT-INF/classes/pe/nivora/backend/notificaciones/presentacion/NotificacionesConsultaController$Consumo.class": "8d2ff808f11ee9a3efec3ba7a6d669a5bef4dee2e7ee282a5be99bd30a2eda77",
+      "BOOT-INF/classes/pe/nivora/backend/notificaciones/presentacion/NotificacionesConsultaController$Respuesta.class": "d12e3dc21485909ebfc2b57e6caa2161d9baad91228c61b85c48182c2e10a699",
+      "BOOT-INF/classes/pe/nivora/backend/notificaciones/presentacion/NotificacionesConsultaController.class": "11d892e6ec102d764783698e6c3a7f2eec17585bddfecd9bd970f8ed0aa2b2f0",
+      "BOOT-INF/classes/pe/nivora/backend/notificaciones/presentacion/WebPushController$ClavePublica.class": "d1d96e6bd7a8c1266bc5e945b4d509f1ea6dc397c943e66ff57a40a7f5b71c9c",
+      "BOOT-INF/classes/pe/nivora/backend/notificaciones/presentacion/WebPushController.class": "c473850bfcbf243972adf716fb8515e2f68c15da44602831f8a4b637d0424b1b",
+      "BOOT-INF/classes/pe/nivora/backend/periodos/aplicacion/GestionarPeriodosMensuales$Vista.class": "8464857231acb074ceb326da976841976fce46ecaab71cf4134d69c9c8f4a208",
+      "BOOT-INF/classes/pe/nivora/backend/periodos/aplicacion/GestionarPeriodosMensuales.class": "0d86b69961f71f6b4032fc2476d2c3f5109478eff03bc1c6b9c639c9a087a01c",
+      "BOOT-INF/classes/pe/nivora/backend/periodos/dominio/CalendarioMensual$Cambio.class": "7bea62a2a46d858aeb74c315dcbce9d80797eb6b2715660b4817f961889d3b36",
+      "BOOT-INF/classes/pe/nivora/backend/periodos/dominio/CalendarioMensual$Publicacion.class": "eb9ea8b2a70f460437f16a5260045c9fe07417f9bdcd70ffbdadf8bd10eaae1e",
+      "BOOT-INF/classes/pe/nivora/backend/periodos/dominio/CalendarioMensual.class": "2f4076b800f0974bfe214f5be86a1499feb8ee5013fb33f3274ea455696c2b4e",
+      "BOOT-INF/classes/pe/nivora/backend/periodos/dominio/RepositorioPeriodosMensuales$Conflicto.class": "31df8315ab6b1090d098e6c734e1e2d5284c4e688ea17366a539c797cf5ea14e",
+      "BOOT-INF/classes/pe/nivora/backend/periodos/dominio/RepositorioPeriodosMensuales$NoDisponible.class": "dfc9ca3611d13af85dd9faf0a10a038026193a4bdf3b0f774db4ce5813436e73",
+      "BOOT-INF/classes/pe/nivora/backend/periodos/dominio/RepositorioPeriodosMensuales.class": "7fbfd356c2b87472a06ec7ddbdfb762df718fc26ae274cf4af87018fa0d7f95b",
+      "BOOT-INF/classes/pe/nivora/backend/periodos/infraestructura/PeriodosMensualesConfiguracion.class": "c4c3f07765703ff676618fb1fb032473d78ff9ac74468566638d738d60d26e94",
+      "BOOT-INF/classes/pe/nivora/backend/periodos/infraestructura/RepositorioPeriodosMensualesJdbc.class": "11214b328222606cf2ba22db31f2aea0b92eb35419938dcf8f9309804daa1e37",
+      "BOOT-INF/classes/pe/nivora/backend/periodos/presentacion/ErroresPeriodosMensuales.class": "bece08c11c16346d81dc848b008724da6b541aa9c8fc156ae0789a143d00c7a7",
+      "BOOT-INF/classes/pe/nivora/backend/periodos/presentacion/PeriodosMensualesController$Periodo.class": "b1a1a9ce1249343cad7ad78c07e5c7205dccb92b15ccb4a10f6fdf4337ccf7b3",
+      "BOOT-INF/classes/pe/nivora/backend/periodos/presentacion/PeriodosMensualesController$Regla.class": "3247d8fcba054dcf65a0d27c826685e01ed4b71f7c12378ce28d47c2e8660fd3",
+      "BOOT-INF/classes/pe/nivora/backend/periodos/presentacion/PeriodosMensualesController$Vista.class": "11fc74e0d4a1ec01b01a6336ea3654b06af927661838ba328b623a63b248ea76",
+      "BOOT-INF/classes/pe/nivora/backend/periodos/presentacion/PeriodosMensualesController.class": "31d770f594ceb11269c7769667bf2872f921dd2c5098924c462da723e7f0299c",
+      "BOOT-INF/classes/pe/nivora/backend/recibos/aplicacion/ConsultarRecibos$Detalle.class": "670e2e167ab45839a51a36d132e333fa27d269e0f0461ecb527cfb8bd70355d1",
+      "BOOT-INF/classes/pe/nivora/backend/recibos/aplicacion/ConsultarRecibos$Resultado.class": "3c7d266a3717f60b7bc41b3d45c9daafa0b52d62f7c15a43d01e6ca34ae0e352",
+      "BOOT-INF/classes/pe/nivora/backend/recibos/aplicacion/ConsultarRecibos.class": "c5e3f3d6130c9c241b881997c7908c2c2dcf0cfd7e08db9836c68b226a7d96fc",
+      "BOOT-INF/classes/pe/nivora/backend/recibos/aplicacion/ConsultarSupervisionRecibos.class": "e25c81588b517df8124d0248e2b1c8cb3c80fc94b5a6a4683be6632600ffd085",
+      "BOOT-INF/classes/pe/nivora/backend/recibos/aplicacion/IncorporarRecibos.class": "188e66d7aaf3c3f6d2b82f45e3e36b93bc5cc23c27ca8ef5aed0183545964420",
+      "BOOT-INF/classes/pe/nivora/backend/recibos/aplicacion/SincronizarRecibos$Intento.class": "9f55bc83d807852cd8d748d9beff6d5fc5187055d8d01d4dff39e9d895562191",
+      "BOOT-INF/classes/pe/nivora/backend/recibos/aplicacion/SincronizarRecibos$Politica.class": "e9af6162f8abc87b8dba4aafc08ab1f6e4baa042ab68e12709624eb1ca4dc03e",
+      "BOOT-INF/classes/pe/nivora/backend/recibos/aplicacion/SincronizarRecibos$Resultado.class": "1ac9d8f3aafe8bda1a9d9a221dfb89b2f1841577836f7e6b73c95fdb3cef0376",
+      "BOOT-INF/classes/pe/nivora/backend/recibos/aplicacion/SincronizarRecibos.class": "4cf0d4873cfcff2803d5f59b5722a105117ebcbf69cdb8211113e91bc87ef78b",
+      "BOOT-INF/classes/pe/nivora/backend/recibos/dominio/ConsultaSupervisionRecibos$NoDisponible.class": "bfd94cf026c7c10b7864334a5809394f6ddce5901d2dae97d7c4c175241782b7",
+      "BOOT-INF/classes/pe/nivora/backend/recibos/dominio/ConsultaSupervisionRecibos.class": "d183cd78017681e4a450d712d64f2925883523cff38e11901994e7f854f3c1b6",
+      "BOOT-INF/classes/pe/nivora/backend/recibos/dominio/FuenteRecibos.class": "1396b2524b3fd913979c388e4bb3d8e2d1341e52534a819b9ff92b8df4b96c8a",
+      "BOOT-INF/classes/pe/nivora/backend/recibos/dominio/FuenteRecibosNoDisponibleException.class": "8957103567863adbceea455b8318e38760e28142ef4a2ec0204ee29e60c94ba1",
+      "BOOT-INF/classes/pe/nivora/backend/recibos/dominio/ReciboEmitido.class": "ff2af62f8f43a956142d78c788f695524dadf1453afca8dfe0146aa369df9256",
+      "BOOT-INF/classes/pe/nivora/backend/recibos/dominio/RecibosEmitidos.class": "a41acf3aee2feb0008614795f4014dd35ccd12747bad6387cd09c11dbc17f015",
+      "BOOT-INF/classes/pe/nivora/backend/recibos/dominio/RepositorioRecibos$Conflicto.class": "af7ad9855ca66f000eefaf1024eba213ccf97f33106f064320fffcbaaad0f311",
+      "BOOT-INF/classes/pe/nivora/backend/recibos/dominio/RepositorioRecibos$Guardado.class": "ee00f37a29c840bc5bea994f8996d40eee8891c62499425e22b8242976c75a18",
+      "BOOT-INF/classes/pe/nivora/backend/recibos/dominio/RepositorioRecibos$Incorporacion.class": "0be3464ef64dba033f4c6537b833d7a951e497e208c41ca798b564fc1a494bc3",
+      "BOOT-INF/classes/pe/nivora/backend/recibos/dominio/RepositorioRecibos$NoDisponible.class": "795cb8a1f7aee6c7d186807ebb5dca5f5b1ce979bf148e13e8ca07464c4c7d58",
+      "BOOT-INF/classes/pe/nivora/backend/recibos/dominio/RepositorioRecibos$Pagina.class": "6dda930b737c5fd7076ec3f5395943d118d3075533bee7b2120f6c579efc5f8d",
+      "BOOT-INF/classes/pe/nivora/backend/recibos/dominio/RepositorioRecibos$SuministroNoRegistrado.class": "fc16cae82e4b95dd986a1a232487fb3790fc262d785e2a4ac6b431b151fc082e",
+      "BOOT-INF/classes/pe/nivora/backend/recibos/dominio/RepositorioRecibos.class": "70d2d29494824eb549a092bef4f7298fa21c9b3bd20073f3721ee15da0c4314f",
+      "BOOT-INF/classes/pe/nivora/backend/recibos/dominio/RepositorioSincronizacionRecibos$Estado.class": "54b5280610f59061d84dce951e0563ad3205387198164d45685893b4464113f1",
+      "BOOT-INF/classes/pe/nivora/backend/recibos/dominio/RepositorioSincronizacionRecibos$NoDisponible.class": "411a5213edbba487c6c57026877e63a7649d0178971cd6f46223d0170f9d2dbf",
+      "BOOT-INF/classes/pe/nivora/backend/recibos/dominio/RepositorioSincronizacionRecibos$Reserva.class": "239ae2e15976215614e770df5ebfee87ea618e5f8640054f30377e18ef90ffd4",
+      "BOOT-INF/classes/pe/nivora/backend/recibos/dominio/RepositorioSincronizacionRecibos.class": "888b8d9a5898e3857306a3236b0495d6524b01bcd3e9139a5f168d03b76703f7",
+      "BOOT-INF/classes/pe/nivora/backend/recibos/dominio/SupervisionRecibos$Almacenamiento.class": "c1988dbcded5b7fa52f05865ffe79e878d0c2e34e5b6825f51ad79efa041ad5e",
+      "BOOT-INF/classes/pe/nivora/backend/recibos/dominio/SupervisionRecibos$Programacion.class": "410d5282cbc2193c79bf4d36b8e3fe11d63f05580c4a5bf977d239436ad2e1e4",
+      "BOOT-INF/classes/pe/nivora/backend/recibos/dominio/SupervisionRecibos.class": "f7d7034e74fb97b06b4f37d186cdb7cdc933dcc53c4c58f66cb82aa6215780c6",
+      "BOOT-INF/classes/pe/nivora/backend/recibos/infraestructura/ComprobarAlmacenamientoRecibos.class": "64e3a1c29049a87ecf65936f908644cfd6c2d5da74a293d2f1ccdb7985a6f18f",
+      "BOOT-INF/classes/pe/nivora/backend/recibos/infraestructura/ComprobarRecibos.class": "a537f25a28c3348c17355476d04823542cd566fdb5c4e5f646bfca59bfdbd39f",
+      "BOOT-INF/classes/pe/nivora/backend/recibos/infraestructura/ConsultaSupervisionRecibosJdbc.class": "d131996f81db61efc6ac28da898f65a4ae2deed164b2283fdd7ab54912b76c25",
+      "BOOT-INF/classes/pe/nivora/backend/recibos/infraestructura/FuenteRecibosHttp.class": "68399359d151ed3e9432f5a5848d9021d4ab85beed28d292fef6f51d2349c291",
+      "BOOT-INF/classes/pe/nivora/backend/recibos/infraestructura/RecibosConfiguracion.class": "49ab09a1b78441a360631ae8b29e1327f6f0be080e5b55d5f0a6cedfb9c489e3",
+      "BOOT-INF/classes/pe/nivora/backend/recibos/infraestructura/RepositorioRecibosJdbc.class": "e0e15b6f689cae062ccadb226f613512a6c058d3e0c60697e1c7b92753ec837d",
+      "BOOT-INF/classes/pe/nivora/backend/recibos/infraestructura/RepositorioSincronizacionRecibosJdbc.class": "b90817a59b9eb0f57ac706c648e3898fa1d14faa46793c5a4567024cf014e58a",
+      "BOOT-INF/classes/pe/nivora/backend/recibos/infraestructura/SincronizacionRecibosAutomatica.class": "f5ba4c17ba2e82fac3b9618b3cdec23735fc7dda7d2ff4bbd22c217799750d3e",
+      "BOOT-INF/classes/pe/nivora/backend/recibos/presentacion/RecibosConsultaController$Recibo.class": "86276bbfdf808de354b9e25e99a894f47fc7f80e103024f534d692a4700c676d",
+      "BOOT-INF/classes/pe/nivora/backend/recibos/presentacion/RecibosConsultaController$Respuesta.class": "b808fda56962787c2a35e5077d39e23249d8a3c1869f7cbf5df56624580de651",
+      "BOOT-INF/classes/pe/nivora/backend/recibos/presentacion/RecibosConsultaController$Ventana.class": "da5af336a122c3a6a4c00054588d9a042b57e8775e76b1aec3e2c2fb55b2b206",
+      "BOOT-INF/classes/pe/nivora/backend/recibos/presentacion/RecibosConsultaController.class": "e3ed44f03c3e6f324e2fd6f33bb7af28ab652495808ae825e81d67bf36971735",
+      "BOOT-INF/classes/pe/nivora/backend/recibos/presentacion/SupervisionRecibosController$RecibosGuardados.class": "03496f37e9244a331e66a3ebcd631f659711e0c5251bcdcb8b1473249fd98556",
+      "BOOT-INF/classes/pe/nivora/backend/recibos/presentacion/SupervisionRecibosController$Respuesta.class": "4799e6f393bab1482abf1d065813b9793aeb13aa3d4e2e37a117a9d8b178703a",
+      "BOOT-INF/classes/pe/nivora/backend/recibos/presentacion/SupervisionRecibosController.class": "0572ceecc4c3db8eb32772eb97af8be8f9977591706a7c37709235c8bd7101f4",
+      "BOOT-INF/classes/pe/nivora/backend/tarifas/aplicacion/ConsultarComparacionCostos$Resultado.class": "bf537c24c9c1139d051b4319f9ff42158543f404ee3da2486f12840653d363c7",
+      "BOOT-INF/classes/pe/nivora/backend/tarifas/aplicacion/ConsultarComparacionCostos$Tramo.class": "2eaa359db5700ba172ef2769e1ebb33809c66ea7b25ccf661e4a2ab91a176a45",
+      "BOOT-INF/classes/pe/nivora/backend/tarifas/aplicacion/ConsultarComparacionCostos.class": "3924de53fcfecdee0156a8b8bbe9954735058ff3cea3f5507a380b3a2267bcc7",
+      "BOOT-INF/classes/pe/nivora/backend/tarifas/aplicacion/ConsultarCostosConsumo$Estado.class": "12a0324b46a538c4a97bd36dc850d0f1e90b3193ee0bf1b1f2541de0ecb3241d",
+      "BOOT-INF/classes/pe/nivora/backend/tarifas/aplicacion/ConsultarCostosConsumo$Estimacion.class": "5f83c5586afe5149ed39ab1ee49d9ac5bdef4200d79a55d5e461170720ba03db",
+      "BOOT-INF/classes/pe/nivora/backend/tarifas/aplicacion/ConsultarCostosConsumo$Resultado.class": "9a53cef65782f276caf03b8fad1dca6fc21eed9217aaf5324937ed50f81ec88e",
+      "BOOT-INF/classes/pe/nivora/backend/tarifas/aplicacion/ConsultarCostosConsumo.class": "874ec31c3dfcb153ce5afb3e141389797b470a9c7058730bd8f592a769b39237",
+      "BOOT-INF/classes/pe/nivora/backend/tarifas/aplicacion/ConsultarProyeccionMensual$Estimacion.class": "426bb403f5fba5ddf0ec54588ffa05760e01ad51df200134b36b42d912511122",
+      "BOOT-INF/classes/pe/nivora/backend/tarifas/aplicacion/ConsultarProyeccionMensual$Resultado.class": "22bf02b97e76fdebd4e1477e6ca69ddc156593db1a02789dd783ccfd01aec351",
+      "BOOT-INF/classes/pe/nivora/backend/tarifas/aplicacion/ConsultarProyeccionMensual.class": "e1511ab896a9bfe2589ff96d67c3e7466e8dc4124b45182ce424cac95b4dc28b",
+      "BOOT-INF/classes/pe/nivora/backend/tarifas/aplicacion/GestionarTarifas.class": "20f54ea073d188dba7bee2a58539f099e5c9646902a82320018bc023905138c9",
+      "BOOT-INF/classes/pe/nivora/backend/tarifas/aplicacion/IncorporarTarifas.class": "559668808ff71b09a6a47d5f2db1e368e5969656c2acf6efad10fd94999ef951",
+      "BOOT-INF/classes/pe/nivora/backend/tarifas/aplicacion/SincronizarTarifas$Intento.class": "d15866cbb711a708a06da877c82ccd4b4f42e126e65c3a1b22cfe2acfd7e0f9b",
+      "BOOT-INF/classes/pe/nivora/backend/tarifas/aplicacion/SincronizarTarifas$Politica.class": "d15f446c75f61d8dc3eee11a2b959f3f482093ebe683f2102b86c4f29bdcd9a9",
+      "BOOT-INF/classes/pe/nivora/backend/tarifas/aplicacion/SincronizarTarifas$Resultado.class": "6ce06c24b59dee8831fd6dbde986343212a0ea2a1f1f26cf676683bebb6f2770",
+      "BOOT-INF/classes/pe/nivora/backend/tarifas/aplicacion/SincronizarTarifas.class": "24f2a473f7d80284fbf4b8cb349340497ec2e1663414a03b122e2f16d5bedab0",
+      "BOOT-INF/classes/pe/nivora/backend/tarifas/dominio/ComparacionCostos$Estado.class": "b815f51c9b4983470f8a60cfc1d3400e23b0b020744a958f0d42975a59f9e04d",
+      "BOOT-INF/classes/pe/nivora/backend/tarifas/dominio/ComparacionCostos.class": "2c1ad7907852eb4dc2975718eeb6980ffbdcce3941bfc8d78ad58d70ce97913f",
+      "BOOT-INF/classes/pe/nivora/backend/tarifas/dominio/CostoEstimado$TramoAplicado.class": "36546e47be34c0dc0d6b9061369788ef7ff76936422db00541bc6ce1bf418b1c",
+      "BOOT-INF/classes/pe/nivora/backend/tarifas/dominio/CostoEstimado.class": "7b5b873b644bceb87ea2d861064bd23a0b5927606e2e27d9533ecd30f8210990",
+      "BOOT-INF/classes/pe/nivora/backend/tarifas/dominio/FuenteTarifas.class": "513a5dd074c5ddabd2e344e1390598abb077a77e1b9b46e2a6909ca528f6bf70",
+      "BOOT-INF/classes/pe/nivora/backend/tarifas/dominio/FuenteTarifasNoDisponibleException.class": "cf503945f4b88cc4c4b7fdec4fde1dbbf587e53d96b7c33c16c626a4249cb9a1",
+      "BOOT-INF/classes/pe/nivora/backend/tarifas/dominio/HistorialTarifario$Asignacion.class": "1f9e872c84e65328dd635f9f1a349f4d69c4eee55fab92ee341bc7b64b20aef9",
+      "BOOT-INF/classes/pe/nivora/backend/tarifas/dominio/HistorialTarifario$ClaveVersion.class": "c26f64a510099c55d1fd1f73aa7e53829606b5713fa098c96ec0791a33b341ab",
+      "BOOT-INF/classes/pe/nivora/backend/tarifas/dominio/HistorialTarifario.class": "8ab79f06824d26452298ec4f74c51c12e06e99578809e315809a1c1fc5f785b4",
+      "BOOT-INF/classes/pe/nivora/backend/tarifas/dominio/ProyeccionMensual$Datos.class": "ba84257ba5151b7851cf64f367124529af26fe5f50863c8c59a1825a451b2fe9",
+      "BOOT-INF/classes/pe/nivora/backend/tarifas/dominio/ProyeccionMensual$Estado.class": "3eb8c66aa3c6e0a9fe095a063f753ef00f3f8b27ae2d6cb3d190ec465852a0d5",
+      "BOOT-INF/classes/pe/nivora/backend/tarifas/dominio/ProyeccionMensual.class": "0090a6793865e2dfe485f0df3eed7049a5bac6bb65aeb0286c397b060cb51f07",
+      "BOOT-INF/classes/pe/nivora/backend/tarifas/dominio/RepositorioSincronizacionTarifas$Estado.class": "3c87c988d6bbadf3038e2adb11d511efc4107f9a9567c846f44c58a9e2cbbf22",
+      "BOOT-INF/classes/pe/nivora/backend/tarifas/dominio/RepositorioSincronizacionTarifas$NoDisponible.class": "fbe98f2a1594e7be8963440b2b184c2a379d98d92d6b21746dc7c0acf00ab17a",
+      "BOOT-INF/classes/pe/nivora/backend/tarifas/dominio/RepositorioSincronizacionTarifas$Reserva.class": "197dd6b365263c081c7a883454e21ced1296ec37609bdc009171b393fb901c20",
+      "BOOT-INF/classes/pe/nivora/backend/tarifas/dominio/RepositorioSincronizacionTarifas.class": "35ce773a340b0ca6641bf1fbdfb11fc85c9362356f910b67666726c2e6c5f175",
+      "BOOT-INF/classes/pe/nivora/backend/tarifas/dominio/RepositorioTarifas$Conflicto.class": "d8b5a25e486016e1db4cfbef6b434a4a9787dfe7736347b8998ae680b040e236",
+      "BOOT-INF/classes/pe/nivora/backend/tarifas/dominio/RepositorioTarifas$Guardado.class": "00ec3781e5c0041c763c7a0d2ad6c36a1ee35c806a39cd063808b0012d0c1b38",
+      "BOOT-INF/classes/pe/nivora/backend/tarifas/dominio/RepositorioTarifas$NoDisponible.class": "c55b3ec5aa622ee0800640133a352e25dfd35ce05a90d389db097512ce588792",
+      "BOOT-INF/classes/pe/nivora/backend/tarifas/dominio/RepositorioTarifas$Publicacion.class": "142fff3f7639dd541871781ac38049a28f45e54befbfe3d226894e33a0c157b2",
+      "BOOT-INF/classes/pe/nivora/backend/tarifas/dominio/RepositorioTarifas$RevisionNoEncontrada.class": "de9792b65b78c650671f6ed19f9eaa6563d72ac06bc13b1cb6b51f1918ff012b",
+      "BOOT-INF/classes/pe/nivora/backend/tarifas/dominio/RepositorioTarifas$SuministroNoEncontrado.class": "41db08dcd7606019a419a234afdc5ba73aa27c803fcc8346e2dab73e87316234",
+      "BOOT-INF/classes/pe/nivora/backend/tarifas/dominio/RepositorioTarifas$VistaAdministrativa.class": "b2561980c5ed76cfd2236005e36025c0048971804fcf6c200bd24a5272e14abd",
+      "BOOT-INF/classes/pe/nivora/backend/tarifas/dominio/RepositorioTarifas.class": "84628fa13f2e865176bd8d2f77576d58b2881a21887e0346747a34307a89e7b4",
+      "BOOT-INF/classes/pe/nivora/backend/tarifas/dominio/TarifasParaCalculo$Seleccion.class": "5caedd1e980411eaa703cb3e312f205ed071dc50c85c9c29ab5353414b3fab08",
+      "BOOT-INF/classes/pe/nivora/backend/tarifas/dominio/TarifasParaCalculo.class": "50abdab0b9d880499844ee219cf3c580777f4d5c12edda8a6ab10bbf6a32366f",
+      "BOOT-INF/classes/pe/nivora/backend/tarifas/dominio/VersionTarifaria$Tramo.class": "91868b53306d908c826973eb848cc5da7e4ab2d7bbd22bac489585b4da2db69a",
+      "BOOT-INF/classes/pe/nivora/backend/tarifas/dominio/VersionTarifaria.class": "6b69fa8d08f8c2f0c99367e884922df82a229dfb02a92a6cb4e8b14836eed33c",
+      "BOOT-INF/classes/pe/nivora/backend/tarifas/infraestructura/ComprobarTarifas.class": "8b859effa38a0970d7937af6e1700befcdfeaf2e6c29e59c6aa42a79581598d6",
+      "BOOT-INF/classes/pe/nivora/backend/tarifas/infraestructura/FuenteTarifasHttp.class": "97868ea386e15962d49ea541a75b30fabbc6a99a76d7749c2e83a5ed7d68a97d",
+      "BOOT-INF/classes/pe/nivora/backend/tarifas/infraestructura/RepositorioSincronizacionTarifasJdbc.class": "d24bd29cc41bebeb3e1721ddc0588660c3df701034511a87ff3d35b37165fbdc",
+      "BOOT-INF/classes/pe/nivora/backend/tarifas/infraestructura/RepositorioTarifasJdbc.class": "9f5c94c09c49006ceee73f3d219c8b51d433dd34ffbbdf684de4b89de207789e",
+      "BOOT-INF/classes/pe/nivora/backend/tarifas/infraestructura/SincronizacionTarifasAutomatica.class": "78f255cf2838632eadf5265762db1b6629bfec97844252e001ad4b7a5c7c9f92",
+      "BOOT-INF/classes/pe/nivora/backend/tarifas/infraestructura/TarifasConfiguracion.class": "730f69bdefc3c4e1659fab285c3763d99d2a4df5fef74f548120914a1923acce",
+      "BOOT-INF/classes/pe/nivora/backend/tarifas/presentacion/ComparacionCostosController$Respuesta.class": "18f2cc7912663fd0c5f567bad4387318671928011651708c5fca8cbc6c9b0696",
+      "BOOT-INF/classes/pe/nivora/backend/tarifas/presentacion/ComparacionCostosController$Tramo.class": "cca1391160d15b29a5d76b36d42a4c3fad261f549779944caa9294d60e383415",
+      "BOOT-INF/classes/pe/nivora/backend/tarifas/presentacion/ComparacionCostosController.class": "4317afb6ccaa3db33c80263d24f43a3907c91872a0422531fc7e182e12659577",
+      "BOOT-INF/classes/pe/nivora/backend/tarifas/presentacion/CostosConsumoController$Consumo.class": "0ea3dd606ed68dc9cbd7b75485de5c95c4c7c7fae8429111ec91c0f99da30ad0",
+      "BOOT-INF/classes/pe/nivora/backend/tarifas/presentacion/CostosConsumoController$CostoProyectado.class": "4803c275bc5fd023f3cb9e0152434c8987bd32964ce9cd9b377c6e66437f707a",
+      "BOOT-INF/classes/pe/nivora/backend/tarifas/presentacion/CostosConsumoController$Desglose.class": "7fa033a186e001032255f76ace39d0d56d8dcfd79d72ba4f5dc9d04fb396f883",
+      "BOOT-INF/classes/pe/nivora/backend/tarifas/presentacion/CostosConsumoController$PeriodoCosto.class": "a224a01f6755d21cec6035da6703978fe2a1d8ccd42ce3ec52a7a3ad8555235c",
+      "BOOT-INF/classes/pe/nivora/backend/tarifas/presentacion/CostosConsumoController$Respuesta.class": "cf129723919733942d7fa71393c99d5741bd51aaafeb8b33db706b0d8c0741cf",
+      "BOOT-INF/classes/pe/nivora/backend/tarifas/presentacion/CostosConsumoController$RespuestaProyeccion.class": "76bb8234e545754179728145ede1a0c092dde432088e3f0a95255bb8666a5e07",
+      "BOOT-INF/classes/pe/nivora/backend/tarifas/presentacion/CostosConsumoController$Supuestos.class": "30785f32159b07fffad90570eb9550c2c4171e31532312f3f27b618331ff4520",
+      "BOOT-INF/classes/pe/nivora/backend/tarifas/presentacion/CostosConsumoController$Tarifa.class": "ba73a68e550f5c761430e7235f576ec0dc2a6ca87191dc4586658767fbbd4c3f",
+      "BOOT-INF/classes/pe/nivora/backend/tarifas/presentacion/CostosConsumoController$Tramo.class": "7e6d9803439df1e7ca36070113f7939de83aaed60e4d804b33cadf957ee1d130",
+      "BOOT-INF/classes/pe/nivora/backend/tarifas/presentacion/CostosConsumoController$VolumenProyectado.class": "11813f75f961a1ea1a1a5640b0bfe995cd519ad1f7986f0526fd19a5333156cb",
+      "BOOT-INF/classes/pe/nivora/backend/tarifas/presentacion/CostosConsumoController.class": "b782cff40f5e548c76797c0a45d5dafc0433c15e8c72dc0b0981fce506ebbf11",
+      "BOOT-INF/classes/pe/nivora/backend/tarifas/presentacion/GestionTarifasController$Historial.class": "f66bba0216d85c9e7245d1873066b4ef51ffbe3f39976b326b76b02b06213bdb",
+      "BOOT-INF/classes/pe/nivora/backend/tarifas/presentacion/GestionTarifasController$Publicacion.class": "47835ef01f8fb3b74ad261ba3dc80d55e242f64e32c3d5462f6e723a34706792",
+      "BOOT-INF/classes/pe/nivora/backend/tarifas/presentacion/GestionTarifasController$Vigencia.class": "306bf82f4d54b264b97e4040fb14af56b09a26df63e1f15942f78860431121f9",
+      "BOOT-INF/classes/pe/nivora/backend/tarifas/presentacion/GestionTarifasController$Vista.class": "0366f7bdde4344298ff9d70b5c726736c7472134a2a2240a44254a2f4ce23a2b",
+      "BOOT-INF/classes/pe/nivora/backend/tarifas/presentacion/GestionTarifasController.class": "e46f7aa2f713521710f1db2933639e697193598172a8cbc843cdcfe5ce4e5f93",
+      "BOOT-INF/classes/static/web-push-sw.js": "9416a22b8cdcd1612b3c44d1f4c8b1f9718ec826cb4bf0f27d2b64661348fa85",
+      "BOOT-INF/classes/static/web-push.html": "9bb54856488bcd6fe38ff20bdc37b7b8cf4d2b34e5167080d084da5709bd24e5",
+      "BOOT-INF/classes/static/web-push.js": "c15797f776adb0d17eb3157b3af1c6b94ddc04c118bd655dc9160a3f71151bf5"
+    },
+    "dependencias_identicas": true,
+    "numero_bibliotecas": 63,
+    "jar_final_sha256": "789f65e1d37c1c10a9430eb380c5ddc239a4c212bf56a07287049636121cc3dc"
+  },
+  "regresion_claves_duplicadas": {
+    "metodo": "retirar solo FAIL_ON_READING_DUP_TREE_KEY en una copia temporal",
+    "casos": 78,
+    "fallos_esperados": 6,
+    "errores": 0,
+    "casos_que_demuestran_el_fallo": [
+      "clasificaLosFallosSinAceptarDatosIncompatiblesNiSeguirRedirecciones(Punto, String)[2]",
+      "clasificaLosFallosSinAceptarDatosIncompatiblesNiSeguirRedirecciones(Punto, String)[12]",
+      "clasificaLosFallosSinAceptarDatosIncompatiblesNiSeguirRedirecciones(Punto, String)[22]",
+      "clasificaLosFallosSinAceptarDatosIncompatiblesNiSeguirRedirecciones(Punto, String)[32]",
+      "clasificaLosFallosSinAceptarDatosIncompatiblesNiSeguirRedirecciones(Punto, String)[42]",
+      "clasificaLosFallosSinAceptarDatosIncompatiblesNiSeguirRedirecciones(Punto, String)[52]"
+    ],
+    "resultado": "sin la correccion se aceptan seis documentos validos con una clave duplicada; la suite corregida los rechaza"
+  },
+  "carga_powershell": {
+    "sincronizacionDuranteMedicion": true,
+    "alertasGeneradasDuranteMedicion": true,
+    "tarifasActualizadasDuranteMedicion": 19,
+    "cumpleContinuidad": true,
+    "cumpleEtapaCompleta": true,
+    "alertasAlFinal": 22,
+    "lecturasIncorporadasDuranteMedicion": 16,
+    "cumpleUmbralesDeEstaEtapa": true,
+    "cubre5000Durante30Minutos": false,
+    "requiereComparacionDeRecursos": true
+  },
+  "p04_https": "comprobado en despliegue local con confianza explicita",
+  "p05_escalabilidad": "comprobado con ampliacion controlada de CPU y etapa final de 1800 s",
+  "p06_contratos": "comprobado para los proveedores y casos definidos",
+  "p07_sustitucion": "cuatro adaptadores; ocho consultas equivalentes; 135 fuentes de nucleo sin cambios",
+  "pendientes_frontend": [
+    "P03 interfaz, graficos y usabilidad",
+    "P08 dispositivos y recepcion visual"
+  ],
+  "escalabilidad": {
+    "rapida": false,
+    "jar_sha256": "789f65e1d37c1c10a9430eb380c5ddc239a4c212bf56a07287049636121cc3dc",
+    "generador_cpu": [
+      4,
+      5
+    ],
+    "fuente_cpu": [
+      6
+    ],
+    "pool": 20,
+    "backend_heap_mb": 512,
+    "generador_heap_mb": 768,
+    "mysql_buffer_mb": 128,
+    "datos": {
+      "suministros": 5000,
+      "acumuladas": 2500,
+      "intervalos": 2500,
+      "lecturas_iniciales_por_suministro": 4,
+      "consultas": 8,
+      "tarifas_automaticas": true
+    },
+    "perfiles": [
+      {
+        "nombre": "inicial",
+        "cpu_servidor": [
+          0
+        ],
+        "resultados": [
+          {
+            "usuarios": 500,
+            "antes": {
+              "suministrosActualizados": 0,
+              "ultimoExitoUTC": null,
+              "alertasRegistradas": 0,
+              "lecturasGuardadas": 20000,
+              "suministrosConExitoDuranteMedicion": null,
+              "alertasDuranteMedicion": null,
+              "lecturasDuranteMedicion": null,
+              "tarifasActualizadas": 0,
+              "tarifasConExitoDuranteMedicion": null,
+              "ultimaAlertaUTC": null
+            },
+            "despues": {
+              "suministrosActualizados": 14,
+              "ultimoExitoUTC": "2026-11-19 21:09:32.537024",
+              "alertasRegistradas": 14,
+              "lecturasGuardadas": 20014,
+              "suministrosConExitoDuranteMedicion": 9,
+              "alertasDuranteMedicion": 9,
+              "lecturasDuranteMedicion": 9,
+              "tarifasActualizadas": 20,
+              "tarifasConExitoDuranteMedicion": 14,
+              "ultimaAlertaUTC": "2026-11-19 21:09:32.538290"
+            },
+            "continuidad": true,
+            "cumple": false
+          },
+          {
+            "usuarios": 1000,
+            "antes": {
+              "suministrosActualizados": 15,
+              "ultimoExitoUTC": "2026-11-19 21:09:33.690525",
+              "alertasRegistradas": 15,
+              "lecturasGuardadas": 20015,
+              "suministrosConExitoDuranteMedicion": null,
+              "alertasDuranteMedicion": null,
+              "lecturasDuranteMedicion": null,
+              "tarifasActualizadas": 20,
+              "tarifasConExitoDuranteMedicion": null,
+              "ultimaAlertaUTC": "2026-11-19 21:09:33.691844"
+            },
+            "despues": {
+              "suministrosActualizados": 30,
+              "ultimoExitoUTC": "2026-11-19 21:10:54.302836",
+              "alertasRegistradas": 30,
+              "lecturasGuardadas": 20030,
+              "suministrosConExitoDuranteMedicion": 9,
+              "alertasDuranteMedicion": 9,
+              "lecturasDuranteMedicion": 8,
+              "tarifasActualizadas": 43,
+              "tarifasConExitoDuranteMedicion": 13,
+              "ultimaAlertaUTC": "2026-11-19 21:10:54.304153"
+            },
+            "continuidad": true,
+            "cumple": false
+          },
+          {
+            "usuarios": 2500,
+            "antes": {
+              "suministrosActualizados": 30,
+              "ultimoExitoUTC": "2026-11-19 21:10:54.302836",
+              "alertasRegistradas": 30,
+              "lecturasGuardadas": 20030,
+              "suministrosConExitoDuranteMedicion": null,
+              "alertasDuranteMedicion": null,
+              "lecturasDuranteMedicion": null,
+              "tarifasActualizadas": 44,
+              "tarifasConExitoDuranteMedicion": null,
+              "ultimaAlertaUTC": "2026-11-19 21:10:54.304153"
+            },
+            "despues": {
+              "suministrosActualizados": 49,
+              "ultimoExitoUTC": "2026-11-19 21:12:19.875378",
+              "alertasRegistradas": 49,
+              "lecturasGuardadas": 20049,
+              "suministrosConExitoDuranteMedicion": 10,
+              "alertasDuranteMedicion": 10,
+              "lecturasDuranteMedicion": 10,
+              "tarifasActualizadas": 68,
+              "tarifasConExitoDuranteMedicion": 15,
+              "ultimaAlertaUTC": "2026-11-19 21:12:19.876372"
+            },
+            "continuidad": true,
+            "cumple": false
+          },
+          {
+            "usuarios": 5000,
+            "antes": {
+              "suministrosActualizados": 50,
+              "ultimoExitoUTC": "2026-11-19 21:12:21.020130",
+              "alertasRegistradas": 50,
+              "lecturasGuardadas": 20050,
+              "suministrosConExitoDuranteMedicion": null,
+              "alertasDuranteMedicion": null,
+              "lecturasDuranteMedicion": null,
+              "tarifasActualizadas": 68,
+              "tarifasConExitoDuranteMedicion": null,
+              "ultimaAlertaUTC": "2026-11-19 21:12:21.021067"
+            },
+            "despues": {
+              "suministrosActualizados": 95,
+              "ultimoExitoUTC": "2026-11-19 21:15:51.441447",
+              "alertasRegistradas": 95,
+              "lecturasGuardadas": 20095,
+              "suministrosConExitoDuranteMedicion": 24,
+              "alertasDuranteMedicion": 24,
+              "lecturasDuranteMedicion": 23,
+              "tarifasActualizadas": 128,
+              "tarifasConExitoDuranteMedicion": 29,
+              "ultimaAlertaUTC": "2026-11-19 21:15:51.442645"
+            },
+            "continuidad": true,
+            "cumple": false
+          }
+        ]
+      },
+      {
+        "nombre": "ampliado",
+        "cpu_servidor": [
+          0,
+          1,
+          2,
+          3
+        ],
+        "resultados": [
+          {
+            "usuarios": 500,
+            "antes": {
+              "suministrosActualizados": 0,
+              "ultimoExitoUTC": null,
+              "alertasRegistradas": 0,
+              "lecturasGuardadas": 20000,
+              "suministrosConExitoDuranteMedicion": null,
+              "alertasDuranteMedicion": null,
+              "lecturasDuranteMedicion": null,
+              "tarifasActualizadas": 0,
+              "tarifasConExitoDuranteMedicion": null,
+              "ultimaAlertaUTC": null
+            },
+            "despues": {
+              "suministrosActualizados": 68,
+              "ultimoExitoUTC": "2026-11-19 21:17:22.020235",
+              "alertasRegistradas": 68,
+              "lecturasGuardadas": 20068,
+              "suministrosConExitoDuranteMedicion": 53,
+              "alertasDuranteMedicion": 53,
+              "lecturasDuranteMedicion": 53,
+              "tarifasActualizadas": 75,
+              "tarifasConExitoDuranteMedicion": 59,
+              "ultimaAlertaUTC": "2026-11-19 21:17:22.021263"
+            },
+            "continuidad": true,
+            "cumple": true
+          },
+          {
+            "usuarios": 1000,
+            "antes": {
+              "suministrosActualizados": 68,
+              "ultimoExitoUTC": "2026-11-19 21:17:22.020235",
+              "alertasRegistradas": 68,
+              "lecturasGuardadas": 20068,
+              "suministrosConExitoDuranteMedicion": null,
+              "alertasDuranteMedicion": null,
+              "lecturasDuranteMedicion": null,
+              "tarifasActualizadas": 75,
+              "tarifasConExitoDuranteMedicion": null,
+              "ultimaAlertaUTC": "2026-11-19 21:17:22.021263"
+            },
+            "despues": {
+              "suministrosActualizados": 139,
+              "ultimoExitoUTC": "2026-11-19 21:18:43.367366",
+              "alertasRegistradas": 139,
+              "lecturasGuardadas": 20139,
+              "suministrosConExitoDuranteMedicion": 52,
+              "alertasDuranteMedicion": 52,
+              "lecturasDuranteMedicion": 52,
+              "tarifasActualizadas": 153,
+              "tarifasConExitoDuranteMedicion": 58,
+              "ultimaAlertaUTC": "2026-11-19 21:18:43.368301"
+            },
+            "continuidad": true,
+            "cumple": true
+          },
+          {
+            "usuarios": 2500,
+            "antes": {
+              "suministrosActualizados": 139,
+              "ultimoExitoUTC": "2026-11-19 21:18:43.367366",
+              "alertasRegistradas": 139,
+              "lecturasGuardadas": 20139,
+              "suministrosConExitoDuranteMedicion": null,
+              "alertasDuranteMedicion": null,
+              "lecturasDuranteMedicion": null,
+              "tarifasActualizadas": 154,
+              "tarifasConExitoDuranteMedicion": null,
+              "ultimaAlertaUTC": "2026-11-19 21:18:43.368301"
+            },
+            "despues": {
+              "suministrosActualizados": 187,
+              "ultimoExitoUTC": "2026-11-19 21:20:04.160543",
+              "alertasRegistradas": 187,
+              "lecturasGuardadas": 20187,
+              "suministrosConExitoDuranteMedicion": 33,
+              "alertasDuranteMedicion": 33,
+              "lecturasDuranteMedicion": 33,
+              "tarifasActualizadas": 216,
+              "tarifasConExitoDuranteMedicion": 44,
+              "ultimaAlertaUTC": "2026-11-19 21:20:04.161672"
+            },
+            "continuidad": true,
+            "cumple": true
+          },
+          {
+            "usuarios": 5000,
+            "antes": {
+              "suministrosActualizados": 187,
+              "ultimoExitoUTC": "2026-11-19 21:20:04.160543",
+              "alertasRegistradas": 187,
+              "lecturasGuardadas": 20187,
+              "suministrosConExitoDuranteMedicion": null,
+              "alertasDuranteMedicion": null,
+              "lecturasDuranteMedicion": null,
+              "tarifasActualizadas": 217,
+              "tarifasConExitoDuranteMedicion": null,
+              "ultimaAlertaUTC": "2026-11-19 21:20:04.161672"
+            },
+            "despues": {
+              "suministrosActualizados": 1364,
+              "ultimoExitoUTC": "2026-11-19 21:51:26.039821",
+              "alertasRegistradas": 1364,
+              "lecturasGuardadas": 21364,
+              "suministrosConExitoDuranteMedicion": 1123,
+              "alertasDuranteMedicion": 1123,
+              "lecturasDuranteMedicion": 1123,
+              "tarifasActualizadas": 1694,
+              "tarifasConExitoDuranteMedicion": 1411,
+              "ultimaAlertaUTC": "2026-11-19 21:51:26.040878"
+            },
+            "continuidad": true,
+            "cumple": true
+          }
+        ]
+      }
+    ],
+    "fechas_iniciales": [
+      "2026-09-01T05:00:00Z",
+      "2026-10-01T05:00:00Z",
+      "2026-11-01T05:00:00Z",
+      "2026-11-19T21:07:54.377756Z"
+    ],
+    "sesiones_sha256": "a0294981688398bcea3eef21f6850f79a0b02699f3ace3c7a2421b40f8294bb0",
+    "limpieza_completada": true
+  },
+  "recursos": [
+    {
+      "perfil": "inicial",
+      "usuarios": 500,
+      "muestras_en_medicion": 12,
+      "procesos": {
+        "backend": {
+          "cpu_media_porcentaje_de_un_nucleo": 70.15,
+          "rss_maximo_durante_medicion_bytes": 395169792,
+          "afinidades_observadas": [
+            "0"
+          ]
+        },
+        "mysql": {
+          "cpu_media_porcentaje_de_un_nucleo": 29.74,
+          "rss_maximo_durante_medicion_bytes": 556412928,
+          "afinidades_observadas": [
+            "0"
+          ]
+        },
+        "generador": {
+          "cpu_media_porcentaje_de_un_nucleo": 22.16,
+          "rss_maximo_durante_medicion_bytes": 254078976,
+          "afinidades_observadas": [
+            "4-5"
+          ]
+        },
+        "fuente": {
+          "cpu_media_porcentaje_de_un_nucleo": 0.45,
+          "rss_maximo_durante_medicion_bytes": 55685120,
+          "afinidades_observadas": [
+            "6"
+          ]
+        }
+      }
+    },
+    {
+      "perfil": "inicial",
+      "usuarios": 1000,
+      "muestras_en_medicion": 12,
+      "procesos": {
+        "backend": {
+          "cpu_media_porcentaje_de_un_nucleo": 60.0,
+          "rss_maximo_durante_medicion_bytes": 465141760,
+          "afinidades_observadas": [
+            "0"
+          ]
+        },
+        "mysql": {
+          "cpu_media_porcentaje_de_un_nucleo": 39.97,
+          "rss_maximo_durante_medicion_bytes": 559837184,
+          "afinidades_observadas": [
+            "0"
+          ]
+        },
+        "generador": {
+          "cpu_media_porcentaje_de_un_nucleo": 21.48,
+          "rss_maximo_durante_medicion_bytes": 273022976,
+          "afinidades_observadas": [
+            "4-5"
+          ]
+        },
+        "fuente": {
+          "cpu_media_porcentaje_de_un_nucleo": 0.27,
+          "rss_maximo_durante_medicion_bytes": 58028032,
+          "afinidades_observadas": [
+            "6"
+          ]
+        }
+      }
+    },
+    {
+      "perfil": "inicial",
+      "usuarios": 2500,
+      "muestras_en_medicion": 12,
+      "procesos": {
+        "backend": {
+          "cpu_media_porcentaje_de_un_nucleo": 55.57,
+          "rss_maximo_durante_medicion_bytes": 522526720,
+          "afinidades_observadas": [
+            "0"
+          ]
+        },
+        "mysql": {
+          "cpu_media_porcentaje_de_un_nucleo": 44.44,
+          "rss_maximo_durante_medicion_bytes": 561909760,
+          "afinidades_observadas": [
+            "0"
+          ]
+        },
+        "generador": {
+          "cpu_media_porcentaje_de_un_nucleo": 28.16,
+          "rss_maximo_durante_medicion_bytes": 450527232,
+          "afinidades_observadas": [
+            "4-5"
+          ]
+        },
+        "fuente": {
+          "cpu_media_porcentaje_de_un_nucleo": 0.22,
+          "rss_maximo_durante_medicion_bytes": 59916288,
+          "afinidades_observadas": [
+            "6"
+          ]
+        }
+      }
+    },
+    {
+      "perfil": "inicial",
+      "usuarios": 5000,
+      "muestras_en_medicion": 24,
+      "procesos": {
+        "backend": {
+          "cpu_media_porcentaje_de_un_nucleo": 47.11,
+          "rss_maximo_durante_medicion_bytes": 789553152,
+          "afinidades_observadas": [
+            "0"
+          ]
+        },
+        "mysql": {
+          "cpu_media_porcentaje_de_un_nucleo": 52.86,
+          "rss_maximo_durante_medicion_bytes": 564363264,
+          "afinidades_observadas": [
+            "0"
+          ]
+        },
+        "generador": {
+          "cpu_media_porcentaje_de_un_nucleo": 29.18,
+          "rss_maximo_durante_medicion_bytes": 923136000,
+          "afinidades_observadas": [
+            "4-5"
+          ]
+        },
+        "fuente": {
+          "cpu_media_porcentaje_de_un_nucleo": 0.32,
+          "rss_maximo_durante_medicion_bytes": 74973184,
+          "afinidades_observadas": [
+            "6"
+          ]
+        }
+      }
+    },
+    {
+      "perfil": "ampliado",
+      "usuarios": 500,
+      "muestras_en_medicion": 12,
+      "procesos": {
+        "backend": {
+          "cpu_media_porcentaje_de_un_nucleo": 55.44,
+          "rss_maximo_durante_medicion_bytes": 368996352,
+          "afinidades_observadas": [
+            "0-3"
+          ]
+        },
+        "mysql": {
+          "cpu_media_porcentaje_de_un_nucleo": 58.26,
+          "rss_maximo_durante_medicion_bytes": 521891840,
+          "afinidades_observadas": [
+            "0-3"
+          ]
+        },
+        "generador": {
+          "cpu_media_porcentaje_de_un_nucleo": 22.39,
+          "rss_maximo_durante_medicion_bytes": 217776128,
+          "afinidades_observadas": [
+            "4-5"
+          ]
+        },
+        "fuente": {
+          "cpu_media_porcentaje_de_un_nucleo": 0.78,
+          "rss_maximo_durante_medicion_bytes": 57868288,
+          "afinidades_observadas": [
+            "6"
+          ]
+        }
+      }
+    },
+    {
+      "perfil": "ampliado",
+      "usuarios": 1000,
+      "muestras_en_medicion": 12,
+      "procesos": {
+        "backend": {
+          "cpu_media_porcentaje_de_un_nucleo": 96.09,
+          "rss_maximo_durante_medicion_bytes": 378695680,
+          "afinidades_observadas": [
+            "0-3"
+          ]
+        },
+        "mysql": {
+          "cpu_media_porcentaje_de_un_nucleo": 111.36,
+          "rss_maximo_durante_medicion_bytes": 525967360,
+          "afinidades_observadas": [
+            "0-3"
+          ]
+        },
+        "generador": {
+          "cpu_media_porcentaje_de_un_nucleo": 41.5,
+          "rss_maximo_durante_medicion_bytes": 242900992,
+          "afinidades_observadas": [
+            "4-5"
+          ]
+        },
+        "fuente": {
+          "cpu_media_porcentaje_de_un_nucleo": 1.16,
+          "rss_maximo_durante_medicion_bytes": 75083776,
+          "afinidades_observadas": [
+            "6"
+          ]
+        }
+      }
+    },
+    {
+      "perfil": "ampliado",
+      "usuarios": 2500,
+      "muestras_en_medicion": 12,
+      "procesos": {
+        "backend": {
+          "cpu_media_porcentaje_de_un_nucleo": 179.58,
+          "rss_maximo_durante_medicion_bytes": 483295232,
+          "afinidades_observadas": [
+            "0-3"
+          ]
+        },
+        "mysql": {
+          "cpu_media_porcentaje_de_un_nucleo": 213.53,
+          "rss_maximo_durante_medicion_bytes": 529059840,
+          "afinidades_observadas": [
+            "0-3"
+          ]
+        },
+        "generador": {
+          "cpu_media_porcentaje_de_un_nucleo": 92.4,
+          "rss_maximo_durante_medicion_bytes": 377794560,
+          "afinidades_observadas": [
+            "4-5"
+          ]
+        },
+        "fuente": {
+          "cpu_media_porcentaje_de_un_nucleo": 0.38,
+          "rss_maximo_durante_medicion_bytes": 79331328,
+          "afinidades_observadas": [
+            "6"
+          ]
+        }
+      }
+    },
+    {
+      "perfil": "ampliado",
+      "usuarios": 5000,
+      "muestras_en_medicion": 360,
+      "procesos": {
+        "backend": {
+          "cpu_media_porcentaje_de_un_nucleo": 172.42,
+          "rss_maximo_durante_medicion_bytes": 715153408,
+          "afinidades_observadas": [
+            "0-3"
+          ]
+        },
+        "mysql": {
+          "cpu_media_porcentaje_de_un_nucleo": 219.61,
+          "rss_maximo_durante_medicion_bytes": 534675456,
+          "afinidades_observadas": [
+            "0-3"
+          ]
+        },
+        "generador": {
+          "cpu_media_porcentaje_de_un_nucleo": 89.24,
+          "rss_maximo_durante_medicion_bytes": 811208704,
+          "afinidades_observadas": [
+            "4-5"
+          ]
+        },
+        "fuente": {
+          "cpu_media_porcentaje_de_un_nucleo": 0.34,
+          "rss_maximo_durante_medicion_bytes": 128176128,
+          "afinidades_observadas": [
+            "6"
+          ]
+        }
+      }
+    }
+  ],
+  "referencia_identidad": {
+    "openapi_url": "https://dniruc.apisperu.com/doc/swagger",
+    "sha256_descarga": "cb4e7aee8118e639c85baafea66fad70c28f64cb846137e1379fd6efcad6f68e",
+    "autenticacion": "OpenAPI describe token en query; diagnostico ficticio reconoce Bearer y query con 401 Token invalido. No es una consulta de identidad valida."
+  },
+  "mysql_metodo": "Copia temporal: mismos casos HTTP con conexion MySQL, mas comprobacion de idempotencia de migracion 22; las adaptaciones de conexion no se distribuyen como cambios del backend.",
+  "mysql_migracion_harness_sha256": "80b11e4d6dd1692ba9ba44579ae9348a6cd2a6e1a6ce40ee656eb3b83701f059",
+  "fuentes_y_herramientas_sha256": {
+    "tecnologia/empresa-agua/src/main/resources/application-https.properties": "3f1b0e3c67922274abc7e0ee87d28dccff516e5773d663d30aef7ae458b346f0",
+    "tecnologia/empresa-agua/src/test/java/pe/nivora/empresaagua/TransporteHttpsTests.java": "7be7612e496b720aac390de15f4ebb7a41077f4bd3dfef7c9bb35c6e0b14450f",
+    "tecnologia/nivora-backend/herramientas/EjecutarCargaGitHub.ps1": "36cb3cbc2918678c327d0bbe0c326b3f2bcc20648e2f7c604dacd776f7f1c642",
+    "tecnologia/nivora-backend/herramientas/EjecutarPruebaCarga.ps1": "17670f558b57697fe3dfd54e2d29260fc3da99b17611b97a5b14ce01ec318d9e",
+    "tecnologia/nivora-backend/herramientas/EvaluarEscalabilidad.py": "1c970650ede3bd3ee01af35db1e0cef40a5cf0e180eff6da6c50f001c7559789",
+    "tecnologia/nivora-backend/herramientas/PrepararDatosCarga.java": "f3dbf623d30b01d3416acea7f4709cae6d6b68cb8ab4cc0fdeca4b280d4b4395",
+    "tecnologia/nivora-backend/herramientas/PruebaCargaConsultas.java": "70deecd0a2cf71036714f0c4f562374f85759f22a4c23bb05c0a073d967ddc82",
+    "tecnologia/nivora-backend/src/main/java/pe/nivora/backend/compartido/infraestructura/empresaagua/ClienteEmpresaAgua.java": "b790e74c16aaf37799f6e3ed392a963921dfeac641bbc932a13f11b60b07a300",
+    "tecnologia/nivora-backend/src/main/java/pe/nivora/backend/compartido/infraestructura/seguridad/TransporteSeguroConfiguracion.java": "16435e97fd9f7923eab46dfa7ea38425746b167e6bd283268d323c7d9ff3a9e0",
+    "tecnologia/nivora-backend/src/main/java/pe/nivora/backend/notificaciones/infraestructura/EmisorWebPushHttp.java": "84928e435b09bd1aab6779755c7dbe967b61571d72a5d1b3c23cdf31b9ff8b71",
+    "tecnologia/nivora-backend/src/main/resources/application-https.properties": "a012ca57766b547d7baafaab4ded52965f96481b4136f164ec2d7054ce93c254",
+    "tecnologia/nivora-backend/src/test/java/pe/nivora/backend/acceso/infraestructura/identidad/EscenarioCierreBackend.java": "397ea53bef9108b5a91b3e104eb0986c16bfdf6c398e49b7edfe40f119137590",
+    "tecnologia/nivora-backend/src/test/java/pe/nivora/backend/acceso/infraestructura/identidad/FuenteIdentidadApisPeruTests.java": "8c134e6319b240f73cd871ba6edb2fd7c53dfc2b4c9dcfa3cb9fb3d923f8baac",
+    "tecnologia/nivora-backend/src/test/java/pe/nivora/backend/acceso/infraestructura/identidad/SustitucionAdaptadoresTests.java": "0a4353be9032459265b9a14bc3be0d6f22e912dd2b08ab968221dc5fcb91f8bf",
+    "tecnologia/nivora-backend/src/test/java/pe/nivora/backend/acceso/infraestructura/identidad/TransporteHttpsTests.java": "9299ecc7592ec8bbd742e2174e7b4e9fc6f8eb98aade8abf897f0aea00094e4b",
+    "tecnologia/nivora-backend/src/test/java/pe/nivora/backend/integracion/contratos/AdaptadoresAguaArchivo.java": "53815e641b3e8fa1d420273df01755eec255fff5f7e1e0bdb3385e690e6d19b9",
+    "tecnologia/nivora-backend/src/test/java/pe/nivora/backend/integracion/contratos/ContratosEmpresaAguaTests.java": "d82f2924412b2978735a9cce234a973650a63d112eb58295946f8ee08a16e4f0",
+    "tecnologia/nivora-backend/src/test/java/pe/nivora/backend/integracion/contratos/DependenciasArquitecturaTests.java": "af8ba8cf15e8e0e4452ab568b5c239ef28ba839777cad0b5d26bfd0c622e12c9",
+    "tecnologia/nivora-backend/src/test/java/pe/nivora/backend/notificaciones/infraestructura/EmisorWebPushHttpTests.java": "000525c1071894fb36601b354fb5562f931ae7563871fcd5a8618c9f9113f7c1",
+    "tecnologia/nivora-backend/src/test/resources/contratos/empresa-agua.json": "4100f91ad6b03ff5435fbb6d8c7fec811ebf9a806c5b1101f670c43e293e2a8e"
+  }
+}

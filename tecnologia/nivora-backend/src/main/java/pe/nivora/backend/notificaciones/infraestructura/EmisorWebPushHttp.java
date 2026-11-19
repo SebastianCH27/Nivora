@@ -30,10 +30,15 @@ public class EmisorWebPushHttp implements EmisorWebPush {
     private final String publica;
     private final Cifrado cifrado;
     private final JsonMapper json;
-    private final HttpClient http = HttpClient.newBuilder()
-        .connectTimeout(Duration.ofSeconds(4)).followRedirects(HttpClient.Redirect.NEVER).build();
+    private final HttpClient http;
 
     public EmisorWebPushHttp(String publica, String privada, String contacto, JsonMapper json) {
+        this(publica, privada, contacto, json, HttpClient.newBuilder()
+            .connectTimeout(Duration.ofSeconds(4)).followRedirects(HttpClient.Redirect.NEVER).build());
+    }
+
+    EmisorWebPushHttp(String publica, String privada, String contacto, JsonMapper json, HttpClient http) {
+        this.http = java.util.Objects.requireNonNull(http);
         if (!contacto.matches("mailto:[^@\\s]+@[^@\\s]+")) {
             throw new IllegalArgumentException("Configura un contacto VAPID con mailto:.");
         }
