@@ -4,6 +4,9 @@ Este avance recorre paginas historicas de la Empresa de Agua utilizando
 el almacenamiento y la deduplicacion de Nivora. Cada ejecucion procesa
 una cantidad limitada de paginas y conserva su avance por fuente y suministro.
 El suministro debe estar registrado previamente en `nivora.suministros`.
+La ampliación de [lecturas de intervalo](lecturas-intervalo.md) reutiliza el
+mismo corte, inventario y cursor. Su recuperación valida todo el tramo del
+intervalo y conserva el avance al fallar una página, igual que con acumuladas.
 
 ## Flujo y confirmacion
 

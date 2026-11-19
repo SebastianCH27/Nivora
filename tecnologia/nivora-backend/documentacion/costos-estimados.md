@@ -25,6 +25,10 @@ como tal. El cargo fijo corresponde al mes completo. El campo principal
 `revisionTarifariaAdministrativa` identifica la publicación administrativa.
 Cada tarifa aplicada indica su fuente, revisión, código, versión y fechas.
 Los volúmenes y montos se entregan como cadenas decimales.
+`consumo.tipoMedicion` identifica contadores o intervalos. Los huecos y los
+intervalos excluidos por cruzar un corte mantienen la cobertura parcial;
+el costo corresponde al volumen conocido y conserva el cargo fijo mensual.
+Ver [lecturas de intervalo](lecturas-intervalo.md).
 
 ## Cálculo
 

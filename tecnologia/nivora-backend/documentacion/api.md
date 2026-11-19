@@ -1,5 +1,11 @@
 # Guia de la API de Nivora
 
+La ampliación posterior a `cc65d63` incorpora [lecturas de intervalo](lecturas-intervalo.md).
+Los detalles de consumo añaden `tipoMedicion` (`ACUMULADA`, `INTERVALO` o null),
+y los motivos incluyen huecos, cruces, superposiciones, mezcla y desbordamiento.
+El contrato actual conserva 40 operaciones de negocio y una de salud;
+contiene 101 esquemas, con 62 registros y 15 enums Java enlazados.
+
 Bloque 9, parte 4. Contrato revisado sobre el codigo de `4fd156a`.
 La API de negocio tiene 40 operaciones explicitas. Se documenta ademas
 `GET /actuator/health`. Las rutas de la Empresa de Agua son contratos externos

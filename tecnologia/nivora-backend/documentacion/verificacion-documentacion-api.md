@@ -22,7 +22,7 @@ revisadas en `SeguridadConfiguracion`; las pruebas funcionales de permisos
 siguen en los contratos e integraciones existentes.
 
 Los controles recorren las 40 operaciones explicitas de negocio y los
-62 registros y 14 enums enlazados. La consulta de salud pertenece a Actuator:
+62 registros y 15 enums enlazados. La consulta de salud pertenece a Actuator:
 se documenta aparte y mantiene su prueba HTTP existente.
 
 ## Ejecucion desde CMD
@@ -79,3 +79,12 @@ introduce rutas de negocio, cambios de seguridad, migraciones ni dependencias
 de ejecucion. La evidencia de carga y la reserva de EQ-02 conservan su alcance.
 La regresion y revision final de requisitos del bloque 9 corresponde a la
 parte 5.
+
+## Ampliación de lecturas de intervalo
+
+El 19 de noviembre se añadió `tipoMedicion` y se ampliaron los motivos de
+consumo. El contrato actual tiene 101 esquemas, 62 registros y 15 enums
+enlazados; la regresión de la ampliación tiene 602 pruebas aprobadas.
+La validación de 100 esquemas y 562 pruebas descrita antes conserva su
+condición de registro histórico de la parte 4. La evidencia actual está en
+[lecturas de intervalo](evidencias/lecturas-intervalo-2026-11-19.json).

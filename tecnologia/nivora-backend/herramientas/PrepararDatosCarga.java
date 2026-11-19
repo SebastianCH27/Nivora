@@ -61,7 +61,7 @@ public class PrepararDatosCarga {
             try (Statement sql = db.createStatement()) {
                 try (var scripts = Files.list(Path.of("base-datos"))) {
                     for (Path script : scripts.filter(p -> p.getFileName().toString()
-                            .matches("(?:0[2-9]|1[0-9]|20)-.*\\.sql")).sorted().toList()) {
+                            .matches("(?:0[2-9]|1[0-9]|2[01])-.*\\.sql")).sorted().toList()) {
                         String texto = Files.readString(script).replaceAll("(?m)^\\s*--[^\\n]*$", "");
                         for (String sentencia : texto.split(";")) {
                             String limpia = sentencia.strip();

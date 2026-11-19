@@ -9,7 +9,8 @@ import java.util.List;
 
 import pe.nivora.backend.acceso.dominio.CodigoSuministro;
 import pe.nivora.backend.lecturas.dominio.ConsumoPeriodo;
-import pe.nivora.backend.lecturas.dominio.LecturaAcumulada;
+import pe.nivora.backend.lecturas.dominio.Lectura;
+import pe.nivora.backend.lecturas.dominio.LecturaIntervalo;
 import pe.nivora.backend.lecturas.dominio.MesConsumo;
 import pe.nivora.backend.lecturas.dominio.contratos.ConsultaLecturasPeriodo;
 import pe.nivora.backend.lecturas.dominio.contratos.SuministroNoRegistradoException;
@@ -42,7 +43,7 @@ public class ConsultarHistorialMensual {
         }
 
         var lecturas = consulta.consultar(FUENTE, suministro,
-                calendario.obtener(primero).inicio(), calendario.obtener(ultimo).fin())
+                calendario.obtener(primero).inicio(), calendario.obtener(ultimo).fin(), ahora)
             .orElseThrow(SuministroNoRegistradoException::new)
             .lecturas();
         return new Resultado(FUENTE, suministro.valor(), MesConsumo.ZONA.getId(), ahora,
@@ -56,8 +57,9 @@ public class ConsultarHistorialMensual {
     }
 
     static List<Periodo> calcularPeriodos(CalendarioMensual calendario, YearMonth primero,
-            int meses, List<LecturaAcumulada> lecturas) {
+            int meses, List<? extends Lectura> lecturas) {
         var periodos = new ArrayList<Periodo>(meses);
+        boolean intervalos = lecturas.stream().anyMatch(l -> l instanceof LecturaIntervalo);
         int inicioLecturas = 0;
         int finLecturas = 0;
         for (int i = 0; i < meses; i++) {
@@ -69,7 +71,8 @@ public class ConsultarHistorialMensual {
                 finLecturas++;
             }
             var consumo = ConsumoPeriodo.calcular(inicio, fin,
-                lecturas.subList(inicioLecturas, finLecturas));
+                intervalos ? ConsumoPeriodo.seleccionar(inicio, fin, lecturas)
+                    : lecturas.subList(inicioLecturas, finLecturas));
             periodos.add(new Periodo(mes.valor().toString(), inicio, fin, consumo));
 
             // Las mediciones exactas del limite cierran este mes y abren el siguiente.

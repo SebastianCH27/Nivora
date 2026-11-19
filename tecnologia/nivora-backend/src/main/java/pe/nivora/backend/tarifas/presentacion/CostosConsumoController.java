@@ -22,6 +22,7 @@ import org.springframework.web.method.annotation.MethodArgumentTypeMismatchExcep
 import pe.nivora.backend.acceso.infraestructura.seguridad.PrincipalConsulta;
 import pe.nivora.backend.lecturas.aplicacion.ConsultarConsumoActual.Actualizacion;
 import pe.nivora.backend.lecturas.dominio.ConsumoPeriodo;
+import pe.nivora.backend.lecturas.dominio.Lectura;
 import pe.nivora.backend.lecturas.dominio.contratos.RepositorioLecturasNoDisponibleException;
 import pe.nivora.backend.lecturas.dominio.contratos.SuministroNoRegistradoException;
 import pe.nivora.backend.tarifas.aplicacion.ConsultarCostosConsumo;
@@ -80,7 +81,8 @@ public class CostosConsumoController {
     private static Consumo consumo(ConsumoPeriodo consumo) {
         return new Consumo(consumo.estado(), consumo.motivo(),
             consumo.litros() == null ? null : consumo.litros().toString(), decimal(consumo.metrosCubicos()),
-            consumo.desde(), consumo.hasta(), consumo.idMedidor(), consumo.idLecturaInicial(), consumo.idLecturaFinal());
+            consumo.desde(), consumo.hasta(), consumo.idMedidor(), consumo.idLecturaInicial(),
+            consumo.idLecturaFinal(), consumo.tipoMedicion());
     }
 
     private static String segundos(Duration duracion) {
@@ -158,7 +160,7 @@ public class CostosConsumoController {
 
     public record Consumo(ConsumoPeriodo.Estado estado, ConsumoPeriodo.Motivo motivo, String litros,
             String metrosCubicos, Instant desde, Instant hasta, String idMedidor, String idLecturaInicial,
-            String idLecturaFinal) {}
+            String idLecturaFinal, Lectura.Tipo tipoMedicion) {}
 
     public record Tarifa(String codigoTarifa, int versionTarifa, String nombreTarifa,
             LocalDate aplicableDesde, LocalDate aplicableHasta, String igvPorcentaje, String fuenteTarifaria,

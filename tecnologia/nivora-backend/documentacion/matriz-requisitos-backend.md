@@ -18,6 +18,14 @@ concretos y el inventario de la última regresión se conservan en
 Las reservas P01–P08 identifican trabajos posteriores, sin modificar los
 requisitos originales.
 
+## Actualización posterior a cc65d63
+
+La entrega de [lecturas de intervalo](lecturas-intervalo.md), del 19 de
+noviembre de 2026, completa RF10/P01 y amplía los casos de EQ-03. Su
+[evidencia propia](evidencias/lecturas-intervalo-2026-11-19.json) contiene
+la regresión de 602 pruebas. El resumen de revisión final enlazado arriba
+conserva el corte histórico de 562 pruebas del bloque 9.
+
 ## Requisitos funcionales
 
 | ID | Función | Estado en esta revisión | Alcance comprobado y reserva | Evidencia |
@@ -27,11 +35,11 @@ requisitos originales.
 | RF03 | Sesión asociada al suministro | Backend comprobado | Inicio, consulta, cierre, caducidad y aislamiento entre suministros. | [E01](#e01), [E11](#e11) |
 | RF04 | Registro del acceso | Backend comprobado | Conserva suministro, identidad y fecha; restringe la consulta administrativa y enmascara el DNI. | [E01](#e01), [E14](#e14) |
 | RF05 | Recuperación automática de lecturas | Backend comprobado | Programación persistida, lotes acotados y reintentos separados de las consultas. | [E03](#e03) |
-| RF06 | Registro de lecturas | Backend comprobado | Conserva fuente, identificador, medidor, fecha y recepción para las lecturas acumuladas en litros admitidas. El soporte de otro tipo de medición se revisa en RF10. | [E02](#e02) |
-| RF07 | Validación de lecturas e incidencias | Backend comprobado | Rechaza datos inválidos y registra motivos; preserva registros aceptados ante conflictos. Alcance: contrato acumulado de la demostración. | [E02](#e02), [E17](#e17) |
+| RF06 | Registro de lecturas | Backend comprobado | Conserva fuente, identificador, medidor, recepción y fecha final; los intervalos también conservan su inicio. Ambos tipos usan litros enteros. | [E02](#e02), [E19](#e19) |
+| RF07 | Validación de lecturas e incidencias | Backend comprobado | Valida ambos extremos, recepción, inventario y superposiciones; conserva los registros aceptados ante conflictos. | [E02](#e02), [E17](#e17), [E19](#e19) |
 | RF08 | Detección de duplicados | Backend comprobado | Repetición, identidad de la medición y concurrencia no agregan una segunda copia. | [E02](#e02) |
 | RF09 | Recuperación tras fallos | Backend comprobado | Conserva progreso y lecturas aceptadas y reanuda el recorrido sin doble conteo. | [E03](#e03), [E14](#e14) |
-| RF10 | Cálculo según tipo de medición | Parcial | La diferencia de contadores acumulados está implementada y probada. P01: falta el modelo, incorporación y suma de consumos de intervalos no superpuestos. | [E04](#e04) |
+| RF10 | Cálculo según tipo de medición | Backend comprobado | Diferencias de acumuladas y suma de intervalos no superpuestos. Identifica huecos, cruces de periodo, mezcla y desbordamiento, sin prorratear. P01 completado en los casos definidos. | [E04](#e04), [E19](#e19) |
 | RF11 | Litros y metros cúbicos | Backend comprobado | La API entrega ambas magnitudes con conversión decimal explícita. La selección y presentación visual corresponden al frontend. | [E04](#e04) |
 | RF12 | Acumulado mensual y fechas | Backend comprobado | Usa los límites del calendario configurado y las fechas efectivamente medidas. | [E04](#e04), [E12](#e12) |
 | RF13 | Cobertura e incompatibilidades | Backend comprobado | Distingue SIN_DATOS, PARCIAL, COMPLETO e INCOMPATIBLE; un dato ausente no se convierte en cero. | [E04](#e04) |
@@ -68,7 +76,7 @@ requisitos originales.
 |---|---|---|---|
 | EQ-01 | Verificado en entorno | 5000 sesiones durante 1800 s; p95 por operación 1793–1867 ms, cero errores y continuidad de sincronización/alertas. [E16](#e16). | Montaje ficticio compartido, carga cerrada y JAR de 2d43391; no extrapolar al despliegue final. |
 | EQ-02 | Parcial | Dos perfiles completos con pools 10 y 20. [E16](#e16). | P05: hosts diferentes; falta comparación controlada de ampliación de recursos. |
-| EQ-03 | Parcial | Validación, unicidad, acumulados, costos y proyecciones con resultados esperados. [E02](#e02), [E04](#e04), [E06](#e06), [E07](#e07). | P01: faltan lecturas de intervalo. |
+| EQ-03 | Verificado en casos | Acumuladas e intervalos, validación, unicidad, cobertura, costos y proyecciones comprobados. [E19](#e19). | Alcance: contratos, datos y casos definidos; incluye periodos incompatibles o incompletos. |
 | EQ-04 | Verificado en casos | Las consultas locales y avisos se conservan durante caídas y los reintentos recuperan pendientes. [E03](#e03), [E08](#e08), [E10](#e10), [E14](#e14). | Casos definidos con fuentes y emisor controlados; no es una certificación general de disponibilidad. |
 | EQ-05 | Verificado en casos | Fechas, referencias de lecturas, vigencias, revisiones y supuestos comprobados. [E04](#e04), [E06](#e06), [E07](#e07), [E12](#e12). | Alcance de las lecturas y consultas implementadas. |
 | EQ-06 | Parcial | Sesiones, caducidad, revocación, permisos y protección de registros comprobados. [E01](#e01), [E11](#e11), [E14](#e14). | P04: falta comprobar comunicaciones HTTPS en un despliegue de pruebas. |
@@ -81,7 +89,7 @@ requisitos originales.
 
 | ID | Trabajo | Referencias | Para considerarlo verificado |
 |---|---|---|---|
-| P01 | Lecturas de intervalo | RF10, EQ-03 | Incorporar intervalos con límites, unidades y suministro; sumar solo intervalos no superpuestos; probar huecos, duplicados, solapes y mezcla con acumulados sin doble conteo. |
+| P01 | Lecturas de intervalo — completado | RF10, EQ-03 | Incorporación, suma exacta, huecos, superposiciones, duplicados, límites y mezcla verificados en [E19](#e19). |
 | P02 | Comparación de costos | RF20 | Definir y devolver la diferencia estimada con los periodos, duraciones y revisiones comparadas; comprobar datos parciales y conceptos o tarifas insuficientes. |
 | P03 | Interfaz, gráficos y usabilidad | RF21, EQ-08, RC01 | Implementar las vistas de consulta y administración; representar huecos y distinguir importes; ejecutar las tareas propuestas con cinco participantes y las dos resoluciones. |
 | P04 | Transporte HTTPS | EQ-06 | Preparar un despliegue de pruebas y comprobar TLS y las comunicaciones protegidas desde sus clientes. |
@@ -90,7 +98,8 @@ requisitos originales.
 | P07 | Sustitución del adaptador | EQ-10 | Sustituir una implementación conservando el contrato; registrar archivos/dependencias y demostrar regresión sin cambios de negocio motivados solo por el protocolo. |
 | P08 | Dispositivos y recepción visual | RF26, EQ-09, RC07 | Comparar valores y fechas desde celular y computadora y documentar Web Push con aplicación cerrada, permiso y conectividad en los dispositivos/navegadores que se declaren admitidos. |
 
-P01 y P02 son brechas funcionales del backend. P06 y P07 completan sus
+P01 está completado para los casos definidos. P02 sigue como brecha funcional
+del backend. P06 y P07 completan sus
 evaluaciones de integración y mantenibilidad. P03 y P08 requieren las
 interfaces y dispositivos finales. P04 y P05 requieren definir y evaluar
 el despliegue correspondiente. Esta revisión conserva todos esos pendientes.
@@ -240,3 +249,13 @@ responsable en Windows/Chrome el 16 de noviembre de 2026, con la página de
 Nivora cerrada. Esa observación no es una prueba automatizada de entrega ni
 una matriz completa de compatibilidad. El procedimiento está en
 [Web Push](web-push.md).
+
+### E19
+
+[Lecturas de intervalo](lecturas-intervalo.md) y
+[evidencia de la ampliación](evidencias/lecturas-intervalo-2026-11-19.json).
+Incluye `ConsumoIntervalosTests`, `LecturasIntervaloJdbcTests`, respuestas
+de intervalo de `FuenteLecturasHttpTests`, reanudación en
+`RecuperacionConCorteTests` y los seis métodos `intervalos*` de
+`AccesoConsultaIntegradoTests`. Los métodos exactos y las huellas de sus
+fuentes se conservan en el resumen estructurado.

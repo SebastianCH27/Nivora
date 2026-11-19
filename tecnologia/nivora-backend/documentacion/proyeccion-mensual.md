@@ -9,7 +9,9 @@ La fecha `calculadoEn` indica cuándo se consultaron los datos. El campo
 ## Cálculo
 
 Se requieren lecturas compatibles desde el inicio del mes y al menos
-86 400 segundos de observación. El cálculo mantiene el ritmo promedio
+86 400 segundos de observación. Los intervalos deben cubrir ese tramo sin
+huecos ni cruces no asignables; `observado.tipoMedicion` identifica su formato.
+El cálculo mantiene el ritmo promedio
 observado hasta el cierre del mes. Multiplica los litros observados por
 la duración del mes y divide entre el tiempo observado. Redondea el
 resultado al litro más próximo con `HALF_UP` y lo convierte a m³. El
@@ -23,7 +25,7 @@ de 30 días dan una proyección de 12 000 L (12 m³).
 |---|---|
 | `PROYECTADO` | El volumen estimado está en `proyeccion`. |
 | `SIN_CONSUMO_CALCULABLE` | Las lecturas son insuficientes o incompatibles. `observado.motivo` indica la causa. |
-| `COBERTURA_INCOMPLETA` | Falta cobertura desde el inicio del mes. |
+| `COBERTURA_INCOMPLETA` | Falta cobertura desde el inicio del mes, hay huecos o se excluyeron intervalos que cruzan un límite. |
 | `TIEMPO_INSUFICIENTE` | El intervalo observado dura menos de un día. |
 | `PERIODO_CERRADO` | La medición alcanza el cierre del periodo. |
 

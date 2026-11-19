@@ -8,7 +8,7 @@ import pe.nivora.backend.acceso.dominio.CodigoSuministro;
 
 /** Una pagina recibida; aun no acredita incorporacion ni confirmacion en la base propia. */
 public record LoteLecturas(String fuente, CodigoSuministro suministro,
-                          List<LecturaAcumulada> lecturas, String siguienteCursor, boolean hayMas) {
+                          List<? extends Lectura> lecturas, String siguienteCursor, boolean hayMas) {
     public LoteLecturas {
         LecturaAcumulada.validarIdentificador(fuente);
         LecturaAcumulada.validarIdentificador(siguienteCursor);

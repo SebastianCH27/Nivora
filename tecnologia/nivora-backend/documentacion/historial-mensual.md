@@ -32,14 +32,17 @@ Cada mes comienza a las 00:00 de `America/Lima`. Las fechas de la respuesta
 se expresan en UTC. La lectura exacta del comienzo del mes siguiente sirve
 como contador final del mes anterior y como contador inicial del siguiente.
 Por ejemplo, la lectura de `2026-11-01T05:00:00Z` permite cerrar octubre y
-abrir noviembre. El consumo se obtiene restando los contadores del tramo.
+abrir noviembre cuando se usan acumuladas. Para intervalos se suman los
+consumos completos contenidos; un intervalo que termina en ese límite
+pertenece solo al periodo anterior. Se aplican las reglas de
+[cobertura de intervalos](lecturas-intervalo.md#cálculos-y-cobertura).
 
 | Estado de `consumo` | Qué indica |
 |---|---|
-| `COMPLETO` | Hay lecturas compatibles en los dos límites exactos del mes. |
-| `PARCIAL` | Hay al menos dos lecturas compatibles y falta uno o ambos límites. El monto corresponde a las fechas `desde` y `hasta`. |
-| `SIN_DATOS` | El mes se devuelve con menos de dos lecturas disponibles y un consumo `null`. |
-| `INCOMPATIBLE` | Se encontró un cambio de medidor o un retroceso del contador. El consumo se devuelve como `null`. |
+| `COMPLETO` | Las acumuladas cubren ambos límites o los intervalos cubren el mes completo sin huecos. |
+| `PARCIAL` | Se conserva el consumo conocido; falta un extremo, existe un hueco o se excluye un intervalo que cruza un límite. |
+| `SIN_DATOS` | Faltan acumuladas suficientes o intervalos completos contenidos. El consumo es `null`. |
+| `INCOMPATIBLE` | Hay cambio de medidor, retroceso, mezcla de tipos, superposición o suma fuera de rango. El consumo es `null`. |
 
 Se entregan los litros y m³ como cadenas decimales exactas, con referencias
 al medidor y a las lecturas usadas. El consumo cero corresponde a lecturas

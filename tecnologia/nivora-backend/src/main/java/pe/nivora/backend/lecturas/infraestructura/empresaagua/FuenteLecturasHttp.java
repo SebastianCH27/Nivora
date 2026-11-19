@@ -14,6 +14,8 @@ import tools.jackson.databind.JsonNode;
 import pe.nivora.backend.acceso.dominio.CodigoSuministro;
 import pe.nivora.backend.compartido.infraestructura.empresaagua.ClienteEmpresaAgua;
 import pe.nivora.backend.lecturas.dominio.LecturaAcumulada;
+import pe.nivora.backend.lecturas.dominio.Lectura;
+import pe.nivora.backend.lecturas.dominio.LecturaIntervalo;
 import pe.nivora.backend.lecturas.dominio.LoteLecturas;
 import pe.nivora.backend.lecturas.dominio.contratos.FuenteLecturas;
 import pe.nivora.backend.lecturas.dominio.contratos.FuenteLecturasNoDisponibleException;
@@ -74,9 +76,10 @@ public final class FuenteLecturasHttp implements FuenteLecturas {
 
     private LoteLecturas interpretar(JsonNode datos, CodigoSuministro codigo,
                                     long desde, int limite, Long hasta) {
+        String tipo = texto(datos, "tipoMedicion");
         exigir(FUENTE.equals(texto(datos, "fuente"))
             && codigo.valor().equals(texto(datos, "codigoSuministro"))
-            && "ACUMULADA".equals(texto(datos, "tipoMedicion"))
+            && ("ACUMULADA".equals(tipo) || "INTERVALO".equals(tipo))
             && "L".equals(texto(datos, "unidad")));
 
         JsonNode filas = datos.get("lecturas");
@@ -86,10 +89,12 @@ public final class FuenteLecturasHttp implements FuenteLecturas {
         boolean hayMas = mas.booleanValue();
         exigir(!hayMas || filas.size() == limite);
 
-        var lecturas = new ArrayList<LecturaAcumulada>();
+        var lecturas = new ArrayList<Lectura>();
         long ultimo = desde;
         for (JsonNode fila : filas) {
             exigir(fila.isObject());
+            JsonNode tipoFila = fila.get("tipoMedicion");
+            exigir(tipoFila == null || (tipoFila.isString() && tipo.equals(tipoFila.stringValue())));
             String id = texto(fila, "idLectura");
             long numero = identificador(id, false);
             exigir(numero > ultimo && (hasta == null || numero <= hasta));
@@ -101,8 +106,17 @@ public final class FuenteLecturasHttp implements FuenteLecturas {
             exigir(valor != null && valor.isIntegralNumber());
             long litros = valor.bigIntegerValue().longValueExact();
 
-            lecturas.add(new LecturaAcumulada(FUENTE, id, codigo, medidor,
-                Instant.parse(fecha), litros));
+            if ("INTERVALO".equals(tipo)) {
+                String inicio = texto(fila, "inicioIntervalo");
+                exigir(inicio != null && inicio.endsWith("Z"));
+                lecturas.add(new LecturaIntervalo(FUENTE, id, codigo, medidor,
+                    Instant.parse(inicio), Instant.parse(fecha), litros));
+            } else {
+                // Un inicio no nulo en una página acumulada sería ambiguo.
+                exigir(fila.get("inicioIntervalo") == null || fila.get("inicioIntervalo").isNull());
+                lecturas.add(new LecturaAcumulada(FUENTE, id, codigo, medidor,
+                    Instant.parse(fecha), litros));
+            }
             ultimo = numero;
         }
 

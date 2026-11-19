@@ -1,7 +1,7 @@
 # Consumo acumulado del mes
 
-La primera parte del bloque 4 implementa RF10–RF14 para lecturas acumuladas
-aceptadas en MySQL. La consulta usa el suministro de la sesión `CONSULTA`
+La consulta implementa RF10–RF14 para lecturas acumuladas y de intervalo
+aceptadas en MySQL. Usa el suministro de la sesión `CONSULTA`
 y puede seguir respondiendo con los datos almacenados durante una caída
 de la Empresa de Agua o de APIsPERU. El inicio de sesión conserva sus
 validaciones externas.
@@ -24,18 +24,21 @@ se puede mostrar como última medición cuando el mes actual está vacío.
 
 | Estado de `consumo` | Significado |
 |---|---|
-| `COMPLETO` | Hay una lectura al inicio del mes y al menos otra posterior. La diferencia cubre desde el inicio hasta la última medición disponible. |
-| `PARCIAL` | Hay dos o más lecturas compatibles dentro del mes. Como falta la lectura del inicio exacto, el resultado cubre el tramo delimitado por `desde` y `hasta`. |
-| `SIN_DATOS` | Hay menos de dos lecturas del mes. Los importes son `null`. |
-| `INCOMPATIBLE` | Las lecturas del mes incluyen un cambio de medidor o un retroceso del contador. Los importes son `null`. |
+| `COMPLETO` | Las acumuladas cubren desde el inicio hasta el corte; o los intervalos cubren ese tramo sin huecos ni superposiciones. |
+| `PARCIAL` | Hay consumo conocido, pero falta un extremo, existe un hueco o se excluye un intervalo que cruza un límite del periodo. |
+| `SIN_DATOS` | Faltan dos acumuladas compatibles o no hay intervalos completos contenidos que puedan sumarse. Los importes son `null`. |
+| `INCOMPATIBLE` | Cambio de medidor, retroceso del contador, tipos mezclados, superposición o suma fuera de rango. Los importes son `null`. |
 
-Para un tramo calculable, `litros` es la diferencia de los contadores
-y `metrosCubicos` es esa diferencia dividida entre 1000. Ambos se entregan
+Para un tramo calculable, `litros` es la diferencia de los contadores o
+la suma de intervalos según `tipoMedicion`. `metrosCubicos` divide ese
+volumen entre 1000. Ambos se entregan
 como cadenas decimales para conservar la precisión. Dos mediciones iguales
 de un mismo contador producen `"0"` litros y `"0.000"` m³. Se conservan
 `idMedidor`, `idLecturaInicial` e `idLecturaFinal` como referencias a la base.
 El cálculo revisa también las mediciones intermedias. La cobertura del
 acumulado corresponde al tramo medido, sin interpolar el inicio del mes.
+Las reglas de intervalos, huecos y límites están en
+[lecturas de intervalo](lecturas-intervalo.md).
 
 | Estado de `actualizacion` | Significado |
 |---|---|
@@ -51,8 +54,9 @@ hasta la última medición utilizada.
 
 ## Comprobación desde Windows
 
-Usa las tablas que ya tienes con los scripts 01 a 09. Compila en el CMD del
-backend.
+Usa el esquema actualizado hasta el script 21, según los pasos de
+[migración de intervalos](lecturas-intervalo.md#aplicar-en-windows).
+Compila en el CMD del backend.
 
 ```bat
 cd /d C:\Users\HP\Desktop\Nivora\tecnologia\nivora-backend

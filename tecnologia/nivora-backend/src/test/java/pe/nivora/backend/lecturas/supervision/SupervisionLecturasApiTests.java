@@ -163,8 +163,8 @@ class SupervisionLecturasApiTests {
     @Test
     void resumeLecturasDeLaFuenteYSuministroSolicitados() throws Exception {
         lecturas();
-        jdbc.update("INSERT INTO lecturas VALUES ('otra','50','13100390','391','2026-09-01 05:00:00',999,'L','ACUMULADA','2026-11-10 22:00:00')");
-        jdbc.update("INSERT INTO lecturas VALUES ('empresa-agua','60','13100391','392','2026-12-01 05:00:00',999,'L','ACUMULADA','2026-12-01 05:00:00')");
+        jdbc.update("INSERT INTO lecturas (fuente,id_lectura,codigo_suministro,id_medidor,fecha_medicion_utc,valor_litros,unidad,tipo_medicion,recibida_en_utc) VALUES ('otra','50','13100390','391','2026-09-01 05:00:00',999,'L','ACUMULADA','2026-11-10 22:00:00')");
+        jdbc.update("INSERT INTO lecturas (fuente,id_lectura,codigo_suministro,id_medidor,fecha_medicion_utc,valor_litros,unidad,tipo_medicion,recibida_en_utc) VALUES ('empresa-agua','60','13100391','392','2026-12-01 05:00:00',999,'L','ACUMULADA','2026-12-01 05:00:00')");
         var almacen = get(RUTA, 200).get("almacenamiento");
         assertEquals(2, almacen.get("lecturasGuardadas").longValue());
         assertEquals("2026-10-01T05:00:00Z", almacen.get("primeraMedicion").stringValue());
@@ -290,7 +290,7 @@ class SupervisionLecturasApiTests {
     }
 
     private void lecturas() {
-        jdbc.update("INSERT INTO lecturas VALUES ('empresa-agua','9','13100390','391','2026-10-01 05:00:00',100,'L','ACUMULADA','2026-11-10 20:00:00'),('empresa-agua','100','13100390','391','2026-10-02 05:00:00.123456',120,'L','ACUMULADA','2026-11-10 21:00:00.654321')");
+        jdbc.update("INSERT INTO lecturas (fuente,id_lectura,codigo_suministro,id_medidor,fecha_medicion_utc,valor_litros,unidad,tipo_medicion,recibida_en_utc) VALUES ('empresa-agua','9','13100390','391','2026-10-01 05:00:00',100,'L','ACUMULADA','2026-11-10 20:00:00'),('empresa-agua','100','13100390','391','2026-10-02 05:00:00.123456',120,'L','ACUMULADA','2026-11-10 21:00:00.654321')");
     }
 
     private void progreso(String estado) {

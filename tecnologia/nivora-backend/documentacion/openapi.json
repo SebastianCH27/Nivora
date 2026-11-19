@@ -3,7 +3,7 @@
   "info": {
     "title": "API de Nivora",
     "version": "0.0.1-SNAPSHOT",
-    "description": "Contrato documentado del backend: 40 operaciones de negocio y una de salud. Base revisada: commit 4fd156a. Usa dos sesiones Bearer opacas distintas; los permisos administrativos estan indicados en x-permisos-requeridos. Las consultas del suministro obtienen su alcance de la sesion. Ejemplos ficticios; reemplazar las fechas futuras antes de ejecutar publicaciones."
+    "description": "Contrato documentado del backend: 40 operaciones de negocio y una de salud. Ampliación de lecturas de intervalo sobre la base cc65d63. Los detalles de consumo identifican tipoMedicion y motivos de cobertura. Usa dos sesiones Bearer opacas distintas; los permisos administrativos estan indicados en x-permisos-requeridos. Las consultas del suministro obtienen su alcance de la sesion. Ejemplos ficticios; reemplazar las fechas futuras antes de ejecutar publicaciones."
   },
   "servers": [
     {
@@ -2886,7 +2886,12 @@
           "FALTA_LECTURA_INICIAL",
           "FALTA_LECTURA_FINAL",
           "CAMBIO_DE_MEDIDOR",
-          "RETROCESO_DEL_CONTADOR"
+          "RETROCESO_DEL_CONTADOR",
+          "TIPOS_DE_MEDICION_MEZCLADOS",
+          "INTERVALOS_SUPERPUESTOS",
+          "HUECOS_ENTRE_INTERVALOS",
+          "INTERVALO_CRUZA_LIMITE",
+          "SUMA_FUERA_DE_RANGO"
         ],
         "x-java-enum": "pe.nivora.backend.lecturas.dominio.ConsumoPeriodo$Motivo"
       },
@@ -3498,7 +3503,8 @@
           "hasta",
           "idMedidor",
           "idLecturaInicial",
-          "idLecturaFinal"
+          "idLecturaFinal",
+          "tipoMedicion"
         ],
         "properties": {
           "estado": {
@@ -3587,13 +3593,24 @@
                 "type": "null"
               }
             ]
+          },
+          "tipoMedicion": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/TipoMedicion"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Origen del cálculo: diferencia de contadores o suma de intervalos. null cuando no se determina un único tipo."
           }
         },
         "x-java-types": [
           "pe.nivora.backend.lecturas.presentacion.ConsumoActualController$Detalle",
           "pe.nivora.backend.tarifas.presentacion.CostosConsumoController$Consumo"
         ],
-        "description": "Un importe null comunica falta de calculo compatible; no equivale a cero. Un estado PARCIAL conserva su motivo."
+        "description": "Un importe null comunica falta de cálculo compatible; no equivale a cero. Un estado PARCIAL conserva su motivo. Los intervalos con huecos o que cruzan el periodo no se proyectan ni se reparten proporcionalmente; el subtotal solo suma intervalos completos contenidos."
       },
       "ActualizacionConsumo": {
         "type": "object",
@@ -3708,7 +3725,8 @@
               "hasta": null,
               "idMedidor": null,
               "idLecturaInicial": null,
-              "idLecturaFinal": null
+              "idLecturaFinal": null,
+              "tipoMedicion": null
             },
             "actualizacion": {
               "estado": "SIN_LECTURAS",
@@ -6348,6 +6366,14 @@
         },
         "additionalProperties": true,
         "description": "Respuesta de Actuator; sus componentes y grupos dependen de la configuracion."
+      },
+      "TipoMedicion": {
+        "type": "string",
+        "enum": [
+          "ACUMULADA",
+          "INTERVALO"
+        ],
+        "x-java-enum": "pe.nivora.backend.lecturas.dominio.Lectura$Tipo"
       }
     }
   },

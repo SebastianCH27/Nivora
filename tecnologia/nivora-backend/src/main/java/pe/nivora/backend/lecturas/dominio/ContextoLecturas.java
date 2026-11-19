@@ -47,7 +47,7 @@ public record ContextoLecturas(String fuente, CodigoSuministro suministro,
         return Long.parseLong(texto);
     }
 
-    public Optional<MotivoRechazoLectura> validar(LecturaAcumulada lectura) {
+    public Optional<MotivoRechazoLectura> validar(Lectura lectura) {
         if (numero(lectura.idLectura(), false) > numero(hastaIdLectura, true)) {
             return Optional.of(MotivoRechazoLectura.ID_POSTERIOR_AL_CORTE);
         }
@@ -60,8 +60,13 @@ public record ContextoLecturas(String fuente, CodigoSuministro suministro,
             return Optional.of(MotivoRechazoLectura.MEDIDOR_NO_REGISTRADO);
         }
         LocalDate fecha = lectura.fechaMedicion().atZone(LIMA).toLocalDate();
+        LocalDate inicio = fecha;
+        if (lectura instanceof LecturaIntervalo intervalo) {
+            inicio = intervalo.inicioIntervalo().atZone(LIMA).toLocalDate();
+            fecha = intervalo.fechaMedicion().minusNanos(1).atZone(LIMA).toLocalDate();
+        }
         var m = medidor.orElseThrow();
-        if (fecha.isBefore(m.fechaInstalacion())
+        if (inicio.isBefore(m.fechaInstalacion())
                 || (m.fechaRetiro() != null && fecha.isAfter(m.fechaRetiro()))) {
             return Optional.of(MotivoRechazoLectura.FECHA_FUERA_VIGENCIA_MEDIDOR);
         }

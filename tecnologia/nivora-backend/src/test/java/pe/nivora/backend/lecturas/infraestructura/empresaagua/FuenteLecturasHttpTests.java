@@ -22,6 +22,7 @@ import org.junit.jupiter.params.provider.MethodSource;
 import tools.jackson.databind.json.JsonMapper;
 
 import pe.nivora.backend.acceso.dominio.CodigoSuministro;
+import pe.nivora.backend.lecturas.dominio.LecturaIntervalo;
 import pe.nivora.backend.compartido.infraestructura.empresaagua.ClienteEmpresaAgua;
 import pe.nivora.backend.lecturas.dominio.contratos.FuenteLecturasNoDisponibleException;
 
@@ -276,6 +277,46 @@ class FuenteLecturasHttpTests {
         return new FuenteLecturasHttp(new ClienteEmpresaAgua(
             "http://127.0.0.1:" + servidor.getAddress().getPort(), 2000, lecturaMs,
             JsonMapper.builder().build()));
+    }
+
+    @Test
+    void interpretaElInicioYFinDeUnIntervaloConElMismoContratoDeCursor() {
+        respuesta.set(new Respuesta(200,"application/json",paginaIntervalo(),0));
+        var lote=fuente.consultar(CODIGO,"0",2,"391").orElseThrow();
+        var intervalo=(LecturaIntervalo)lote.lecturas().getFirst();
+        assertEquals(Instant.parse("2026-10-01T04:00:00Z"),intervalo.inicioIntervalo());
+        assertEquals(Instant.parse("2026-10-01T05:00:00.123456Z"),intervalo.fechaMedicion());
+        assertEquals(80,intervalo.valorLitros());
+        assertEquals("391",lote.siguienteCursor());
+        assertTrue(consulta.get().contains("hastaId=391"));
+    }
+
+    @ParameterizedTest
+    @MethodSource("intervalosInvalidos")
+    void rechazaPaginasDeIntervalosAmbiguosOIncompletos(String cuerpo) {
+        respuesta.set(new Respuesta(200,"application/json",cuerpo,0));
+        assertThrows(FuenteLecturasNoDisponibleException.class,()->fuente.consultar(CODIGO,"0",2));
+    }
+
+    static Stream<String> intervalosInvalidos() {
+        String valida=paginaIntervalo();
+        return Stream.of(
+            valida.replace("\"inicioIntervalo\":\"2026-10-01T04:00:00Z\",",""),
+            valida.replace("2026-10-01T04:00:00Z","2026-10-01T05:00:00.123456Z"),
+            valida.replace("2026-10-01T04:00:00Z","2026-10-02T04:00:00Z"),
+            valida.replace("2026-10-01T04:00:00Z","2026-10-01T04:00:00"),
+            valida.replace("\"inicioIntervalo\":\"2026-10-01T04:00:00Z\"","\"inicioIntervalo\":null"),
+            valida.replace("\"valorLitros\":80","\"valorLitros\":1.5"),
+            valida.replace("\"valorLitros\":80","\"valorLitros\":-1"),
+            valida.replace("\"L\"","\"m3\""),
+            valida.replace("\"idLectura\":","\"tipoMedicion\":\"ACUMULADA\",\"idLectura\":"),
+            valida.replace("\"tipoMedicion\":\"INTERVALO\"","\"tipoMedicion\":\"ACUMULADA\""));
+    }
+
+    private static String paginaIntervalo() {
+        String fila=lectura("391","391","80").replace("\"fechaMedicion\":",
+            "\"inicioIntervalo\":\"2026-10-01T04:00:00Z\",\"fechaMedicion\":");
+        return pagina("["+fila+"]","391",false).replace("ACUMULADA","INTERVALO");
     }
 
     private static String lectura(String id, String medidor, String litros) {

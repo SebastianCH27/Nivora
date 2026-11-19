@@ -10,9 +10,15 @@ import java.util.OptionalLong;
 public final class PoliticaIncorporacionLecturas {
     private PoliticaIncorporacionLecturas() {}
 
-    public static Optional<MotivoRechazoLectura> validarFecha(LecturaAcumulada lectura,
+    public static Optional<MotivoRechazoLectura> validarFecha(Lectura lectura,
                                                              Instant recibidaEn) {
-        Instant fecha = lectura.fechaMedicion();
+        var fin = validarInstante(lectura.fechaMedicion(), recibidaEn);
+        if (fin.isPresent()) return fin;
+        return lectura instanceof LecturaIntervalo intervalo
+            ? validarInstante(intervalo.inicioIntervalo(), recibidaEn) : Optional.empty();
+    }
+
+    private static Optional<MotivoRechazoLectura> validarInstante(Instant fecha, Instant recibidaEn) {
         try {
             int anio = fecha.atOffset(ZoneOffset.UTC).getYear();
             if (anio < 1000 || anio > 9999) {

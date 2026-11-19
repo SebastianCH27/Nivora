@@ -16,10 +16,12 @@ comparan las rutas, parametros y DTO reales con la especificacion versionada.
 ## Revisión final de requisitos
 
 El [balance del bloque 9](documentacion/verificacion-final-backend.md)
-consolida las 562 pruebas de la última regresión y la evidencia de carga.
+conserva las 562 pruebas de ese corte y la evidencia de carga. La ampliación de
+[lecturas de intervalo](documentacion/lecturas-intervalo.md) eleva la regresión
+a 602 pruebas aprobadas.
 La [matriz RF/EQ](documentacion/matriz-requisitos-backend.md) identifica
-la cobertura del backend y los pendientes: lecturas de intervalo,
-comparación de costos, interfaces y evaluaciones de calidad restantes.
+la cobertura del backend y los pendientes: comparación de costos,
+interfaces y evaluaciones de calidad restantes.
 
 ## Servicios del entorno local
 
@@ -35,7 +37,7 @@ El puerto 8080 esta ocupado por Jenkins en el equipo de desarrollo.
 | Paquete | Modulo | Estado |
 |---|---|---|
 | `acceso` | Acceso y suministros | Suministros, consulta de DNI mediante APIsPERU, sesiones de consulta y administrativas, gestion de cuentas y supervision protegida. |
-| `lecturas` | Lecturas, consumo e historial | Recuperación con corte e inventario persistidos; consumo acumulado, historial, estadísticas y supervisión local. Lecturas de intervalo pendientes. |
+| `lecturas` | Lecturas, consumo e historial | Recuperación con corte e inventario persistidos; consumo acumulado, historial, estadísticas y supervisión local. Suma de intervalos con validación de cobertura y superposiciones. |
 | `tarifas` | Tarifas, costos y proyecciones | Historial versionado, gestión administrativa de vigencias, costos estimados y proyección mensual. |
 | `notificaciones` | Alertas y notificaciones | Alertas, bandeja, marcas de lectura, preferencias por dispositivo y entrega Web Push con reintentos. |
 | `recibos` | Recibos | Importación, sincronización automática y consulta de recibos por suministro. |
@@ -221,9 +223,18 @@ en `contexto_recuperacion_lecturas` para reanudar el mismo recorrido.
 Un acumulado mensual no equivale a un incremento nuevo que deba sumarse
 cada vez que se consulta.
 
+## Lecturas de intervalo
+
+La ampliación [RF10/P01](documentacion/lecturas-intervalo.md) permite incorporar
+consumos de intervalos, además de contadores acumulados. Requiere aplicar
+`base-datos/21-lecturas-intervalo.sql` antes de arrancar el JAR nuevo sobre
+una base anterior. La regresión incluye 602 pruebas aprobadas y el contrato
+OpenAPI publica `tipoMedicion` y los nuevos motivos de cobertura.
+
 ## Consulta de paginas de lecturas
 
-El paquete `lecturas/dominio` define `LecturaAcumulada`, `LoteLecturas` y
+El paquete `lecturas/dominio` define `Lectura`, `LecturaAcumulada`,
+`LecturaIntervalo`, `LoteLecturas` y
 el contrato `FuenteLecturas`. Se reutiliza `CodigoSuministro` como identificador
 del suministro. Estos modelos no dependen de bibliotecas HTTP, JSON ni Spring.
 

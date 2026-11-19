@@ -54,7 +54,7 @@ class RecuperacionConCorteTests {
     private final JsonMapper json = JsonMapper.builder().build();
     private final AtomicReference<String> corte = new AtomicReference<>();
     private final AtomicReference<String> inventario = new AtomicReference<>();
-    private final AtomicReference<List<LecturaAcumulada>> datos = new AtomicReference<>();
+    private final AtomicReference<List<? extends Lectura>> datos = new AtomicReference<>();
     private final AtomicReference<String> fallo = new AtomicReference<>("");
     private final AtomicInteger contextos = new AtomicInteger();
     private final List<String> limites = new CopyOnWriteArrayList<>();
@@ -320,6 +320,27 @@ class RecuperacionConCorteTests {
         assertEquals(0,base.lecturas.contar(CODIGO));
     }
 
+    @Test
+    void reanudaPaginasDeIntervalosYRepetirElRecorridoNoDuplicaElConsumo() {
+        var inicio=java.time.Instant.parse("2026-10-01T05:00:00Z");
+        datos.set(List.of(
+            new LecturaIntervalo("empresa-agua","1",CODIGO,"391",inicio,inicio.plusSeconds(3600),80),
+            new LecturaIntervalo("empresa-agua","2",CODIGO,"391",inicio.plusSeconds(3600),inicio.plusSeconds(7200),120),
+            new LecturaIntervalo("empresa-agua","3",CODIGO,"391",inicio.plusSeconds(7200),inicio.plusSeconds(10800),50),
+            new LecturaIntervalo("empresa-agua","4",CODIGO,"391",inicio.plusSeconds(10800),inicio.plusSeconds(14400),150)));
+        fallo.set("pagina2");
+        assertThrows(FuenteLecturasNoDisponibleException.class,()->caso().ejecutar(CODIGO,2,10));
+        assertEquals("2",base.progreso.consultar("empresa-agua",CODIGO).cursor());
+        assertEquals(2,base.lecturas.contar(CODIGO));
+        fallo.set("");
+        assertEquals(2,caso().ejecutar(CODIGO,2,10).incorporacion().nuevas());
+        assertEquals(4,caso().ejecutar(CODIGO,2,10).incorporacion().repetidas());
+        assertEquals(4,base.lecturas.contar(CODIGO));
+        assertEquals(400,base.jdbc.queryForObject("SELECT SUM(valor_litros) FROM lecturas",Integer.class));
+        assertEquals(EstadoRecuperacion.RECORRIDO_COMPLETO,base.progreso.consultar("empresa-agua",CODIGO).estado());
+        assertEquals(List.of("0","2","2","0","2"),cursores);
+    }
+
     private void verificarRechazo(String motivo,int cantidad) {
         var resultado=caso().ejecutar(CODIGO,2,10);
         assertEquals(cantidad,resultado.incorporacion().rechazadas());
@@ -360,11 +381,12 @@ class RecuperacionConCorteTests {
                 var filas=todas.subList(0,Math.min(todas.size(),limite));
                 var respuesta=json.createObjectNode();
                 respuesta.put("fuente","empresa-agua");respuesta.put("codigoSuministro",CODIGO.valor());
-                respuesta.put("tipoMedicion","ACUMULADA");respuesta.put("unidad","L");
+                respuesta.put("tipoMedicion",filas.isEmpty()?"ACUMULADA":filas.getFirst().tipoMedicion().name());respuesta.put("unidad","L");
                 var lista=respuesta.putArray("lecturas");
                 for(var l:filas) {
                     var fila=lista.addObject();fila.put("idLectura",l.idLectura());fila.put("idMedidor",l.idMedidor());
                     fila.put("fechaMedicion",l.fechaMedicion().toString());fila.put("valorLitros",l.valorLitros());
+                    if(l instanceof LecturaIntervalo i)fila.put("inicioIntervalo",i.inicioIntervalo().toString());
                 }
                 respuesta.put("siguienteDespuesDe",filas.isEmpty()?desde:filas.getLast().idLectura());
                 respuesta.put("hayMas",todas.size()>limite);cuerpo=json.writeValueAsString(respuesta);

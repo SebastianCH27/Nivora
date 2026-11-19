@@ -24,6 +24,7 @@ import pe.nivora.backend.lecturas.aplicacion.ConsultarEstadisticasConsumo;
 import pe.nivora.backend.lecturas.aplicacion.ConsultarHistorialMensual;
 import pe.nivora.backend.lecturas.aplicacion.ConsultarHistorialMensual.Periodo;
 import pe.nivora.backend.lecturas.dominio.ConsumoPeriodo;
+import pe.nivora.backend.lecturas.dominio.Lectura;
 import pe.nivora.backend.lecturas.dominio.contratos.RepositorioLecturasNoDisponibleException;
 import pe.nivora.backend.lecturas.dominio.contratos.SuministroNoRegistradoException;
 
@@ -114,7 +115,7 @@ public class ConsumoActualController {
             consumo.litros() == null ? null : consumo.litros().toString(),
             consumo.metrosCubicos() == null ? null : consumo.metrosCubicos().toPlainString(),
             consumo.desde(), consumo.hasta(), consumo.idMedidor(),
-            consumo.idLecturaInicial(), consumo.idLecturaFinal());
+            consumo.idLecturaInicial(), consumo.idLecturaFinal(), consumo.tipoMedicion());
     }
 
     @ExceptionHandler({IllegalArgumentException.class, MethodArgumentTypeMismatchException.class})
@@ -142,7 +143,7 @@ public class ConsumoActualController {
 
     public record Detalle(ConsumoPeriodo.Estado estado, ConsumoPeriodo.Motivo motivo,
             String litros, String metrosCubicos, Instant desde, Instant hasta,
-            String idMedidor, String idLecturaInicial, String idLecturaFinal) {}
+            String idMedidor, String idLecturaInicial, String idLecturaFinal, Lectura.Tipo tipoMedicion) {}
 
     public record Respuesta(String fuente, String codigoSuministro, String periodo,
             String zonaHoraria, Instant inicioMes, Instant finMesExclusivo, Instant consultadoEn,

@@ -64,6 +64,10 @@ import pe.nivora.backend.lecturas.aplicacion.RecuperarLecturasConCorte;
 import pe.nivora.backend.lecturas.aplicacion.SincronizarLecturas;
 import pe.nivora.backend.lecturas.dominio.EstadoSincronizacion;
 import pe.nivora.backend.lecturas.dominio.LecturaAcumulada;
+import pe.nivora.backend.lecturas.dominio.LecturaIntervalo;
+import pe.nivora.backend.lecturas.aplicacion.ImportarPaginaLecturas;
+import pe.nivora.backend.lecturas.infraestructura.empresaagua.FuenteLecturasHttp;
+import pe.nivora.backend.compartido.infraestructura.empresaagua.ClienteEmpresaAgua;
 import pe.nivora.backend.lecturas.dominio.LoteLecturas;
 import pe.nivora.backend.lecturas.dominio.ResultadoIncorporacion;
 import pe.nivora.backend.lecturas.dominio.contratos.RepositorioLecturas;
@@ -2163,6 +2167,148 @@ class AccesoConsultaIntegradoTests {
 
         assertEquals(EvaluarAlertaConsumo.Estado.GENERADA, evaluarAlertaConsumo.ejecutar(suministro).estado());
         assertEquals(0L, jdbc.queryForObject("SELECT consumo_anterior_litros FROM alertas_consumo", Long.class));
+    }
+
+    @Test
+    void intervalosHttpAlimentanConsumoHistorialCostosProyeccionYAlertas() throws Exception {
+        var sesion=token(enviar("POST",CONSULTA+"/sesiones",SOLICITUD,null,201));
+        incorporarIntervalo("1","2026-10-01T05:00:00Z","2026-11-01T05:00:00Z",2000);
+        paginaLecturasPendiente.set(new Respuesta(200,"application/json","""
+            {"fuente":"empresa-agua","codigoSuministro":"000101","tipoMedicion":"INTERVALO","unidad":"L",
+             "lecturas":[
+               {"idLectura":"2","idMedidor":"1","inicioIntervalo":"2026-11-01T05:00:00Z","fechaMedicion":"2026-11-06T05:00:00Z","valorLitros":1000},
+               {"idLectura":"3","idMedidor":"1","inicioIntervalo":"2026-11-06T05:00:00Z","fechaMedicion":"2026-11-11T05:00:00Z","valorLitros":1200}],
+             "hayMas":false,"siguienteDespuesDe":"3"}
+            """));
+        var fuente=new FuenteLecturasHttp(new ClienteEmpresaAgua(origen().toString(),2000,2000,json));
+        var importar=new ImportarPaginaLecturas(fuente,repositorioLecturas,new RelojPrueba(ZoneOffset.UTC));
+        var suministro=new CodigoSuministro("000101");
+        assertEquals(new ResultadoIncorporacion(2,0,0),importar.ejecutar(suministro,"1",500).orElseThrow().incorporacion());
+        assertEquals(new ResultadoIncorporacion(0,2,0),importar.ejecutar(suministro,"1",500).orElseThrow().incorporacion());
+        guardarTarifaIntervalos();
+        agua.set(CAIDA);identidad.set(CAIDA);paginaLecturasPendiente.set(CAIDA);
+        var actual=consultarJson(CONSUMO+"?codigoSuministro=000202",sesion);
+        assertEquals("000101",actual.path("codigoSuministro").stringValue());
+        assertEquals("INTERVALO",actual.at("/consumo/tipoMedicion").stringValue());
+        assertEquals("COMPLETO",actual.at("/consumo/estado").stringValue());
+        assertEquals("2200",actual.at("/consumo/litros").stringValue());
+        assertEquals("2",actual.at("/consumo/idLecturaInicial").stringValue());
+        assertEquals("3",actual.at("/consumo/idLecturaFinal").stringValue());
+        assertEquals("2026-11-11T05:00:00Z",actual.at("/actualizacion/ultimaLectura").stringValue());
+        var historial=consultarJson(HISTORIAL+"?meses=1",sesion);
+        assertEquals("COMPLETO",historial.at("/periodos/0/consumo/estado").stringValue());
+        assertEquals("2000",historial.at("/periodos/0/consumo/litros").stringValue());
+        assertEquals("200",consultarJson(ESTADISTICAS+"?meses=1",sesion).at("/comparacion/diferencia/litros").stringValue());
+        var costos=consultarJson(COSTOS+"?meses=1",sesion);
+        assertEquals("10.50",costos.at("/actual/desglose/totalEstimado").stringValue());
+        assertEquals("10.00",costos.at("/anteriores/0/desglose/totalEstimado").stringValue());
+        assertEquals("INTERVALO",costos.at("/actual/consumo/tipoMedicion").stringValue());
+        var proyeccion=consultarJson(PROYECCION,sesion);
+        assertEquals("PROYECTADO",proyeccion.path("estado").stringValue());
+        assertEquals("6600",proyeccion.at("/proyeccion/litros").stringValue());
+        assertEquals("21.50",proyeccion.at("/costoProyectado/desglose/totalEstimado").stringValue());
+        assertEquals(EvaluarAlertaConsumo.Estado.GENERADA,evaluarAlertaConsumo.ejecutar(suministro).estado());
+        assertEquals(EvaluarAlertaConsumo.Estado.YA_REGISTRADA,evaluarAlertaConsumo.ejecutar(suministro).estado());
+        assertEquals(3,repositorioLecturas.contar(suministro));
+        assertEquals(1,llamadasAgua.get());assertEquals(1,llamadasIdentidad.get());
+        enviar("DELETE",CONSULTA+"/sesion",null,sesion,204);
+        enviar("GET",CONSUMO,null,sesion,401);
+    }
+
+    @Test
+    void intervalosConHuecosConservanElSubtotalYDetienenProyeccionYAlerta() throws Exception {
+        var sesion=token(enviar("POST",CONSULTA+"/sesiones",SOLICITUD,null,201));
+        incorporarIntervalo("1","2026-10-01T05:00:00Z","2026-11-01T05:00:00Z",2000);
+        incorporarIntervalo("2","2026-11-01T05:00:00Z","2026-11-05T05:00:00Z",1200);
+        incorporarIntervalo("3","2026-11-06T05:00:00Z","2026-11-11T05:00:00Z",1200);
+        guardarTarifaIntervalos();
+        var actual=consultarJson(CONSUMO,sesion);
+        assertEquals("2400",actual.at("/consumo/litros").stringValue());
+        assertEquals("PARCIAL",actual.at("/consumo/estado").stringValue());
+        assertEquals("HUECOS_ENTRE_INTERVALOS",actual.at("/consumo/motivo").stringValue());
+        var proyeccion=consultarJson(PROYECCION,sesion);
+        assertEquals("COBERTURA_INCOMPLETA",proyeccion.path("estado").stringValue());
+        assertTrue(proyeccion.path("proyeccion").isNull());
+        assertTrue(proyeccion.path("costoProyectado").isNull());
+        assertEquals("11.00",consultarJson(COSTOS,sesion).at("/actual/desglose/totalEstimado").stringValue());
+        assertEquals(EvaluarAlertaConsumo.Estado.SIN_DATOS_COMPARABLES,
+            evaluarAlertaConsumo.ejecutar(new CodigoSuministro("000101")).estado());
+    }
+
+    @Test
+    void intervalosQueCruzanElMesNoSeRepartenEntreHistorialYActual() throws Exception {
+        var sesion=token(enviar("POST",CONSULTA+"/sesiones",SOLICITUD,null,201));
+        incorporarIntervalo("1","2026-10-01T05:00:00Z","2026-10-31T05:00:00Z",1500);
+        incorporarIntervalo("2","2026-10-31T05:00:00Z","2026-11-02T05:00:00Z",400);
+        incorporarIntervalo("3","2026-11-02T05:00:00Z","2026-11-11T05:00:00Z",200);
+        var actual=consultarJson(CONSUMO,sesion).path("consumo");
+        assertEquals("200",actual.path("litros").stringValue());
+        assertEquals("INTERVALO_CRUZA_LIMITE",actual.path("motivo").stringValue());
+        var octubre=consultarJson(HISTORIAL+"?meses=1",sesion).at("/periodos/0/consumo");
+        assertEquals("1500",octubre.path("litros").stringValue());
+        assertEquals("PARCIAL",octubre.path("estado").stringValue());
+        assertEquals("INTERVALO_CRUZA_LIMITE",octubre.path("motivo").stringValue());
+        var estadisticas=consultarJson(ESTADISTICAS+"?meses=1",sesion);
+        assertEquals(octubre,estadisticas.at("/comparacion/anterior/consumo"));
+        assertEquals(0,estadisticas.at("/resumen/mesesCompletos").intValue());
+    }
+
+    @Test
+    void intervalosYAcumuladasEnElMismoPeriodoNoGeneranCostosNiProyeccion() throws Exception {
+        var sesion=token(enviar("POST",CONSULTA+"/sesiones",SOLICITUD,null,201));
+        incorporarLectura("1","2026-11-01T05:00:00Z",1000);
+        incorporarIntervalo("2","2026-11-01T05:00:00Z","2026-11-11T05:00:00Z",2200);
+        var consumo=consultarJson(CONSUMO,sesion).path("consumo");
+        assertEquals("INCOMPATIBLE",consumo.path("estado").stringValue());
+        assertEquals("TIPOS_DE_MEDICION_MEZCLADOS",consumo.path("motivo").stringValue());
+        assertTrue(consumo.path("litros").isNull());
+        assertTrue(consumo.path("tipoMedicion").isNull());
+        assertEquals("SIN_CONSUMO_CALCULABLE",consultarJson(COSTOS,sesion).at("/actual/estado").stringValue());
+        assertEquals("SIN_CONSUMO_CALCULABLE",consultarJson(PROYECCION,sesion).path("estado").stringValue());
+    }
+
+    @Test
+    void intervalosRespetanLosCortesDelCalendarioMensualConfigurado() throws Exception {
+        instantePrueba.set(Instant.parse("2026-10-20T13:00:00Z"));
+        var admin=iniciarAdminTarifas();
+        enviar("PUT",PERIODOS,reglaPeriodo(0,"2026-11",5),admin,200);
+        instantePrueba.set(AHORA);
+        var sesion=token(enviar("POST",CONSULTA+"/sesiones",SOLICITUD,null,201));
+        incorporarIntervalo("1","2026-10-01T05:00:00Z","2026-11-05T05:00:00Z",1000);
+        incorporarIntervalo("2","2026-11-05T05:00:00Z","2026-11-11T05:00:00Z",600);
+        var actual=consultarJson(CONSUMO,sesion);
+        assertEquals("2026-11-05T05:00:00Z",actual.path("inicioMes").stringValue());
+        assertEquals("600",actual.at("/consumo/litros").stringValue());
+        assertEquals("COMPLETO",actual.at("/consumo/estado").stringValue());
+        assertEquals("1000",consultarJson(HISTORIAL+"?meses=1",sesion).at("/periodos/0/consumo/litros").stringValue());
+        assertEquals("3000",consultarJson(PROYECCION,sesion).at("/proyeccion/litros").stringValue());
+    }
+
+    @Test
+    void intervalosConservanLaUltimaFechaAlComenzarUnMesSinDatosNuevos() throws Exception {
+        var sesion=token(enviar("POST",CONSULTA+"/sesiones",SOLICITUD,null,201));
+        incorporarIntervalo("1","2026-10-01T05:00:00Z","2026-11-01T05:00:00Z",2000);
+        var actual=consultarJson(CONSUMO,sesion);
+        assertEquals("SIN_DATOS",actual.at("/consumo/estado").stringValue());
+        assertTrue(actual.at("/consumo/litros").isNull());
+        assertEquals("2026-11-01T05:00:00Z",actual.at("/actualizacion/ultimaLectura").stringValue());
+        assertEquals("PENDIENTE",actual.at("/actualizacion/estado").stringValue());
+        assertEquals("2000",consultarJson(HISTORIAL+"?meses=1",sesion).at("/periodos/0/consumo/litros").stringValue());
+    }
+
+    private void guardarTarifaIntervalos() {
+        var inicio=LocalDate.parse("2026-10-01");
+        var tarifa=new VersionTarifaria("INTERVALOS-PRUEBA",1,"Demostración",inicio,
+            new BigDecimal("5.00"),BigDecimal.ZERO,List.of(tramoCosto("0",null,"2.50","0")));
+        tarifas.guardar(new HistorialTarifario("empresa-agua",new CodigoSuministro("000101"),List.of(
+            new HistorialTarifario.Asignacion(tarifa,null,inicio,null))),instantePrueba.get());
+    }
+
+    private void incorporarIntervalo(String id,String inicio,String fin,long litros) {
+        var codigo=new CodigoSuministro("000101");
+        var lectura=new LecturaIntervalo("empresa-agua",id,codigo,"1",Instant.parse(inicio),Instant.parse(fin),litros);
+        assertEquals(new ResultadoIncorporacion(1,0,0),repositorioLecturas.incorporar(
+            new LoteLecturas("empresa-agua",codigo,List.of(lectura),id,false),instantePrueba.get()));
     }
 
     private void incorporarLectura(String id, String fecha, long litros) {

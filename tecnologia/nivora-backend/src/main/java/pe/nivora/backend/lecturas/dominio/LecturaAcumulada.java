@@ -7,7 +7,7 @@ import pe.nivora.backend.acceso.dominio.CodigoSuministro;
 
 /** Contador acumulado de un medidor expresado en litros enteros. */
 public record LecturaAcumulada(String fuente, String idLectura, CodigoSuministro suministro,
-                              String idMedidor, Instant fechaMedicion, long valorLitros) {
+                              String idMedidor, Instant fechaMedicion, long valorLitros) implements Lectura {
     public LecturaAcumulada {
         validarIdentificador(fuente);
         validarIdentificador(idLectura);
@@ -18,6 +18,8 @@ public record LecturaAcumulada(String fuente, String idLectura, CodigoSuministro
             throw new IllegalArgumentException("El contador no puede ser negativo.");
         }
     }
+
+    @Override public Tipo tipoMedicion() { return Tipo.ACUMULADA; }
 
     static void validarIdentificador(String valor) {
         if (valor == null || valor.isBlank() || !valor.equals(valor.strip()) || valor.length() > 100) {

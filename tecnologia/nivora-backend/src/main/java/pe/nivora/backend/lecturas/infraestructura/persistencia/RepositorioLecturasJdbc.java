@@ -27,6 +27,8 @@ import tools.jackson.databind.json.JsonMapper;
 
 import pe.nivora.backend.acceso.dominio.CodigoSuministro;
 import pe.nivora.backend.lecturas.dominio.LecturaAcumulada;
+import pe.nivora.backend.lecturas.dominio.Lectura;
+import pe.nivora.backend.lecturas.dominio.LecturaIntervalo;
 import pe.nivora.backend.lecturas.dominio.ContextoLecturas;
 import pe.nivora.backend.lecturas.dominio.LoteLecturas;
 import pe.nivora.backend.lecturas.dominio.MotivoRechazoLectura;
@@ -118,9 +120,19 @@ public class RepositorioLecturasJdbc implements RepositorioLecturas {
                     lectura.idMedidor(), aUtc(lectura.fechaMedicion()));
                 if (!mismaMedicion.isEmpty()) {
                     motivo = Optional.of(MotivoRechazoLectura.MEDICION_CON_OTRO_ID);
-                } else {
-                    motivo = PoliticaIncorporacionLecturas.validarContador(lectura,
-                        vecino(lectura, true), vecino(lectura, false));
+                } else if (lectura instanceof LecturaAcumulada acumulada) {
+                    motivo = PoliticaIncorporacionLecturas.validarContador(acumulada,
+                        vecino(acumulada, true), vecino(acumulada, false));
+                } else if (lectura instanceof LecturaIntervalo intervalo) {
+                    Long superpuestos = jdbc.queryForObject("""
+                        SELECT COUNT(*) FROM lecturas
+                        WHERE fuente = ? AND codigo_suministro = ? AND tipo_medicion = 'INTERVALO'
+                            AND inicio_intervalo_utc < ? AND fecha_medicion_utc > ?
+                        """, Long.class, lectura.fuente(), lectura.suministro().valor(),
+                        aUtc(intervalo.fechaMedicion()), aUtc(intervalo.inicioIntervalo()));
+                    if (superpuestos != null && superpuestos > 0) {
+                        motivo = Optional.of(MotivoRechazoLectura.INTERVALO_SUPERPUESTO);
+                    }
                 }
             }
             if (motivo.isPresent()) {
@@ -129,10 +141,13 @@ public class RepositorioLecturasJdbc implements RepositorioLecturas {
             } else {
                 jdbc.update("""
                     INSERT INTO lecturas (fuente, id_lectura, codigo_suministro, id_medidor,
-                        fecha_medicion_utc, valor_litros, unidad, tipo_medicion, recibida_en_utc)
-                    VALUES (?, ?, ?, ?, ?, ?, 'L', 'ACUMULADA', ?)
+                        fecha_medicion_utc, valor_litros, unidad, tipo_medicion, recibida_en_utc,
+                        inicio_intervalo_utc)
+                    VALUES (?, ?, ?, ?, ?, ?, 'L', ?, ?, ?)
                     """, lectura.fuente(), lectura.idLectura(), lectura.suministro().valor(),
-                    lectura.idMedidor(), aUtc(lectura.fechaMedicion()), lectura.valorLitros(), recepcion);
+                    lectura.idMedidor(), aUtc(lectura.fechaMedicion()), lectura.valorLitros(),
+                    lectura.tipoMedicion().name(), recepcion,
+                    lectura instanceof LecturaIntervalo i ? aUtc(i.inicioIntervalo()) : null);
                 nuevas++;
             }
         }
@@ -145,7 +160,7 @@ public class RepositorioLecturasJdbc implements RepositorioLecturas {
         // Los fragmentos son constantes internas; todos los datos se envian como parametros.
         var valores = jdbc.queryForList("""
             SELECT valor_litros FROM lecturas
-            WHERE fuente = ? AND codigo_suministro = ? AND id_medidor = ?
+            WHERE fuente = ? AND codigo_suministro = ? AND id_medidor = ? AND tipo_medicion = 'ACUMULADA'
                 AND fecha_medicion_utc
             """ + condicion + " ? ORDER BY fecha_medicion_utc " + orden + " LIMIT 1",
             Long.class, lectura.fuente(), lectura.suministro().valor(), lectura.idMedidor(),
@@ -153,14 +168,22 @@ public class RepositorioLecturasJdbc implements RepositorioLecturas {
         return valores.isEmpty() ? OptionalLong.empty() : OptionalLong.of(valores.getFirst());
     }
 
-    private void registrarIncidencia(LecturaAcumulada lectura, MotivoRechazoLectura motivo,
+    private void registrarIncidencia(Lectura lectura, MotivoRechazoLectura motivo,
                                      LocalDateTime recepcion) {
         var detalle = new Detalle(lectura.fuente(), lectura.idLectura(), lectura.suministro().valor(),
             lectura.idMedidor(), lectura.fechaMedicion().toString(), lectura.valorLitros());
+        // Mantener la huella histórica de acumuladas al actualizar el backend.
         String datos = json.writeValueAsString(detalle);
         String huella = huella(motivo.name(), detalle.fuente(), detalle.idLectura(),
             detalle.codigoSuministro(), detalle.idMedidor(), detalle.fechaMedicion(),
             Long.toString(detalle.valorLitros()));
+        if (lectura instanceof LecturaIntervalo intervalo) {
+            datos = json.writeValueAsString(new DetalleIntervalo(detalle, "INTERVALO",
+                intervalo.inicioIntervalo().toString()));
+            huella = huella(motivo.name(), detalle.fuente(), detalle.idLectura(),
+                detalle.codigoSuministro(), detalle.idMedidor(), detalle.fechaMedicion(),
+                Long.toString(detalle.valorLitros()), "INTERVALO", intervalo.inicioIntervalo().toString());
+        }
         jdbc.update("""
             INSERT INTO incidencias_lecturas (fuente, id_lectura, codigo_suministro, motivo,
                 datos_recibidos, huella, primera_recepcion_utc, ultima_recepcion_utc, repeticiones)
@@ -187,7 +210,7 @@ public class RepositorioLecturasJdbc implements RepositorioLecturas {
     }
 
     @Override
-    public Optional<LecturaAcumulada> buscar(String fuente, String idLectura) {
+    public Optional<Lectura> buscar(String fuente, String idLectura) {
         try {
             return buscarInterno(fuente, idLectura);
         } catch (DataAccessException ex) {
@@ -195,7 +218,7 @@ public class RepositorioLecturasJdbc implements RepositorioLecturas {
         }
     }
 
-    private Optional<LecturaAcumulada> buscarInterno(String fuente, String idLectura) {
+    private Optional<Lectura> buscarInterno(String fuente, String idLectura) {
         return jdbc.query("SELECT * FROM lecturas WHERE fuente = ? AND id_lectura = ?",
             RepositorioLecturasJdbc::mapear, fuente, idLectura).stream().findFirst();
     }
@@ -220,7 +243,14 @@ public class RepositorioLecturasJdbc implements RepositorioLecturas {
         }
     }
 
-    private static LecturaAcumulada mapear(ResultSet fila, int numero) throws SQLException {
+    private static Lectura mapear(ResultSet fila, int numero) throws SQLException {
+        if ("INTERVALO".equals(fila.getString("tipo_medicion"))) {
+            return new LecturaIntervalo(fila.getString("fuente"), fila.getString("id_lectura"),
+                new CodigoSuministro(fila.getString("codigo_suministro")), fila.getString("id_medidor"),
+                fila.getObject("inicio_intervalo_utc", LocalDateTime.class).toInstant(ZoneOffset.UTC),
+                fila.getObject("fecha_medicion_utc", LocalDateTime.class).toInstant(ZoneOffset.UTC),
+                fila.getLong("valor_litros"));
+        }
         return new LecturaAcumulada(fila.getString("fuente"), fila.getString("id_lectura"),
             new CodigoSuministro(fila.getString("codigo_suministro")), fila.getString("id_medidor"),
             fila.getObject("fecha_medicion_utc", LocalDateTime.class).toInstant(ZoneOffset.UTC),
@@ -233,4 +263,5 @@ public class RepositorioLecturasJdbc implements RepositorioLecturas {
 
     private record Detalle(String fuente, String idLectura, String codigoSuministro,
                            String idMedidor, String fechaMedicion, long valorLitros) {}
+    private record DetalleIntervalo(Detalle medicion, String tipoMedicion, String inicioIntervalo) {}
 }

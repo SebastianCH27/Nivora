@@ -17,6 +17,7 @@ CREATE TABLE IF NOT EXISTS lecturas (
     unidad CHAR(1) NOT NULL DEFAULT 'L',
     tipo_medicion VARCHAR(10) NOT NULL DEFAULT 'ACUMULADA',
     recibida_en_utc DATETIME(6) NOT NULL,
+    inicio_intervalo_utc DATETIME(6) NULL,
 
     PRIMARY KEY (fuente, id_lectura),
     UNIQUE KEY uq_nivora_medicion (fuente, codigo_suministro, id_medidor, fecha_medicion_utc),
@@ -25,7 +26,10 @@ CREATE TABLE IF NOT EXISTS lecturas (
         REFERENCES suministros (codigo),
     CONSTRAINT chk_nivora_lectura_valor CHECK (valor_litros >= 0),
     CONSTRAINT chk_nivora_lectura_unidad CHECK (unidad = 'L'),
-    CONSTRAINT chk_nivora_lectura_tipo CHECK (tipo_medicion = 'ACUMULADA')
+    CONSTRAINT chk_nivora_lectura_intervalo CHECK (
+        (tipo_medicion = 'ACUMULADA' AND inicio_intervalo_utc IS NULL)
+        OR (tipo_medicion = 'INTERVALO' AND inicio_intervalo_utc IS NOT NULL
+            AND inicio_intervalo_utc < fecha_medicion_utc))
 ) ENGINE = InnoDB;
 
 CREATE TABLE IF NOT EXISTS incidencias_lecturas (

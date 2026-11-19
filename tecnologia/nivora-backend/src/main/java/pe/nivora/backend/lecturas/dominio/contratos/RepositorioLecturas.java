@@ -4,7 +4,7 @@ import java.time.Instant;
 import java.util.Optional;
 
 import pe.nivora.backend.acceso.dominio.CodigoSuministro;
-import pe.nivora.backend.lecturas.dominio.LecturaAcumulada;
+import pe.nivora.backend.lecturas.dominio.Lectura;
 import pe.nivora.backend.lecturas.dominio.ContextoLecturas;
 import pe.nivora.backend.lecturas.dominio.LoteLecturas;
 import pe.nivora.backend.lecturas.dominio.ResultadoIncorporacion;
@@ -24,7 +24,7 @@ public interface RepositorioLecturas {
         return incorporar(lote, recibidaEn);
     }
 
-    Optional<LecturaAcumulada> buscar(String fuente, String idLectura);
+    Optional<? extends Lectura> buscar(String fuente, String idLectura);
 
     long contar(CodigoSuministro codigo);
 

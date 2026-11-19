@@ -27,6 +27,10 @@ conserva fracciones de segundo y queda como `null` si el consumo del tramo
 es incalculable. Una diferencia negativa indica que el volumen medido del
 tramo actual es menor. Consulta las duraciones antes de interpretar esa
 diferencia, porque el acumulado actual puede abarcar menos días.
+Con intervalos, la duración sigue siendo la separación entre los extremos;
+si hay huecos no equivale a tiempo completamente cubierto. Consultar
+`consumo.estado`, `motivo` y `tipoMedicion`, según
+[las reglas de intervalos](lecturas-intervalo.md#cálculos-y-cobertura).
 
 La serie conserva los meses sin datos o incompatibles con consumo `null`.
 Un mes parcial incluye el consumo del tramo disponible. Un mes completo

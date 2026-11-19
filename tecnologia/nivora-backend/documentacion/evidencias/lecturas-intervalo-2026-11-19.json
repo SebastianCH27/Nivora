@@ -1,0 +1,639 @@
+{
+  "versionFormato": 1,
+  "fechaLocal": "2026-11-19",
+  "zonaHoraria": "America/Lima",
+  "baseContenidoReportada": "cc65d63",
+  "alcance": "RF10/P01: incorporación y cálculo de intervalos. RF20/P02 conserva su estado pendiente.",
+  "regresion": {
+    "tests": 602,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0,
+    "clases": 34,
+    "comando": "clean verify",
+    "buildSuccess": true,
+    "java": "21.0.13",
+    "compilador": "ECJ 3.38.0 para Java 21",
+    "pomVersionadoModificado": false,
+    "jarSha256": "cd523fd1a82183d56a263e064fb80a78548cb2575e6baae3abf45ea61bd05df8",
+    "inventario": [
+      {
+        "clase": "pe.nivora.backend.NivoraBackendApplicationTests",
+        "tests": 2,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      {
+        "clase": "pe.nivora.backend.acceso.administradores.ClavesAdministrativasTests",
+        "tests": 17,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      {
+        "clase": "pe.nivora.backend.acceso.administradores.GestionAdministradoresApiTests",
+        "tests": 43,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      {
+        "clase": "pe.nivora.backend.acceso.administradores.InicializacionAdministrativaTests",
+        "tests": 10,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      {
+        "clase": "pe.nivora.backend.acceso.administradores.InicializadorAdministrativoConfiguracionTests",
+        "tests": 6,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      {
+        "clase": "pe.nivora.backend.acceso.aplicacion.ActualizarSuministroTests",
+        "tests": 5,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      {
+        "clase": "pe.nivora.backend.acceso.infraestructura.empresaagua.FuenteSuministrosHttpTests",
+        "tests": 29,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      {
+        "clase": "pe.nivora.backend.acceso.infraestructura.identidad.AccesoConsultaIntegradoTests",
+        "tests": 100,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      {
+        "clase": "pe.nivora.backend.acceso.infraestructura.identidad.FuenteIdentidadApisPeruTests",
+        "tests": 23,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      {
+        "clase": "pe.nivora.backend.acceso.infraestructura.persistencia.RepositorioSuministrosJdbcTests",
+        "tests": 15,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      {
+        "clase": "pe.nivora.backend.acceso.sesiones.SesionesAdministrativasApiTests",
+        "tests": 31,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      {
+        "clase": "pe.nivora.backend.acceso.sesiones.SesionesConsultaApiTests",
+        "tests": 21,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      {
+        "clase": "pe.nivora.backend.documentacion.DocumentacionApiTests",
+        "tests": 3,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      {
+        "clase": "pe.nivora.backend.lecturas.aplicacion.ImportarPaginaLecturasTests",
+        "tests": 5,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      {
+        "clase": "pe.nivora.backend.lecturas.aplicacion.RecuperacionConCorteTests",
+        "tests": 36,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      {
+        "clase": "pe.nivora.backend.lecturas.aplicacion.RecuperarLecturasTests",
+        "tests": 10,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      {
+        "clase": "pe.nivora.backend.lecturas.dominio.ConsumoIntervalosTests",
+        "tests": 13,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      {
+        "clase": "pe.nivora.backend.lecturas.dominio.ConsumoPeriodoTests",
+        "tests": 4,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      {
+        "clase": "pe.nivora.backend.lecturas.infraestructura.empresaagua.FuenteLecturasHttpTests",
+        "tests": 74,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      {
+        "clase": "pe.nivora.backend.lecturas.infraestructura.persistencia.LecturasIntervaloJdbcTests",
+        "tests": 9,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      {
+        "clase": "pe.nivora.backend.lecturas.infraestructura.persistencia.RepositorioLecturasJdbcTests",
+        "tests": 28,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      {
+        "clase": "pe.nivora.backend.lecturas.infraestructura.persistencia.RepositorioRecuperacionLecturasJdbcTests",
+        "tests": 8,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      {
+        "clase": "pe.nivora.backend.lecturas.sincronizacion.PoliticaSincronizacionTests",
+        "tests": 6,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      {
+        "clase": "pe.nivora.backend.lecturas.sincronizacion.ProgramacionSincronizacionTests",
+        "tests": 11,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      {
+        "clase": "pe.nivora.backend.lecturas.sincronizacion.SincronizarLecturasTests",
+        "tests": 14,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      {
+        "clase": "pe.nivora.backend.lecturas.supervision.SupervisionLecturasApiTests",
+        "tests": 20,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      {
+        "clase": "pe.nivora.backend.notificaciones.infraestructura.ColaWebPushTests",
+        "tests": 5,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      {
+        "clase": "pe.nivora.backend.notificaciones.infraestructura.EmisorWebPushHttpTests",
+        "tests": 3,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      {
+        "clase": "pe.nivora.backend.periodos.dominio.CalendarioMensualTests",
+        "tests": 1,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      {
+        "clase": "pe.nivora.backend.recibos.infraestructura.AlmacenamientoRecibosTests",
+        "tests": 13,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      {
+        "clase": "pe.nivora.backend.recibos.infraestructura.FuenteRecibosHttpTests",
+        "tests": 18,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      {
+        "clase": "pe.nivora.backend.tarifas.CostoEstimadoTests",
+        "tests": 6,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      {
+        "clase": "pe.nivora.backend.tarifas.ProyeccionMensualTests",
+        "tests": 4,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      {
+        "clase": "pe.nivora.backend.tarifas.TarifasIntegracionTests",
+        "tests": 9,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      }
+    ]
+  },
+  "ampliacion": {
+    "casosAnteriores": 562,
+    "casosNuevos": 40,
+    "clasesYMetodos": [
+      {
+        "clase": "pe.nivora.backend.acceso.infraestructura.identidad.AccesoConsultaIntegradoTests",
+        "archivo": "tecnologia/nivora-backend/src/test/java/pe/nivora/backend/acceso/infraestructura/identidad/AccesoConsultaIntegradoTests.java",
+        "casosNuevos": 6,
+        "metodos": [
+          "intervalosConHuecosConservanElSubtotalYDetienenProyeccionYAlerta",
+          "intervalosConservanLaUltimaFechaAlComenzarUnMesSinDatosNuevos",
+          "intervalosHttpAlimentanConsumoHistorialCostosProyeccionYAlertas",
+          "intervalosQueCruzanElMesNoSeRepartenEntreHistorialYActual",
+          "intervalosRespetanLosCortesDelCalendarioMensualConfigurado",
+          "intervalosYAcumuladasEnElMismoPeriodoNoGeneranCostosNiProyeccion"
+        ]
+      },
+      {
+        "clase": "pe.nivora.backend.lecturas.aplicacion.RecuperacionConCorteTests",
+        "archivo": "tecnologia/nivora-backend/src/test/java/pe/nivora/backend/lecturas/aplicacion/RecuperacionConCorteTests.java",
+        "casosNuevos": 1,
+        "metodos": [
+          "reanudaPaginasDeIntervalosYRepetirElRecorridoNoDuplicaElConsumo"
+        ]
+      },
+      {
+        "clase": "pe.nivora.backend.lecturas.dominio.ConsumoIntervalosTests",
+        "archivo": "tecnologia/nivora-backend/src/test/java/pe/nivora/backend/lecturas/dominio/ConsumoIntervalosTests.java",
+        "casosNuevos": 13,
+        "metodos": [
+          "conservaElSubtotalCuandoFaltaUnExtremo",
+          "detectaHuecosAunqueLosExtremosCoincidanYNoProyectaElSubtotal",
+          "elDesbordeSeInformaSinInventarUnConsumoNegativo",
+          "elInventarioCompruebaTodoElTramoYElRetiroInclusivoEnLima",
+          "intervalosDeOtroPeriodoNoVuelvenIncompatibleUnAcumulado",
+          "noMezclaIntervalosConContadoresNiConOtroMedidor",
+          "noProrrateaUnIntervaloQueCruzaUnLimite",
+          "sumaIntervalosContiguosSinRestarSusConsumos",
+          "superpuestosODuplicadosNoProducenUnaSuma",
+          "unIntervaloContinuoPermiteProyectarConElTiempoRealmenteCubierto",
+          "unIntervaloEnElLimiteSeCuentaEnUnSoloPeriodo",
+          "unSoloIntervaloPuedeCubrirTodoElPeriodoYMedirCero",
+          "validaElOrdenYLaDuracionSinExigirConsumosCrecientes"
+        ]
+      },
+      {
+        "clase": "pe.nivora.backend.lecturas.infraestructura.empresaagua.FuenteLecturasHttpTests",
+        "archivo": "tecnologia/nivora-backend/src/test/java/pe/nivora/backend/lecturas/infraestructura/empresaagua/FuenteLecturasHttpTests.java",
+        "casosNuevos": 11,
+        "metodos": [
+          "interpretaElInicioYFinDeUnIntervaloConElMismoContratoDeCursor",
+          "rechazaPaginasDeIntervalosAmbiguosOIncompletos"
+        ]
+      },
+      {
+        "clase": "pe.nivora.backend.lecturas.infraestructura.persistencia.LecturasIntervaloJdbcTests",
+        "archivo": "tecnologia/nivora-backend/src/test/java/pe/nivora/backend/lecturas/infraestructura/persistencia/LecturasIntervaloJdbcTests.java",
+        "casosNuevos": 9,
+        "metodos": [
+          "aceptaContiguosYConservaUnaIncidenciaAlRepetirUnSolape",
+          "consultaCrucesDeMesSoloCuandoYaFueronMedidos",
+          "dosTrabajadoresNoPuedenAceptarIntervalosSuperpuestos",
+          "elConsumoDeIntervaloNoSeComparaConLosContadoresAcumulados",
+          "elFalloDeLaIncidenciaRevierteLaPaginaCompleta",
+          "guardaRepiteYRecuperaElIntervaloSinCambiarLaPrimeraRecepcion",
+          "lasRestriccionesDeLaBaseProtegenElTipoYLosExtremos",
+          "otroIdParaLaMismaMedicionYUnIdConOtroInicioNoReemplazanElAceptado",
+          "validaAmbosExtremosContraRecepcionPrecisionEInventario"
+        ]
+      }
+    ]
+  },
+  "mysql": {
+    "version": "8.0.46",
+    "tests": 7,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0,
+    "buildSuccess": true,
+    "procedencia": "Instancia aislada y copia temporal del backend; cambio solo de propiedades del datasource en los seis recorridos HTTP.",
+    "inventario": [
+      {
+        "clase": "pe.nivora.backend.acceso.infraestructura.identidad.AccesoConsultaIntegradoTests",
+        "tests": 6,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      {
+        "clase": "pe.nivora.backend.lecturas.infraestructura.persistencia.MigracionIntervalosMySqlTests",
+        "tests": 1,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      }
+    ],
+    "comprobacionAuxiliar": "MigracionIntervalosMySqlTests se añadió solo en la copia de validación. Parte del script 03 anterior a esta entrega y aplica el 21.",
+    "verificaciones": [
+      "Conserva valores y recepción con microsegundos de registros acumulados previos.",
+      "Añade inicio nullable y las restricciones de tipo/intervalo.",
+      "Un segundo pase de la migración conserva datos y esquema.",
+      "La instalación nueva (script 03) también acepta aplicar el 21.",
+      "La reserva por fuente permite aceptar solo uno de dos intervalos concurrentes superpuestos.",
+      "Duplicados e incidencias se conservan sin reemplazos silenciosos.",
+      "Los seis recorridos HTTP intervalos* producen los mismos resultados que con H2."
+    ]
+  },
+  "contrato": {
+    "archivo": "documentacion/openapi.json",
+    "openapi": "3.1.0",
+    "operacionesNegocio": 40,
+    "operacionesSalud": 1,
+    "esquemas": 101,
+    "registrosJavaEnlazados": 62,
+    "enumsJavaEnlazados": 15,
+    "referenciasResueltas": 497,
+    "ejemplosValidados": 16,
+    "validacionEstructural": "fastapi.openapi.models.OpenAPI y JSON Schema 2020-12"
+  },
+  "cargaBreve": {
+    "ejecucion": "c60379cacb0b",
+    "resultado": {
+      "inicioUTC": "2026-11-19T15:39:50.572193847Z",
+      "finUTC": "2026-11-19T15:40:46.721268565Z",
+      "inicioMedicionUTC": "2026-11-19T15:40:00.758095974Z",
+      "finMedicionUTC": "2026-11-19T15:40:45.758095974Z",
+      "usuarios": 20,
+      "usuariosMinimosEnMedicion": 20,
+      "rampaSegundos": 5,
+      "calentamientoSegundos": 5,
+      "medicionSegundos": 45,
+      "pausaMs": 1000,
+      "fallosGenerador": 0,
+      "cumpleUmbralesDeEstaEtapa": true,
+      "cubre5000Durante30Minutos": false,
+      "generador": {
+        "procesadores": 9,
+        "heapMaximoBytes": 536870912,
+        "heapObservadoMaximoBytes": 33511616,
+        "cpuMediaPorcentajeDeUnNucleo": 7.52
+      },
+      "operaciones": [
+        {
+          "nombre": "consumo",
+          "solicitudes": 127,
+          "internosOTransporte": 0,
+          "otrosErrores": 0,
+          "erroresPorcentaje": 0.0,
+          "solicitudesPorSegundo": 2.822,
+          "mediaMs": 5.948,
+          "p50MsHasta": 6,
+          "p95MsHasta": 10,
+          "p99MsHasta": 13,
+          "maximoMs": 15.183,
+          "cumple": true
+        },
+        {
+          "nombre": "historial",
+          "solicitudes": 127,
+          "internosOTransporte": 0,
+          "otrosErrores": 0,
+          "erroresPorcentaje": 0.0,
+          "solicitudesPorSegundo": 2.822,
+          "mediaMs": 6.294,
+          "p50MsHasta": 6,
+          "p95MsHasta": 11,
+          "p99MsHasta": 17,
+          "maximoMs": 22.88,
+          "cumple": true
+        },
+        {
+          "nombre": "estadisticas",
+          "solicitudes": 128,
+          "internosOTransporte": 0,
+          "otrosErrores": 0,
+          "erroresPorcentaje": 0.0,
+          "solicitudesPorSegundo": 2.844,
+          "mediaMs": 6.755,
+          "p50MsHasta": 6,
+          "p95MsHasta": 13,
+          "p99MsHasta": 26,
+          "maximoMs": 28.116,
+          "cumple": true
+        },
+        {
+          "nombre": "costos",
+          "solicitudes": 128,
+          "internosOTransporte": 0,
+          "otrosErrores": 0,
+          "erroresPorcentaje": 0.0,
+          "solicitudesPorSegundo": 2.844,
+          "mediaMs": 9.372,
+          "p50MsHasta": 9,
+          "p95MsHasta": 16,
+          "p99MsHasta": 19,
+          "maximoMs": 20.304,
+          "cumple": true
+        },
+        {
+          "nombre": "proyeccion",
+          "solicitudes": 128,
+          "internosOTransporte": 0,
+          "otrosErrores": 0,
+          "erroresPorcentaje": 0.0,
+          "solicitudesPorSegundo": 2.844,
+          "mediaMs": 8.351,
+          "p50MsHasta": 8,
+          "p95MsHasta": 15,
+          "p99MsHasta": 21,
+          "maximoMs": 20.907,
+          "cumple": true
+        },
+        {
+          "nombre": "recibos",
+          "solicitudes": 129,
+          "internosOTransporte": 0,
+          "otrosErrores": 0,
+          "erroresPorcentaje": 0.0,
+          "solicitudesPorSegundo": 2.867,
+          "mediaMs": 5.833,
+          "p50MsHasta": 6,
+          "p95MsHasta": 11,
+          "p99MsHasta": 17,
+          "maximoMs": 38.66,
+          "cumple": true
+        },
+        {
+          "nombre": "notificaciones",
+          "solicitudes": 128,
+          "internosOTransporte": 0,
+          "otrosErrores": 0,
+          "erroresPorcentaje": 0.0,
+          "solicitudesPorSegundo": 2.844,
+          "mediaMs": 5.794,
+          "p50MsHasta": 6,
+          "p95MsHasta": 12,
+          "p99MsHasta": 17,
+          "maximoMs": 19.364,
+          "cumple": true
+        }
+      ]
+    },
+    "evaluacion": {
+      "sincronizacionDuranteMedicion": true,
+      "alertasGeneradasDuranteMedicion": true,
+      "alertasAlFinal": 20,
+      "lecturasIncorporadasDuranteMedicion": 14,
+      "cumpleUmbralesDeEstaEtapa": true,
+      "cubre5000Durante30Minutos": false,
+      "requiereComparacionDeRecursos": true
+    },
+    "limite": "20 usuarios y 45 segundos; comprueba el montaje actual con acumuladas. No acredita 5000 usuarios ni una carga de intervalos a esa escala.",
+    "entorno": {
+      "procesadores": 9,
+      "mysql": {
+        "version": "8.0.46",
+        "maxConnections": 151,
+        "innodbBufferPoolBytes": 134217728
+      },
+      "poolConexiones": 10,
+      "hilosHttp": 200,
+      "generadorYServidorEnMismoEquipo": true
+    }
+  },
+  "controlMuestraPreliminar": {
+    "ejecucion": "82df8f4a935f",
+    "duracionSegundos": 15,
+    "resultadoUmbrales": false,
+    "muestrasPorOperacion": [
+      42,
+      43,
+      43,
+      43,
+      43,
+      43,
+      42
+    ],
+    "motivo": "El ensayo inicial de montaje tuvo 42–43 muestras por operación, menos del mínimo de 100. No se interpreta como aprobación; se repitió el perfil normal de 45 segundos sin cambiar los umbrales."
+  },
+  "reglas": [
+    "Intervalos [inicioIntervalo, fechaMedicion) en litros enteros, sin prorratear ni interpolar.",
+    "Los intervalos contiguos se suman; un solo registro puede cubrir el periodo completo.",
+    "Un hueco conserva el subtotal parcial y bloquea proyección y alerta comparativa.",
+    "Los intervalos que cruzan un periodo se excluyen de su suma y se informa el motivo.",
+    "Un intervalo que termina en el límite pertenece al periodo anterior y conserva su fecha como última medición.",
+    "No se suman contadores e intervalos del mismo periodo ni medidores incompatibles.",
+    "Se rechazan superposiciones entre intervalos de la misma fuente y suministro.",
+    "Un desbordamiento se informa como incompatibilidad en vez de producir una suma negativa."
+  ],
+  "limites": [
+    "La fuente habitual empresa-agua conserva sus acumuladas; los intervalos del consumidor se validan mediante proveedores HTTP ficticios.",
+    "No se añade una ruta pública de escritura de lecturas.",
+    "La evidencia EQ-01 de 5000 usuarios conserva el commit 2d43391 y su JAR original; no se vuelve a ejecutar ese perfil en esta entrega.",
+    "EQ-02 conserva su reserva de escalabilidad controlada.",
+    "RF20/P02 y las evaluaciones pendientes de interfaz, despliegue y dispositivos conservan su estado."
+  ],
+  "huellasSha256": {
+    "README.md": "479f86fd0daf938dd888706a08e1715a122ce8731ef74229ae788bccc05cb49d",
+    "docs/01-analisis-de-sistema/08-escenarios-atributos-calidad.md": "802e9d29499c2312d2d689bbfa6a82df4c2f273061fde5c073c7f288320a69d2",
+    "tecnologia/nivora-backend/README.md": "9a3213d2f8b0c8a5c2a8d90dfcf81ae9b6d4ce02cb4f483d2bf3837ba86e1803",
+    "tecnologia/nivora-backend/base-datos/03-lecturas.sql": "52d03f5bfda4d6ea7aa48bc74d040bccb71cbc6625977aa60e19aff3115cd670",
+    "tecnologia/nivora-backend/base-datos/21-lecturas-intervalo.sql": "7f85668796b22a1aa02942cef752fe1a7ba194e2ebd5c7de5b5c7756abe63cca",
+    "tecnologia/nivora-backend/documentacion/api.md": "bbaddd854d2382dfb0df0f7b990eef084e0a9f82bc6891c830683ed8ef1e5b14",
+    "tecnologia/nivora-backend/documentacion/consumo-actual.md": "031f59d515f14997f9155dbba3980ec4c4b83ec81483a1c69ed80bcbb2b53a36",
+    "tecnologia/nivora-backend/documentacion/costos-estimados.md": "d5a10efeae5c0e8d55d741e79248b5969199e186168477d009ed578146b1d885",
+    "tecnologia/nivora-backend/documentacion/estadisticas-consumo.md": "44ca2b16b1ff2c758b9ff0b056e701f49290a62b566380516c4303649e30575e",
+    "tecnologia/nivora-backend/documentacion/historial-mensual.md": "5602f0edd86548ea7b1d1735e59f0cc2e076749dc409c089079e5595c342c33f",
+    "tecnologia/nivora-backend/documentacion/lecturas-intervalo.md": "2dfe2c2881eff6d88a60fa3765b7aef4c6490782f67fa16206fe8ef7885df63d",
+    "tecnologia/nivora-backend/documentacion/matriz-requisitos-backend.md": "6d5cd30b031370e9ffbbb72ac250df1a0c0be1b0ab4f1deff69c8e7d8294e681",
+    "tecnologia/nivora-backend/documentacion/openapi.json": "28e64899b57f6ac28a64b684cb4a2360c1fc6f3efc3976713981c01c704a390a",
+    "tecnologia/nivora-backend/documentacion/proyeccion-mensual.md": "2ee4f20e92170b9513a8ed5f96cbd750a0908da75c532d68b440bb6b8be42733",
+    "tecnologia/nivora-backend/documentacion/recuperacion-lecturas.md": "3dc662bcf697facfec48f4645f65ac37e2579c7807b75c6b911a401368acebbc",
+    "tecnologia/nivora-backend/documentacion/verificacion-documentacion-api.md": "8bec0201afa8928cb6b611aa8d5e5537667cdb7178513682d4a11ba189615821",
+    "tecnologia/nivora-backend/herramientas/PrepararDatosCarga.java": "b360e747b09c902c00747c30faa67cd592a8a91dd714b427f6b1a6f0ce609541",
+    "tecnologia/nivora-backend/src/main/java/pe/nivora/backend/lecturas/aplicacion/ConsultarHistorialMensual.java": "b1d71e02362e0317dd1623130b642f6fa05554ad10e015c09d82c89781e1b9db",
+    "tecnologia/nivora-backend/src/main/java/pe/nivora/backend/lecturas/dominio/ConsumoPeriodo.java": "38f19111c53edc72f18836c397fab11d082e3ec162d98b72a54db10adb6ec042",
+    "tecnologia/nivora-backend/src/main/java/pe/nivora/backend/lecturas/dominio/ContextoLecturas.java": "a6abf4698110923f1f5056e918da450073ebbf8bc2113f1126f743cf50737149",
+    "tecnologia/nivora-backend/src/main/java/pe/nivora/backend/lecturas/dominio/Lectura.java": "71bccefcf5ebc0dfe2a6304d94cd3024e7d002ee9441d9bfebb37ddb70f6738c",
+    "tecnologia/nivora-backend/src/main/java/pe/nivora/backend/lecturas/dominio/LecturaAcumulada.java": "cb884d964b67188d7ca9981c05fd5d6762ac746bac45aada90c1ec63bac761e5",
+    "tecnologia/nivora-backend/src/main/java/pe/nivora/backend/lecturas/dominio/LecturaIntervalo.java": "dc1515c0946833ba9fcc3b763ca6600de97fe6afca649b489db0fbd591709bd1",
+    "tecnologia/nivora-backend/src/main/java/pe/nivora/backend/lecturas/dominio/LoteLecturas.java": "31250f6591d3f4fe39a7fb6d504a0e1c4b6f7a17a8b41a0d94c2aaea031aecab",
+    "tecnologia/nivora-backend/src/main/java/pe/nivora/backend/lecturas/dominio/MotivoRechazoLectura.java": "2673993b883c81d194af8fe919be3770e332584d3d3f50d28daae373d69654f3",
+    "tecnologia/nivora-backend/src/main/java/pe/nivora/backend/lecturas/dominio/PoliticaIncorporacionLecturas.java": "544c1199e1aefac465feafa4f5570ce53a9987836013e27cc8b6d70b2c38ab21",
+    "tecnologia/nivora-backend/src/main/java/pe/nivora/backend/lecturas/dominio/contratos/ConsultaLecturasPeriodo.java": "262259c5f3404e68b532cee5bd8ff499fc1ff030a417dd2ec16831a7a416c699",
+    "tecnologia/nivora-backend/src/main/java/pe/nivora/backend/lecturas/dominio/contratos/RepositorioLecturas.java": "e9d89de5494a9bfebf055b866dc8e5ad752e71350412fa2f44b418d1977a6ff7",
+    "tecnologia/nivora-backend/src/main/java/pe/nivora/backend/lecturas/infraestructura/empresaagua/FuenteLecturasHttp.java": "0ef0d5e3905d9771f624752f45f46928532859c5efaa1d9275b4b95513d32856",
+    "tecnologia/nivora-backend/src/main/java/pe/nivora/backend/lecturas/infraestructura/persistencia/ConsultaLecturasPeriodoJdbc.java": "c5974482af37740e11aa172af827e10bfe4fd7da944789dbf01a07ed938c9d78",
+    "tecnologia/nivora-backend/src/main/java/pe/nivora/backend/lecturas/infraestructura/persistencia/RepositorioLecturasJdbc.java": "aedfc31ef913559446d2afe841736b1d81d8f39d265fe144b1255ffb9c18d62d",
+    "tecnologia/nivora-backend/src/main/java/pe/nivora/backend/lecturas/presentacion/ConsumoActualController.java": "00bb9a607baaf5689bdffe7ed160d1b0943cb51bb5bae1413f47084754135ca3",
+    "tecnologia/nivora-backend/src/main/java/pe/nivora/backend/tarifas/presentacion/CostosConsumoController.java": "8835806b17798b7ad690768d66a2c4b81c59557c6c21134002ee80ea9b8d096c",
+    "tecnologia/nivora-backend/src/test/java/pe/nivora/backend/acceso/infraestructura/identidad/AccesoConsultaIntegradoTests.java": "2794f45ea7d9711e34ad47e04625882cac400c05dc9f08e9338bd7fe7455393f",
+    "tecnologia/nivora-backend/src/test/java/pe/nivora/backend/lecturas/aplicacion/RecuperacionConCorteTests.java": "3adaab15ed6ce82af17422badd90a6d3184516c7775bd622ad899536fbe5be48",
+    "tecnologia/nivora-backend/src/test/java/pe/nivora/backend/lecturas/dominio/ConsumoIntervalosTests.java": "f2c43878cad33bdc992e9b196911c1ec4930950e65fffad8f6a51f2ca6f2a685",
+    "tecnologia/nivora-backend/src/test/java/pe/nivora/backend/lecturas/infraestructura/empresaagua/FuenteLecturasHttpTests.java": "4f45b18b9b22de68ca89f8fa056cd9da346f6c3c249a5574c1e1bb4ca2668ca3",
+    "tecnologia/nivora-backend/src/test/java/pe/nivora/backend/lecturas/infraestructura/persistencia/LecturasIntervaloJdbcTests.java": "ad9ae08fb4820c9c8f0b22b38a2e5e109b08b510027bcf554125e48418cccc0c",
+    "tecnologia/nivora-backend/src/test/java/pe/nivora/backend/lecturas/supervision/SupervisionLecturasApiTests.java": "1b64e5e11f2fd5f6d383a38143cffbfc7522fd44ad696f988cff7e756862c835"
+  },
+  "archivosEntrega": [
+    "README.md",
+    "docs/01-analisis-de-sistema/08-escenarios-atributos-calidad.md",
+    "tecnologia/nivora-backend/README.md",
+    "tecnologia/nivora-backend/base-datos/03-lecturas.sql",
+    "tecnologia/nivora-backend/base-datos/21-lecturas-intervalo.sql",
+    "tecnologia/nivora-backend/documentacion/api.md",
+    "tecnologia/nivora-backend/documentacion/consumo-actual.md",
+    "tecnologia/nivora-backend/documentacion/costos-estimados.md",
+    "tecnologia/nivora-backend/documentacion/estadisticas-consumo.md",
+    "tecnologia/nivora-backend/documentacion/evidencias/lecturas-intervalo-2026-11-19.json",
+    "tecnologia/nivora-backend/documentacion/historial-mensual.md",
+    "tecnologia/nivora-backend/documentacion/lecturas-intervalo.md",
+    "tecnologia/nivora-backend/documentacion/matriz-requisitos-backend.md",
+    "tecnologia/nivora-backend/documentacion/openapi.json",
+    "tecnologia/nivora-backend/documentacion/proyeccion-mensual.md",
+    "tecnologia/nivora-backend/documentacion/recuperacion-lecturas.md",
+    "tecnologia/nivora-backend/documentacion/verificacion-documentacion-api.md",
+    "tecnologia/nivora-backend/herramientas/PrepararDatosCarga.java",
+    "tecnologia/nivora-backend/src/main/java/pe/nivora/backend/lecturas/aplicacion/ConsultarHistorialMensual.java",
+    "tecnologia/nivora-backend/src/main/java/pe/nivora/backend/lecturas/dominio/ConsumoPeriodo.java",
+    "tecnologia/nivora-backend/src/main/java/pe/nivora/backend/lecturas/dominio/ContextoLecturas.java",
+    "tecnologia/nivora-backend/src/main/java/pe/nivora/backend/lecturas/dominio/Lectura.java",
+    "tecnologia/nivora-backend/src/main/java/pe/nivora/backend/lecturas/dominio/LecturaAcumulada.java",
+    "tecnologia/nivora-backend/src/main/java/pe/nivora/backend/lecturas/dominio/LecturaIntervalo.java",
+    "tecnologia/nivora-backend/src/main/java/pe/nivora/backend/lecturas/dominio/LoteLecturas.java",
+    "tecnologia/nivora-backend/src/main/java/pe/nivora/backend/lecturas/dominio/MotivoRechazoLectura.java",
+    "tecnologia/nivora-backend/src/main/java/pe/nivora/backend/lecturas/dominio/PoliticaIncorporacionLecturas.java",
+    "tecnologia/nivora-backend/src/main/java/pe/nivora/backend/lecturas/dominio/contratos/ConsultaLecturasPeriodo.java",
+    "tecnologia/nivora-backend/src/main/java/pe/nivora/backend/lecturas/dominio/contratos/RepositorioLecturas.java",
+    "tecnologia/nivora-backend/src/main/java/pe/nivora/backend/lecturas/infraestructura/empresaagua/FuenteLecturasHttp.java",
+    "tecnologia/nivora-backend/src/main/java/pe/nivora/backend/lecturas/infraestructura/persistencia/ConsultaLecturasPeriodoJdbc.java",
+    "tecnologia/nivora-backend/src/main/java/pe/nivora/backend/lecturas/infraestructura/persistencia/RepositorioLecturasJdbc.java",
+    "tecnologia/nivora-backend/src/main/java/pe/nivora/backend/lecturas/presentacion/ConsumoActualController.java",
+    "tecnologia/nivora-backend/src/main/java/pe/nivora/backend/tarifas/presentacion/CostosConsumoController.java",
+    "tecnologia/nivora-backend/src/test/java/pe/nivora/backend/acceso/infraestructura/identidad/AccesoConsultaIntegradoTests.java",
+    "tecnologia/nivora-backend/src/test/java/pe/nivora/backend/lecturas/aplicacion/RecuperacionConCorteTests.java",
+    "tecnologia/nivora-backend/src/test/java/pe/nivora/backend/lecturas/dominio/ConsumoIntervalosTests.java",
+    "tecnologia/nivora-backend/src/test/java/pe/nivora/backend/lecturas/infraestructura/empresaagua/FuenteLecturasHttpTests.java",
+    "tecnologia/nivora-backend/src/test/java/pe/nivora/backend/lecturas/infraestructura/persistencia/LecturasIntervaloJdbcTests.java",
+    "tecnologia/nivora-backend/src/test/java/pe/nivora/backend/lecturas/supervision/SupervisionLecturasApiTests.java"
+  ]
+}
