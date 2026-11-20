@@ -3,6 +3,8 @@ package pe.nivora.backend.acceso.infraestructura.identidad;
 import java.io.IOException;
 import java.net.HttpURLConnection;
 import java.net.URI;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.util.Objects;
 
 import org.springframework.http.MediaType;
@@ -27,7 +29,7 @@ public final class FuenteIdentidadApisPeru implements FuenteIdentidad {
     private static final int MAXIMO_RESPUESTA_BYTES = 16 * 1024;
 
     private final URI origen;
-    private final String autorizacion;
+    private final String parametroToken;
     private final ObjectReader lector;
 
     public FuenteIdentidadApisPeru(String token, JsonMapper json) {
@@ -40,7 +42,7 @@ public final class FuenteIdentidadApisPeru implements FuenteIdentidad {
         if (token == null || !token.matches("[A-Za-z0-9._~+/\\-]+=*")) {
             throw new IllegalArgumentException("El token de APIsPERU tiene un formato incompatible.");
         }
-        autorizacion = "Bearer " + token;
+        parametroToken = "token=" + URLEncoder.encode(token, StandardCharsets.UTF_8);
         lector = Objects.requireNonNull(json).reader()
             .with(DeserializationFeature.FAIL_ON_TRAILING_TOKENS)
             .with(DeserializationFeature.FAIL_ON_READING_DUP_TREE_KEY);
@@ -51,12 +53,15 @@ public final class FuenteIdentidadApisPeru implements FuenteIdentidad {
         Objects.requireNonNull(dni);
         HttpURLConnection conexion = null;
         try {
-            conexion = (HttpURLConnection) origen.resolve(RUTA + dni.valor()).toURL().openConnection();
+            // El contrato publicado exige el token en la consulta. La URI contiene
+            // datos sensibles: no debe registrarse ni conservarse como causa del error.
+            URI consulta = URI.create(origen.resolve(RUTA + dni.valor()).toASCIIString()
+                + "?" + parametroToken);
+            conexion = (HttpURLConnection) consulta.toURL().openConnection();
             conexion.setInstanceFollowRedirects(false);
             conexion.setUseCaches(false);
             conexion.setConnectTimeout(5000);
             conexion.setReadTimeout(10000);
-            conexion.setRequestProperty("Authorization", autorizacion);
             conexion.setRequestProperty("Accept", MediaType.APPLICATION_JSON_VALUE);
             conexion.setRequestProperty("Cache-Control", "no-store");
 

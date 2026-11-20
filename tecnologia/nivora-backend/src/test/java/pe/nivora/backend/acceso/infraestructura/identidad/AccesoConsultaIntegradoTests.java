@@ -505,7 +505,7 @@ class AccesoConsultaIntegradoTests {
         assertEquals("Persona Ficticia", sesion.path("nombre").stringValue());
         assertEquals("000101", sesion.path("codigoSuministro").stringValue());
         assertEquals("GET /api/v1/suministros/000101", peticionAgua.get());
-        assertEquals(new PeticionIdentidad("GET", "/api/v1/dni/" + DNI, null, "Bearer " + TOKEN_PROVEEDOR),
+        assertEquals(new PeticionIdentidad("GET", "/api/v1/dni/" + DNI, "token=" + TOKEN_PROVEEDOR, null),
             peticionIdentidad.get());
         assertEquals(1, llamadasAgua.get());
         assertEquals(1, llamadasIdentidad.get());

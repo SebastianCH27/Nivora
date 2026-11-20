@@ -54,7 +54,10 @@ final class EscenarioCierreBackend {
                 : ruta.endsWith("/medidores") ? "inventario"
                 : ruta.endsWith("/lecturas") ? "pagina"
                 : ruta.endsWith("/tarifas") ? "tarifas" : ruta.endsWith("/recibos") ? "recibos" : "suministro";
-            if (clave.equals("identidad")) assertEquals("Bearer token-ficticio", intercambio.getRequestHeaders().getFirst("Authorization"));
+            if (clave.equals("identidad")) {
+                assertEquals("token=token-ficticio", intercambio.getRequestURI().getRawQuery());
+                assertEquals(null, intercambio.getRequestHeaders().getFirst("Authorization"));
+            }
             responder(intercambio, DATOS.path(clave));
         });
     }

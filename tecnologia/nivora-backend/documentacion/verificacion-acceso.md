@@ -7,7 +7,7 @@ adaptador de identidad envía una credencial ficticia al servidor de pruebas.
 
 | Caso | Comprobación |
 |---|---|
-| Suministro y DNI válidos | Nivora consulta ambas rutas HTTP, conserva los ceros iniciales y registra el acceso. El token de APIsPERU viaja en la cabecera Bearer. |
+| Suministro y DNI válidos | Nivora consulta ambas rutas HTTP, conserva los ceros iniciales y registra el acceso. El token de APIsPERU viaja en el parametro `token` de la consulta, codificado y sin registrar la URI. |
 | Suministro ausente confirmado | HTTP 401. La validación se detiene antes de consultar la identidad. |
 | Ruta de suministro incompatible | HTTP 503. El fallo conserva su significado de integración. |
 | Credencial, cuota o servicio de identidad indisponible | HTTP 503. La respuesta protege el DNI y el token del proveedor. |
@@ -33,8 +33,9 @@ Para ejecutar el conjunto de integración de forma aislada, usa este comando.
 mvnw.cmd -Dtest=AccesoConsultaIntegradoTests test
 ```
 
-La prueba en Windows con la Empresa de Agua, MySQL y APIsPERU confirmó la
-secuencia **201 → 200 → 204 → 401**. Se puede repetir con los pasos de
+La secuencia esperada en Windows con la Empresa de Agua, MySQL y APIsPERU es
+**201 → 200 → 204 → 401**. Debe comprobarse con las credenciales vigentes y el
+contrato actualizado de identidad. Se puede repetir con los pasos de
 [Sesiones de consulta](sesiones-consulta.md). Las operaciones con una cuenta
 administrativa se describen en [Sesiones administrativas](sesiones-administrativas.md).
 

@@ -121,7 +121,9 @@ El arranque habitual no consulta a la Empresa de Agua.
 
 `FuenteIdentidad` recibe un `Dni` de ocho digitos ASCII y devuelve el
 documento y el nombre completo informados por el proveedor. El adaptador
-consulta `GET https://dniruc.apisperu.com/api/v1/dni/{numero}` con Bearer.
+consulta `GET https://dniruc.apisperu.com/api/v1/dni/{numero}` con el parametro
+`token` en la consulta, segun el OpenAPI publicado del proveedor. El valor se
+codifica y no se registra la URI, que contiene el DNI y la credencial.
 El DNI devuelto debe coincidir con el solicitado y la respuesta debe incluir
 nombres. Los fallos de red, el limite de consultas y las respuestas sin
 coincidencia se informan como una consulta no confirmada.
@@ -144,6 +146,35 @@ powershell -NoProfile -STA -Command "& { $null = Read-Host 'Pulsa Copiar junto a
 ```
 
 El resultado esperado es `Consulta DNI correcta desde Nivora mediante APIsPERU.`
+
+### Comprobar el token y arrancar desde Windows
+
+El ayudante `herramientas/IniciarConIdentidad.ps1` lee el token del portapapeles
+solo despues de que lo copies desde el panel. Muestra su longitud, no su valor,
+y solicita el DNI en un campo oculto. Consulta al proveedor con el parametro
+`token` requerido por su contrato; no imprime la URI ni los datos personales.
+
+Desde la carpeta del backend en CMD, primero puedes comprobar solamente la identidad:
+
+```bat
+powershell -NoProfile -STA -ExecutionPolicy Bypass -File herramientas\IniciarConIdentidad.ps1 -SoloComprobar
+```
+
+Ejecuta el comando antes de copiar el token. Cuando el ayudante lo indique, pulsa
+Copiar en el panel de Consulta DNI/RUC, vuelve a la consola y presiona Enter.
+No pegues el token en la consola: se lee directamente del portapapeles.
+
+Sin `-SoloComprobar`, despues de confirmar el DNI pide la clave de `nivora_app`
+e inicia el JAR con el mismo token comprobado y un heap maximo de 512 MiB.
+El backend anterior debe estar detenido y el JAR debe haberse generado con
+`mvnw.cmd clean verify`. La Empresa de Agua y MySQL deben estar disponibles
+para el uso normal de la aplicacion.
+
+```bat
+powershell -NoProfile -STA -ExecutionPolicy Bypass -File herramientas\IniciarConIdentidad.ps1
+```
+
+`Bypass` se aplica a ese proceso de PowerShell. No modifica la politica del equipo.
 
 ## Inicio de sesion de consulta
 

@@ -46,22 +46,25 @@ un dispositivo haya mostrado la notificación. Esa parte corresponde a P08.
   La regresión del proveedor comprueba sus rutas, formatos y errores.
 - APIsPERU: [servicio DNI/RUC](https://www.apisperu.com/servicios/dniruc)
   y [OpenAPI publicado](https://dniruc.apisperu.com/doc/swagger), consultados
-  el 19 de noviembre de 2026. Coinciden el origen, la ruta, los campos de
+  el 20 de noviembre de 2026. Coinciden el origen, la ruta, los campos de
   identidad y la variante `success=false`.
 - Web Push: [RFC 8030](https://www.rfc-editor.org/rfc/rfc8030.html),
   [cifrado RFC 8291](https://www.rfc-editor.org/rfc/rfc8291.html) y
   [VAPID RFC 8292](https://www.rfc-editor.org/rfc/rfc8292.html).
 
-El OpenAPI de APIsPERU describe `token` en la consulta. El adaptador conserva
-la cabecera `Authorization: Bearer`: el diagnóstico público con una credencial
-ficticia y DNI `00000000` obtuvo `Token not found` sin credencial y
-`Token inválido` tanto con Bearer como con el parámetro. Esto indica que
-ambas formas llegan a la validación de credenciales del servicio observado;
-no demuestra una consulta de identidad válida ni disponibilidad de una cuota.
-El registro manual anterior del proyecto documenta el flujo completo en
-Windows con sus fuentes configuradas en [verificación de acceso](verificacion-acceso.md).
-No se incluyen tokens reales, respuestas personales ni el documento completo
-del proveedor en las evidencias de esta revisión.
+El OpenAPI de APIsPERU exige `token` como parametro de la consulta. El
+adaptador usa ese formato y codifica su valor para preservar caracteres como
+`+`, `/` y `=`. La URI contiene tanto el DNI como la credencial; no se registra
+ni se incluye como causa de las excepciones. No se siguen redirecciones.
+
+La comprobacion anterior con una credencial ficticia no acreditaba una consulta
+valida de identidad mediante Bearer. La regresion actual incluye un proveedor
+local que responde 401 cuando falta el parametro requerido. El ayudante
+`herramientas/IniciarConIdentidad.ps1` permite comprobar el contrato con una
+credencial real en el equipo local, sin exponer el token ni los datos personales.
+Las pruebas locales no certifican la vigencia de una credencial, la cuota ni la
+disponibilidad del proveedor real. El flujo manual esta en
+[verificacion de acceso](verificacion-acceso.md).
 
 Para sustituir un proveedor real se contrasta su contrato y autenticación
 con esta matriz y se ejecutan los casos de integración antes de utilizar sus

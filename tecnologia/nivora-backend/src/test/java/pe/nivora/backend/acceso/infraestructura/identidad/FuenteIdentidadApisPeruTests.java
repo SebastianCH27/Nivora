@@ -3,6 +3,7 @@ package pe.nivora.backend.acceso.infraestructura.identidad;
 import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.net.URI;
+import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
@@ -63,16 +64,53 @@ class FuenteIdentidadApisPeruTests {
     }
 
     @Test
-    void consultaLaRutaCompletaConBearerYConservaLosCerosIniciales() {
+    void consultaLaRutaConElTokenRequeridoPorElProveedorYConservaLosCerosIniciales() {
         var identidad = fuente.consultar(DNI);
 
         assertEquals(DNI, identidad.dni());
         assertEquals("María Persona Ejemplo", identidad.nombreCompleto());
-        assertEquals(new Peticion("GET", "/api/v1/dni/00000001", null, "Bearer " + TOKEN),
+        assertEquals(new Peticion("GET", "/api/v1/dni/00000001", "token=" + TOKEN, null),
             peticion.get());
         assertFalse(identidad.toString().contains("María"));
         assertFalse(identidad.toString().contains(DNI.valor()));
         assertFalse(DNI.toString().contains(DNI.valor()));
+    }
+
+    @Test
+    void codificaElTokenParaConservarSignosReservadosEnLaConsulta() {
+        String token = "ficticio+con/barras==";
+        fuente = new FuenteIdentidadApisPeru(URI.create("http://127.0.0.1:"
+            + servidor.getAddress().getPort()), token, JsonMapper.builder().build());
+
+        assertEquals(DNI, fuente.consultar(DNI).dni());
+        assertEquals("token=ficticio%2Bcon%2Fbarras%3D%3D", peticion.get().consulta());
+        assertEquals("token=" + token,
+            URLDecoder.decode(peticion.get().consulta(), StandardCharsets.UTF_8));
+        assertNull(peticion.get().autorizacion());
+    }
+
+    @Test
+    void unProveedorQueExigeTokenEnLaConsultaPermiteConfirmarLaIdentidad() throws Exception {
+        var proveedor = HttpServer.create(new InetSocketAddress("127.0.0.1", 0), 0);
+        try {
+            proveedor.createContext("/api/v1/dni/", intercambio -> {
+                try (intercambio) {
+                    // Una cabecera Bearer por sí sola no satisface este contrato.
+                    boolean autorizado = ("token=" + TOKEN).equals(intercambio.getRequestURI().getRawQuery());
+                    byte[] cuerpo = (autorizado ? PERSONA : "{\"message\":\"Token not found\"}")
+                        .getBytes(StandardCharsets.UTF_8);
+                    intercambio.getResponseHeaders().set("Content-Type", "application/json");
+                    intercambio.sendResponseHeaders(autorizado ? 200 : 401, cuerpo.length);
+                    intercambio.getResponseBody().write(cuerpo);
+                }
+            });
+            proveedor.start();
+            var adaptador = new FuenteIdentidadApisPeru(URI.create("http://127.0.0.1:"
+                + proveedor.getAddress().getPort()), TOKEN, JsonMapper.builder().build());
+            assertEquals(DNI, adaptador.consultar(DNI).dni());
+        } finally {
+            proveedor.stop(0);
+        }
     }
 
     @Test
