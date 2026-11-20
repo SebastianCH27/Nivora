@@ -133,6 +133,11 @@ class ConsumoActual {
 abstract class ServicioNivora {
   Future<SesionConsulta> ingresar(String suministro, String dni);
   Future<ConsumoActual> consumo(SesionConsulta sesion);
+  Future<HistorialMensual> historial(
+    SesionConsulta sesion, {
+    int meses = 12,
+    String? hasta,
+  });
   Future<void> salir(SesionConsulta sesion);
   void cerrar();
 }
@@ -297,10 +302,176 @@ class ApiNivora implements ServicioNivora {
   }
 
   @override
+  Future<HistorialMensual> historial(
+    SesionConsulta sesion, {
+    int meses = 12,
+    String? hasta,
+  }) async {
+    if (meses < 1 || meses > 12 || (hasta != null && !periodoValido(hasta))) {
+      throw const FalloApi('Selecciona entre 1 y 12 meses anteriores.');
+    }
+    final parametros = {'meses': '$meses'};
+    if (hasta != null) parametros['hasta'] = hasta;
+    final consulta = Uri(queryParameters: parametros).query;
+    final json = await _pedir(
+      'GET',
+      '/historial?$consulta',
+      200,
+      sesion: sesion,
+    );
+    try {
+      return HistorialMensual.desdeJson(
+        json,
+        sesion.suministro,
+        meses: meses,
+        hasta: hasta,
+      );
+    } on FormatException {
+      throw const FalloApi(
+        'No se pudo interpretar el historial. Inténtalo más tarde.',
+      );
+    }
+  }
+
+  @override
   void cerrar() {
     for (final cliente in _clientes.toList()) {
       cliente.close(force: true);
     }
     _clientes.clear();
   }
+}
+
+bool periodoValido(String valor) =>
+    RegExp(r'^[1-9][0-9]{3}-(0[1-9]|1[0-2])$').hasMatch(valor);
+
+String moverMes(String periodo, int meses) {
+  final fecha = DateTime.utc(
+    int.parse(periodo.substring(0, 4)),
+    int.parse(periodo.substring(5)) + meses,
+  );
+  return '${fecha.year.toString().padLeft(4, '0')}-'
+      '${fecha.month.toString().padLeft(2, '0')}';
+}
+
+class ConsumoMensual {
+  const ConsumoMensual({
+    required this.periodo,
+    required this.estado,
+    required this.metrosCubicos,
+    required this.litros,
+    required this.desde,
+    required this.hasta,
+  });
+
+  factory ConsumoMensual.desdeJson(Object? valor) {
+    final json = objeto(valor);
+    final periodo = texto(json, 'periodo');
+    if (!periodoValido(periodo)) throw const FormatException();
+    final inicio = DateTime.utc(
+      int.parse(periodo.substring(0, 4)),
+      int.parse(periodo.substring(5)),
+      1,
+      5,
+    );
+    final fin = DateTime.utc(inicio.year, inicio.month + 1, 1, 5);
+    if (fecha(json, 'inicioMes') != inicio ||
+        fecha(json, 'finMesExclusivo') != fin) {
+      throw const FormatException();
+    }
+    final consumo = objeto(json['consumo']);
+    final estado = texto(consumo, 'estado');
+    if (!{
+      'COMPLETO',
+      'PARCIAL',
+      'SIN_DATOS',
+      'INCOMPATIBLE',
+    }.contains(estado)) {
+      throw const FormatException();
+    }
+    final conValor = estado == 'COMPLETO' || estado == 'PARCIAL';
+    final litros = consumo['litros'];
+    final m3 = consumo['metrosCubicos'];
+    final desde = consumo['desde'] == null ? null : fecha(consumo, 'desde');
+    final hasta = consumo['hasta'] == null ? null : fecha(consumo, 'hasta');
+    if (conValor) {
+      if (litros is! String ||
+          !RegExp(r'^[0-9]+$').hasMatch(litros) ||
+          m3 is! String ||
+          !RegExp(r'^[0-9]+(?:\.[0-9]{1,3})?$').hasMatch(m3) ||
+          desde == null ||
+          hasta == null ||
+          desde.isBefore(inicio) ||
+          hasta.isAfter(fin) ||
+          desde.isAfter(hasta)) {
+        throw const FormatException();
+      }
+      // Compara unidades sin redondear con double ni perder decimales.
+      final partes = m3.split('.');
+      final convertido =
+          BigInt.parse(partes[0]) * BigInt.from(1000) +
+          BigInt.parse(partes.length == 1 ? '0' : partes[1].padRight(3, '0'));
+      if (convertido != BigInt.parse(litros) ||
+          (estado == 'COMPLETO' && (desde != inicio || hasta != fin))) {
+        throw const FormatException();
+      }
+    } else if (litros != null || m3 != null || desde != null || hasta != null) {
+      throw const FormatException();
+    }
+    return ConsumoMensual(
+      periodo: periodo,
+      estado: estado,
+      metrosCubicos: conValor ? m3 as String : null,
+      litros: conValor ? litros as String : null,
+      desde: desde,
+      hasta: hasta,
+    );
+  }
+
+  final String periodo;
+  final String estado;
+  final String? metrosCubicos;
+  final String? litros;
+  final DateTime? desde;
+  final DateTime? hasta;
+}
+
+class HistorialMensual {
+  const HistorialMensual({required this.consultadoEn, required this.periodos});
+
+  factory HistorialMensual.desdeJson(
+    Object? valor,
+    String suministro, {
+    required int meses,
+    String? hasta,
+  }) {
+    final json = objeto(valor);
+    final consultadoEn = fecha(json, 'consultadoEn');
+    final lima = consultadoEn.subtract(const Duration(hours: 5));
+    final mesActual =
+        '${lima.year.toString().padLeft(4, '0')}-'
+        '${lima.month.toString().padLeft(2, '0')}';
+    final ultimo = hasta ?? moverMes(mesActual, -1);
+    final lista = json['periodos'];
+    if (json['codigoSuministro'] != suministro ||
+        json['zonaHoraria'] != 'America/Lima' ||
+        lista is! List ||
+        lista.length != meses ||
+        ultimo.compareTo(mesActual) >= 0) {
+      throw const FormatException();
+    }
+    final periodos = lista.map(ConsumoMensual.desdeJson).toList();
+    for (var i = 0; i < periodos.length; i++) {
+      if (periodos[i].periodo != moverMes(ultimo, -i)) {
+        throw const FormatException();
+      }
+    }
+    return HistorialMensual(
+      consultadoEn: consultadoEn,
+      periodos: List.unmodifiable(periodos),
+    );
+  }
+
+  final DateTime consultadoEn;
+  final List<ConsumoMensual> periodos;
 }

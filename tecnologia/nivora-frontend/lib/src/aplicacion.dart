@@ -361,9 +361,17 @@ class Aviso extends StatelessWidget {
   );
 }
 
-class ResumenConsumo extends StatelessWidget {
+class ResumenConsumo extends StatefulWidget {
   const ResumenConsumo({super.key, required this.controlador});
   final ControladorConsulta controlador;
+
+  @override
+  State<ResumenConsumo> createState() => _ResumenConsumoState();
+}
+
+class _ResumenConsumoState extends State<ResumenConsumo> {
+  bool verHistorial = false;
+  ControladorConsulta get controlador => widget.controlador;
 
   @override
   Widget build(BuildContext context) {
@@ -405,60 +413,323 @@ class ResumenConsumo extends StatelessWidget {
                   ),
                   const SizedBox(height: 28),
                   Wrap(
-                    alignment: WrapAlignment.spaceBetween,
-                    crossAxisAlignment: WrapCrossAlignment.center,
-                    spacing: 16,
+                    spacing: 12,
                     runSpacing: 12,
                     children: [
-                      const Text(
-                        'Tu consumo actual',
-                        style: TextStyle(
-                          fontSize: 22,
-                          fontWeight: FontWeight.w700,
-                          color: _azul,
-                        ),
-                      ),
-                      OutlinedButton.icon(
-                        onPressed:
-                            controlador.consultando || controlador.saliendo
+                      ChoiceChip(
+                        label: const Text('Consumo actual'),
+                        selected: !verHistorial,
+                        onSelected: controlador.saliendo
                             ? null
-                            : controlador.actualizar,
-                        icon: const Icon(Icons.refresh),
-                        label: const Text('Actualizar'),
+                            : (_) {
+                                setState(() => verHistorial = false);
+                              },
+                      ),
+                      ChoiceChip(
+                        label: const Text('Historial mensual'),
+                        selected: verHistorial,
+                        onSelected: controlador.saliendo
+                            ? null
+                            : (_) {
+                                setState(() => verHistorial = true);
+                                if (controlador.historial == null &&
+                                    controlador.errorHistorial == null) {
+                                  controlador.cargarHistorial();
+                                }
+                              },
                       ),
                     ],
                   ),
-                  const SizedBox(height: 20),
-                  if (controlador.saliendo) const LinearProgressIndicator(),
-                  if (controlador.consultando) ...[
-                    const LinearProgressIndicator(),
-                    const SizedBox(height: 16),
-                    const Text('Consultando tus lecturas…'),
-                    const SizedBox(height: 16),
-                  ],
-                  if (controlador.errorConsumo != null) ...[
-                    Aviso(texto: controlador.errorConsumo!),
-                    const SizedBox(height: 16),
-                    if (consumo != null)
-                      const Padding(
-                        padding: EdgeInsets.only(bottom: 16),
-                        child: Text(
-                          'Se muestran los últimos datos consultados.',
-                        ),
-                      ),
-                  ],
-                  if (consumo != null) _TarjetaConsumo(consumo: consumo),
                   const SizedBox(height: 24),
-                  const Text(
-                    'El consumo se calcula con las lecturas disponibles del suministro. '
-                    'Puede actualizarse cuando se incorporen nuevas mediciones.',
-                    style: TextStyle(color: Color(0xFF536976), height: 1.6),
-                  ),
+                  if (verHistorial)
+                    _HistorialMensual(controlador: controlador)
+                  else ...[
+                    Wrap(
+                      alignment: WrapAlignment.spaceBetween,
+                      crossAxisAlignment: WrapCrossAlignment.center,
+                      spacing: 16,
+                      runSpacing: 12,
+                      children: [
+                        const Text(
+                          'Tu consumo actual',
+                          style: TextStyle(
+                            fontSize: 22,
+                            fontWeight: FontWeight.w700,
+                            color: _azul,
+                          ),
+                        ),
+                        OutlinedButton.icon(
+                          onPressed:
+                              controlador.consultando || controlador.saliendo
+                              ? null
+                              : controlador.actualizar,
+                          icon: const Icon(Icons.refresh),
+                          label: const Text('Actualizar'),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 20),
+                    if (controlador.saliendo) const LinearProgressIndicator(),
+                    if (controlador.consultando) ...[
+                      const LinearProgressIndicator(),
+                      const SizedBox(height: 16),
+                      const Text('Consultando tus lecturas…'),
+                      const SizedBox(height: 16),
+                    ],
+                    if (controlador.errorConsumo != null) ...[
+                      Aviso(texto: controlador.errorConsumo!),
+                      const SizedBox(height: 16),
+                      if (consumo != null)
+                        const Padding(
+                          padding: EdgeInsets.only(bottom: 16),
+                          child: Text(
+                            'Se muestran los últimos datos consultados.',
+                          ),
+                        ),
+                    ],
+                    if (consumo != null) _TarjetaConsumo(consumo: consumo),
+                    const SizedBox(height: 24),
+                    const Text(
+                      'El consumo se calcula con las lecturas disponibles del suministro. '
+                      'Puede actualizarse cuando se incorporen nuevas mediciones.',
+                      style: TextStyle(color: Color(0xFF536976), height: 1.6),
+                    ),
+                  ],
                 ],
               ),
             ),
           ),
         ),
+      ),
+    );
+  }
+}
+
+class _HistorialMensual extends StatelessWidget {
+  const _HistorialMensual({required this.controlador});
+  final ControladorConsulta controlador;
+
+  @override
+  Widget build(BuildContext context) {
+    final datos = controlador.historial;
+    final ocupado = controlador.consultandoHistorial || controlador.saliendo;
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        const Text(
+          'Tus meses anteriores',
+          style: TextStyle(
+            fontSize: 22,
+            fontWeight: FontWeight.w700,
+            color: _azul,
+          ),
+        ),
+        const SizedBox(height: 10),
+        const Text(
+          'Consulta meses ya terminados. Cada mes indica si sus lecturas '
+          'cubren todo el periodo o solo una parte.',
+          style: TextStyle(height: 1.5, color: Color(0xFF536976)),
+        ),
+        const SizedBox(height: 16),
+        Wrap(
+          spacing: 16,
+          runSpacing: 12,
+          crossAxisAlignment: WrapCrossAlignment.center,
+          children: [
+            DropdownButton<int>(
+              value: controlador.mesesHistorial,
+              items: [
+                for (final meses in [3, 6, 12])
+                  DropdownMenuItem(value: meses, child: Text('$meses meses')),
+              ],
+              onChanged: ocupado
+                  ? null
+                  : (meses) {
+                      if (meses != null) {
+                        controlador.cargarHistorial(meses: meses);
+                      }
+                    },
+            ),
+            OutlinedButton.icon(
+              onPressed: ocupado ? null : () => controlador.cargarHistorial(),
+              icon: const Icon(Icons.refresh),
+              label: const Text('Actualizar historial'),
+            ),
+            if (controlador.hastaHistorial != null)
+              TextButton(
+                onPressed: ocupado
+                    ? null
+                    : () => controlador.cargarHistorial(ultimos: true),
+                child: const Text('Últimos meses'),
+              ),
+          ],
+        ),
+        const SizedBox(height: 12),
+        Text(
+          controlador.hastaHistorial == null
+              ? 'Últimos ${controlador.mesesHistorial} meses terminados'
+              : 'Hasta ${_mes(controlador.hastaHistorial!)}',
+        ),
+        if (ocupado) ...[
+          const SizedBox(height: 16),
+          const LinearProgressIndicator(),
+          const SizedBox(height: 12),
+          Text(
+            controlador.saliendo
+                ? 'Cerrando sesión…'
+                : 'Consultando tu historial…',
+          ),
+        ],
+        if (controlador.errorHistorial != null) ...[
+          const SizedBox(height: 16),
+          Aviso(texto: controlador.errorHistorial!),
+          if (datos != null)
+            const Padding(
+              padding: EdgeInsets.only(top: 12),
+              child: Text(
+                'Se muestran los últimos datos consultados para este rango.',
+              ),
+            ),
+          TextButton.icon(
+            onPressed: ocupado ? null : () => controlador.cargarHistorial(),
+            icon: const Icon(Icons.refresh),
+            label: const Text('Reintentar historial'),
+          ),
+        ],
+        if (datos != null) ...[
+          const SizedBox(height: 16),
+          Text(
+            '${_mes(datos.periodos.last.periodo)} — ${_mes(datos.periodos.first.periodo)}',
+            style: const TextStyle(fontWeight: FontWeight.w700, color: _azul),
+          ),
+          const SizedBox(height: 8),
+          Text(
+            'Consultado: ${_fechaLima(datos.consultadoEn)}',
+            style: const TextStyle(color: Color(0xFF536976)),
+          ),
+          const SizedBox(height: 16),
+          for (final mes in datos.periodos) ...[
+            _TarjetaMes(key: ValueKey(mes.periodo), mes: mes),
+            const SizedBox(height: 12),
+          ],
+          Wrap(
+            spacing: 12,
+            runSpacing: 12,
+            children: [
+              OutlinedButton.icon(
+                onPressed:
+                    ocupado ||
+                        moverMes(
+                              datos.periodos.last.periodo,
+                              -controlador.mesesHistorial,
+                            ).compareTo('1000-01') <
+                            0
+                    ? null
+                    : () {
+                        controlador.cargarHistorial(
+                          hasta: moverMes(datos.periodos.last.periodo, -1),
+                        );
+                      },
+                icon: const Icon(Icons.chevron_left),
+                label: const Text('Meses anteriores'),
+              ),
+              if (controlador.hastaHistorial != null)
+                OutlinedButton.icon(
+                  onPressed: ocupado
+                      ? null
+                      : () {
+                          final siguiente = moverMes(
+                            datos.periodos.first.periodo,
+                            controlador.mesesHistorial,
+                          );
+                          final lima = datos.consultadoEn.subtract(
+                            const Duration(hours: 5),
+                          );
+                          final actual =
+                              '${lima.year.toString().padLeft(4, '0')}-'
+                              '${lima.month.toString().padLeft(2, '0')}';
+                          if (siguiente.compareTo(moverMes(actual, -1)) >= 0) {
+                            controlador.cargarHistorial(ultimos: true);
+                          } else {
+                            controlador.cargarHistorial(hasta: siguiente);
+                          }
+                        },
+                  icon: const Icon(Icons.chevron_right),
+                  label: const Text('Más recientes'),
+                ),
+            ],
+          ),
+        ],
+      ],
+    );
+  }
+}
+
+class _TarjetaMes extends StatelessWidget {
+  const _TarjetaMes({super.key, required this.mes});
+  final ConsumoMensual mes;
+
+  @override
+  Widget build(BuildContext context) {
+    final etiqueta = switch (mes.estado) {
+      'COMPLETO' => 'Mes completo',
+      'PARCIAL' => 'Consumo parcial',
+      'INCOMPATIBLE' => 'Lecturas en revisión',
+      _ => 'Sin datos suficientes',
+    };
+    final explicacion = switch (mes.estado) {
+      'COMPLETO' => 'Las lecturas cubren todo el mes.',
+      'PARCIAL' =>
+        'El valor corresponde al tramo con lecturas disponibles. '
+            'Puede faltar parte del consumo del mes.',
+      'INCOMPATIBLE' =>
+        'Las lecturas presentan incompatibilidades. '
+            'No se puede calcular un consumo confiable para este mes.',
+      _ =>
+        'No hay lecturas suficientes para calcular este mes. '
+            'Esto no significa que el consumo haya sido cero.',
+    };
+    return Card(
+      color: Colors.white,
+      clipBehavior: Clip.antiAlias,
+      child: ExpansionTile(
+        title: Text(
+          _mes(mes.periodo),
+          style: const TextStyle(fontWeight: FontWeight.w700, color: _azul),
+        ),
+        subtitle: Padding(
+          padding: const EdgeInsets.only(top: 8, bottom: 12),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                mes.metrosCubicos == null
+                    ? 'Sin valor disponible'
+                    : '${mes.metrosCubicos!.replaceAll('.', ',')} m³',
+                style: const TextStyle(
+                  fontSize: 22,
+                  fontWeight: FontWeight.w700,
+                  color: _azul,
+                ),
+              ),
+              if (mes.litros != null) Text('${mes.litros} litros'),
+              const SizedBox(height: 8),
+              Text(etiqueta, style: const TextStyle(color: _turquesa)),
+            ],
+          ),
+        ),
+        childrenPadding: const EdgeInsets.fromLTRB(16, 0, 16, 20),
+        expandedCrossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          Text(explicacion, style: const TextStyle(height: 1.5)),
+          if (mes.desde != null && mes.hasta != null) ...[
+            const SizedBox(height: 10),
+            Text(
+              'Tramo medido: ${_fechaLima(mes.desde!)} a ${_fechaLima(mes.hasta!)}',
+              style: const TextStyle(height: 1.5),
+            ),
+          ],
+        ],
       ),
     );
   }

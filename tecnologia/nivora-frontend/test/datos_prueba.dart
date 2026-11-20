@@ -43,6 +43,9 @@ class ServicioPrueba implements ServicioNivora {
   int ingresos = 0;
   int consultas = 0;
   int salidas = 0;
+  int consultasHistorial = 0;
+  final rangosHistorial = <({int meses, String? hasta})>[];
+  Future<HistorialMensual> Function(int meses, String? hasta)? alHistorial;
   Future<SesionConsulta> Function()? alIngresar;
   Future<ConsumoActual> Function()? alConsultar;
   Future<void> Function()? alSalir;
@@ -66,5 +69,68 @@ class ServicioPrueba implements ServicioNivora {
   }
 
   @override
+  Future<HistorialMensual> historial(
+    SesionConsulta sesion, {
+    int meses = 12,
+    String? hasta,
+  }) async {
+    consultasHistorial++;
+    rangosHistorial.add((meses: meses, hasta: hasta));
+    if (alHistorial != null) return await alHistorial!(meses, hasta);
+    return HistorialMensual.desdeJson(
+      respuestaHistorial(meses: meses, hasta: hasta),
+      sesion.suministro,
+      meses: meses,
+      hasta: hasta,
+    );
+  }
+
+  @override
   void cerrar() {}
+}
+
+Map<String, dynamic> respuestaHistorial({int meses = 12, String? hasta}) {
+  const actual = '2026-11';
+  final ultimo = hasta ?? moverMes(actual, -1);
+  return {
+    'fuente': 'empresa-agua',
+    'codigoSuministro': '0013100390',
+    'zonaHoraria': 'America/Lima',
+    'consultadoEn': '2026-11-20T18:00:00Z',
+    'periodos': List.generate(meses, (i) {
+      final periodo = moverMes(ultimo, -i);
+      final inicio = DateTime.utc(
+        int.parse(periodo.substring(0, 4)),
+        int.parse(periodo.substring(5)),
+        1,
+        5,
+      );
+      final fin = DateTime.utc(inicio.year, inicio.month + 1, 1, 5);
+      final estado = [
+        'COMPLETO',
+        'PARCIAL',
+        'SIN_DATOS',
+        'INCOMPATIBLE',
+      ][i % 4];
+      final conValor = i % 4 < 2;
+      return {
+        'periodo': periodo,
+        'inicioMes': inicio.toIso8601String(),
+        'finMesExclusivo': fin.toIso8601String(),
+        'consumo': <String, dynamic>{
+          'estado': estado,
+          'motivo': estado == 'COMPLETO' ? null : 'LECTURAS_INSUFICIENTES',
+          'litros': conValor ? (i == 0 ? '0' : '1234') : null,
+          'metrosCubicos': conValor ? (i == 0 ? '0.000' : '1.234') : null,
+          'desde': conValor ? inicio.toIso8601String() : null,
+          'hasta': conValor
+              ? (estado == 'COMPLETO'
+                        ? fin
+                        : fin.subtract(const Duration(days: 1)))
+                    .toIso8601String()
+              : null,
+        },
+      };
+    }),
+  };
 }

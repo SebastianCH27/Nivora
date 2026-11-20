@@ -1,7 +1,7 @@
 # Nivora: aplicación para Android y Windows
 
-Primera entrega funcional del frontend: acceso mediante código de suministro y DNI,
-consulta del consumo actual, actualización manual y cierre de sesión. Usa el contrato
+Frontend con acceso mediante código de suministro y DNI, consumo actual,
+historial mensual, actualización manual y cierre de sesión. Usa el contrato
 existente de `nivora-backend`; no contiene un acceso de demostración ni datos simulados
 en la aplicación.
 
@@ -89,6 +89,10 @@ como texto para conservar sus ceros iniciales. El DNI debe tener ocho dígitos.
 
 - `POST /api/v1/acceso/consulta/sesiones`: crea la sesión con suministro y DNI.
 - `GET /api/v1/acceso/consulta/consumo-actual`: consulta con el Bearer de la sesión.
+- `GET /api/v1/acceso/consulta/historial?meses=12`: historial con el mismo Bearer.
+  Se carga al abrir **Historial mensual**, permite elegir 3, 6 o 12 meses,
+  recorrer ventanas anteriores y regresar a los últimos meses. `hasta=AAAA-MM`
+  se envía al navegar; el primer rango lo decide el backend en hora de Lima.
 - `DELETE /api/v1/acceso/consulta/sesion`: revoca la sesión al salir.
 - El token se mantiene únicamente en memoria. El formulario con el DNI se destruye
   al ingresar. El cierre de la aplicación no conserva el acceso.
@@ -97,12 +101,17 @@ como texto para conservar sus ceros iniciales. El DNI debe tener ocho dígitos.
 - 400, 401, 429, 503, desconexiones, respuestas inválidas y espera agotada tienen
   mensajes visibles. `Retry-After` impide repetir el acceso antes de tiempo.
 - Si falla una actualización, se identifica el resultado anterior como tal.
+  En historial solo se conserva el resultado si pertenece al mismo filtro.
+  Cambiar de rango elimina los meses anteriores mientras se consulta el nuevo.
 - Si falla el cierre remoto, se elimina la sesión local y se informa que no se
   pudo confirmar la revocación; el servidor conserva su vencimiento habitual.
 - Los valores de consumo se conservan como cadenas decimales exactas. `SIN_DATOS`
   e `INCOMPATIBLE` no se representan como cero. Se indica la cobertura parcial,
   el tramo medido y la última lectura; las fechas se muestran en hora de Lima.
 - Las peticiones tienen un límite total de 20 segundos y no siguen redirecciones.
+
+Los detalles de cobertura, navegación y comprobación del historial están en
+[Historial mensual](documentacion/historial-mensual.md).
 
 El HTTP de desarrollo se limita a direcciones locales. Android permite tráfico en
 claro local solamente en la variante `debug`; la variante de publicación utiliza
@@ -113,8 +122,8 @@ servidor de publicación y la firma de distribución antes de publicar la aplica
 
 ## Alcance de esta entrega
 
-Esta entrega conecta el acceso y el resumen de consumo al backend existente. Las
-pantallas de historial, costos, proyección, comparación, recibos, administración y
+Esta entrega conecta el acceso, el resumen y el historial de consumo al backend existente. Las
+pantallas de costos, proyección, comparación, recibos, administración y
 notificaciones nativas se incorporarán en entregas siguientes. El ícono sigue siendo
 el de Flutter; el nombre visible de la aplicación ahora es Nivora.
 

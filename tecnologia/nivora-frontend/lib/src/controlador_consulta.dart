@@ -11,6 +11,11 @@ class ControladorConsulta extends ChangeNotifier {
   final DateTime Function() reloj;
   SesionConsulta? sesion;
   ConsumoActual? consumo;
+  HistorialMensual? historial;
+  String? errorHistorial;
+  bool consultandoHistorial = false;
+  int mesesHistorial = 12;
+  String? hastaHistorial;
   String? aviso;
   String? errorConsumo;
   bool ingresando = false;
@@ -90,6 +95,7 @@ class ControladorConsulta extends ChangeNotifier {
     // Invalida las consultas que todavía estén en curso.
     final version = ++_version;
     consultando = false;
+    consultandoHistorial = false;
     notifyListeners();
     String mensaje = 'Cerraste tu sesión.';
     try {
@@ -100,6 +106,50 @@ class ControladorConsulta extends ChangeNotifier {
           'el cierre en el servidor; la sesión vencerá automáticamente.';
     } finally {
       if (!_cerrado && version == _version) _limpiar(mensaje);
+    }
+  }
+
+  Future<void> cargarHistorial({
+    int? meses,
+    String? hasta,
+    bool ultimos = false,
+  }) async {
+    verificarVencimiento();
+    final actual = sesion;
+    if (_cerrado || actual == null || consultandoHistorial || saliendo) return;
+    final nuevosMeses = meses ?? mesesHistorial;
+    final nuevoHasta = ultimos ? null : hasta ?? hastaHistorial;
+    if (nuevosMeses != mesesHistorial || nuevoHasta != hastaHistorial) {
+      // Nunca atribuir a un filtro nuevo los datos de una consulta anterior.
+      historial = null;
+    }
+    mesesHistorial = nuevosMeses;
+    hastaHistorial = nuevoHasta;
+    consultandoHistorial = true;
+    errorHistorial = null;
+    final version = _version;
+    notifyListeners();
+    try {
+      final nuevo = await api.historial(
+        actual,
+        meses: nuevosMeses,
+        hasta: nuevoHasta,
+      );
+      if (!_cerrado && version == _version) historial = nuevo;
+    } on FalloApi catch (fallo) {
+      if (_cerrado || version != _version) return;
+      if (fallo.estado == 401) {
+        _limpiar('Tu sesión terminó. Vuelve a ingresar.');
+      } else {
+        errorHistorial = fallo.estado == 400
+            ? 'El rango no está disponible. Selecciona los últimos meses.'
+            : fallo.mensaje;
+      }
+    } finally {
+      if (!_cerrado && version == _version) {
+        consultandoHistorial = false;
+        notifyListeners();
+      }
     }
   }
 
@@ -128,6 +178,11 @@ class ControladorConsulta extends ChangeNotifier {
     _temporizador?.cancel();
     sesion = null;
     consumo = null;
+    historial = null;
+    errorHistorial = null;
+    consultandoHistorial = false;
+    mesesHistorial = 12;
+    hastaHistorial = null;
     errorConsumo = null;
     ingresando = consultando = saliendo = false;
     aviso = mensaje;
@@ -141,6 +196,7 @@ class ControladorConsulta extends ChangeNotifier {
     _temporizador?.cancel();
     sesion = null;
     consumo = null;
+    historial = null;
     api.cerrar();
     super.dispose();
   }
