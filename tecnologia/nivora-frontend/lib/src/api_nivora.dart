@@ -3,7 +3,9 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'modelos_costos.dart';
+import 'modelos_proyeccion.dart';
 export 'modelos_costos.dart';
+export 'modelos_proyeccion.dart';
 
 class FalloApi implements Exception {
   const FalloApi(this.mensaje, {this.estado, this.reintentarEn});
@@ -143,6 +145,7 @@ abstract class ServicioNivora {
   });
   Future<void> salir(SesionConsulta sesion);
   Future<CostosConsumo> costos(SesionConsulta sesion, {int meses = 3});
+  Future<ProyeccionConsumo> proyeccion(SesionConsulta sesion);
   void cerrar();
 }
 
@@ -361,6 +364,18 @@ class ApiNivora implements ServicioNivora {
     } on FormatException {
       throw const FalloApi(
         'No se pudieron interpretar los costos. Inténtalo más tarde.',
+      );
+    }
+  }
+
+  @override
+  Future<ProyeccionConsumo> proyeccion(SesionConsulta sesion) async {
+    final json = await _pedir('GET', '/proyeccion', 200, sesion: sesion);
+    try {
+      return ProyeccionConsumo.desdeJson(json, sesion.suministro);
+    } on FormatException {
+      throw const FalloApi(
+        'No se pudo interpretar la proyección. Inténtalo más tarde.',
       );
     }
   }

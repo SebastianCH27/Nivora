@@ -1,6 +1,7 @@
 import 'package:nivora_frontend/src/api_nivora.dart';
 
 import 'datos_costos_prueba.dart';
+import 'datos_proyeccion_prueba.dart';
 
 Map<String, dynamic> respuestaSesion({String suministro = '0013100390'}) => {
   'tipoToken': 'Bearer',
@@ -47,6 +48,8 @@ class ServicioPrueba implements ServicioNivora {
   int salidas = 0;
   int consultasHistorial = 0;
   int consultasCostos = 0;
+  int consultasProyeccion = 0;
+  Future<ProyeccionConsumo> Function()? alProyeccion;
   final rangosCostos = <int>[];
   Future<CostosConsumo> Function(int meses)? alCostos;
   final rangosHistorial = <({int meses, String? hasta})>[];
@@ -103,6 +106,12 @@ class ServicioPrueba implements ServicioNivora {
       sesion.suministro,
       meses: meses,
     );
+  }
+
+  @override
+  Future<ProyeccionConsumo> proyeccion(SesionConsulta sesion) async {
+    consultasProyeccion++;
+    return alProyeccion == null ? proyeccionPrueba() : await alProyeccion!();
   }
 }
 

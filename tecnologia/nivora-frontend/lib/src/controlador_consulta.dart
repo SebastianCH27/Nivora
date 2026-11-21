@@ -20,6 +20,9 @@ class ControladorConsulta extends ChangeNotifier {
   String? errorCostos;
   bool consultandoCostos = false;
   int mesesCostos = 3;
+  ProyeccionConsumo? proyeccion;
+  String? errorProyeccion;
+  bool consultandoProyeccion = false;
   String? aviso;
   String? errorConsumo;
   bool ingresando = false;
@@ -101,6 +104,7 @@ class ControladorConsulta extends ChangeNotifier {
     consultando = false;
     consultandoHistorial = false;
     consultandoCostos = false;
+    consultandoProyeccion = false;
     notifyListeners();
     String mensaje = 'Cerraste tu sesión.';
     try {
@@ -209,11 +213,40 @@ class ControladorConsulta extends ChangeNotifier {
     });
   }
 
+  Future<void> cargarProyeccion() async {
+    verificarVencimiento();
+    final actual = sesion;
+    if (_cerrado || actual == null || consultandoProyeccion || saliendo) return;
+    consultandoProyeccion = true;
+    errorProyeccion = null;
+    final version = _version;
+    notifyListeners();
+    try {
+      final nueva = await api.proyeccion(actual);
+      if (!_cerrado && version == _version) proyeccion = nueva;
+    } on FalloApi catch (fallo) {
+      if (_cerrado || version != _version) return;
+      if (fallo.estado == 401) {
+        _limpiar('Tu sesión terminó. Vuelve a ingresar.');
+      } else {
+        errorProyeccion = fallo.mensaje;
+      }
+    } finally {
+      if (!_cerrado && version == _version) {
+        consultandoProyeccion = false;
+        notifyListeners();
+      }
+    }
+  }
+
   void _limpiar(String mensaje) {
     ++_version;
     _temporizador?.cancel();
     sesion = null;
     consumo = null;
+    proyeccion = null;
+    errorProyeccion = null;
+    consultandoProyeccion = false;
     costos = null;
     errorCostos = null;
     consultandoCostos = false;
@@ -236,6 +269,7 @@ class ControladorConsulta extends ChangeNotifier {
     _temporizador?.cancel();
     sesion = null;
     consumo = null;
+    proyeccion = null;
     costos = null;
     historial = null;
     api.cerrar();
