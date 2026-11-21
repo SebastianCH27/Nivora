@@ -3,6 +3,7 @@ import 'package:nivora_frontend/src/api_nivora.dart';
 import 'datos_costos_prueba.dart';
 import 'datos_proyeccion_prueba.dart';
 import 'datos_comparacion_prueba.dart';
+import 'datos_recibos_prueba.dart';
 
 Map<String, dynamic> respuestaSesion({String suministro = '0013100390'}) => {
   'tipoToken': 'Bearer',
@@ -51,6 +52,9 @@ class ServicioPrueba implements ServicioNivora {
   int consultasCostos = 0;
   int consultasProyeccion = 0;
   int consultasComparacion = 0;
+  int consultasRecibos = 0;
+  final rangosRecibos = <({int limite, String? antesDe})>[];
+  Future<PaginaRecibos> Function(int limite, String? antesDe)? alRecibos;
   final rangosComparacion = <({String? base, String? comparado})>[];
   Future<ComparacionConsumo> Function(String? base, String? comparado)?
   alComparar;
@@ -130,6 +134,19 @@ class ServicioPrueba implements ServicioNivora {
     return alComparar == null
         ? comparacionPrueba(base: periodoBase, comparado: periodoComparado)
         : await alComparar!(periodoBase, periodoComparado);
+  }
+
+  @override
+  Future<PaginaRecibos> recibos(
+    SesionConsulta sesion, {
+    int limite = 12,
+    String? antesDe,
+  }) async {
+    consultasRecibos++;
+    rangosRecibos.add((limite: limite, antesDe: antesDe));
+    return alRecibos == null
+        ? paginaRecibosPrueba(limite: limite, antesDe: antesDe)
+        : await alRecibos!(limite, antesDe);
   }
 }
 

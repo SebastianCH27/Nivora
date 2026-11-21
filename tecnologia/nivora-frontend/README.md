@@ -1,7 +1,7 @@
 # Nivora: aplicación para Android y Windows
 
 Frontend con acceso mediante código de suministro y DNI, consumo actual,
-historial mensual, costos estimados, proyección mensual, comparación de meses,
+historial mensual, costos estimados, proyección mensual, comparación de meses, recibos,
 actualización manual y cierre de sesión. Usa el contrato
 existente de `nivora-backend`; no contiene un acceso de demostración ni datos simulados
 en la aplicación.
@@ -111,6 +111,13 @@ como texto para conservar sus ceros iniciales. El DNI debe tener ocho dígitos.
   y `periodoComparado`. Muestra diferencias con signo, cobertura y avisos
   sobre periodos en curso, duraciones y tarifas diferentes. Cuando faltan
   totales, puede conservar la diferencia de consumo sin inventar un costo.
+- `GET /api/v1/acceso/consulta/recibos?limite=12`: recibos emitidos guardados
+  para el suministro de la sesión. Se carga al abrir **Recibos**. Cada tarjeta
+  muestra número, periodo, consumo facturado, importe definitivo y vencimiento.
+  Al desplegarla aparecen los cargos, la disponibilidad, la tarifa, la fecha
+  de recepción y los límites del periodo facturado. Se avisa cuando difiere
+  del periodo de análisis de Nivora. Permite consultar recibos anteriores con
+  `antesDe=AAAA-MM` y volver a los más recientes.
 - El token se mantiene únicamente en memoria. El formulario con el DNI se destruye
   al ingresar. El cierre de la aplicación no conserva el acceso.
 - Al vencer la sesión o recibir 401 en una consulta, se borran los datos y vuelve
@@ -135,6 +142,8 @@ Los supuestos, estados y comprobaciones de la nueva pestaña están en
 [Proyección mensual](documentacion/proyeccion-mensual.md).
 La selección de periodos y la lectura de diferencias se describen en
 [Comparación mensual](documentacion/comparacion-mensual.md).
+La presentación de importes emitidos y la navegación están en
+[Recibos](documentacion/recibos.md).
 
 El HTTP de desarrollo se limita a direcciones locales. Android permite tráfico en
 claro local solamente en la variante `debug`; la variante de publicación utiliza
@@ -145,8 +154,8 @@ servidor de publicación y la firma de distribución antes de publicar la aplica
 
 ## Alcance de esta entrega
 
-Esta entrega conecta el acceso, el resumen, el historial, los costos, la proyección
-y la comparación al backend existente. Las pantallas de recibos, administración y
+Esta entrega conecta el acceso, el resumen, el historial, los costos, la proyección,
+la comparación y los recibos al backend existente. Las pantallas de administración y
 notificaciones nativas se incorporarán en entregas siguientes. El ícono sigue siendo
 el de Flutter; el nombre visible de la aplicación ahora es Nivora.
 

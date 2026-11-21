@@ -5,9 +5,11 @@ import 'dart:io';
 import 'modelos_costos.dart';
 import 'modelos_proyeccion.dart';
 import 'modelos_comparacion.dart';
+import 'modelos_recibos.dart';
 export 'modelos_costos.dart';
 export 'modelos_proyeccion.dart';
 export 'modelos_comparacion.dart';
+export 'modelos_recibos.dart';
 
 class FalloApi implements Exception {
   const FalloApi(this.mensaje, {this.estado, this.reintentarEn});
@@ -148,6 +150,11 @@ abstract class ServicioNivora {
   Future<void> salir(SesionConsulta sesion);
   Future<CostosConsumo> costos(SesionConsulta sesion, {int meses = 3});
   Future<ProyeccionConsumo> proyeccion(SesionConsulta sesion);
+  Future<PaginaRecibos> recibos(
+    SesionConsulta sesion, {
+    int limite = 12,
+    String? antesDe,
+  });
   Future<ComparacionConsumo> comparar(
     SesionConsulta sesion, {
     String? periodoBase,
@@ -383,6 +390,33 @@ class ApiNivora implements ServicioNivora {
     } on FormatException {
       throw const FalloApi(
         'No se pudo interpretar la proyección. Inténtalo más tarde.',
+      );
+    }
+  }
+
+  @override
+  Future<PaginaRecibos> recibos(
+    SesionConsulta sesion, {
+    int limite = 12,
+    String? antesDe,
+  }) async {
+    if (!parametrosRecibosValidos(limite, antesDe)) {
+      throw const FalloApi('Usa un límite de 1 a 60 y un mes de corte válido.');
+    }
+    final consulta = Uri(
+      queryParameters: {'limite': '$limite', 'antesDe': ?antesDe},
+    ).query;
+    final json = await _pedir('GET', '/recibos?$consulta', 200, sesion: sesion);
+    try {
+      return PaginaRecibos.desdeJson(
+        json,
+        sesion.suministro,
+        limite: limite,
+        antesDe: antesDe,
+      );
+    } on FormatException {
+      throw const FalloApi(
+        'No se pudieron interpretar los recibos. Inténtalo más tarde.',
       );
     }
   }
