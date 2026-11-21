@@ -1,7 +1,8 @@
 # Nivora: aplicación para Android y Windows
 
 Frontend con acceso mediante código de suministro y DNI, consumo actual,
-historial mensual, costos estimados, proyección mensual, comparación de meses, recibos,
+historial mensual, costos estimados, proyección mensual, comparación de meses,
+estadísticas con gráfico mensual, recibos,
 actualización manual y cierre de sesión. Usa el contrato
 existente de `nivora-backend`; no contiene un acceso de demostración ni datos simulados
 en la aplicación.
@@ -54,11 +55,20 @@ flutter build apk --debug
 "%LOCALAPPDATA%\Android\Sdk\platform-tools\adb.exe" -s 192.168.18.41:44219 reverse tcp:8082 tcp:8082
 ```
 
-6. Abre el APK que acabas de compilar, sin repetir Gradle:
+6. Instala el APK que acabas de compilar, sin repetir Gradle:
 
 ```cmd
-flutter run -d 192.168.18.41:44219 --use-application-binary="build\app\outputs\flutter-apk\app-debug.apk"
+"%LOCALAPPDATA%\Android\Sdk\platform-tools\adb.exe" -s 192.168.18.41:44219 install -r "build\app\outputs\flutter-apk\app-debug.apk"
 ```
+
+7. Abre Nivora directamente:
+
+```cmd
+"%LOCALAPPDATA%\Android\Sdk\platform-tools\adb.exe" -s 192.168.18.41:44219 shell am start -S -n pe.nivora.nivora_frontend/.MainActivity
+```
+
+Esta ruta permite comprobar la app sin esperar la conexión del servicio de
+depuración de Flutter. El reinicio de la app requiere volver a ingresar.
 
 La aplicación usa `http://127.0.0.1:8082` durante el desarrollo. `adb reverse` conecta
 ese puerto del teléfono con el mismo puerto de la PC; también funciona por ADB
@@ -118,6 +128,13 @@ como texto para conservar sus ceros iniciales. El DNI debe tener ocho dígitos.
   de recepción y los límites del periodo facturado. Se avisa cuando difiere
   del periodo de análisis de Nivora. Permite consultar recibos anteriores con
   `antesDe=AAAA-MM` y volver a los más recientes.
+- `GET /api/v1/acceso/consulta/estadisticas?meses=12`: serie cronológica de
+  meses anteriores con un resumen de los que tienen cobertura completa.
+  Se carga al abrir **Estadísticas** y permite elegir 3, 6 o 12 meses.
+  Presenta un gráfico de columnas verticales con meses abajo y escala común
+  de consumo en m³ al costado, seguido de total, promedio, mínimo y máximo.
+  Tocar una columna selecciona su detalle de cobertura y fechas. Los parciales
+  conservan su volumen; los meses sin datos se distinguen de los ceros.
 - El token se mantiene únicamente en memoria. El formulario con el DNI se destruye
   al ingresar. El cierre de la aplicación no conserva el acceso.
 - Al vencer la sesión o recibir 401 en una consulta, se borran los datos y vuelve
@@ -144,6 +161,8 @@ La selección de periodos y la lectura de diferencias se describen en
 [Comparación mensual](documentacion/comparacion-mensual.md).
 La presentación de importes emitidos y la navegación están en
 [Recibos](documentacion/recibos.md).
+Las reglas del resumen y la lectura de las barras se describen en
+[Estadísticas y gráfico mensual](documentacion/estadisticas.md).
 
 El HTTP de desarrollo se limita a direcciones locales. Android permite tráfico en
 claro local solamente en la variante `debug`; la variante de publicación utiliza
@@ -155,7 +174,7 @@ servidor de publicación y la firma de distribución antes de publicar la aplica
 ## Alcance de esta entrega
 
 Esta entrega conecta el acceso, el resumen, el historial, los costos, la proyección,
-la comparación y los recibos al backend existente. Las pantallas de administración y
+la comparación, las estadísticas y los recibos al backend existente. Las pantallas de administración y
 notificaciones nativas se incorporarán en entregas siguientes. El ícono sigue siendo
 el de Flutter; el nombre visible de la aplicación ahora es Nivora.
 

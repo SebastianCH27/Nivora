@@ -4,6 +4,7 @@ import 'datos_costos_prueba.dart';
 import 'datos_proyeccion_prueba.dart';
 import 'datos_comparacion_prueba.dart';
 import 'datos_recibos_prueba.dart';
+import 'datos_estadisticas_prueba.dart';
 
 Map<String, dynamic> respuestaSesion({String suministro = '0013100390'}) => {
   'tipoToken': 'Bearer',
@@ -53,6 +54,9 @@ class ServicioPrueba implements ServicioNivora {
   int consultasProyeccion = 0;
   int consultasComparacion = 0;
   int consultasRecibos = 0;
+  int consultasEstadisticas = 0;
+  final rangosEstadisticas = <int>[];
+  Future<EstadisticasConsumo> Function(int meses)? alEstadisticas;
   final rangosRecibos = <({int limite, String? antesDe})>[];
   Future<PaginaRecibos> Function(int limite, String? antesDe)? alRecibos;
   final rangosComparacion = <({String? base, String? comparado})>[];
@@ -147,6 +151,18 @@ class ServicioPrueba implements ServicioNivora {
     return alRecibos == null
         ? paginaRecibosPrueba(limite: limite, antesDe: antesDe)
         : await alRecibos!(limite, antesDe);
+  }
+
+  @override
+  Future<EstadisticasConsumo> estadisticas(
+    SesionConsulta sesion, {
+    int meses = 12,
+  }) async {
+    consultasEstadisticas++;
+    rangosEstadisticas.add(meses);
+    return alEstadisticas == null
+        ? estadisticasPrueba(meses: meses)
+        : await alEstadisticas!(meses);
   }
 }
 

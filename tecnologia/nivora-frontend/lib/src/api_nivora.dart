@@ -6,10 +6,12 @@ import 'modelos_costos.dart';
 import 'modelos_proyeccion.dart';
 import 'modelos_comparacion.dart';
 import 'modelos_recibos.dart';
+import 'modelos_estadisticas.dart';
 export 'modelos_costos.dart';
 export 'modelos_proyeccion.dart';
 export 'modelos_comparacion.dart';
 export 'modelos_recibos.dart';
+export 'modelos_estadisticas.dart';
 
 class FalloApi implements Exception {
   const FalloApi(this.mensaje, {this.estado, this.reintentarEn});
@@ -150,6 +152,10 @@ abstract class ServicioNivora {
   Future<void> salir(SesionConsulta sesion);
   Future<CostosConsumo> costos(SesionConsulta sesion, {int meses = 3});
   Future<ProyeccionConsumo> proyeccion(SesionConsulta sesion);
+  Future<EstadisticasConsumo> estadisticas(
+    SesionConsulta sesion, {
+    int meses = 12,
+  });
   Future<PaginaRecibos> recibos(
     SesionConsulta sesion, {
     int limite = 12,
@@ -390,6 +396,33 @@ class ApiNivora implements ServicioNivora {
     } on FormatException {
       throw const FalloApi(
         'No se pudo interpretar la proyección. Inténtalo más tarde.',
+      );
+    }
+  }
+
+  @override
+  Future<EstadisticasConsumo> estadisticas(
+    SesionConsulta sesion, {
+    int meses = 12,
+  }) async {
+    if (meses < 1 || meses > 12) {
+      throw const FalloApi('Selecciona de 1 a 12 meses.');
+    }
+    final json = await _pedir(
+      'GET',
+      '/estadisticas?meses=$meses',
+      200,
+      sesion: sesion,
+    );
+    try {
+      return EstadisticasConsumo.desdeJson(
+        json,
+        sesion.suministro,
+        meses: meses,
+      );
+    } on FormatException {
+      throw const FalloApi(
+        'No se pudieron interpretar las estadísticas. Inténtalo más tarde.',
       );
     }
   }

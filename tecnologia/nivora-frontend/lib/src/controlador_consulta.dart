@@ -33,6 +33,10 @@ class ControladorConsulta extends ChangeNotifier {
   String? errorRecibos;
   bool consultandoRecibos = false;
   String? antesDeRecibos;
+  EstadisticasConsumo? estadisticas;
+  String? errorEstadisticas;
+  bool consultandoEstadisticas = false;
+  int mesesEstadisticas = 12;
   String? aviso;
   String? errorConsumo;
   bool ingresando = false;
@@ -117,6 +121,7 @@ class ControladorConsulta extends ChangeNotifier {
     consultandoProyeccion = false;
     consultandoComparacion = false;
     consultandoRecibos = false;
+    consultandoEstadisticas = false;
     notifyListeners();
     String mensaje = 'Cerraste tu sesión.';
     try {
@@ -223,6 +228,39 @@ class ControladorConsulta extends ChangeNotifier {
       }
       if (sesion == null) notifyListeners();
     });
+  }
+
+  Future<void> cargarEstadisticas({int? meses}) async {
+    verificarVencimiento();
+    final actual = sesion;
+    if (_cerrado || actual == null || consultandoEstadisticas || saliendo) {
+      return;
+    }
+    final nuevosMeses = meses ?? mesesEstadisticas;
+    if (nuevosMeses != mesesEstadisticas) estadisticas = null;
+    mesesEstadisticas = nuevosMeses;
+    errorEstadisticas = null;
+    consultandoEstadisticas = true;
+    final version = _version;
+    notifyListeners();
+    try {
+      final datos = await api.estadisticas(actual, meses: nuevosMeses);
+      if (!_cerrado && version == _version) estadisticas = datos;
+    } on FalloApi catch (fallo) {
+      if (_cerrado || version != _version) return;
+      if (fallo.estado == 401) {
+        _limpiar('Tu sesión terminó. Vuelve a ingresar.');
+      } else {
+        errorEstadisticas = fallo.estado == 400
+            ? 'Ese rango no está disponible. Selecciona 3, 6 o 12 meses.'
+            : fallo.mensaje;
+      }
+    } finally {
+      if (!_cerrado && version == _version) {
+        consultandoEstadisticas = false;
+        notifyListeners();
+      }
+    }
   }
 
   Future<void> cargarRecibos({String? antesDe, bool recientes = false}) async {
@@ -355,6 +393,10 @@ class ControladorConsulta extends ChangeNotifier {
     _temporizador?.cancel();
     sesion = null;
     consumo = null;
+    estadisticas = null;
+    errorEstadisticas = null;
+    consultandoEstadisticas = false;
+    mesesEstadisticas = 12;
     recibos = null;
     errorRecibos = null;
     consultandoRecibos = false;
@@ -390,6 +432,7 @@ class ControladorConsulta extends ChangeNotifier {
     consumo = null;
     comparacion = null;
     recibos = null;
+    estadisticas = null;
     proyeccion = null;
     costos = null;
     historial = null;

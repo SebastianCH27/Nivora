@@ -7,6 +7,7 @@ import 'pantalla_costos.dart';
 import 'pantalla_proyeccion.dart';
 import 'pantalla_comparacion.dart';
 import 'pantalla_recibos.dart';
+import 'pantalla_estadisticas.dart';
 
 const _azul = Color(0xFF123D59);
 const _turquesa = Color(0xFF087F8C);
@@ -379,6 +380,7 @@ enum _VistaConsulta {
   proyeccion,
   comparacion,
   recibos,
+  estadisticas,
 }
 
 class ResumenConsumo extends StatefulWidget {
@@ -505,6 +507,21 @@ class _ResumenConsumoState extends State<ResumenConsumo> {
                               },
                       ),
                       ChoiceChip(
+                        label: const Text('Estadísticas'),
+                        selected: vista == _VistaConsulta.estadisticas,
+                        onSelected: controlador.saliendo
+                            ? null
+                            : (_) {
+                                setState(
+                                  () => vista = _VistaConsulta.estadisticas,
+                                );
+                                if (controlador.estadisticas == null &&
+                                    controlador.errorEstadisticas == null) {
+                                  controlador.cargarEstadisticas();
+                                }
+                              },
+                      ),
+                      ChoiceChip(
                         label: const Text('Recibos'),
                         selected: vista == _VistaConsulta.recibos,
                         onSelected: controlador.saliendo
@@ -520,7 +537,9 @@ class _ResumenConsumoState extends State<ResumenConsumo> {
                     ],
                   ),
                   const SizedBox(height: 24),
-                  if (vista == _VistaConsulta.recibos)
+                  if (vista == _VistaConsulta.estadisticas)
+                    PantallaEstadisticas(controlador: controlador)
+                  else if (vista == _VistaConsulta.recibos)
                     PantallaRecibos(controlador: controlador)
                   else if (vista == _VistaConsulta.comparacion)
                     PantallaComparacion(controlador: controlador)
