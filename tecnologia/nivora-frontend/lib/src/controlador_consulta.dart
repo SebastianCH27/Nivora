@@ -37,6 +37,17 @@ class ControladorConsulta extends ChangeNotifier {
   String? errorEstadisticas;
   bool consultandoEstadisticas = false;
   int mesesEstadisticas = 12;
+  PaginaNotificaciones? notificaciones;
+  bool soloPendientesNotificaciones = false;
+  bool consultandoNotificaciones = false;
+  bool ampliandoNotificaciones = false;
+  String? errorNotificaciones;
+  bool errorAlAmpliarNotificaciones = false;
+  String? marcandoNotificacion;
+  String? errorMarcarNotificacion;
+  String? mensajeNotificaciones;
+  bool get ocupadaBandeja =>
+      consultandoNotificaciones || marcandoNotificacion != null || saliendo;
   String? aviso;
   String? errorConsumo;
   bool ingresando = false;
@@ -122,6 +133,9 @@ class ControladorConsulta extends ChangeNotifier {
     consultandoComparacion = false;
     consultandoRecibos = false;
     consultandoEstadisticas = false;
+    consultandoNotificaciones = false;
+    ampliandoNotificaciones = false;
+    marcandoNotificacion = null;
     notifyListeners();
     String mensaje = 'Cerraste tu sesión.';
     try {
@@ -263,6 +277,113 @@ class ControladorConsulta extends ChangeNotifier {
     }
   }
 
+  Future<void> cargarNotificaciones({
+    bool? soloPendientes,
+    bool mas = false,
+  }) async {
+    verificarVencimiento();
+    final actual = sesion;
+    if (_cerrado || actual == null || ocupadaBandeja) return;
+    final filtro = soloPendientes ?? soloPendientesNotificaciones;
+    final cambia = filtro != soloPendientesNotificaciones;
+    if (cambia) notificaciones = null;
+    soloPendientesNotificaciones = filtro;
+    final anterior = notificaciones;
+    final corte = mas && !cambia ? anterior?.siguienteAntesDe : null;
+    if (mas && corte == null) return;
+    consultandoNotificaciones = true;
+    ampliandoNotificaciones = mas;
+    errorNotificaciones = errorMarcarNotificacion = mensajeNotificaciones =
+        null;
+    errorAlAmpliarNotificaciones = false;
+    final version = _version;
+    notifyListeners();
+    try {
+      final pagina = await api.notificaciones(
+        actual,
+        soloPendientes: filtro,
+        antesDe: corte,
+      );
+      if (_cerrado || version != _version) return;
+      if (mas && anterior != null) {
+        final ids = anterior.avisos.map((a) => a.id).toSet();
+        // Una página repetida no debe duplicar avisos ni hacer retroceder el cursor.
+        if (pagina.avisos.any((a) => ids.contains(a.id)) ||
+            (pagina.hayMas && pagina.siguienteAntesDe == corte)) {
+          throw const FalloApi(
+            'La lista cambió durante la consulta. Actualiza la bandeja.',
+          );
+        }
+        notificaciones = PaginaNotificaciones(
+          avisos: [...anterior.avisos, ...pagina.avisos],
+          siguienteAntesDe: pagina.siguienteAntesDe,
+        );
+      } else {
+        notificaciones = pagina;
+      }
+    } on FalloApi catch (fallo) {
+      if (_cerrado || version != _version) return;
+      if (fallo.estado == 401) {
+        _limpiar('Tu sesión terminó. Vuelve a ingresar.');
+      } else {
+        errorAlAmpliarNotificaciones = mas;
+        errorNotificaciones = fallo.estado == 400
+            ? 'Ese rango de avisos no está disponible. Actualiza la bandeja.'
+            : fallo.mensaje;
+      }
+    } finally {
+      if (!_cerrado && version == _version) {
+        consultandoNotificaciones = ampliandoNotificaciones = false;
+        notifyListeners();
+      }
+    }
+  }
+
+  Future<void> marcarNotificacionLeida(String id) async {
+    verificarVencimiento();
+    final actual = sesion;
+    if (_cerrado || actual == null || ocupadaBandeja) return;
+    final datos = notificaciones;
+    if (datos == null || !datos.avisos.any((a) => a.id == id && !a.leida)) {
+      return;
+    }
+    marcandoNotificacion = id;
+    errorMarcarNotificacion = mensajeNotificaciones = null;
+    final version = _version;
+    notifyListeners();
+    try {
+      await api.marcarNotificacionLeida(actual, id);
+      if (_cerrado || version != _version) return;
+      notificaciones = PaginaNotificaciones(
+        avisos: [
+          for (final aviso in datos.avisos)
+            if (aviso.id != id)
+              aviso
+            else if (!soloPendientesNotificaciones)
+              aviso.comoLeida(),
+        ],
+        siguienteAntesDe: datos.siguienteAntesDe,
+      );
+      mensajeNotificaciones = 'Aviso marcado como leído.';
+    } on FalloApi catch (fallo) {
+      if (_cerrado || version != _version) return;
+      if (fallo.estado == 401) {
+        _limpiar('Tu sesión terminó. Vuelve a ingresar.');
+      } else {
+        errorMarcarNotificacion = switch (fallo.estado) {
+          404 => 'El aviso ya no está disponible. Actualiza la bandeja.',
+          400 => 'No se pudo marcar este aviso. Actualiza la bandeja.',
+          _ => 'No pudimos confirmar la lectura. Actualiza la bandeja o vuelve a intentarlo.',
+        };
+      }
+    } finally {
+      if (!_cerrado && version == _version) {
+        marcandoNotificacion = null;
+        notifyListeners();
+      }
+    }
+  }
+
   Future<void> cargarRecibos({String? antesDe, bool recientes = false}) async {
     verificarVencimiento();
     final actual = sesion;
@@ -392,6 +513,12 @@ class ControladorConsulta extends ChangeNotifier {
     ++_version;
     _temporizador?.cancel();
     sesion = null;
+    notificaciones = null;
+    soloPendientesNotificaciones = false;
+    consultandoNotificaciones = ampliandoNotificaciones =
+        errorAlAmpliarNotificaciones = false;
+    errorNotificaciones = errorMarcarNotificacion = mensajeNotificaciones =
+        marcandoNotificacion = null;
     consumo = null;
     estadisticas = null;
     errorEstadisticas = null;
@@ -429,6 +556,12 @@ class ControladorConsulta extends ChangeNotifier {
     ++_version;
     _temporizador?.cancel();
     sesion = null;
+    notificaciones = null;
+    soloPendientesNotificaciones = false;
+    consultandoNotificaciones = ampliandoNotificaciones =
+        errorAlAmpliarNotificaciones = false;
+    errorNotificaciones = errorMarcarNotificacion = mensajeNotificaciones =
+        marcandoNotificacion = null;
     consumo = null;
     comparacion = null;
     recibos = null;

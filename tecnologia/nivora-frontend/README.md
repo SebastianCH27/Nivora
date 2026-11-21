@@ -2,7 +2,7 @@
 
 Frontend con acceso mediante código de suministro y DNI, consumo actual,
 historial mensual, costos estimados, proyección mensual, comparación de meses,
-estadísticas con gráfico mensual, recibos,
+estadísticas con gráfico mensual, recibos y bandeja de notificaciones,
 actualización manual y cierre de sesión. Usa el contrato
 existente de `nivora-backend`; no contiene un acceso de demostración ni datos simulados
 en la aplicación.
@@ -135,6 +135,15 @@ como texto para conservar sus ceros iniciales. El DNI debe tener ocho dígitos.
   de consumo en m³ al costado, seguido de total, promedio, mínimo y máximo.
   Tocar una columna selecciona su detalle de cobertura y fechas. Los parciales
   conservan su volumen; los meses sin datos se distinguen de los ceros.
+- `GET /api/v1/acceso/consulta/notificaciones?limite=20&soloPendientes=false`:
+  bandeja de alertas de consumo y avisos de recibos. Se carga al abrir
+  **Notificaciones**. Permite filtrar pendientes, desplegar el detalle,
+  actualizar y cargar más sin perder los avisos anteriores, usando el cursor
+  `siguienteAntesDe`. El contador indica los avisos mostrados.
+- `PUT /api/v1/acceso/consulta/notificaciones/{id}/leida`: marca un aviso solo
+  cuando se recibe HTTP 204. La lectura se guarda por suministro y se comparte
+  entre sesiones y personas que lo consultan. Abrir el detalle no marca el aviso.
+  Actualizar recupera la fecha del servidor; leer no cambia el pago de un recibo.
 - El token se mantiene únicamente en memoria. El formulario con el DNI se destruye
   al ingresar. El cierre de la aplicación no conserva el acceso.
 - Al vencer la sesión o recibir 401 en una consulta, se borran los datos y vuelve
@@ -163,6 +172,8 @@ La presentación de importes emitidos y la navegación están en
 [Recibos](documentacion/recibos.md).
 Las reglas del resumen y la lectura de las barras se describen en
 [Estadísticas y gráfico mensual](documentacion/estadisticas.md).
+Los tipos de avisos, la lectura compartida y sus comprobaciones se describen en
+[Bandeja de notificaciones](documentacion/notificaciones.md).
 
 El HTTP de desarrollo se limita a direcciones locales. Android permite tráfico en
 claro local solamente en la variante `debug`; la variante de publicación utiliza
@@ -174,11 +185,14 @@ servidor de publicación y la firma de distribución antes de publicar la aplica
 ## Alcance de esta entrega
 
 Esta entrega conecta el acceso, el resumen, el historial, los costos, la proyección,
-la comparación, las estadísticas y los recibos al backend existente. Las pantallas de administración y
-notificaciones nativas se incorporarán en entregas siguientes. El ícono sigue siendo
+la comparación, las estadísticas, los recibos y la bandeja de notificaciones al
+backend existente. Las pantallas de administración y las notificaciones nativas
+se incorporarán en entregas siguientes. El ícono sigue siendo
 el de Flutter; el nombre visible de la aplicación ahora es Nivora.
 
 Las pruebas usan respuestas controladas, incluidas peticiones HTTP locales reales.
 La comprobación contra MySQL, la empresa de agua y la fuente de identidad debe
-realizarse con los servicios del entorno local. No se requiere modificar la base de
-datos ni el backend para aplicar estos archivos.
+realizarse con los servicios del entorno local. No se requiere modificar el backend
+para aplicar estos archivos.
+La bandeja utiliza los scripts existentes 14, 15 y 16 del backend; si aún no se
+aplicaron en un entorno, consulta su documentación antes de probarla.

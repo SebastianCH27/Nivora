@@ -7,11 +7,13 @@ import 'modelos_proyeccion.dart';
 import 'modelos_comparacion.dart';
 import 'modelos_recibos.dart';
 import 'modelos_estadisticas.dart';
+import 'modelos_notificaciones.dart';
 export 'modelos_costos.dart';
 export 'modelos_proyeccion.dart';
 export 'modelos_comparacion.dart';
 export 'modelos_recibos.dart';
 export 'modelos_estadisticas.dart';
+export 'modelos_notificaciones.dart';
 
 class FalloApi implements Exception {
   const FalloApi(this.mensaje, {this.estado, this.reintentarEn});
@@ -166,6 +168,13 @@ abstract class ServicioNivora {
     String? periodoBase,
     String? periodoComparado,
   });
+  Future<PaginaNotificaciones> notificaciones(
+    SesionConsulta sesion, {
+    int limite = 20,
+    bool soloPendientes = false,
+    String? antesDe,
+  });
+  Future<void> marcarNotificacionLeida(SesionConsulta sesion, String id);
   void cerrar();
 }
 
@@ -425,6 +434,54 @@ class ApiNivora implements ServicioNivora {
         'No se pudieron interpretar las estadísticas. Inténtalo más tarde.',
       );
     }
+  }
+
+  @override
+  Future<PaginaNotificaciones> notificaciones(
+    SesionConsulta sesion, {
+    int limite = 20,
+    bool soloPendientes = false,
+    String? antesDe,
+  }) async {
+    if (!parametrosNotificacionesValidos(limite, antesDe)) {
+      throw const FalloApi(
+        'El rango de notificaciones no es válido. Actualiza la bandeja.',
+      );
+    }
+    final consulta = Uri(
+      queryParameters: {
+        'limite': '$limite',
+        'soloPendientes': '$soloPendientes',
+        'antesDe': ?antesDe,
+      },
+    ).query;
+    final json = await _pedir(
+      'GET',
+      '/notificaciones?$consulta',
+      200,
+      sesion: sesion,
+    );
+    try {
+      return PaginaNotificaciones.desdeJson(
+        json,
+        sesion.suministro,
+        limite: limite,
+        soloPendientes: soloPendientes,
+        antesDe: antesDe,
+      );
+    } on FormatException {
+      throw const FalloApi(
+        'No se pudieron interpretar las notificaciones. Inténtalo más tarde.',
+      );
+    }
+  }
+
+  @override
+  Future<void> marcarNotificacionLeida(SesionConsulta sesion, String id) async {
+    if (!idNotificacionValido(id)) {
+      throw const FalloApi('El aviso no es válido. Actualiza la bandeja.');
+    }
+    await _pedir('PUT', '/notificaciones/$id/leida', 204, sesion: sesion);
   }
 
   @override

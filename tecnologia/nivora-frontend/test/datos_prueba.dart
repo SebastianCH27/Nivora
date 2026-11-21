@@ -5,6 +5,7 @@ import 'datos_proyeccion_prueba.dart';
 import 'datos_comparacion_prueba.dart';
 import 'datos_recibos_prueba.dart';
 import 'datos_estadisticas_prueba.dart';
+import 'datos_notificaciones_prueba.dart';
 
 Map<String, dynamic> respuestaSesion({String suministro = '0013100390'}) => {
   'tipoToken': 'Bearer',
@@ -55,6 +56,18 @@ class ServicioPrueba implements ServicioNivora {
   int consultasComparacion = 0;
   int consultasRecibos = 0;
   int consultasEstadisticas = 0;
+  int consultasNotificaciones = 0;
+  final rangosNotificaciones =
+      <({int limite, bool soloPendientes, String? antesDe})>[];
+  final marcasNotificaciones = <String>[];
+  Future<PaginaNotificaciones> Function(
+    int limite,
+    bool soloPendientes,
+    String? antesDe,
+  )?
+  alNotificaciones;
+  Future<void> Function(String id)? alMarcarNotificacion;
+  final leidasNotificaciones = <String>{};
   final rangosEstadisticas = <int>[];
   Future<EstadisticasConsumo> Function(int meses)? alEstadisticas;
   final rangosRecibos = <({int limite, String? antesDe})>[];
@@ -151,6 +164,36 @@ class ServicioPrueba implements ServicioNivora {
     return alRecibos == null
         ? paginaRecibosPrueba(limite: limite, antesDe: antesDe)
         : await alRecibos!(limite, antesDe);
+  }
+
+  @override
+  Future<PaginaNotificaciones> notificaciones(
+    SesionConsulta sesion, {
+    int limite = 20,
+    bool soloPendientes = false,
+    String? antesDe,
+  }) async {
+    consultasNotificaciones++;
+    rangosNotificaciones.add((
+      limite: limite,
+      soloPendientes: soloPendientes,
+      antesDe: antesDe,
+    ));
+    return alNotificaciones == null
+        ? paginaNotificacionesPrueba(
+            limite: limite,
+            soloPendientes: soloPendientes,
+            antesDe: antesDe,
+            leidas: leidasNotificaciones,
+          )
+        : await alNotificaciones!(limite, soloPendientes, antesDe);
+  }
+
+  @override
+  Future<void> marcarNotificacionLeida(SesionConsulta sesion, String id) async {
+    marcasNotificaciones.add(id);
+    await alMarcarNotificacion?.call(id);
+    leidasNotificaciones.add(id);
   }
 
   @override

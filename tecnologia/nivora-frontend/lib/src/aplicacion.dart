@@ -8,6 +8,7 @@ import 'pantalla_proyeccion.dart';
 import 'pantalla_comparacion.dart';
 import 'pantalla_recibos.dart';
 import 'pantalla_estadisticas.dart';
+import 'pantalla_notificaciones.dart';
 
 const _azul = Color(0xFF123D59);
 const _turquesa = Color(0xFF087F8C);
@@ -381,6 +382,7 @@ enum _VistaConsulta {
   comparacion,
   recibos,
   estadisticas,
+  notificaciones,
 }
 
 class ResumenConsumo extends StatefulWidget {
@@ -522,6 +524,21 @@ class _ResumenConsumoState extends State<ResumenConsumo> {
                               },
                       ),
                       ChoiceChip(
+                        label: const Text('Notificaciones'),
+                        selected: vista == _VistaConsulta.notificaciones,
+                        onSelected: controlador.saliendo
+                            ? null
+                            : (_) {
+                                setState(
+                                  () => vista = _VistaConsulta.notificaciones,
+                                );
+                                if (controlador.notificaciones == null &&
+                                    controlador.errorNotificaciones == null) {
+                                  controlador.cargarNotificaciones();
+                                }
+                              },
+                      ),
+                      ChoiceChip(
                         label: const Text('Recibos'),
                         selected: vista == _VistaConsulta.recibos,
                         onSelected: controlador.saliendo
@@ -537,7 +554,9 @@ class _ResumenConsumoState extends State<ResumenConsumo> {
                     ],
                   ),
                   const SizedBox(height: 24),
-                  if (vista == _VistaConsulta.estadisticas)
+                  if (vista == _VistaConsulta.notificaciones)
+                    PantallaNotificaciones(controlador: controlador)
+                  else if (vista == _VistaConsulta.estadisticas)
                     PantallaEstadisticas(controlador: controlador)
                   else if (vista == _VistaConsulta.recibos)
                     PantallaRecibos(controlador: controlador)
