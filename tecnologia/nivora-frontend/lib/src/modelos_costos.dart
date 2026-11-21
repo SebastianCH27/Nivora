@@ -74,7 +74,7 @@ class TarifaCosto {
         ? null
         : _decimal(json['igvPorcentaje'], escala: 4);
     // Las vigencias son fechas de Lima y el extremo final es exclusivo.
-    final inicioLocal = DateTime.utc(inicio.year, inicio.month, 1);
+    final inicioLocal = DateTime.utc(inicio.year, inicio.month, inicio.day);
     final finLocal = DateTime.utc(fin.year, fin.month, fin.day);
     if (version is! int ||
         version < 1 ||
@@ -186,19 +186,38 @@ class PeriodoCosto {
     String periodoEsperado,
     DateTime consultadoEn, {
     required bool enCurso,
+    DateTime? inicioPeriodo,
+    DateTime? finPeriodo,
   }) {
     final json = _objeto(valor);
     if (json['periodo'] != periodoEsperado ||
         !RegExp(r'^[1-9][0-9]{3}-(0[1-9]|1[0-2])$').hasMatch(periodoEsperado)) {
       throw const FormatException();
     }
-    final inicio = DateTime.utc(
+    final primero = DateTime.utc(
       int.parse(periodoEsperado.substring(0, 4)),
       int.parse(periodoEsperado.substring(5)),
       1,
       5,
     );
-    final fin = DateTime.utc(inicio.year, inicio.month + 1, 1, 5);
+    final siguiente = DateTime.utc(primero.year, primero.month + 1, 1, 5);
+    final inicio = inicioPeriodo ?? primero;
+    final fin = finPeriodo ?? siguiente;
+    bool corte(DateTime fecha, DateTime mes) =>
+        fecha.isUtc &&
+        fecha.year == mes.year &&
+        fecha.month == mes.month &&
+        fecha.hour == 5 &&
+        fecha.minute == 0 &&
+        fecha.second == 0 &&
+        fecha.millisecond == 0 &&
+        fecha.microsecond == 0;
+    if ((inicioPeriodo == null) != (finPeriodo == null) ||
+        !corte(inicio, primero) ||
+        !corte(fin, siguiente) ||
+        !inicio.isBefore(fin)) {
+      throw const FormatException();
+    }
     if (_instante(json, 'inicioMes') != inicio ||
         _instante(json, 'finMesExclusivo') != fin) {
       throw const FormatException();

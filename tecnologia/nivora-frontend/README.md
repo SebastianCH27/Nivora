@@ -1,7 +1,8 @@
 # Nivora: aplicación para Android y Windows
 
 Frontend con acceso mediante código de suministro y DNI, consumo actual,
-historial mensual, costos estimados, proyección mensual, actualización manual y cierre de sesión. Usa el contrato
+historial mensual, costos estimados, proyección mensual, comparación de meses,
+actualización manual y cierre de sesión. Usa el contrato
 existente de `nivora-backend`; no contiene un acceso de demostración ni datos simulados
 en la aplicación.
 
@@ -103,6 +104,13 @@ como texto para conservar sus ceros iniciales. El DNI debe tener ocho dígitos.
   del mes actual, usando el mismo Bearer. Se carga al abrir **Proyección mensual**.
   Distingue lo observado, el volumen proyectado y el total o subtotal proyectado.
   Explica cuándo faltan lecturas, cobertura o tiempo suficiente para proyectar.
+- `GET /api/v1/acceso/consulta/comparacion`: compara el consumo y el costo
+  estimado de dos meses. Se carga al abrir **Comparación**; inicialmente el
+  backend elige el actual y el anterior. Los selectores permiten comparar
+  dos meses entre el actual y sus doce anteriores, enviando `periodoBase`
+  y `periodoComparado`. Muestra diferencias con signo, cobertura y avisos
+  sobre periodos en curso, duraciones y tarifas diferentes. Cuando faltan
+  totales, puede conservar la diferencia de consumo sin inventar un costo.
 - El token se mantiene únicamente en memoria. El formulario con el DNI se destruye
   al ingresar. El cierre de la aplicación no conserva el acceso.
 - Al vencer la sesión o recibir 401 en una consulta, se borran los datos y vuelve
@@ -125,6 +133,8 @@ La consulta en soles, sus estados y las pruebas manuales se describen en
 [Costos estimados](documentacion/costos-estimados.md).
 Los supuestos, estados y comprobaciones de la nueva pestaña están en
 [Proyección mensual](documentacion/proyeccion-mensual.md).
+La selección de periodos y la lectura de diferencias se describen en
+[Comparación mensual](documentacion/comparacion-mensual.md).
 
 El HTTP de desarrollo se limita a direcciones locales. Android permite tráfico en
 claro local solamente en la variante `debug`; la variante de publicación utiliza
@@ -135,8 +145,8 @@ servidor de publicación y la firma de distribución antes de publicar la aplica
 
 ## Alcance de esta entrega
 
-Esta entrega conecta el acceso, el resumen, el historial, los costos y la proyección al backend existente. Las
-pantallas de comparación, recibos, administración y
+Esta entrega conecta el acceso, el resumen, el historial, los costos, la proyección
+y la comparación al backend existente. Las pantallas de recibos, administración y
 notificaciones nativas se incorporarán en entregas siguientes. El ícono sigue siendo
 el de Flutter; el nombre visible de la aplicación ahora es Nivora.
 

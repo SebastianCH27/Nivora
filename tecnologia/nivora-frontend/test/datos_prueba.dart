@@ -2,6 +2,7 @@ import 'package:nivora_frontend/src/api_nivora.dart';
 
 import 'datos_costos_prueba.dart';
 import 'datos_proyeccion_prueba.dart';
+import 'datos_comparacion_prueba.dart';
 
 Map<String, dynamic> respuestaSesion({String suministro = '0013100390'}) => {
   'tipoToken': 'Bearer',
@@ -49,6 +50,10 @@ class ServicioPrueba implements ServicioNivora {
   int consultasHistorial = 0;
   int consultasCostos = 0;
   int consultasProyeccion = 0;
+  int consultasComparacion = 0;
+  final rangosComparacion = <({String? base, String? comparado})>[];
+  Future<ComparacionConsumo> Function(String? base, String? comparado)?
+  alComparar;
   Future<ProyeccionConsumo> Function()? alProyeccion;
   final rangosCostos = <int>[];
   Future<CostosConsumo> Function(int meses)? alCostos;
@@ -112,6 +117,19 @@ class ServicioPrueba implements ServicioNivora {
   Future<ProyeccionConsumo> proyeccion(SesionConsulta sesion) async {
     consultasProyeccion++;
     return alProyeccion == null ? proyeccionPrueba() : await alProyeccion!();
+  }
+
+  @override
+  Future<ComparacionConsumo> comparar(
+    SesionConsulta sesion, {
+    String? periodoBase,
+    String? periodoComparado,
+  }) async {
+    consultasComparacion++;
+    rangosComparacion.add((base: periodoBase, comparado: periodoComparado));
+    return alComparar == null
+        ? comparacionPrueba(base: periodoBase, comparado: periodoComparado)
+        : await alComparar!(periodoBase, periodoComparado);
   }
 }
 

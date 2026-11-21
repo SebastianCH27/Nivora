@@ -23,6 +23,12 @@ class ControladorConsulta extends ChangeNotifier {
   ProyeccionConsumo? proyeccion;
   String? errorProyeccion;
   bool consultandoProyeccion = false;
+  ComparacionConsumo? comparacion;
+  String? errorComparacion;
+  bool consultandoComparacion = false;
+  String? baseComparacion;
+  String? comparadoComparacion;
+  String? actualComparacion;
   String? aviso;
   String? errorConsumo;
   bool ingresando = false;
@@ -105,6 +111,7 @@ class ControladorConsulta extends ChangeNotifier {
     consultandoHistorial = false;
     consultandoCostos = false;
     consultandoProyeccion = false;
+    consultandoComparacion = false;
     notifyListeners();
     String mensaje = 'Cerraste tu sesión.';
     try {
@@ -213,6 +220,74 @@ class ControladorConsulta extends ChangeNotifier {
     });
   }
 
+  void seleccionarComparacion({String? periodoBase, String? periodoComparado}) {
+    verificarVencimiento();
+    if (_cerrado || sesion == null || consultandoComparacion || saliendo) {
+      return;
+    }
+    final base = periodoBase ?? baseComparacion;
+    final comparado = periodoComparado ?? comparadoComparacion;
+    if (base == baseComparacion && comparado == comparadoComparacion) return;
+    baseComparacion = base;
+    comparadoComparacion = comparado;
+    comparacion = null;
+    errorComparacion = null;
+    notifyListeners();
+  }
+
+  Future<void> cargarComparacion({
+    String? periodoBase,
+    String? periodoComparado,
+    bool predeterminada = false,
+  }) async {
+    verificarVencimiento();
+    final actual = sesion;
+    if (_cerrado || actual == null || consultandoComparacion || saliendo) {
+      return;
+    }
+    final base = predeterminada ? null : periodoBase ?? baseComparacion;
+    final comparado = predeterminada
+        ? null
+        : periodoComparado ?? comparadoComparacion;
+    if (base != baseComparacion || comparado != comparadoComparacion) {
+      comparacion = null;
+    }
+    baseComparacion = base;
+    comparadoComparacion = comparado;
+    errorComparacion = null;
+    consultandoComparacion = true;
+    final version = _version;
+    notifyListeners();
+    try {
+      final nueva = await api.comparar(
+        actual,
+        periodoBase: base,
+        periodoComparado: comparado,
+      );
+      if (_cerrado || version != _version) return;
+      comparacion = nueva;
+      baseComparacion = nueva.base.estimacion.periodo;
+      comparadoComparacion = nueva.comparado.estimacion.periodo;
+      if (base == null && comparado == null) {
+        actualComparacion = comparadoComparacion;
+      }
+    } on FalloApi catch (fallo) {
+      if (_cerrado || version != _version) return;
+      if (fallo.estado == 401) {
+        _limpiar('Tu sesión terminó. Vuelve a ingresar.');
+      } else {
+        errorComparacion = fallo.estado == 400
+            ? 'Elige ambos meses, sin periodos futuros y con hasta 12 meses de separación.'
+            : fallo.mensaje;
+      }
+    } finally {
+      if (!_cerrado && version == _version) {
+        consultandoComparacion = false;
+        notifyListeners();
+      }
+    }
+  }
+
   Future<void> cargarProyeccion() async {
     verificarVencimiento();
     final actual = sesion;
@@ -244,6 +319,10 @@ class ControladorConsulta extends ChangeNotifier {
     _temporizador?.cancel();
     sesion = null;
     consumo = null;
+    comparacion = null;
+    errorComparacion = null;
+    consultandoComparacion = false;
+    baseComparacion = comparadoComparacion = actualComparacion = null;
     proyeccion = null;
     errorProyeccion = null;
     consultandoProyeccion = false;
@@ -269,6 +348,7 @@ class ControladorConsulta extends ChangeNotifier {
     _temporizador?.cancel();
     sesion = null;
     consumo = null;
+    comparacion = null;
     proyeccion = null;
     costos = null;
     historial = null;

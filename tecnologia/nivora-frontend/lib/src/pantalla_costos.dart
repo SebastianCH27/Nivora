@@ -124,7 +124,7 @@ class PantallaCostos extends StatelessWidget {
             ),
           ),
           const SizedBox(height: 12),
-          _TarjetaCosto(
+          TarjetaCosto(
             key: ValueKey('costo-${datos.actual.periodo}'),
             costo: datos.actual,
           ),
@@ -139,10 +139,7 @@ class PantallaCostos extends StatelessWidget {
           ),
           const SizedBox(height: 12),
           for (final costo in datos.anteriores) ...[
-            _TarjetaCosto(
-              key: ValueKey('costo-${costo.periodo}'),
-              costo: costo,
-            ),
+            TarjetaCosto(key: ValueKey('costo-${costo.periodo}'), costo: costo),
             const SizedBox(height: 12),
           ],
         ],
@@ -151,8 +148,8 @@ class PantallaCostos extends StatelessWidget {
   }
 }
 
-class _TarjetaCosto extends StatelessWidget {
-  const _TarjetaCosto({super.key, required this.costo});
+class TarjetaCosto extends StatelessWidget {
+  const TarjetaCosto({super.key, required this.costo});
   final PeriodoCosto costo;
 
   @override

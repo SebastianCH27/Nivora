@@ -5,6 +5,7 @@ import 'controlador_consulta.dart';
 import 'formatos_consulta.dart';
 import 'pantalla_costos.dart';
 import 'pantalla_proyeccion.dart';
+import 'pantalla_comparacion.dart';
 
 const _azul = Color(0xFF123D59);
 const _turquesa = Color(0xFF087F8C);
@@ -364,7 +365,7 @@ class Aviso extends StatelessWidget {
   );
 }
 
-enum _VistaConsulta { actual, historial, costos, proyeccion }
+enum _VistaConsulta { actual, historial, costos, proyeccion, comparacion }
 
 class ResumenConsumo extends StatefulWidget {
   const ResumenConsumo({super.key, required this.controlador});
@@ -473,10 +474,28 @@ class _ResumenConsumoState extends State<ResumenConsumo> {
                                 }
                               },
                       ),
+                      ChoiceChip(
+                        label: const Text('Comparación'),
+                        selected: vista == _VistaConsulta.comparacion,
+                        onSelected: controlador.saliendo
+                            ? null
+                            : (_) {
+                                setState(
+                                  () => vista = _VistaConsulta.comparacion,
+                                );
+                                if (controlador.actualComparacion == null &&
+                                    controlador.comparacion == null &&
+                                    controlador.errorComparacion == null) {
+                                  controlador.cargarComparacion();
+                                }
+                              },
+                      ),
                     ],
                   ),
                   const SizedBox(height: 24),
-                  if (vista == _VistaConsulta.proyeccion)
+                  if (vista == _VistaConsulta.comparacion)
+                    PantallaComparacion(controlador: controlador)
+                  else if (vista == _VistaConsulta.proyeccion)
                     PantallaProyeccion(controlador: controlador)
                   else if (vista == _VistaConsulta.costos)
                     PantallaCostos(controlador: controlador)

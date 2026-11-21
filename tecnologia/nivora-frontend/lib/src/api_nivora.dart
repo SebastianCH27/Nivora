@@ -4,8 +4,10 @@ import 'dart:io';
 
 import 'modelos_costos.dart';
 import 'modelos_proyeccion.dart';
+import 'modelos_comparacion.dart';
 export 'modelos_costos.dart';
 export 'modelos_proyeccion.dart';
+export 'modelos_comparacion.dart';
 
 class FalloApi implements Exception {
   const FalloApi(this.mensaje, {this.estado, this.reintentarEn});
@@ -146,6 +148,11 @@ abstract class ServicioNivora {
   Future<void> salir(SesionConsulta sesion);
   Future<CostosConsumo> costos(SesionConsulta sesion, {int meses = 3});
   Future<ProyeccionConsumo> proyeccion(SesionConsulta sesion);
+  Future<ComparacionConsumo> comparar(
+    SesionConsulta sesion, {
+    String? periodoBase,
+    String? periodoComparado,
+  });
   void cerrar();
 }
 
@@ -376,6 +383,40 @@ class ApiNivora implements ServicioNivora {
     } on FormatException {
       throw const FalloApi(
         'No se pudo interpretar la proyección. Inténtalo más tarde.',
+      );
+    }
+  }
+
+  @override
+  Future<ComparacionConsumo> comparar(
+    SesionConsulta sesion, {
+    String? periodoBase,
+    String? periodoComparado,
+  }) async {
+    if (!rangoComparacionValido(periodoBase, periodoComparado)) {
+      throw const FalloApi(
+        'Selecciona ambos meses, con hasta 12 meses de separación.',
+      );
+    }
+    final consulta = periodoBase == null
+        ? ''
+        : '?${Uri(queryParameters: {'periodoBase': periodoBase, 'periodoComparado': periodoComparado!}).query}';
+    final json = await _pedir(
+      'GET',
+      '/comparacion$consulta',
+      200,
+      sesion: sesion,
+    );
+    try {
+      return ComparacionConsumo.desdeJson(
+        json,
+        sesion.suministro,
+        periodoBase: periodoBase,
+        periodoComparado: periodoComparado,
+      );
+    } on FormatException {
+      throw const FalloApi(
+        'No se pudo interpretar la comparación. Inténtalo más tarde.',
       );
     }
   }
