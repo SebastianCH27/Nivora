@@ -2,6 +2,9 @@ import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
 
+import 'modelos_costos.dart';
+export 'modelos_costos.dart';
+
 class FalloApi implements Exception {
   const FalloApi(this.mensaje, {this.estado, this.reintentarEn});
   final String mensaje;
@@ -139,6 +142,7 @@ abstract class ServicioNivora {
     String? hasta,
   });
   Future<void> salir(SesionConsulta sesion);
+  Future<CostosConsumo> costos(SesionConsulta sesion, {int meses = 3});
   void cerrar();
 }
 
@@ -339,6 +343,26 @@ class ApiNivora implements ServicioNivora {
       cliente.close(force: true);
     }
     _clientes.clear();
+  }
+
+  @override
+  Future<CostosConsumo> costos(SesionConsulta sesion, {int meses = 3}) async {
+    if (meses < 1 || meses > 12) {
+      throw const FalloApi('Selecciona entre 1 y 12 meses anteriores.');
+    }
+    final json = await _pedir(
+      'GET',
+      '/costos?meses=$meses',
+      200,
+      sesion: sesion,
+    );
+    try {
+      return CostosConsumo.desdeJson(json, sesion.suministro, meses: meses);
+    } on FormatException {
+      throw const FalloApi(
+        'No se pudieron interpretar los costos. Inténtalo más tarde.',
+      );
+    }
   }
 }
 

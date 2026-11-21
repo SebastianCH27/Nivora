@@ -16,6 +16,10 @@ class ControladorConsulta extends ChangeNotifier {
   bool consultandoHistorial = false;
   int mesesHistorial = 12;
   String? hastaHistorial;
+  CostosConsumo? costos;
+  String? errorCostos;
+  bool consultandoCostos = false;
+  int mesesCostos = 3;
   String? aviso;
   String? errorConsumo;
   bool ingresando = false;
@@ -96,6 +100,7 @@ class ControladorConsulta extends ChangeNotifier {
     final version = ++_version;
     consultando = false;
     consultandoHistorial = false;
+    consultandoCostos = false;
     notifyListeners();
     String mensaje = 'Cerraste tu sesión.';
     try {
@@ -160,6 +165,37 @@ class ControladorConsulta extends ChangeNotifier {
     }
   }
 
+  Future<void> cargarCostos({int? meses}) async {
+    verificarVencimiento();
+    final actual = sesion;
+    if (_cerrado || actual == null || consultandoCostos || saliendo) return;
+    final nuevosMeses = meses ?? mesesCostos;
+    if (nuevosMeses != mesesCostos) costos = null;
+    mesesCostos = nuevosMeses;
+    errorCostos = null;
+    consultandoCostos = true;
+    final version = _version;
+    notifyListeners();
+    try {
+      final nuevo = await api.costos(actual, meses: nuevosMeses);
+      if (!_cerrado && version == _version) costos = nuevo;
+    } on FalloApi catch (fallo) {
+      if (_cerrado || version != _version) return;
+      if (fallo.estado == 401) {
+        _limpiar('Tu sesión terminó. Vuelve a ingresar.');
+      } else {
+        errorCostos = fallo.estado == 400
+            ? 'Selecciona entre 1 y 12 meses anteriores para consultar los costos.'
+            : fallo.mensaje;
+      }
+    } finally {
+      if (!_cerrado && version == _version) {
+        consultandoCostos = false;
+        notifyListeners();
+      }
+    }
+  }
+
   void _iniciarReloj() {
     _temporizador?.cancel();
     _temporizador = Timer.periodic(const Duration(seconds: 1), (_) {
@@ -178,6 +214,10 @@ class ControladorConsulta extends ChangeNotifier {
     _temporizador?.cancel();
     sesion = null;
     consumo = null;
+    costos = null;
+    errorCostos = null;
+    consultandoCostos = false;
+    mesesCostos = 3;
     historial = null;
     errorHistorial = null;
     consultandoHistorial = false;
@@ -196,6 +236,7 @@ class ControladorConsulta extends ChangeNotifier {
     _temporizador?.cancel();
     sesion = null;
     consumo = null;
+    costos = null;
     historial = null;
     api.cerrar();
     super.dispose();

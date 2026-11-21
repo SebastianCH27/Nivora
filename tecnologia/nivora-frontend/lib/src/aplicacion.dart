@@ -2,6 +2,8 @@ import 'package:material_ui/material_ui.dart';
 
 import 'api_nivora.dart';
 import 'controlador_consulta.dart';
+import 'formatos_consulta.dart';
+import 'pantalla_costos.dart';
 
 const _azul = Color(0xFF123D59);
 const _turquesa = Color(0xFF087F8C);
@@ -361,6 +363,8 @@ class Aviso extends StatelessWidget {
   );
 }
 
+enum _VistaConsulta { actual, historial, costos }
+
 class ResumenConsumo extends StatefulWidget {
   const ResumenConsumo({super.key, required this.controlador});
   final ControladorConsulta controlador;
@@ -370,7 +374,7 @@ class ResumenConsumo extends StatefulWidget {
 }
 
 class _ResumenConsumoState extends State<ResumenConsumo> {
-  bool verHistorial = false;
+  _VistaConsulta vista = _VistaConsulta.actual;
   ControladorConsulta get controlador => widget.controlador;
 
   @override
@@ -418,30 +422,47 @@ class _ResumenConsumoState extends State<ResumenConsumo> {
                     children: [
                       ChoiceChip(
                         label: const Text('Consumo actual'),
-                        selected: !verHistorial,
+                        selected: vista == _VistaConsulta.actual,
                         onSelected: controlador.saliendo
                             ? null
                             : (_) {
-                                setState(() => verHistorial = false);
+                                setState(() => vista = _VistaConsulta.actual);
                               },
                       ),
                       ChoiceChip(
                         label: const Text('Historial mensual'),
-                        selected: verHistorial,
+                        selected: vista == _VistaConsulta.historial,
                         onSelected: controlador.saliendo
                             ? null
                             : (_) {
-                                setState(() => verHistorial = true);
+                                setState(
+                                  () => vista = _VistaConsulta.historial,
+                                );
                                 if (controlador.historial == null &&
                                     controlador.errorHistorial == null) {
                                   controlador.cargarHistorial();
                                 }
                               },
                       ),
+                      ChoiceChip(
+                        label: const Text('Costos estimados'),
+                        selected: vista == _VistaConsulta.costos,
+                        onSelected: controlador.saliendo
+                            ? null
+                            : (_) {
+                                setState(() => vista = _VistaConsulta.costos);
+                                if (controlador.costos == null &&
+                                    controlador.errorCostos == null) {
+                                  controlador.cargarCostos();
+                                }
+                              },
+                      ),
                     ],
                   ),
                   const SizedBox(height: 24),
-                  if (verHistorial)
+                  if (vista == _VistaConsulta.costos)
+                    PantallaCostos(controlador: controlador)
+                  else if (vista == _VistaConsulta.historial)
                     _HistorialMensual(controlador: controlador)
                   else ...[
                     Wrap(
@@ -568,7 +589,7 @@ class _HistorialMensual extends StatelessWidget {
         Text(
           controlador.hastaHistorial == null
               ? 'Últimos ${controlador.mesesHistorial} meses terminados'
-              : 'Hasta ${_mes(controlador.hastaHistorial!)}',
+              : 'Hasta ${nombreMes(controlador.hastaHistorial!)}',
         ),
         if (ocupado) ...[
           const SizedBox(height: 16),
@@ -599,12 +620,12 @@ class _HistorialMensual extends StatelessWidget {
         if (datos != null) ...[
           const SizedBox(height: 16),
           Text(
-            '${_mes(datos.periodos.last.periodo)} — ${_mes(datos.periodos.first.periodo)}',
+            '${nombreMes(datos.periodos.last.periodo)} — ${nombreMes(datos.periodos.first.periodo)}',
             style: const TextStyle(fontWeight: FontWeight.w700, color: _azul),
           ),
           const SizedBox(height: 8),
           Text(
-            'Consultado: ${_fechaLima(datos.consultadoEn)}',
+            'Consultado: ${fechaLima(datos.consultadoEn)}',
             style: const TextStyle(color: Color(0xFF536976)),
           ),
           const SizedBox(height: 16),
@@ -694,7 +715,7 @@ class _TarjetaMes extends StatelessWidget {
       clipBehavior: Clip.antiAlias,
       child: ExpansionTile(
         title: Text(
-          _mes(mes.periodo),
+          nombreMes(mes.periodo),
           style: const TextStyle(fontWeight: FontWeight.w700, color: _azul),
         ),
         subtitle: Padding(
@@ -725,7 +746,7 @@ class _TarjetaMes extends StatelessWidget {
           if (mes.desde != null && mes.hasta != null) ...[
             const SizedBox(height: 10),
             Text(
-              'Tramo medido: ${_fechaLima(mes.desde!)} a ${_fechaLima(mes.hasta!)}',
+              'Tramo medido: ${fechaLima(mes.desde!)} a ${fechaLima(mes.hasta!)}',
               style: const TextStyle(height: 1.5),
             ),
           ],
@@ -766,7 +787,7 @@ class _TarjetaConsumo extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            _mes(consumo.periodo),
+            nombreMes(consumo.periodo),
             style: const TextStyle(
               color: _turquesa,
               fontSize: 16,
@@ -801,14 +822,14 @@ class _TarjetaConsumo extends StatelessWidget {
           if (consumo.desde != null && consumo.hasta != null) ...[
             const SizedBox(height: 16),
             Text(
-              'Tramo medido: ${_fechaLima(consumo.desde!)} a ${_fechaLima(consumo.hasta!)}',
+              'Tramo medido: ${fechaLima(consumo.desde!)} a ${fechaLima(consumo.hasta!)}',
             ),
           ],
           const Divider(height: 40),
           Text(
             consumo.ultimaLectura == null
                 ? 'Última lectura: no disponible'
-                : 'Última lectura: ${_fechaLima(consumo.ultimaLectura!)}',
+                : 'Última lectura: ${fechaLima(consumo.ultimaLectura!)}',
           ),
           const SizedBox(height: 10),
           Text(switch (consumo.actualizacion) {
@@ -823,29 +844,4 @@ class _TarjetaConsumo extends StatelessWidget {
       ),
     );
   }
-}
-
-String _fechaLima(DateTime utc) {
-  final fecha = utc.toUtc().subtract(const Duration(hours: 5));
-  String dos(int n) => n.toString().padLeft(2, '0');
-  return '${dos(fecha.day)}/${dos(fecha.month)}/${fecha.year} '
-      '${dos(fecha.hour)}:${dos(fecha.minute)} (Lima)';
-}
-
-String _mes(String periodo) {
-  const meses = [
-    'Enero',
-    'Febrero',
-    'Marzo',
-    'Abril',
-    'Mayo',
-    'Junio',
-    'Julio',
-    'Agosto',
-    'Septiembre',
-    'Octubre',
-    'Noviembre',
-    'Diciembre',
-  ];
-  return '${meses[int.parse(periodo.substring(5)) - 1]} ${periodo.substring(0, 4)}';
 }
