@@ -8,6 +8,8 @@ import 'modelos_comparacion.dart';
 import 'modelos_recibos.dart';
 import 'modelos_estadisticas.dart';
 import 'modelos_notificaciones.dart';
+import 'modelos_configuracion_notificaciones.dart';
+export 'modelos_configuracion_notificaciones.dart';
 export 'modelos_costos.dart';
 export 'modelos_proyeccion.dart';
 export 'modelos_comparacion.dart';
@@ -175,6 +177,16 @@ abstract class ServicioNivora {
     String? antesDe,
   });
   Future<void> marcarNotificacionLeida(SesionConsulta sesion, String id);
+  Future<PreferenciaNotificaciones?> configuracionNotificaciones(
+    SesionConsulta sesion,
+    String id,
+  );
+  Future<PreferenciaNotificaciones> guardarConfiguracionNotificaciones(
+    SesionConsulta sesion,
+    String id,
+    PermisoNotificaciones permiso,
+    bool habilitadas,
+  );
   void cerrar();
 }
 
@@ -212,7 +224,7 @@ class ApiNivora implements ServicioNivora {
     String ruta,
     int esperado, {
     SesionConsulta? sesion,
-    Map<String, String>? datos,
+    Map<String, Object>? datos,
   }) async {
     if (!configuracionValida) {
       throw const FalloApi('No se pudo configurar la conexión con Nivora.');
@@ -474,6 +486,69 @@ class ApiNivora implements ServicioNivora {
         'No se pudieron interpretar las notificaciones. Inténtalo más tarde.',
       );
     }
+  }
+
+  @override
+  Future<PreferenciaNotificaciones?> configuracionNotificaciones(
+    SesionConsulta sesion,
+    String id,
+  ) async {
+    if (!idDispositivoValido(id)) {
+      throw const FalloApi('El dispositivo no es válido.');
+    }
+    Object? json;
+    try {
+      json = await _pedir(
+        'GET',
+        '/notificaciones/dispositivos/$id',
+        200,
+        sesion: sesion,
+      );
+    } on FalloApi catch (e) {
+      if (e.estado == 404) return null;
+      rethrow;
+    }
+    return _preferencia(json, id);
+  }
+
+  PreferenciaNotificaciones _preferencia(Object? json, String id) {
+    try {
+      return PreferenciaNotificaciones.desdeJson(json, id);
+    } on FormatException {
+      throw const FalloApi(
+        'No pudimos interpretar la configuración de notificaciones. Actualízala.',
+      );
+    }
+  }
+
+  @override
+  Future<PreferenciaNotificaciones> guardarConfiguracionNotificaciones(
+    SesionConsulta sesion,
+    String id,
+    PermisoNotificaciones permiso,
+    bool habilitadas,
+  ) async {
+    if (!idDispositivoValido(id) ||
+        (habilitadas && permiso != PermisoNotificaciones.concedido)) {
+      throw const FalloApi(
+        'Concede el permiso antes de activar las notificaciones.',
+      );
+    }
+    final json = await _pedir(
+      'PUT',
+      '/notificaciones/dispositivos/$id',
+      200,
+      sesion: sesion,
+      datos: {'permiso': permiso.codigo, 'habilitadas': habilitadas},
+    );
+    final preferencia = _preferencia(json, id);
+    if (preferencia.permiso != permiso ||
+        preferencia.habilitadas != habilitadas) {
+      throw const FalloApi(
+        'No pudimos confirmar el cambio. Actualiza la configuración.',
+      );
+    }
+    return preferencia;
   }
 
   @override

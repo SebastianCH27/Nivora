@@ -3,11 +3,24 @@ import 'dart:async';
 import 'package:flutter/foundation.dart';
 
 import 'api_nivora.dart';
+import 'dispositivo_notificaciones.dart';
 
 class ControladorConsulta extends ChangeNotifier {
-  ControladorConsulta(this.api, {DateTime Function()? reloj})
+  ControladorConsulta(this.api, {DateTime Function()? reloj, this.dispositivo})
     : reloj = reloj ?? DateTime.now;
   final ServicioNivora api;
+  final DispositivoNotificaciones? dispositivo;
+  PreferenciaNotificaciones? preferenciaNotificaciones;
+  PermisoNotificaciones? permisoDispositivo;
+  String? idDispositivo;
+  bool configuracionAbierta = false;
+  bool configurandoNotificaciones = false;
+  bool configuracionConfirmada = false;
+  String? errorConfiguracion;
+  String? mensajeConfiguracion;
+  bool _revisarPermisoAlTerminar = false;
+  Object? _revisionPermiso;
+
   final DateTime Function() reloj;
   SesionConsulta? sesion;
   ConsumoActual? consumo;
@@ -91,7 +104,12 @@ class ControladorConsulta extends ChangeNotifier {
         notifyListeners();
       }
     }
-    if (!_cerrado && version == _version && sesion != null) await actualizar();
+    if (!_cerrado && version == _version && sesion != null) {
+      await actualizar();
+      if (!_cerrado && version == _version && sesion != null) {
+        await configurarNotificaciones();
+      }
+    }
   }
 
   Future<void> actualizar() async {
@@ -124,6 +142,7 @@ class ControladorConsulta extends ChangeNotifier {
     final actual = sesion;
     if (_cerrado || actual == null || saliendo) return;
     saliendo = true;
+    _limpiarConfiguracion();
     // Invalida las consultas que todavía estén en curso.
     final version = ++_version;
     consultando = false;
@@ -275,6 +294,183 @@ class ControladorConsulta extends ChangeNotifier {
         notifyListeners();
       }
     }
+  }
+
+  bool _configuracionVigente(int version, SesionConsulta actual) {
+    if (_cerrado || version != _version || saliendo || sesion != actual) {
+      return false;
+    }
+    verificarVencimiento();
+    return !_cerrado && version == _version && sesion == actual;
+  }
+
+  Future<void> configurarNotificaciones({
+    bool? habilitar,
+    bool solicitar = false,
+  }) async {
+    verificarVencimiento();
+    final actual = sesion;
+    final dispositivoActual = dispositivo;
+    if (_cerrado ||
+        actual == null ||
+        saliendo ||
+        configurandoNotificaciones ||
+        dispositivoActual == null) {
+      return;
+    }
+    // Una acción explícita sustituye cualquier lectura al recuperar el foco.
+    _revisionPermiso = null;
+    configuracionAbierta = true;
+    configurandoNotificaciones = true;
+    configuracionConfirmada = false;
+    errorConfiguracion = mensajeConfiguracion = null;
+    final version = _version;
+    notifyListeners();
+    try {
+      final id = await dispositivoActual.identificar();
+      if (!_configuracionVigente(version, actual)) return;
+      idDispositivo = id;
+      var permiso = solicitar
+          ? await dispositivoActual.solicitarPermiso()
+          : await dispositivoActual.consultarPermiso();
+      if (!_configuracionVigente(version, actual)) return;
+      permisoDispositivo = permiso;
+      // Consultar antes de escribir conserva la preferencia de este suministro.
+      final guardada = await api.configuracionNotificaciones(actual, id);
+      if (!_configuracionVigente(version, actual)) return;
+      // El permiso pudo cambiar mientras se esperaba la respuesta del servidor.
+      permiso = await dispositivoActual.consultarPermiso();
+      if (!_configuracionVigente(version, actual)) return;
+      permisoDispositivo = permiso;
+      final habilitadas =
+          permiso == PermisoNotificaciones.concedido &&
+          (habilitar ?? guardada?.habilitadas ?? false);
+      final nueva =
+          guardada != null &&
+              guardada.permiso == permiso &&
+              guardada.habilitadas == habilitadas
+          ? guardada
+          : await api.guardarConfiguracionNotificaciones(
+              actual,
+              id,
+              permiso,
+              habilitadas,
+            );
+      if (!_configuracionVigente(version, actual)) return;
+      preferenciaNotificaciones = nueva;
+      configuracionConfirmada = true;
+      if (habilitar != null || solicitar) {
+        mensajeConfiguracion = solicitar
+            ? switch (permiso) {
+                PermisoNotificaciones.concedido => 'Permiso concedido. Puedes activar el interruptor para este suministro.',
+                PermisoNotificaciones.denegado => 'El sistema mantiene las notificaciones bloqueadas. Revisa los ajustes del sistema.',
+                PermisoNotificaciones.pendiente => 'El sistema todavía no confirmó el permiso. Pulsa Actualizar configuración para comprobarlo de nuevo.',
+              }
+            : nueva.habilitadas
+            ? 'Notificaciones activadas para este dispositivo y suministro.'
+            : 'Notificaciones desactivadas para este dispositivo y suministro.';
+      }
+    } on FalloApi catch (fallo) {
+      if (!_configuracionVigente(version, actual)) return;
+      if (fallo.estado == 401) {
+        _limpiar('Tu sesión terminó. Vuelve a ingresar.');
+      } else {
+        errorConfiguracion =
+            'No pudimos confirmar la configuración. ${fallo.mensaje}';
+      }
+    } finally {
+      if (!_cerrado && version == _version) {
+        configurandoNotificaciones = false;
+        notifyListeners();
+        if (_revisarPermisoAlTerminar) {
+          _revisarPermisoAlTerminar = false;
+          revisarPermisoAlVolver();
+        }
+      }
+    }
+  }
+
+  void revisarPermisoAlVolver() {
+    verificarVencimiento();
+    if (_cerrado ||
+        sesion == null ||
+        saliendo ||
+        !configuracionAbierta ||
+        dispositivo == null) {
+      return;
+    }
+    if (configurandoNotificaciones || _revisionPermiso != null) {
+      _revisarPermisoAlTerminar = true;
+    } else {
+      unawaited(_comprobarPermisoAlVolver());
+    }
+  }
+
+  Future<void> _comprobarPermisoAlVolver() async {
+    final actual = sesion!;
+    final version = _version;
+    final revision = Object();
+    _revisionPermiso = revision;
+    bool vigente() =>
+        identical(_revisionPermiso, revision) &&
+        _configuracionVigente(version, actual);
+    try {
+      // Cambiar de ventana no requiere recargar la preferencia del servidor.
+      // Sin cambios de permiso, la pantalla conserva su estado y su altura.
+      final permiso = await dispositivo!.consultarPermiso();
+      if (!vigente()) return;
+      if (permiso != permisoDispositivo || !configuracionConfirmada) {
+        permisoDispositivo = permiso;
+        await configurarNotificaciones();
+      }
+    } on FalloApi catch (fallo) {
+      if (!vigente()) return;
+      configuracionConfirmada = false;
+      mensajeConfiguracion = null;
+      errorConfiguracion =
+          'No pudimos confirmar la configuración. ${fallo.mensaje}';
+      notifyListeners();
+    } finally {
+      if (identical(_revisionPermiso, revision)) {
+        _revisionPermiso = null;
+        if (_revisarPermisoAlTerminar) {
+          _revisarPermisoAlTerminar = false;
+          revisarPermisoAlVolver();
+        }
+      }
+    }
+  }
+
+  Future<void> abrirAjustesNotificaciones() async {
+    verificarVencimiento();
+    final dispositivoActual = dispositivo;
+    if (_cerrado ||
+        sesion == null ||
+        saliendo ||
+        configurandoNotificaciones ||
+        dispositivoActual == null) {
+      return;
+    }
+    final version = _version;
+    try {
+      await dispositivoActual.abrirAjustes();
+    } on FalloApi catch (e) {
+      if (!_cerrado && version == _version) {
+        errorConfiguracion = e.mensaje;
+        notifyListeners();
+      }
+    }
+  }
+
+  void _limpiarConfiguracion() {
+    preferenciaNotificaciones = null;
+    permisoDispositivo = null;
+    idDispositivo = null;
+    configuracionAbierta = configurandoNotificaciones =
+        configuracionConfirmada = false;
+    _revisarPermisoAlTerminar = false;
+    _revisionPermiso = null;
+    errorConfiguracion = mensajeConfiguracion = null;
   }
 
   Future<void> cargarNotificaciones({
@@ -513,6 +709,7 @@ class ControladorConsulta extends ChangeNotifier {
     ++_version;
     _temporizador?.cancel();
     sesion = null;
+    _limpiarConfiguracion();
     notificaciones = null;
     soloPendientesNotificaciones = false;
     consultandoNotificaciones = ampliandoNotificaciones =
@@ -556,6 +753,7 @@ class ControladorConsulta extends ChangeNotifier {
     ++_version;
     _temporizador?.cancel();
     sesion = null;
+    _limpiarConfiguracion();
     notificaciones = null;
     soloPendientesNotificaciones = false;
     consultandoNotificaciones = ampliandoNotificaciones =

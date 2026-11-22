@@ -144,6 +144,10 @@ como texto para conservar sus ceros iniciales. El DNI debe tener ocho dígitos.
   cuando se recibe HTTP 204. La lectura se guarda por suministro y se comparte
   entre sesiones y personas que lo consultan. Abrir el detalle no marca el aviso.
   Actualizar recupera la fecha del servidor; leer no cambia el pago de un recibo.
+- `GET/PUT /api/v1/acceso/consulta/notificaciones/dispositivos/{uuid}`: permiso
+  del sistema y activación para esta instalación y el suministro de la sesión.
+  Se sincroniza al ingresar y al volver a la app. Solicitar permiso y activar
+  son acciones distintas; revocar el permiso desactiva la preferencia.
 - El token se mantiene únicamente en memoria. El formulario con el DNI se destruye
   al ingresar. El cierre de la aplicación no conserva el acceso.
 - Al vencer la sesión o recibir 401 en una consulta, se borran los datos y vuelve
@@ -174,6 +178,8 @@ Las reglas del resumen y la lectura de las barras se describen en
 [Estadísticas y gráfico mensual](documentacion/estadisticas.md).
 Los tipos de avisos, la lectura compartida y sus comprobaciones se describen en
 [Bandeja de notificaciones](documentacion/notificaciones.md).
+El permiso de Android/Windows, la identidad por instalación y las pruebas locales
+se describen en [Configuración de notificaciones](documentacion/configuracion-notificaciones.md).
 
 El HTTP de desarrollo se limita a direcciones locales. Android permite tráfico en
 claro local solamente en la variante `debug`; la variante de publicación utiliza

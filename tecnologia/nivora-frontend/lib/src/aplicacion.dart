@@ -1,6 +1,7 @@
 import 'package:material_ui/material_ui.dart';
 
 import 'api_nivora.dart';
+import 'dispositivo_notificaciones.dart';
 import 'controlador_consulta.dart';
 import 'formatos_consulta.dart';
 import 'pantalla_costos.dart';
@@ -15,7 +16,8 @@ const _turquesa = Color(0xFF087F8C);
 const _fondo = Color(0xFFF3F7F8);
 
 class NivoraApp extends StatefulWidget {
-  const NivoraApp({super.key, required this.api});
+  const NivoraApp({super.key, required this.api, this.dispositivo});
+  final DispositivoNotificaciones? dispositivo;
   final ServicioNivora api;
 
   @override
@@ -28,13 +30,19 @@ class _NivoraAppState extends State<NivoraApp> with WidgetsBindingObserver {
   @override
   void initState() {
     super.initState();
-    controlador = ControladorConsulta(widget.api);
+    controlador = ControladorConsulta(
+      widget.api,
+      dispositivo:
+          widget.dispositivo ?? const DispositivoNotificacionesNativo(),
+    );
     WidgetsBinding.instance.addObserver(this);
   }
 
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
-    if (state == AppLifecycleState.resumed) controlador.verificarVencimiento();
+    if (state == AppLifecycleState.resumed) {
+      controlador.revisarPermisoAlVolver();
+    }
   }
 
   @override

@@ -6,13 +6,16 @@ import 'package:nivora_frontend/src/api_nivora.dart';
 import 'package:nivora_frontend/src/aplicacion.dart';
 
 import 'datos_prueba.dart';
+import 'datos_dispositivo_prueba.dart';
 import 'datos_notificaciones_prueba.dart';
 
 const reciboId = 'RECIBO_DISPONIBLE-2026-10';
 const alertaId = 'ALERTA_CONSUMO-2026-10';
 
 Future<void> abrirBandeja(WidgetTester tester, ServicioPrueba api) async {
-  await tester.pumpWidget(NivoraApp(api: api));
+  await tester.pumpWidget(
+    NivoraApp(api: api, dispositivo: DispositivoPrueba()),
+  );
   await tester.enterText(find.byType(TextFormField).at(0), '0013100390');
   await tester.enterText(find.byType(TextFormField).at(1), '01234567');
   await tester.ensureVisible(find.text('Ingresar'));

@@ -3,13 +3,16 @@ import 'package:material_ui/material_ui.dart';
 import 'package:nivora_frontend/src/aplicacion.dart';
 
 import 'datos_prueba.dart';
+import 'datos_dispositivo_prueba.dart';
 
 void main() {
   testWidgets('valida ambos campos antes de consultar el backend', (
     tester,
   ) async {
     final api = ServicioPrueba();
-    await tester.pumpWidget(NivoraApp(api: api));
+    await tester.pumpWidget(
+      NivoraApp(api: api, dispositivo: DispositivoPrueba()),
+    );
     await tester.ensureVisible(find.text('Ingresar'));
     await tester.tap(find.text('Ingresar'));
     await tester.pumpAndSettle();
@@ -26,7 +29,9 @@ void main() {
     'acceso real del formulario, consumo parcial y cierre de sesión',
     (tester) async {
       final api = ServicioPrueba();
-      await tester.pumpWidget(NivoraApp(api: api));
+      await tester.pumpWidget(
+        NivoraApp(api: api, dispositivo: DispositivoPrueba()),
+      );
       await tester.enterText(find.byType(TextFormField).at(0), '0013100390');
       await tester.enterText(find.byType(TextFormField).at(1), '01234567');
       await tester.ensureVisible(find.text('Ingresar'));
@@ -57,7 +62,9 @@ void main() {
       tester.view.devicePixelRatio = 1;
       addTearDown(tester.view.resetPhysicalSize);
       addTearDown(tester.view.resetDevicePixelRatio);
-      await tester.pumpWidget(NivoraApp(api: ServicioPrueba()));
+      await tester.pumpWidget(
+        NivoraApp(api: ServicioPrueba(), dispositivo: DispositivoPrueba()),
+      );
       await tester.pumpAndSettle();
       expect(find.text('Consulta tu suministro'), findsOneWidget);
       expect(tester.takeException(), isNull);

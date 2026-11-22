@@ -1,6 +1,7 @@
 import 'package:material_ui/material_ui.dart';
 
 import 'api_nivora.dart';
+import 'configuracion_notificaciones.dart';
 import 'controlador_consulta.dart';
 import 'formatos_consulta.dart';
 
@@ -34,6 +35,8 @@ class PantallaNotificaciones extends StatelessWidget {
           'La marca de lectura se comparte entre quienes consultan el mismo suministro.',
           style: TextStyle(height: 1.5),
         ),
+        const SizedBox(height: 20),
+        ConfiguracionNotificaciones(controlador: control),
         const SizedBox(height: 20),
         Wrap(
           spacing: 12,

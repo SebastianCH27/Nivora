@@ -47,6 +47,63 @@ ConsumoActual consumoPrueba() =>
     ConsumoActual.desdeJson(respuestaConsumo(), '0013100390');
 
 class ServicioPrueba implements ServicioNivora {
+  final preferenciasDispositivo = <String, PreferenciaNotificaciones>{};
+  int consultasConfiguracion = 0;
+  final cambiosConfiguracion =
+      <
+        ({
+          String suministro,
+          String id,
+          PermisoNotificaciones permiso,
+          bool habilitadas,
+        })
+      >[];
+  Future<PreferenciaNotificaciones?> Function(SesionConsulta, String)?
+  alConfiguracion;
+  Future<PreferenciaNotificaciones> Function(
+    SesionConsulta,
+    String,
+    PermisoNotificaciones,
+    bool,
+  )?
+  alGuardarConfiguracion;
+
+  @override
+  Future<PreferenciaNotificaciones?> configuracionNotificaciones(
+    SesionConsulta sesion,
+    String id,
+  ) async {
+    consultasConfiguracion++;
+    if (alConfiguracion != null) return alConfiguracion!(sesion, id);
+    return preferenciasDispositivo['${sesion.suministro}/$id'];
+  }
+
+  @override
+  Future<PreferenciaNotificaciones> guardarConfiguracionNotificaciones(
+    SesionConsulta sesion,
+    String id,
+    PermisoNotificaciones permiso,
+    bool habilitadas,
+  ) async {
+    cambiosConfiguracion.add((
+      suministro: sesion.suministro,
+      id: id,
+      permiso: permiso,
+      habilitadas: habilitadas,
+    ));
+    if (alGuardarConfiguracion != null) {
+      return alGuardarConfiguracion!(sesion, id, permiso, habilitadas);
+    }
+    final nueva = PreferenciaNotificaciones(
+      idDispositivo: id,
+      permiso: permiso,
+      habilitadas: habilitadas,
+      actualizadaEn: DateTime.utc(2026, 11, 21, 22),
+    );
+    preferenciasDispositivo['${sesion.suministro}/$id'] = nueva;
+    return nueva;
+  }
+
   int ingresos = 0;
   int consultas = 0;
   int salidas = 0;
